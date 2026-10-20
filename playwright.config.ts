@@ -22,7 +22,9 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1400, height: 1000 } } }],
   webServer: {
-    command: `npm run site:build && npm run site:preview -- --port ${PORT}`,
+    // Astro 7.4 runs `astro preview` in the background when it detects an AI agent.
+    // That mode does not work with `--root site`. `--ignore-lock` keeps the server in the foreground.
+    command: `npm run site:build && npm run site:preview -- --port ${PORT} --ignore-lock`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

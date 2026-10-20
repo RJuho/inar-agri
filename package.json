@@ -9,20 +9,23 @@
     "typecheck": "tsc --noEmit",
     "site:sync": "node scripts/sync-site-data.ts",
     "site:dev": "npm run site:sync && astro dev --root site",
-    "site:build": "npm run site:sync && astro build --root site",
+    "site:build": "npm run site:sync && astro build --root site && node scripts/check-dist.ts",
     "site:preview": "astro preview --root site",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "cf:preview": "npm run site:build && wrangler dev",
+    "deploy": "npm run site:build && wrangler deploy"
   },
   "devDependencies": {
     "@duckdb/node-api": "1.5.6-r.1",
     "@playwright/test": "1.64.1",
     "@types/node": "^24.0.0",
     "typescript": "^5.9.0",
-    "valibot": "1.5.0"
+    "valibot": "1.5.0",
+    "wrangler": "4.151.3"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "1.32.0",
-    "astro": "7.1.1",
+    "astro": "7.4.1",
     "echarts": "^6.1.0"
   }
 }

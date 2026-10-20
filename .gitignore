@@ -9,3 +9,4 @@ site/.astro/
 site/public/data/
 test-results/
 playwright-report/
+.wrangler/

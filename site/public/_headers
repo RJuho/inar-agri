@@ -1,0 +1,8 @@
+# Cache rules for Cloudflare Workers static assets.
+# Astro puts a content hash in each file name in /_astro/, so these files do not change.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The Parquet files change when we rebuild the database.
+/data/*
+  Cache-Control: public, max-age=3600

@@ -84,11 +84,15 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 
 ## Website (`site/`)
 
-- Static Astro site. Apache ECharts draws the charts. DuckDB-WASM reads the Parquet files in the browser. Vanilla TypeScript and vanilla CSS only. Do not add a UI framework.
+- Static Astro site (Astro 7.4.1). Apache ECharts draws the charts. DuckDB-WASM reads the Parquet files in the browser. Vanilla TypeScript and vanilla CSS only. Do not add a UI framework.
+- Hosting: Cloudflare Workers static assets. `wrangler.jsonc` (root) serves `site/dist/`. No Worker script and no Astro adapter. `site/public/_headers` sets the cache rules: `/_astro/*` immutable for 1 year, `/data/*` 1 hour.
+- Cloudflare accepts files up to 25 MiB only. The DuckDB WASM files are 34 to 40 MB. Thus the page loads the WASM and worker files from jsDelivr (`getJsDelivrBundles()`). Do not bundle `.wasm` files. `scripts/check-dist.ts` runs in `site:build` and fails if a file in `site/dist/` is 25 MiB or larger.
 - Data flow: `npm run build:db` writes `db/*.parquet`. `npm run site:sync` (`scripts/sync-site-data.ts`) copies them to `site/public/data/` (not in git). The page fetches the files, registers them in DuckDB-WASM and runs SQL.
+- At start, `db.ts` makes table `obs`: all columns of `observations.parquet` plus `tl`, the period start in site local time (`ts_start` + `sites.utc_offset_min`). The database stays open. `query(sql)` runs SQL on it.
 - Code: `site/src/pages/index.astro` (page), `site/src/scripts/db.ts` (DuckDB-WASM start and queries), `site/src/scripts/chart.ts` (ECharts option), `site/src/styles/global.css`.
 - The first page shows all data: five panels (`nee`, `nee_f`, `ta`, `tsoil`, `swc`), one series per site, shared UTC time axis, zoom linked across panels. Labels and units come from `sites.parquet` and `variables.parquet`.
 - The chart container gets `data-status="ready"`, `data-rows` and `data-series` when the chart is drawn. Tests use these attributes.
-- Commands: `npm run site:dev`, `npm run site:build`, `npm run site:preview`, `npm run test:e2e` (Playwright, Chromium, `tests/site.spec.ts`).
-- DuckDB-WASM downloads the parquet extension from `extensions.duckdb.org` at run time. The page needs internet access.
+- Commands: `npm run site:dev`, `npm run site:build`, `npm run site:preview`, `npm run test:e2e` (Playwright, Chromium, `tests/site.spec.ts`), `npm run cf:preview` (build, then `wrangler dev` on the local Workers runtime), `npm run deploy` (build, then `wrangler deploy`; needs a Cloudflare login).
+- Astro 7.4 runs `astro preview` in the background when it detects an AI agent, and that mode fails with `--root site`. Add `--ignore-lock` to keep it in the foreground. The Playwright config does this.
+- The page needs internet access: DuckDB-WASM comes from jsDelivr, and the parquet extension comes from `extensions.duckdb.org`.
 - To add a chart: add a query in `db.ts`, an option builder in `site/src/scripts/`, and a container in the page.

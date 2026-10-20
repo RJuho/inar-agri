@@ -3,11 +3,14 @@
 // in-browser DuckDB and reads them with SQL. The files are small (about 8 MB),
 // so we register full buffers. This works on all static hosts and does not
 // need HTTP range requests.
+//
+// The WASM and worker files come from jsDelivr, not from our own host.
+// Cloudflare Workers static assets accept files up to 25 MiB only, and the
+// DuckDB WASM files are 34 to 40 MB.
+//
+// DuckDB-WASM loads the parquet extension from extensions.duckdb.org.
+// A later option is to host the extension and set `custom_extension_repository`.
 import * as duckdb from '@duckdb/duckdb-wasm';
-import mvpWasm from '@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url';
-import mvpWorker from '@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url';
-import ehWasm from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url';
-import ehWorker from '@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url';
 import type { Table, Vector } from 'apache-arrow';
 
 /** Variables that the first page shows, in panel order. */
@@ -65,17 +68,67 @@ async function fetchBuffer(file: string): Promise<Uint8Array> {
   return new Uint8Array(await res.arrayBuffer());
 }
 
-/** Start DuckDB-WASM. selectBundle picks the EH build when the browser supports WASM exceptions. */
+/**
+ * Start DuckDB-WASM with the jsDelivr bundles.
+ * selectBundle picks the EH build when the browser supports WASM exceptions.
+ * A worker script must come from the page origin, so we start it through a
+ * small blob script that calls importScripts() on the jsDelivr URL.
+ */
 async function startDuckDB(): Promise<duckdb.AsyncDuckDB> {
-  const bundle = await duckdb.selectBundle({
-    mvp: { mainModule: mvpWasm, mainWorker: mvpWorker },
-    eh: { mainModule: ehWasm, mainWorker: ehWorker },
-  });
+  const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
   if (!bundle.mainWorker) throw new Error('No DuckDB worker bundle found.');
-  const worker = new Worker(bundle.mainWorker);
-  const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker);
-  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-  return db;
+  const workerUrl = URL.createObjectURL(
+    new Blob([`importScripts(${JSON.stringify(bundle.mainWorker)});`], { type: 'text/javascript' }),
+  );
+  try {
+    const worker = new Worker(workerUrl);
+    const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker);
+    await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+    return db;
+  } finally {
+    URL.revokeObjectURL(workerUrl);
+  }
+}
+
+let dbPromise: Promise<duckdb.AsyncDuckDB> | null = null;
+
+/**
+ * Start DuckDB one time and load the data.
+ * Table `obs` has all columns of observations.parquet plus `tl`:
+ * the start of the period in site local time (ts_start + utc_offset_min).
+ * The database stays open for later queries.
+ */
+function getDB(): Promise<duckdb.AsyncDuckDB> {
+  dbPromise ??= (async () => {
+    const [db, buffers] = await Promise.all([startDuckDB(), Promise.all(PARQUET_FILES.map(fetchBuffer))]);
+    await Promise.all(PARQUET_FILES.map((f, i) => db.registerFileBuffer(f, buffers[i])));
+    const conn = await db.connect();
+    try {
+      await conn.query(
+        `CREATE TABLE obs AS
+         SELECT o.*, o.ts_start + to_minutes(s.utc_offset_min::INT) AS tl
+         FROM 'observations.parquet' o JOIN 'sites.parquet' s USING (site_id)`,
+      );
+    } finally {
+      await conn.close();
+    }
+    return db;
+  })();
+  dbPromise.catch(() => {
+    dbPromise = null;
+  });
+  return dbPromise;
+}
+
+/** Run one SQL query on the open database and return an Arrow table. */
+export async function query(sql: string): Promise<Table> {
+  const db = await getDB();
+  const conn = await db.connect();
+  try {
+    return await conn.query(sql);
+  } finally {
+    await conn.close();
+  }
 }
 
 /** Copy an Arrow number column into a Float64Array. NULL becomes NaN. */
@@ -146,8 +199,7 @@ function splitBySite(siteIds: Float64Array, t: Float64Array, cols: Record<PlotVa
 
 /** Load all data of the harmonised database for the first page. */
 export async function loadDataset(): Promise<Dataset> {
-  const [db, buffers] = await Promise.all([startDuckDB(), Promise.all(PARQUET_FILES.map(fetchBuffer))]);
-  await Promise.all(PARQUET_FILES.map((f, i) => db.registerFileBuffer(f, buffers[i])));
+  const db = await getDB();
   const conn = await db.connect();
   try {
     const sitesTable = await conn.query(
@@ -175,7 +227,7 @@ export async function loadDataset(): Promise<Dataset> {
     // Cast to DOUBLE: Arrow gives BigInt for BIGINT, and ECharts needs numbers.
     const obs = await conn.query(
       `SELECT site_id::DOUBLE AS site_id, epoch_ms(ts_start)::DOUBLE AS t, ${PLOT_VARIABLES.join(', ')}
-       FROM 'observations.parquet' ORDER BY site_id, ts_start`,
+       FROM obs ORDER BY site_id, ts_start`,
     );
     const n = obs.numRows;
     const cols = Object.fromEntries(PLOT_VARIABLES.map((v) => [v, toFloat64(obs.getChild(v), n)])) as Record<PlotVariable, Float64Array>;
@@ -183,6 +235,5 @@ export async function loadDataset(): Promise<Dataset> {
     return { sites, variables, series, rowCount: n };
   } finally {
     await conn.close();
-    await db.terminate();
   }
 }

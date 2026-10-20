@@ -1,0 +1,12 @@
+// Cloudflare Workers configuration. The Worker serves only static assets
+// from the Astro build. There is no Worker script.
+// Preview: npm run cf:preview. Deploy: npm run deploy.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "inar-agri",
+  "compatibility_date": "2026-10-20",
+  "assets": {
+    "directory": "./site/dist",
+    "html_handling": "auto-trailing-slash"
+  }
+}
