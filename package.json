@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "screenshot": "node scripts/screenshot.ts",
     "cf:preview": "npm run site:build && wrangler dev",
-    "deploy": "npm run site:build && wrangler deploy"
+    "deploy": "npm run site:build && wrangler deploy",
+    "wrangler": "wrangler"
   },
   "devDependencies": {
     "@duckdb/node-api": "1.5.6-r.1",
