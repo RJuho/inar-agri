@@ -75,3 +75,9 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Viikki EC files: `read_csv(path, delim=';', decimal_separator=',', timestampformat='%-d.%-m.%Y %-H:%M')` or parse `Datetime` with `strptime(Datetime, '%d.%m.%Y %H:%M')`.
 - `YYYYMMDDHHMM` timestamps (Qvidja, Maktau): read as VARCHAR or BIGINT, then `strptime(CAST(col AS VARCHAR), '%Y%m%d%H%M')`.
 - Example: `SELECT * FROM read_csv('data/Haltiala/haltiala.csv', nullstr='NA') LIMIT 5;`
+
+## Harmonised database (`db/`)
+
+- Design and rules: `docs/harmonised-database.md`. Build: `npm run build:db` (runs `scripts/build-db.ts`, DuckDB + Valibot, about 12 s). Registry of sites, files and column mappings: `scripts/lib/registry.ts`.
+- Output: `db/observations.parquet` (one row per site and 30-min period, UTC `ts_start`, strict core columns `nee`, `nee_f`, `nee_qc`, `ta`, `tsoil`, `swc`), `db/sites.parquet` (geolocation index), `db/variables.parquet`, `db/site_variables.parquet`, `db/report.md`.
+- The Parquet files are not in git. Run the build to create them. Read the report for counts, conflicts and warnings.

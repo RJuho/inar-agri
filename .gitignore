@@ -2,3 +2,5 @@
 data/*
 .agents/skills/*
 .claude/skills/*
+node_modules/
+db/*.parquet
