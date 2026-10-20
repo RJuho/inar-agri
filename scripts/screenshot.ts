@@ -108,7 +108,7 @@ async function reachable(url: string): Promise<boolean> {
   }
   for (const candidate of urls) {
     try {
-      const res = await fetch(candidate, { signal: AbortSignal.timeout(3000) });
+      const res = await fetch(candidate, { signal: AbortSignal.timeout(10000) });
       if (res.status < 500) return true;
     } catch {
       // Try the next address.
