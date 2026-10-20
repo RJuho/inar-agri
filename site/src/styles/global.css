@@ -202,6 +202,83 @@ select:disabled {
   padding: 2px 8px;
 }
 
+/* "Download data" menu. The menu opens below the button, at the end side. */
+.data-menu {
+  position: relative;
+}
+
+.data-menu > button::after {
+  content: '';
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: 0.15em;
+  border: 4px solid transparent;
+  border-top-color: currentColor;
+  border-bottom: none;
+}
+
+.menu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 15rem;
+  max-width: calc(100vw - 32px);
+  padding: 4px;
+  border: 1px solid var(--axis-line);
+  border-radius: 8px;
+  background: var(--surface-raised);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.14);
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.menu.menu-start {
+  right: auto;
+  left: 0;
+}
+
+.menu [role='group'] + [role='group'] {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--grid-line);
+}
+
+.menu-label {
+  padding: 4px 8px 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.menu-item {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 16px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: var(--grid-line);
+}
+
+.menu-item:focus-visible {
+  outline-offset: -2px;
+}
+
+.menu-ext {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---------- Parameter form ---------- */
 
 .params {

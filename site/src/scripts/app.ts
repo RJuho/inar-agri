@@ -20,7 +20,8 @@ import {
   viewToHash,
 } from './state';
 import { DiagramList } from './ui/diagrams';
-import { compositePng, DEFAULT_SCALE, diagramPng, download, slug, type PngResult } from './export';
+import { compositePng, DEFAULT_SCALE, diagramPng, download, downloadBlob, slug, type PngResult } from './export';
+import { exportData, sizeText, type DataFormat, type DataScope } from './dataexport';
 import { ParamsForm } from './ui/params';
 import { Tabs } from './ui/tabs';
 
@@ -127,6 +128,7 @@ export async function start(): Promise<void> {
     downloadAll() {
       void savePng('all');
     },
+    downloadData: (scope, format) => saveData(scope, format),
   });
 
   const form = new ParamsForm(byId('params'), meta, (params) => {
@@ -136,14 +138,34 @@ export async function start(): Promise<void> {
     commit();
   });
 
-  /** Show a short message in the status line, then the normal text again. */
-  const flash = (text: string, error = false) => {
+  /** Show a message in the status line. After `ms` (0 = never), show the normal text again. */
+  let flashTimer: ReturnType<typeof setTimeout> | undefined;
+  const flash = (text: string, error = false, ms = 4000) => {
+    clearTimeout(flashTimer);
     statusEl.textContent = text;
     statusEl.classList.toggle('error', error);
-    setTimeout(() => {
-      statusEl.textContent = baseStatus;
-      statusEl.classList.remove('error');
-    }, 4000);
+    if (ms > 0) {
+      flashTimer = setTimeout(() => {
+        statusEl.textContent = baseStatus;
+        statusEl.classList.remove('error');
+      }, ms);
+    }
+  };
+
+  /** Make the data file of the active view in the browser and save it. */
+  const saveData = async (scope: DataScope, format: DataFormat) => {
+    const view = activeView(store);
+    const what = `${format === 'csv' ? 'CSV' : 'Parquet'} ${scope === 'one' ? 'file' : 'files (one per site, ZIP)'}`;
+    flash(`Making the ${what} for view ${view.name}…`, false, 0);
+    try {
+      const file = await exportData(view, meta, scope, format);
+      downloadBlob(new Blob([file.bytes], { type: file.mime }), file.fileName);
+      const parts = file.files > 1 ? `${file.files} files, ` : '';
+      flash(`Saved ${file.fileName}: ${sizeText(file.bytes.length)}, ${parts}${fmt(file.rows)} rows.`, false, 10_000);
+    } catch (err) {
+      console.warn(err);
+      flash(`Cannot make the data file: ${err instanceof Error ? err.message : String(err)}`, true, 10_000);
+    }
   };
 
   /** PNG of one diagram (id or index) or of all diagrams ("all") of the active view. */

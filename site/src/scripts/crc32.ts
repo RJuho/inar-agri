@@ -1,5 +1,5 @@
 // CRC-32 (ISO 3309, polynomial 0xEDB88320), as PNG chunks and ZIP entries use it.
-// png.ts uses it for the iTXt chunks. The ZIP writer of the data export can use it too.
+// png.ts uses it for the iTXt chunks. zip.ts uses it for the ZIP entries of the data export.
 
 let table: Uint32Array | null = null;
 

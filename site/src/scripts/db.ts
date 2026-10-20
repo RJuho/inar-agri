@@ -181,3 +181,23 @@ export async function loadMeta(): Promise<Meta> {
     rowCount: Number(range.getChild('n')?.get(0)),
   };
 }
+
+let copySeq = 0;
+
+/**
+ * Run `COPY (<selectSql>) TO '<file>' (<options>)` in the virtual file system of
+ * DuckDB-WASM and return the bytes of the file. The file is dropped after the read.
+ * The work stays in the browser: no file goes to a server.
+ */
+export async function copyToBuffer(selectSql: string, options: string, ext: string): Promise<Uint8Array<ArrayBuffer>> {
+  const db = await getDB();
+  const file = `export-${++copySeq}.${ext}`;
+  const conn = await db.connect();
+  try {
+    await conn.query(`COPY (${selectSql}) TO '${file}' (${options})`);
+    return (await db.copyFileToBuffer(file)) as Uint8Array<ArrayBuffer>;
+  } finally {
+    await conn.close();
+    await db.dropFile(file).catch(() => null);
+  }
+}

@@ -1,5 +1,8 @@
-// Tab list: one tab per view, and the buttons New, Copy, Rename, Delete, Copy link and Download all.
+// Tab list: one tab per view, and the buttons New, Copy, Rename, Delete, Copy link, Download all
+// and Download data (menu).
+import type { DataFormat, DataScope } from '../dataexport';
 import { activeView, canAddView, type Store } from '../state';
+import { DataMenu } from './dataMenu';
 
 export interface TabActions {
   activate(id: string): void;
@@ -10,6 +13,8 @@ export interface TabActions {
   copyLink(): void;
   /** Download one PNG image with all diagrams of the selected view. */
   downloadAll(): void;
+  /** Make and save the data of the selected view. The promise ends when the file is saved. */
+  downloadData(scope: DataScope, format: DataFormat): Promise<void>;
 }
 
 function button(text: string, cls: string, onClick: () => void, title?: string): HTMLButtonElement {
@@ -26,11 +31,15 @@ export class Tabs {
   /** Id of the view whose name is in edit mode, or null. */
   private renaming: string | null = null;
   private store: Store | null = null;
+  /** The menu stays the same element across renders, so that its state (open, busy) stays. */
+  private readonly dataMenu: DataMenu;
 
   constructor(
     private readonly el: HTMLElement,
     private readonly actions: TabActions,
-  ) {}
+  ) {
+    this.dataMenu = new DataMenu((scope, format) => this.actions.downloadData(scope, format));
+  }
 
   render(store: Store): void {
     this.store = store;
@@ -74,7 +83,9 @@ export class Tabs {
     all.disabled = activeView(store).diagrams.length === 0;
     link.dataset.action = 'link';
     all.dataset.action = 'png-all';
-    tools.append(add, copy, rename, del, link, all);
+    const params = activeView(store).params;
+    this.dataMenu.setEnabled(params.sites.length > 0 && params.variables.length > 0);
+    tools.append(add, copy, rename, del, link, all, this.dataMenu.el);
 
     this.el.replaceChildren(list, tools);
     if (this.renaming) {

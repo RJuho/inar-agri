@@ -268,7 +268,11 @@ export async function compositePng(view: View, meta: Meta, items: ExportItem[], 
 
 /** Save a data URL as a file through a temporary link. */
 export function download(dataUrl: string, fileName: string): void {
-  const blob = new Blob([dataUrlToBytes(dataUrl) as Uint8Array<ArrayBuffer>], { type: 'image/png' });
+  downloadBlob(new Blob([dataUrlToBytes(dataUrl) as Uint8Array<ArrayBuffer>], { type: 'image/png' }), fileName);
+}
+
+/** Save a Blob as a file through a temporary link. */
+export function downloadBlob(blob: Blob, fileName: string): void {
   const href = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = href;

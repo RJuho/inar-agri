@@ -2,7 +2,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import { DuckDBInstance } from '@duckdb/node-api';
 import { execFile } from 'node:child_process';
-import { readFile, rm } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import zlib from 'node:zlib';
 import { dirname, join } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -457,4 +458,253 @@ test('screenshot script writes a PNG and an alt text file', async ({ baseURL }) 
   expect(pngText(png).Description).toBe(alt);
   expect(alt).toContain('Monthly means');
   expect(alt).toContain('Cumulative NEE');
+});
+
+// ---------- Data export ----------
+
+/** Hosts that the page may call: the page origin, jsDelivr (DuckDB-WASM) and the DuckDB extension host. */
+const ALLOWED_HOSTS = new Set(['cdn.jsdelivr.net', 'extensions.duckdb.org']);
+
+/** Collect the requests to other hosts. blob: and data: URLs stay in the browser. */
+function trackForeignRequests(page: Page, origin: string): string[] {
+  const foreign: string[] = [];
+  page.on('request', (req) => {
+    const url = req.url();
+    if (url.startsWith('data:')) return;
+    const u = new URL(url);
+    const host = u.protocol === 'blob:' ? new URL(u.pathname).host : u.host;
+    const own = u.protocol === 'blob:' ? new URL(u.pathname).origin === origin : u.origin === origin;
+    if (!own && !ALLOWED_HOSTS.has(host)) foreign.push(url);
+  });
+  return foreign;
+}
+
+/** Open the "Download data" menu, pick one item and return the saved file. */
+async function downloadData(page: Page, item: string): Promise<{ name: string; bytes: Buffer }> {
+  await page.locator('[data-action="data"]').click();
+  await expect(page.getByRole('menu')).toBeVisible();
+  const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 120_000 }), page.locator(`[data-export="${item}"]`).click()]);
+  const bytes = await readFile(await dl.path());
+  await expect(page.locator('#status')).toContainText(`Saved ${dl.suggestedFilename()}`);
+  await expect(page.locator('[data-action="data"]')).toBeEnabled();
+  return { name: dl.suggestedFilename(), bytes };
+}
+
+/** Parse a CSV file without quoted fields (the site names have no comma). Returns the header and the rows. */
+function parseCsv(bytes: Buffer): { header: string[]; rows: string[][] } {
+  const lines = bytes.toString('utf8').replace(/\r?\n$/, '').split(/\r?\n/);
+  const header = (lines.shift() ?? '').split(',');
+  return { header, rows: lines.map((l) => l.split(',')) };
+}
+
+/** Read the entries of a store-only ZIP file through its central directory. Checks the CRC-32 of each entry. */
+function readZip(zip: Buffer): Array<{ name: string; data: Buffer }> {
+  const eocd = zip.length - 22;
+  expect(zip.readUInt32LE(eocd)).toBe(0x06054b50);
+  const count = zip.readUInt16LE(eocd + 10);
+  let p = zip.readUInt32LE(eocd + 16);
+  const out: Array<{ name: string; data: Buffer }> = [];
+  for (let i = 0; i < count; i++) {
+    expect(zip.readUInt32LE(p)).toBe(0x02014b50);
+    expect(zip.readUInt16LE(p + 10)).toBe(0); // stored
+    const crc = zip.readUInt32LE(p + 16);
+    const size = zip.readUInt32LE(p + 20);
+    const nameLen = zip.readUInt16LE(p + 28);
+    const offset = zip.readUInt32LE(p + 42);
+    const name = zip.subarray(p + 46, p + 46 + nameLen).toString('utf8');
+    const local = offset + 30 + zip.readUInt16LE(offset + 26) + zip.readUInt16LE(offset + 28);
+    const data = zip.subarray(local, local + size);
+    expect(zlib.crc32(data)).toBe(crc);
+    out.push({ name, data });
+    p += 46 + nameLen;
+  }
+  return out;
+}
+
+/** Read a Parquet file with DuckDB (Node): rows, column names, rows per site and the key/value metadata. */
+async function readParquet(bytes: Buffer, name: string) {
+  const path = join('test-results', 'data-export', name);
+  await mkdir(dirname(path), { recursive: true });
+  await writeFile(path, bytes);
+  const instance = await DuckDBInstance.create(':memory:');
+  const conn = await instance.connect();
+  try {
+    const get = async (sql: string) => (await conn.runAndReadAll(sql)).getRowObjects();
+    const n = Number((await get(`SELECT count(*)::INTEGER AS n FROM read_parquet('${path}')`))[0]?.n);
+    const columns = (await get(`DESCRIBE SELECT * FROM read_parquet('${path}')`)).map((r) => String(r.column_name));
+    const perSite = Object.fromEntries(
+      (await get(`SELECT site_code, count(*)::INTEGER AS n FROM read_parquet('${path}') GROUP BY ALL`)).map((r) => [String(r.site_code), Number(r.n)]),
+    );
+    const kv = Object.fromEntries(
+      (await get(`SELECT decode(key) AS k, decode(value) AS v FROM parquet_kv_metadata('${path}')`)).map((r) => [String(r.k), String(r.v)]),
+    );
+    return { n, columns, perSite, kv };
+  } finally {
+    conn.closeSync();
+    instance.closeSync();
+  }
+}
+
+const DATA_VIEW = {
+  id: 'data1',
+  name: 'Data view',
+  params: { sites: [3, 4], variables: ['nee_f', 'ta'], xVariable: 'ta', yearFrom: 2022, yearTo: 2023, aggregation: 'day' },
+  diagrams: [{ id: 't1', type: 'timeseries' }],
+};
+
+test.describe('data export', () => {
+  test.describe.configure({ timeout: 300_000 });
+  let errors: string[];
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    errors = trackErrors(page);
+    foreign = trackForeignRequests(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+
+  test('menu opens and closes with the mouse and the keyboard', async ({ page }) => {
+    await page.goto('/');
+    await waitReady(page);
+    const button = page.locator('[data-action="data"]');
+    const menu = page.getByRole('menu');
+    await expect(button).toHaveAttribute('aria-haspopup', 'menu');
+    await expect(menu).toBeHidden();
+
+    await button.click();
+    await expect(menu).toBeVisible();
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('menuitem')).toHaveCount(4);
+    await expect(page.locator('[data-export="one-parquet"]')).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('[data-export="one-csv"]')).toBeFocused();
+    await page.keyboard.press('End');
+    await expect(page.locator('[data-export="sites-csv"]')).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('[data-export="one-parquet"]')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    await expect(button).toBeFocused();
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+
+    // Arrow Up opens the menu on the last item. A click outside closes it.
+    await page.keyboard.press('ArrowUp');
+    await expect(page.locator('[data-export="sites-csv"]')).toBeFocused();
+    await page.locator('h1').click();
+    await expect(menu).toBeHidden();
+
+    // Enter on an item starts the export.
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(menu).toBeVisible();
+    await page.keyboard.press('ArrowDown');
+    const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 120_000 }), page.keyboard.press('Enter')]);
+    expect(dl.suggestedFilename()).toMatch(/^inar-agri_all-data_\d{4}-\d{4}_raw\.csv$/);
+
+    // No site: the button is disabled.
+    for (const box of await page.locator('input[name="site"]').all()) await box.uncheck();
+    await expect(button).toBeDisabled();
+  });
+
+  test('default view: all four options give the full data', async ({ page }) => {
+    await page.goto('/');
+    await waitReady(page);
+    const expected = await parquetRowCount(OBS_FILE);
+    await expect(page.locator('#chart')).toHaveAttribute('data-rows', String(expected));
+    const columns = ['site_code', 'site_name', 'ts_start_utc', 'ts_local', 'nee', 'nee_f', 'ta', 'tsoil', 'swc', 'nee_qc'];
+    const codes = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'];
+    const sizes: Record<string, number> = {};
+
+    const csv = await downloadData(page, 'one-csv');
+    expect(csv.name).toMatch(/^inar-agri_all-data_\d{4}-\d{4}_raw\.csv$/);
+    sizes[csv.name] = csv.bytes.length;
+    const table = parseCsv(csv.bytes);
+    expect(table.header).toEqual(columns);
+    expect(table.rows.length).toBe(expected);
+    expect(table.rows.every((r) => r.length === columns.length)).toBe(true);
+    const first = table.rows[0] as string[];
+    expect(first[2]).toMatch(/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/);
+    expect(first[3]).toMatch(/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d$/);
+    expect(table.rows.some((r) => r.includes(''))).toBe(true); // NULL = empty field
+    expect(table.rows.find((r) => r[0] === 'sarkisuo')?.[1]).toBe('Särkisuo'); // UTF-8
+
+    const pq = await downloadData(page, 'one-parquet');
+    expect(pq.name).toBe(csv.name.replace(/\.csv$/, '.parquet'));
+    sizes[pq.name] = pq.bytes.length;
+    const info = await readParquet(pq.bytes, pq.name);
+    expect(info.n).toBe(expected);
+    expect(info.columns).toEqual(columns);
+    expect(info.kv['unit:nee']).toBe('µmol CO2 m-2 s-1');
+    expect(info.kv['unit:ta']).toBe('°C');
+    const csvPerSite: Record<string, number> = {};
+    for (const r of table.rows) csvPerSite[r[0] as string] = (csvPerSite[r[0] as string] ?? 0) + 1;
+    expect(info.perSite).toEqual(csvPerSite);
+
+    for (const format of ['csv', 'parquet'] as const) {
+      const zip = await downloadData(page, `sites-${format}`);
+      expect(zip.name).toBe(csv.name.replace(/\.csv$/, `_${format}.zip`));
+      sizes[zip.name] = zip.bytes.length;
+      const entries = readZip(zip.bytes);
+      expect(entries.map((e) => e.name)).toEqual(codes.map((c) => csv.name.replace(/\.csv$/, `_${c}.${format}`)));
+      let total = 0;
+      for (const [i, e] of entries.entries()) {
+        const code = codes[i] as string;
+        if (format === 'csv') {
+          const t = parseCsv(e.data);
+          expect(t.header).toEqual(columns);
+          expect(t.rows.every((r) => r[0] === code)).toBe(true);
+          expect(t.rows.length).toBe(csvPerSite[code]);
+          total += t.rows.length;
+        } else {
+          const p = await readParquet(e.data, e.name);
+          expect(p.columns).toEqual(columns);
+          expect(p.perSite).toEqual({ [code]: csvPerSite[code] });
+          total += p.n;
+        }
+      }
+      expect(total).toBe(expected);
+    }
+    console.log('Export sizes (bytes):', JSON.stringify(sizes));
+  });
+
+  test('changed view (2 sites, daily mean, 2 years): files hold the shown rows', async ({ page }) => {
+    await page.goto('/' + viewHash(DATA_VIEW));
+    await waitReady(page);
+    // The time series diagram shows one row per site and day: the export must have the same rows.
+    const shown = Number(await page.locator('.diagram[data-type="timeseries"]').getAttribute('data-rows'));
+    expect(shown).toBeGreaterThan(600);
+    const columns = ['site_code', 'site_name', 'ts_start_utc', 'ts_local', 'nee_f', 'ta'];
+    const base = 'inar-agri_data-view_2022-2023_day';
+
+    const csv = await downloadData(page, 'one-csv');
+    expect(csv.name).toBe(`${base}.csv`);
+    const table = parseCsv(csv.bytes);
+    expect(table.header).toEqual(columns);
+    expect(table.rows.length).toBe(shown);
+    expect(new Set(table.rows.map((r) => r[0]))).toEqual(new Set(['haltiala', 'qvidja']));
+    // Daily step: local midnight, which is 22:00 UTC on the day before (UTC+2).
+    expect(table.rows.every((r) => /T00:00:00$/.test(r[3] as string) && /T22:00:00Z$/.test(r[2] as string))).toBe(true);
+    expect(table.rows.every((r) => /^202[23]-/.test(r[3] as string))).toBe(true);
+
+    const pq = await downloadData(page, 'one-parquet');
+    expect(pq.name).toBe(`${base}.parquet`);
+    const info = await readParquet(pq.bytes, pq.name);
+    expect(info.n).toBe(shown);
+    expect(info.columns).toEqual(columns);
+    expect(info.kv['step']).toBe('Daily mean');
+
+    for (const format of ['csv', 'parquet'] as const) {
+      const zip = await downloadData(page, `sites-${format}`);
+      expect(zip.name).toBe(`${base}_${format}.zip`);
+      const entries = readZip(zip.bytes);
+      expect(entries.map((e) => e.name)).toEqual([`${base}_haltiala.${format}`, `${base}_qvidja.${format}`]);
+      let total = 0;
+      for (const e of entries) total += format === 'csv' ? parseCsv(e.data).rows.length : (await readParquet(e.data, e.name)).n;
+      expect(total).toBe(shown);
+    }
+  });
 });
