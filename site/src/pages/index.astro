@@ -1,5 +1,5 @@
 ---
-// First page: all data in the harmonised database.
+// First page: views (tabs) with diagrams of the harmonised database.
 // The browser loads the Parquet files with DuckDB-WASM and draws them with ECharts.
 import '../styles/global.css';
 ---
@@ -16,45 +16,36 @@ import '../styles/global.css';
       <header>
         <h1>INAR agricultural flux sites</h1>
         <p class="lead">
-          All data in the harmonised database: net ecosystem exchange (NEE), air temperature, soil temperature and
-          soil water content at six sites, 30-minute periods. The time axis is UTC. Click a site in the legend to hide or
-          show it. Scroll or drag on the chart, or use the slider, to zoom.
+          Data in the harmonised database: net ecosystem exchange (NEE), air temperature, soil temperature and soil
+          water content at six sites, 30-minute periods. The time axis shows site local time. Each view (tab) has its
+          own data parameters and diagrams. The views stay in this browser.
         </p>
         <p id="status" class="status" role="status" aria-live="polite">Loading data…</p>
       </header>
-      <div id="chart" class="chart" data-status="loading" aria-label="Time series chart of all sites"></div>
+      <div class="toolbar">
+        <label class="field">
+          <span class="field-label">Add diagram</span>
+          <select id="add-diagram" aria-label="Add diagram">
+            <option value="">Pick a type…</option>
+          </select>
+        </label>
+      </div>
+      <nav id="tabs" class="tabs" aria-label="Views"></nav>
+      <div id="params"></div>
+      <div id="chart" class="diagrams" data-status="loading" aria-label="Diagrams"></div>
     </main>
 
     <script>
-      import { loadDataset } from '../scripts/db';
-      import { renderChart } from '../scripts/chart';
+      import { start } from '../scripts/app';
 
-      const statusEl = document.getElementById('status') as HTMLElement;
-      const chartEl = document.getElementById('chart') as HTMLElement;
-
-      // Group digits with a thin space, for example 537 980.
-      const fmt = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
-      async function main() {
-        const t0 = performance.now();
-        const data = await loadDataset();
-        const t1 = performance.now();
-        const handle = renderChart(chartEl, data);
-        const t2 = performance.now();
-        statusEl.textContent =
-          `${fmt(data.rowCount)} rows, ${data.sites.length} sites. ` +
-          `Loaded in ${((t1 - t0) / 1000).toFixed(1)} s, drawn in ${((t2 - t1) / 1000).toFixed(1)} s.`;
-        chartEl.dataset.rows = String(data.rowCount);
-        chartEl.dataset.series = String(handle.seriesCount);
-        chartEl.dataset.status = 'ready';
-      }
-
-      main().catch((err: unknown) => {
+      start().catch((err: unknown) => {
         console.error(err);
-        const msg = err instanceof Error ? err.message : String(err);
-        statusEl.textContent = `Cannot show the data: ${msg}`;
-        statusEl.classList.add('error');
-        chartEl.dataset.status = 'error';
+        const statusEl = document.getElementById('status');
+        if (statusEl) {
+          statusEl.textContent = `Cannot show the data: ${err instanceof Error ? err.message : String(err)}`;
+          statusEl.classList.add('error');
+        }
+        document.getElementById('chart')?.setAttribute('data-status', 'error');
       });
     </script>
   </body>

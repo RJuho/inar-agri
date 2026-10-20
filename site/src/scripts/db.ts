@@ -13,13 +13,6 @@
 import * as duckdb from '@duckdb/duckdb-wasm';
 import type { Table, Vector } from 'apache-arrow';
 
-/** Variables that the first page shows, in panel order. */
-export const PLOT_VARIABLES = ['nee', 'nee_f', 'ta', 'tsoil', 'swc'] as const;
-export type PlotVariable = (typeof PLOT_VARIABLES)[number];
-
-/** Length of one averaging period in milliseconds (30 min). */
-const STEP_MS = 30 * 60 * 1000;
-
 const PARQUET_FILES = ['observations.parquet', 'sites.parquet', 'variables.parquet'] as const;
 
 export interface Site {
@@ -30,26 +23,19 @@ export interface Site {
   utcOffsetMin: number;
 }
 
-export interface Variable {
+export interface VariableInfo {
   name: string;
   unit: string;
   description: string;
 }
 
-/**
- * Column data for one site. All arrays have the same length.
- * `t` is UTC epoch milliseconds. NaN marks a missing value or a gap.
- */
-export interface SiteSeries {
-  siteId: number;
-  t: Float64Array;
-  values: Record<PlotVariable, Float64Array>;
-}
-
-export interface Dataset {
+/** Facts about the data that the UI needs: sites, variable units, year range. */
+export interface Meta {
   sites: Site[];
-  variables: Map<string, Variable>;
-  series: SiteSeries[];
+  variables: Map<string, VariableInfo>;
+  /** First and last year in site local time. */
+  yearMin: number;
+  yearMax: number;
   /** Number of rows in observations.parquet. */
   rowCount: number;
 }
@@ -132,7 +118,7 @@ export async function query(sql: string): Promise<Table> {
 }
 
 /** Copy an Arrow number column into a Float64Array. NULL becomes NaN. */
-function toFloat64(vec: Vector | null, length: number): Float64Array {
+export function toFloat64(vec: Vector | null, length: number): Float64Array {
   const out = new Float64Array(length);
   if (!vec) {
     out.fill(Number.NaN);
@@ -160,80 +146,38 @@ function stringAt(table: Table, column: string, row: number): string {
   return v == null ? '' : String(v);
 }
 
-/**
- * Split the sorted rows into one block per site.
- * Where the time step between two rows is longer than 30 min, add one NaN row.
- * ECharts then draws a gap there and does not join the two ends.
- */
-function splitBySite(siteIds: Float64Array, t: Float64Array, cols: Record<PlotVariable, Float64Array>): SiteSeries[] {
-  const result: SiteSeries[] = [];
-  const n = siteIds.length;
-  let start = 0;
-  while (start < n) {
-    const id = siteIds[start];
-    let end = start;
-    let gaps = 0;
-    while (end < n && siteIds[end] === id) {
-      if (end > start && t[end] - t[end - 1] > STEP_MS) gaps++;
-      end++;
-    }
-    const len = end - start + gaps;
-    const st = new Float64Array(len);
-    const sv = Object.fromEntries(PLOT_VARIABLES.map((k) => [k, new Float64Array(len)])) as Record<PlotVariable, Float64Array>;
-    let k = 0;
-    for (let i = start; i < end; i++) {
-      if (i > start && t[i] - t[i - 1] > STEP_MS) {
-        st[k] = t[i - 1] + STEP_MS;
-        for (const v of PLOT_VARIABLES) sv[v][k] = Number.NaN;
-        k++;
-      }
-      st[k] = t[i];
-      for (const v of PLOT_VARIABLES) sv[v][k] = cols[v][i];
-      k++;
-    }
-    result.push({ siteId: id, t: st, values: sv });
-    start = end;
+/** Load the sites, the variable units and the year range. */
+export async function loadMeta(): Promise<Meta> {
+  const sitesTable = await query(
+    `SELECT site_id::INTEGER AS site_id, code, name, country, utc_offset_min::INTEGER AS utc_offset_min
+     FROM 'sites.parquet' ORDER BY site_id`,
+  );
+  const sites: Site[] = [];
+  for (let i = 0; i < sitesTable.numRows; i++) {
+    sites.push({
+      siteId: Number(sitesTable.getChild('site_id')?.get(i)),
+      code: stringAt(sitesTable, 'code', i),
+      name: stringAt(sitesTable, 'name', i),
+      country: stringAt(sitesTable, 'country', i),
+      utcOffsetMin: Number(sitesTable.getChild('utc_offset_min')?.get(i)),
+    });
   }
-  return result;
-}
 
-/** Load all data of the harmonised database for the first page. */
-export async function loadDataset(): Promise<Dataset> {
-  const db = await getDB();
-  const conn = await db.connect();
-  try {
-    const sitesTable = await conn.query(
-      `SELECT site_id::INTEGER AS site_id, code, name, country, utc_offset_min::INTEGER AS utc_offset_min
-       FROM 'sites.parquet' ORDER BY site_id`,
-    );
-    const sites: Site[] = [];
-    for (let i = 0; i < sitesTable.numRows; i++) {
-      sites.push({
-        siteId: Number(sitesTable.getChild('site_id')?.get(i)),
-        code: stringAt(sitesTable, 'code', i),
-        name: stringAt(sitesTable, 'name', i),
-        country: stringAt(sitesTable, 'country', i),
-        utcOffsetMin: Number(sitesTable.getChild('utc_offset_min')?.get(i)),
-      });
-    }
-
-    const varTable = await conn.query(`SELECT column_name, unit, description FROM 'variables.parquet'`);
-    const variables = new Map<string, Variable>();
-    for (let i = 0; i < varTable.numRows; i++) {
-      const name = stringAt(varTable, 'column_name', i);
-      variables.set(name, { name, unit: stringAt(varTable, 'unit', i), description: stringAt(varTable, 'description', i) });
-    }
-
-    // Cast to DOUBLE: Arrow gives BigInt for BIGINT, and ECharts needs numbers.
-    const obs = await conn.query(
-      `SELECT site_id::DOUBLE AS site_id, epoch_ms(ts_start)::DOUBLE AS t, ${PLOT_VARIABLES.join(', ')}
-       FROM obs ORDER BY site_id, ts_start`,
-    );
-    const n = obs.numRows;
-    const cols = Object.fromEntries(PLOT_VARIABLES.map((v) => [v, toFloat64(obs.getChild(v), n)])) as Record<PlotVariable, Float64Array>;
-    const series = splitBySite(toFloat64(obs.getChild('site_id'), n), toFloat64(obs.getChild('t'), n), cols);
-    return { sites, variables, series, rowCount: n };
-  } finally {
-    await conn.close();
+  const varTable = await query(`SELECT column_name, unit, description FROM 'variables.parquet'`);
+  const variables = new Map<string, VariableInfo>();
+  for (let i = 0; i < varTable.numRows; i++) {
+    const name = stringAt(varTable, 'column_name', i);
+    variables.set(name, { name, unit: stringAt(varTable, 'unit', i), description: stringAt(varTable, 'description', i) });
   }
+
+  const range = await query(
+    `SELECT year(min(tl))::INTEGER AS y0, year(max(tl))::INTEGER AS y1, count(*)::INTEGER AS n FROM obs`,
+  );
+  return {
+    sites,
+    variables,
+    yearMin: Number(range.getChild('y0')?.get(0)),
+    yearMax: Number(range.getChild('y1')?.get(0)),
+    rowCount: Number(range.getChild('n')?.get(0)),
+  };
 }
