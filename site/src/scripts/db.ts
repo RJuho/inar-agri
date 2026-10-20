@@ -4,12 +4,16 @@
 // so we register full buffers. This works on all static hosts and does not
 // need HTTP range requests.
 //
-// The WASM and worker files come from jsDelivr, not from our own host.
-// Cloudflare Workers static assets accept files up to 25 MiB only, and the
-// DuckDB WASM files are 34 to 40 MB.
-//
-// DuckDB-WASM loads the parquet extension from extensions.duckdb.org.
-// A later option is to host the extension and set `custom_extension_repository`.
+// All DuckDB files come from our own origin. The page makes no requests to
+// other hosts. scripts/sync-site-duckdb.ts copies them from the npm package
+// to public/duckdb/:
+// - <npm version>/duckdb-browser-{eh,mvp}.worker.js
+// - <npm version>/duckdb-{eh,mvp}.wasm.gz: Cloudflare Workers static assets
+//   accept files up to 25 MiB only, and the WASM files are 34 to 40 MB.
+//   Thus the files are gzip-compressed. The page decompresses them.
+// - extensions/<DuckDB version>/<platform>/parquet.duckdb_extension.wasm:
+//   the official signed parquet extension. DuckDB-WASM loads it from
+//   `custom_extension_repository`.
 import * as duckdb from '@duckdb/duckdb-wasm';
 import type { Table, Vector } from 'apache-arrow';
 
@@ -40,39 +44,69 @@ export interface Meta {
   rowCount: number;
 }
 
-/** Make the URL of a file in public/data/. It follows the Astro base path. */
-function dataUrl(file: string): string {
+/** Make an absolute URL of a path below the Astro base path. */
+function siteUrl(path: string): string {
   const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-  return new URL(`${base}data/${file}`, window.location.href).toString();
+  return new URL(`${base}${path}`, window.location.href).toString();
 }
 
 async function fetchBuffer(file: string): Promise<Uint8Array> {
-  const res = await fetch(dataUrl(file));
+  const res = await fetch(siteUrl(`data/${file}`));
   if (!res.ok) {
     throw new Error(`Cannot load ${file}: HTTP ${res.status}. Run "npm run build:db" and then the site build.`);
   }
   return new Uint8Array(await res.arrayBuffer());
 }
 
+/** The bundles in public/duckdb/. The package version in the path makes a long cache safe. */
+function localBundles(): duckdb.DuckDBBundles {
+  const dir = `duckdb/${duckdb.PACKAGE_VERSION}`;
+  return {
+    mvp: { mainModule: siteUrl(`${dir}/duckdb-mvp.wasm.gz`), mainWorker: siteUrl(`${dir}/duckdb-browser-mvp.worker.js`) },
+    eh: { mainModule: siteUrl(`${dir}/duckdb-eh.wasm.gz`), mainWorker: siteUrl(`${dir}/duckdb-browser-eh.worker.js`) },
+  };
+}
+
 /**
- * Start DuckDB-WASM with the jsDelivr bundles.
+ * Fetch the gzip-compressed WASM file and return a blob URL of the WASM module.
+ * If the host already decoded the file (no gzip magic bytes 1f 8b), we use the bytes as they are.
+ */
+async function wasmBlobUrl(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Cannot load ${url}: HTTP ${res.status}. Run "npm run site:sync".`);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  let wasm: Blob = new Blob([bytes]);
+  if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
+    wasm = await new Response(wasm.stream().pipeThrough(new DecompressionStream('gzip'))).blob();
+  }
+  return URL.createObjectURL(new Blob([wasm], { type: 'application/wasm' }));
+}
+
+/**
+ * Start DuckDB-WASM with the bundles from our own origin.
  * selectBundle picks the EH build when the browser supports WASM exceptions.
- * A worker script must come from the page origin, so we start it through a
- * small blob script that calls importScripts() on the jsDelivr URL.
  */
 async function startDuckDB(): Promise<duckdb.AsyncDuckDB> {
-  const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
+  const bundle = await duckdb.selectBundle(localBundles());
   if (!bundle.mainWorker) throw new Error('No DuckDB worker bundle found.');
-  const workerUrl = URL.createObjectURL(
-    new Blob([`importScripts(${JSON.stringify(bundle.mainWorker)});`], { type: 'text/javascript' }),
-  );
+  const wasmUrl = await wasmBlobUrl(bundle.mainModule);
   try {
-    const worker = new Worker(workerUrl);
+    const worker = new Worker(bundle.mainWorker);
     const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker);
-    await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+    await db.instantiate(wasmUrl, bundle.pthreadWorker);
+    const conn = await db.connect();
+    try {
+      // Load the extensions from our own origin, not from extensions.duckdb.org.
+      // DuckDB adds /<DuckDB version>/<platform>/<name>.duckdb_extension.wasm to this URL.
+      const repo = siteUrl('duckdb/extensions').replaceAll("'", "''");
+      await conn.query(`SET custom_extension_repository = '${repo}'`);
+      await conn.query(`LOAD parquet`);
+    } finally {
+      await conn.close();
+    }
     return db;
   } finally {
-    URL.revokeObjectURL(workerUrl);
+    URL.revokeObjectURL(wasmUrl);
   }
 }
 

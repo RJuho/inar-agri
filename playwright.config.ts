@@ -7,7 +7,7 @@ const PORT = 4321;
 export default defineConfig({
   testDir: 'tests',
   outputDir: 'test-results',
-  // DuckDB-WASM loads a large Parquet file and downloads an extension from the internet.
+  // DuckDB-WASM loads a 34 MB WASM file and an 8 MB Parquet file.
   timeout: 120_000,
   expect: { timeout: 60_000 },
   fullyParallel: false,

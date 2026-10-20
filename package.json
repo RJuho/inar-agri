@@ -7,7 +7,7 @@
   "scripts": {
     "build:db": "node scripts/build-db.ts",
     "typecheck": "tsc --noEmit",
-    "site:sync": "node scripts/sync-site-data.ts",
+    "site:sync": "node scripts/sync-site-data.ts && node scripts/sync-site-duckdb.ts",
     "site:dev": "npm run site:sync && astro dev --root site --host",
     "site:build": "npm run site:sync && astro build --root site && node scripts/check-dist.ts",
     "site:preview": "astro preview --root site",

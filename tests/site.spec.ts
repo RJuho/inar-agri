@@ -33,17 +33,45 @@ function trackErrors(page: Page): string[] {
   return errors;
 }
 
+/**
+ * Collect the requests to other origins and block them. The page loads all files
+ * (DuckDB-WASM, the parquet extension, the data) from its own origin.
+ * blob: URLs of the page origin and data: URLs stay in the browser.
+ */
+async function isolate(page: Page, origin: string): Promise<string[]> {
+  const foreign: string[] = [];
+  const own = (url: string): boolean => {
+    if (url.startsWith('data:')) return true;
+    const u = new URL(url);
+    return (u.protocol === 'blob:' ? new URL(u.pathname).origin : u.origin) === origin;
+  };
+  page.on('request', (req) => {
+    if (!own(req.url())) foreign.push(req.url());
+  });
+  await page.route(
+    (url) => !own(url.toString()),
+    (route) => route.abort('blockedbyclient'),
+  );
+  return foreign;
+}
+
 test.describe('first page', () => {
   let errors: string[];
+  let foreign: string[];
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, baseURL }) => {
     errors = trackErrors(page);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
     await page.goto('/');
     await expect(page.locator('#chart')).toHaveAttribute('data-status', 'ready', { timeout: READY_TIMEOUT });
   });
 
   test('loads without console errors or page errors', async () => {
     expect(errors).toEqual([]);
+  });
+
+  test('makes no requests to other origins', async () => {
+    expect(foreign).toEqual([]);
   });
 
   test('shows all rows of observations.parquet', async ({ page }) => {
@@ -462,23 +490,6 @@ test('screenshot script writes a PNG and an alt text file', async ({ baseURL }) 
 
 // ---------- Data export ----------
 
-/** Hosts that the page may call: the page origin, jsDelivr (DuckDB-WASM) and the DuckDB extension host. */
-const ALLOWED_HOSTS = new Set(['cdn.jsdelivr.net', 'extensions.duckdb.org']);
-
-/** Collect the requests to other hosts. blob: and data: URLs stay in the browser. */
-function trackForeignRequests(page: Page, origin: string): string[] {
-  const foreign: string[] = [];
-  page.on('request', (req) => {
-    const url = req.url();
-    if (url.startsWith('data:')) return;
-    const u = new URL(url);
-    const host = u.protocol === 'blob:' ? new URL(u.pathname).host : u.host;
-    const own = u.protocol === 'blob:' ? new URL(u.pathname).origin === origin : u.origin === origin;
-    if (!own && !ALLOWED_HOSTS.has(host)) foreign.push(url);
-  });
-  return foreign;
-}
-
 /** Open the "Download data" menu, pick one item and return the saved file. */
 async function downloadData(page: Page, item: string): Promise<{ name: string; bytes: Buffer }> {
   await page.locator('[data-action="data"]').click();
@@ -559,7 +570,7 @@ test.describe('data export', () => {
 
   test.beforeEach(async ({ page, baseURL }) => {
     errors = trackErrors(page);
-    foreign = trackForeignRequests(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
   });
 
   test.afterEach(() => {
