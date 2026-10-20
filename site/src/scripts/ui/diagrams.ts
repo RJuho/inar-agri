@@ -14,7 +14,8 @@ import {
 import { CanvasRenderer } from 'echarts/renderers';
 import type { Table } from 'apache-arrow';
 import { query, type Meta } from '../db';
-import { diagramDef, type DiagramDef, type Prepared } from '../diagrams/registry';
+import { diagramDef, type BuildContext, type DiagramDef, type Prepared } from '../diagrams/registry';
+import { composeAlt, parseStats, statsQuery, type SiteStats } from '../alttext';
 import { onSchemeChange, prefersDark, readTokens } from '../theme';
 import type { Diagram, View, ViewParams } from '../state';
 
@@ -38,8 +39,8 @@ export interface DiagramActions {
   remove(id: string): void;
 }
 
-// Diagrams of one view often run the same SQL. Keep the last results.
-const CACHE_SIZE = 4;
+// Diagrams of one view often run the same SQL (data and alt text stats). Keep the last results.
+const CACHE_SIZE = 12;
 const cache = new Map<string, Promise<Table>>();
 
 function cachedQuery(sql: string): Promise<Table> {
@@ -79,6 +80,10 @@ class DiagramCard {
   private readonly chartEl: HTMLDivElement;
   private readonly noteEl: HTMLParagraphElement;
   private readonly titleEl: HTMLHeadingElement;
+  private readonly subEl: HTMLParagraphElement;
+  private readonly captionEl: HTMLElement;
+  private readonly altEl: HTMLParagraphElement;
+  private alt = '';
   private readonly upBtn: HTMLButtonElement;
   private readonly downBtn: HTMLButtonElement;
   private chart: echarts.ECharts | null = null;
@@ -87,6 +92,7 @@ class DiagramCard {
   private zoom = { start: 0, end: 100 };
   private token = 0;
   private lastHeight = 0;
+  private lastWidth = 0;
   private readonly observer: ResizeObserver;
 
   constructor(
@@ -115,6 +121,10 @@ class DiagramCard {
     tools.append(this.upBtn, this.downBtn, button('Remove diagram', '×', () => actions.remove(this.id)));
     head.append(this.titleEl, tools);
 
+    this.subEl = document.createElement('p');
+    this.subEl.className = 'diagram-sub';
+    this.subEl.hidden = true;
+
     this.noteEl = document.createElement('p');
     this.noteEl.className = 'diagram-note';
     this.noteEl.hidden = true;
@@ -124,11 +134,43 @@ class DiagramCard {
     this.chartEl.setAttribute('role', 'img');
     this.chartEl.setAttribute('aria-label', def.label);
 
-    this.el.append(head, this.noteEl, this.chartEl);
+    // Alt text below the chart, with a Copy button.
+    this.captionEl = document.createElement('figcaption');
+    this.captionEl.className = 'diagram-alt';
+    this.captionEl.hidden = true;
+    this.altEl = document.createElement('p');
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'copy-alt';
+    copy.textContent = 'Copy';
+    copy.title = 'Copy the alt text';
+    copy.setAttribute('aria-label', 'Copy the alt text');
+    copy.addEventListener('click', () => void this.copyAlt(copy));
+    const altLabel = document.createElement('span');
+    altLabel.className = 'diagram-alt-label';
+    altLabel.textContent = 'Alt text';
+    this.captionEl.append(altLabel, this.altEl, copy);
 
-    // Width changes need only resize(). Height changes can also move the panels.
+    const figure = document.createElement('figure');
+    figure.className = 'diagram-figure';
+    figure.append(this.chartEl, this.captionEl);
+
+    this.el.append(head, this.subEl, this.noteEl, figure);
+
+    // Width changes need resize(). Some types also change their layout and height with the width.
+    // Height changes can also move the panels.
     this.observer = new ResizeObserver(() => {
       if (!this.chart) return;
+      const w = this.chartEl.clientWidth;
+      if (w !== this.lastWidth && this.def.widthDependent && this.data && this.params && !this.data.note) {
+        this.lastWidth = w;
+        this.chartEl.style.height = `${this.def.height(this.params, this.data, w)}px`;
+        this.lastHeight = this.chartEl.clientHeight;
+        this.chart.resize();
+        this.draw();
+        return;
+      }
+      this.lastWidth = w;
       this.chart.resize();
       const h = this.chartEl.clientHeight;
       if (h !== this.lastHeight && this.data && this.def.relayout && this.params) {
@@ -154,14 +196,45 @@ class DiagramCard {
     this.onStatus();
   }
 
-  private context(params: ViewParams) {
+  private context(params: ViewParams): BuildContext {
     return {
       params,
       meta: this.meta,
       tokens: readTokens(this.chartEl),
       height: this.chartEl.clientHeight,
+      width: this.chartEl.clientWidth,
       zoom: this.zoom,
     };
+  }
+
+  /** The current alt text. Empty while the diagram loads. */
+  altText(): string {
+    return this.alt;
+  }
+
+  private setAlt(text: string): void {
+    this.alt = text;
+    this.altEl.textContent = text;
+    this.captionEl.hidden = text === '';
+    this.chartEl.setAttribute('aria-label', text || this.def.label);
+  }
+
+  private async copyAlt(btn: HTMLButtonElement): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(this.alt);
+      btn.textContent = 'Copied';
+    } catch {
+      // No clipboard access: select the text, so that the user can copy it.
+      const range = document.createRange();
+      range.selectNodeContents(this.altEl);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+      btn.textContent = 'Selected';
+    }
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+    }, 2000);
   }
 
   private ensureChart(): echarts.ECharts {
@@ -185,19 +258,32 @@ class DiagramCard {
     this.setStatus('loading');
     try {
       const sql = this.def.query(params);
-      const table = sql === null ? null : await cachedQuery(sql);
+      const statsVars = this.def.statsVariables?.(params) ?? params.variables;
+      const sSql = sql === null ? null : statsQuery(params, statsVars);
+      // The data query and the stats query for the alt text run at the same time.
+      const [table, statsTable] = await Promise.all([
+        sql === null ? null : cachedQuery(sql),
+        sSql === null ? null : cachedQuery(sSql),
+      ]);
       if (token !== this.token) return;
       const data = this.def.prepare(table, params, this.meta);
+      const stats: SiteStats[] = statsTable ? parseStats(statsTable) : [];
       this.data = data;
       this.rowCount = data.rowCount;
       this.seriesCount = data.seriesCount;
       this.showNote(data.note ?? null);
+      this.subEl.hidden = !data.subtitle || !!data.note;
+      this.subEl.textContent = data.subtitle ?? '';
       if (data.note) {
+        this.setAlt('');
         this.chart?.clear();
         this.chartEl.hidden = true;
       } else {
         this.chartEl.hidden = false;
-        this.chartEl.style.height = `${this.def.height(params)}px`;
+        const altCtx = { params, meta: this.meta, stats };
+        this.setAlt(composeAlt(this.def.label, this.def.describe(data, altCtx), params, this.meta, stats, statsVars));
+        this.lastWidth = this.chartEl.clientWidth;
+        this.chartEl.style.height = `${this.def.height(params, data, this.lastWidth)}px`;
         this.lastHeight = this.chartEl.clientHeight;
         const chart = this.ensureChart();
         chart.resize();
@@ -209,6 +295,7 @@ class DiagramCard {
       console.error(err);
       this.rowCount = 0;
       this.seriesCount = 0;
+      this.setAlt('');
       this.showNote(`Cannot draw the diagram: ${err instanceof Error ? err.message : String(err)}`);
       this.setStatus('error');
     }
@@ -312,6 +399,18 @@ export class DiagramList {
       if (paramsChanged || fresh.includes(card)) void card.update(params);
     }
     this.report();
+  }
+
+  /**
+   * Alt text of one diagram of the active view: by diagram id or by position (0 = first).
+   * Returns null when no such diagram exists. T4 (PNG export) uses this.
+   */
+  altText(target: string | number): string | null {
+    const cards = [...this.cards.values()];
+    const order = [...this.container.querySelectorAll<HTMLElement>('.diagram')].map((e) => e.dataset.id);
+    cards.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    const card = typeof target === 'number' ? cards[target] : this.cards.get(target);
+    return card ? card.altText() : null;
   }
 
   /** Write the sums of all cards to the container attributes. */

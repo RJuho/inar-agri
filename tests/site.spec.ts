@@ -256,3 +256,89 @@ test.describe('views and diagrams', () => {
     await expect(page.getByRole('tab', { selected: true })).toHaveText('Linked view');
   });
 });
+
+const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative'] as const;
+const SITE_NAMES = ['Anttila', 'Särkisuo', 'Haltiala', 'Qvidja', 'Viikki', 'Maktau'];
+
+/** A view with one diagram of `type`. */
+function typeView(type: string, variables: string[] = ['nee_f', 'ta'], aggregation = 'raw') {
+  return {
+    id: `t-${type}`,
+    name: `Type ${type}`,
+    params: { sites: [1, 2, 3, 4, 5, 6], variables, xVariable: 'ta', yearFrom: null, yearTo: null, aggregation },
+    diagrams: [{ id: 'd1', type }],
+  };
+}
+
+test.describe('diagram types', () => {
+  let errors: string[];
+
+  test.beforeEach(async ({ page }) => {
+    errors = trackErrors(page);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+  });
+
+  test('the add list shows all diagram types', async ({ page }) => {
+    await page.goto('/');
+    await waitReady(page);
+    const values = await page.locator('#add-diagram option').evaluateAll((els) => els.map((e) => e.getAttribute('value') ?? ''));
+    for (const t of ALL_TYPES) expect(values).toContain(t);
+  });
+
+  for (const type of ALL_TYPES) {
+    test(`${type} reaches ready with series and alt text`, async ({ page }) => {
+      await page.goto('/' + viewHash(typeView(type)));
+      await waitReady(page);
+      const card = page.locator('.diagram');
+      await expect(card).toHaveAttribute('data-type', type);
+      await expect(card).toHaveAttribute('data-status', 'ready');
+      expect(Number(await card.getAttribute('data-series'))).toBeGreaterThan(0);
+      expect(Number(await card.getAttribute('data-rows'))).toBeGreaterThan(0);
+      await expect(card.locator('canvas').first()).toBeVisible();
+
+      // Alt text: in the figcaption, as aria-label of the chart element and from the page hook.
+      const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+      expect(alt).toContain('NEE, gap-filled');
+      for (const name of SITE_NAMES) expect(alt).toContain(name);
+      await expect(card.locator('.diagram-chart')).toHaveAttribute('role', 'img');
+      await expect(card.locator('.diagram-chart')).toHaveAttribute('aria-label', alt);
+      const hook = await page.evaluate(() => (globalThis as unknown as { __inar: { altText(t: number): string } }).__inar.altText(0));
+      expect(hook).toBe(alt);
+      await expect(card.getByRole('button', { name: 'Copy the alt text' })).toBeVisible();
+    });
+  }
+
+  test('years types show raw data as daily means', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('yearPanels')));
+    await waitReady(page);
+    await expect(page.locator('.diagram-sub')).toContainText('daily means');
+  });
+
+  test('cumulative without NEE shows a note, not an error', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('cumulative', ['ta', 'swc'])));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    await expect(card).toHaveAttribute('data-series', '0');
+    await expect(card.locator('.diagram-note')).toContainText('needs the variable');
+  });
+
+  test('scatter with only the x variable shows a note', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('scatter', ['ta'])));
+    await waitReady(page);
+    await expect(page.locator('.diagram')).toHaveAttribute('data-series', '0');
+    await expect(page.locator('.diagram-note')).toContainText('x variable');
+  });
+
+  test('site checkboxes show the site emoji, hidden from screen readers', async ({ page }) => {
+    await page.goto('/');
+    await waitReady(page);
+    const label = page.locator('label.check', { has: page.locator('input[name="site"]') }).filter({ hasText: 'Qvidja' });
+    await expect(label.locator('.check-emoji')).toHaveText('🐂🐝');
+    await expect(label.locator('.check-emoji')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.getByRole('checkbox', { name: 'Qvidja', exact: true })).toBeVisible();
+  });
+});

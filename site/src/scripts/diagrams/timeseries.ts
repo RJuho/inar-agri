@@ -344,6 +344,8 @@ export const timeseries: DiagramDef<TimeseriesData> = {
   prepare: (table, params) => prepare(table, params),
   build,
   relayout: (data, ctx) => panelLayout(data.variables.length, ctx.height),
+  describe: (data) =>
+    `One panel per variable, one line per site, ${AGGREGATION_LABELS[data.aggregation].toLowerCase()}, time axis in site local time.`,
   // Same panel height as the first version of the page: five panels in about 1100 px.
   height: (params) => (params.variables.length === 0 ? 160 : LAYOUT.top + LAYOUT.bottom + params.variables.length * 202),
 };

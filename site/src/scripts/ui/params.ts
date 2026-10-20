@@ -1,6 +1,7 @@
 // Parameter form of the active view: sites, variables, years, aggregation and x variable.
 // All diagrams of the view use these parameters.
 import type { Meta } from '../db';
+import { siteEmoji } from '../sites';
 import {
   AGGREGATION_LABELS,
   AGGREGATIONS,
@@ -21,14 +22,21 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
   return e;
 }
 
-function checkbox(name: string, value: string, label: string, checked: boolean): HTMLLabelElement {
+function checkbox(name: string, value: string, label: string, checked: boolean, emoji = ''): HTMLLabelElement {
   const wrap = el('label', 'check');
   const input = el('input');
   input.type = 'checkbox';
   input.name = name;
   input.value = value;
   input.checked = checked;
-  wrap.append(input, document.createTextNode(label));
+  wrap.append(input);
+  if (emoji) {
+    // Decoration only: screen readers read the site name.
+    const icon = el('span', 'check-emoji', emoji);
+    icon.setAttribute('aria-hidden', 'true');
+    wrap.append(icon);
+  }
+  wrap.append(document.createTextNode(label));
   return wrap;
 }
 
@@ -69,7 +77,7 @@ export class ParamsForm {
 
     const sites = el('fieldset', 'group');
     sites.append(el('legend', undefined, 'Sites'));
-    for (const s of meta.sites) sites.append(checkbox('site', String(s.siteId), s.name, params.sites.includes(s.siteId)));
+    for (const s of meta.sites) sites.append(checkbox('site', String(s.siteId), s.name, params.sites.includes(s.siteId), siteEmoji(s.code)));
 
     const vars = el('fieldset', 'group');
     vars.append(el('legend', undefined, 'Variables'));

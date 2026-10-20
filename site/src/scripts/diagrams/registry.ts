@@ -4,8 +4,15 @@ import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import type { Meta } from '../db';
 import type { Tokens } from '../theme';
-import type { ViewParams } from '../state';
+import type { Variable, ViewParams } from '../state';
+import type { SiteStats } from '../alttext';
 import { timeseries } from './timeseries';
+import { years } from './years';
+import { yearPanels } from './yearPanels';
+import { monthly } from './monthly';
+import { diurnal } from './diurnal';
+import { scatter } from './scatter';
+import { cumulative } from './cumulative';
 
 /** Data that a diagram type made from its query result. */
 export interface Prepared {
@@ -13,8 +20,10 @@ export interface Prepared {
   rowCount: number;
   /** Number of chart series. */
   seriesCount: number;
-  /** A short note when the diagram cannot show data, for example "Select a site". */
+  /** A short note when the diagram cannot show data, for example "Select a site". The chart is then hidden. */
   note?: string;
+  /** A short line below the title, for example "Raw data is shown as daily means". The chart stays visible. */
+  subtitle?: string;
 }
 
 /** Values that the option builder needs, in addition to the data. */
@@ -22,10 +31,19 @@ export interface BuildContext {
   params: ViewParams;
   meta: Meta;
   tokens: Tokens;
-  /** Chart height in px. */
+  /** Chart height and width in px. */
   height: number;
+  width: number;
   /** Zoom range in percent of the full x range. */
   zoom: { start: number; end: number };
+}
+
+/** Values that the alt text template needs. */
+export interface AltContext {
+  params: ViewParams;
+  meta: Meta;
+  /** Statistics per site and variable from alttext.ts. Empty when no stats query ran. */
+  stats: SiteStats[];
 }
 
 export interface DiagramDef<D extends Prepared = Prepared> {
@@ -40,12 +58,18 @@ export interface DiagramDef<D extends Prepared = Prepared> {
   build(data: D, ctx: BuildContext): EChartsCoreOption;
   /** Option part that changes with the chart height. Optional. */
   relayout?(data: D, ctx: BuildContext): EChartsCoreOption;
-  /** Chart height in px for these parameters. */
-  height(params: ViewParams): number;
+  /** True when the layout changes with the chart width. The card then draws again after a width change. */
+  widthDependent?: boolean;
+  /** Chart height in px. `data` is null before the first query result. */
+  height(params: ViewParams, data: D | null, width: number): number;
+  /** Variables for the statistics of the alt text. Default: the variables of the view. */
+  statsVariables?(params: ViewParams): Variable[];
+  /** Sentence that tells how the diagram shows the data. The alt text starts with it. */
+  describe(data: D, ctx: AltContext): string;
 }
 
 // Each def has its own data type. The registry stores them with the base type.
-const DEFS: DiagramDef[] = [timeseries as unknown as DiagramDef];
+const DEFS = [timeseries, years, yearPanels, monthly, diurnal, scatter, cumulative] as unknown as DiagramDef[];
 
 export const DIAGRAM_DEFS: ReadonlyMap<string, DiagramDef> = new Map(DEFS.map((d) => [d.type, d]));
 export const DIAGRAM_TYPES: ReadonlySet<string> = new Set(DIAGRAM_DEFS.keys());

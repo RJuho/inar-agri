@@ -143,6 +143,10 @@ export async function start(): Promise<void> {
     },
   });
 
+  // Hook for scripts and tests: the alt text of a diagram of the active view (id or index).
+  const hook = ((window as unknown as { __inar?: Record<string, unknown> }).__inar ??= {});
+  hook.altText = (target: string | number) => diagrams.altText(target);
+
   function render(): void {
     const view = activeView(store);
     tabs.render(store);
