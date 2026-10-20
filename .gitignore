@@ -4,3 +4,8 @@ data/*
 .claude/skills/*
 node_modules/
 db/*.parquet
+site/dist/
+site/.astro/
+site/public/data/
+test-results/
+playwright-report/

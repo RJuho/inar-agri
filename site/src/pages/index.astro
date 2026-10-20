@@ -1,0 +1,61 @@
+---
+// First page: all data in the harmonised database.
+// The browser loads the Parquet files with DuckDB-WASM and draws them with ECharts.
+import '../styles/global.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>INAR agri data</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>INAR agricultural flux sites</h1>
+        <p class="lead">
+          All data in the harmonised database: net ecosystem exchange (NEE), air temperature, soil temperature and
+          soil water content at six sites, 30-minute periods. The time axis is UTC. Click a site in the legend to hide or
+          show it. Scroll or drag on the chart, or use the slider, to zoom.
+        </p>
+        <p id="status" class="status" role="status" aria-live="polite">Loading data…</p>
+      </header>
+      <div id="chart" class="chart" data-status="loading" aria-label="Time series chart of all sites"></div>
+    </main>
+
+    <script>
+      import { loadDataset } from '../scripts/db';
+      import { renderChart } from '../scripts/chart';
+
+      const statusEl = document.getElementById('status') as HTMLElement;
+      const chartEl = document.getElementById('chart') as HTMLElement;
+
+      // Group digits with a thin space, for example 537 980.
+      const fmt = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+      async function main() {
+        const t0 = performance.now();
+        const data = await loadDataset();
+        const t1 = performance.now();
+        const handle = renderChart(chartEl, data);
+        const t2 = performance.now();
+        statusEl.textContent =
+          `${fmt(data.rowCount)} rows, ${data.sites.length} sites. ` +
+          `Loaded in ${((t1 - t0) / 1000).toFixed(1)} s, drawn in ${((t2 - t1) / 1000).toFixed(1)} s.`;
+        chartEl.dataset.rows = String(data.rowCount);
+        chartEl.dataset.series = String(handle.seriesCount);
+        chartEl.dataset.status = 'ready';
+      }
+
+      main().catch((err: unknown) => {
+        console.error(err);
+        const msg = err instanceof Error ? err.message : String(err);
+        statusEl.textContent = `Cannot show the data: ${msg}`;
+        statusEl.classList.add('error');
+        chartEl.dataset.status = 'error';
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+/* Global styles for the data website. Vanilla CSS only. */
+
+/* Colour tokens. Light mode first, dark mode below.
+   Series colours: categorical slots 1 to 8 of the dataviz reference palette,
+   in fixed order. The chart reads these tokens at run time. */
+:root {
+  color-scheme: light;
+  --surface: #fcfcfb;
+  --surface-raised: #ffffff;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --grid-line: #e4e3df;
+  --axis-line: #b9b8b2;
+  --error: #b42318;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #6250d6;
+  --series-8: #e34948;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --surface: #1a1a19;
+    --surface-raised: #252524;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --grid-line: #343432;
+    --axis-line: #5c5b57;
+    --error: #f97066;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+    --series-8: #e66767;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 650;
+}
+
+.lead {
+  max-width: 70ch;
+  margin: 0 0 12px;
+  color: var(--text-secondary);
+}
+
+.status {
+  margin: 0 0 16px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.status.error {
+  color: var(--error);
+  font-weight: 600;
+}
+
+/* ECharts needs a fixed height. Five panels share this height. */
+.chart {
+  width: 100%;
+  height: 1100px;
+}
+
+.chart[data-status='error'] {
+  display: none;
+}

@@ -81,3 +81,14 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Design and rules: `docs/harmonised-database.md`. Build: `npm run build:db` (runs `scripts/build-db.ts`, DuckDB + Valibot, about 12 s). Registry of sites, files and column mappings: `scripts/lib/registry.ts`.
 - Output: `db/observations.parquet` (one row per site and 30-min period, UTC `ts_start`, strict core columns `nee`, `nee_f`, `nee_qc`, `ta`, `tsoil`, `swc`), `db/sites.parquet` (geolocation index), `db/variables.parquet`, `db/site_variables.parquet`, `db/report.md`.
 - The Parquet files are not in git. Run the build to create them. Read the report for counts, conflicts and warnings.
+
+## Website (`site/`)
+
+- Static Astro site. Apache ECharts draws the charts. DuckDB-WASM reads the Parquet files in the browser. Vanilla TypeScript and vanilla CSS only. Do not add a UI framework.
+- Data flow: `npm run build:db` writes `db/*.parquet`. `npm run site:sync` (`scripts/sync-site-data.ts`) copies them to `site/public/data/` (not in git). The page fetches the files, registers them in DuckDB-WASM and runs SQL.
+- Code: `site/src/pages/index.astro` (page), `site/src/scripts/db.ts` (DuckDB-WASM start and queries), `site/src/scripts/chart.ts` (ECharts option), `site/src/styles/global.css`.
+- The first page shows all data: five panels (`nee`, `nee_f`, `ta`, `tsoil`, `swc`), one series per site, shared UTC time axis, zoom linked across panels. Labels and units come from `sites.parquet` and `variables.parquet`.
+- The chart container gets `data-status="ready"`, `data-rows` and `data-series` when the chart is drawn. Tests use these attributes.
+- Commands: `npm run site:dev`, `npm run site:build`, `npm run site:preview`, `npm run test:e2e` (Playwright, Chromium, `tests/site.spec.ts`).
+- DuckDB-WASM downloads the parquet extension from `extensions.duckdb.org` at run time. The page needs internet access.
+- To add a chart: add a query in `db.ts`, an option builder in `site/src/scripts/`, and a container in the page.
