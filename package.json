@@ -12,6 +12,7 @@
     "site:build": "npm run site:sync && astro build --root site && node scripts/check-dist.ts",
     "site:preview": "astro preview --root site",
     "test:e2e": "playwright test",
+    "screenshot": "node scripts/screenshot.ts",
     "cf:preview": "npm run site:build && wrangler dev",
     "deploy": "npm run site:build && wrangler deploy"
   },

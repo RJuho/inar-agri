@@ -1,5 +1,5 @@
-// Tab list: one tab per view, and the buttons New, Copy, Rename, Delete and Copy link.
-import { canAddView, type Store } from '../state';
+// Tab list: one tab per view, and the buttons New, Copy, Rename, Delete, Copy link and Download all.
+import { activeView, canAddView, type Store } from '../state';
 
 export interface TabActions {
   activate(id: string): void;
@@ -8,6 +8,8 @@ export interface TabActions {
   rename(id: string, name: string): void;
   remove(id: string): void;
   copyLink(): void;
+  /** Download one PNG image with all diagrams of the selected view. */
+  downloadAll(): void;
 }
 
 function button(text: string, cls: string, onClick: () => void, title?: string): HTMLButtonElement {
@@ -68,8 +70,11 @@ export class Tabs {
     copy.dataset.action = 'copy';
     rename.dataset.action = 'rename';
     del.dataset.action = 'delete';
+    const all = button('Download all', 'tab-action', () => this.actions.downloadAll(), 'Download all diagrams of the selected view as one PNG image');
+    all.disabled = activeView(store).diagrams.length === 0;
     link.dataset.action = 'link';
-    tools.append(add, copy, rename, del, link);
+    all.dataset.action = 'png-all';
+    tools.append(add, copy, rename, del, link, all);
 
     this.el.replaceChildren(list, tools);
     if (this.renaming) {

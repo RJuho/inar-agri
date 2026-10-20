@@ -18,6 +18,7 @@ import { diagramDef, type BuildContext, type DiagramDef, type Prepared } from '.
 import { composeAlt, parseStats, statsQuery, type SiteStats } from '../alttext';
 import { onSchemeChange, prefersDark, readTokens } from '../theme';
 import type { Diagram, View, ViewParams } from '../state';
+import type { ExportItem } from '../export';
 
 // Components that all diagram types use. Chart types register their own series modules.
 echarts.use([
@@ -37,6 +38,8 @@ type Status = 'loading' | 'ready' | 'error';
 export interface DiagramActions {
   move(id: string, step: -1 | 1): void;
   remove(id: string): void;
+  /** Download the diagram as a PNG file. */
+  png(id: string): void;
 }
 
 // Diagrams of one view often run the same SQL (data and alt text stats). Keep the last results.
@@ -86,6 +89,7 @@ class DiagramCard {
   private alt = '';
   private readonly upBtn: HTMLButtonElement;
   private readonly downBtn: HTMLButtonElement;
+  private readonly pngBtn: HTMLButtonElement;
   private chart: echarts.ECharts | null = null;
   private data: Prepared | null = null;
   private params: ViewParams | null = null;
@@ -118,7 +122,10 @@ class DiagramCard {
     tools.className = 'diagram-tools';
     this.upBtn = button('Move diagram up', '↑', () => actions.move(this.id, -1));
     this.downBtn = button('Move diagram down', '↓', () => actions.move(this.id, 1));
-    tools.append(this.upBtn, this.downBtn, button('Remove diagram', '×', () => actions.remove(this.id)));
+    this.pngBtn = button('Download the diagram as PNG', 'PNG', () => actions.png(this.id));
+    this.pngBtn.dataset.action = 'png';
+    this.pngBtn.disabled = true;
+    tools.append(this.pngBtn, this.upBtn, this.downBtn, button('Remove diagram', '×', () => actions.remove(this.id)));
     head.append(this.titleEl, tools);
 
     this.subEl = document.createElement('p');
@@ -193,6 +200,7 @@ class DiagramCard {
     this.el.dataset.status = status;
     this.el.dataset.rows = String(this.rowCount);
     this.el.dataset.series = String(this.seriesCount);
+    this.pngBtn.disabled = !(status === 'ready' && this.chart && !this.chartEl.hidden);
     this.onStatus();
   }
 
@@ -210,6 +218,25 @@ class DiagramCard {
   /** The current alt text. Empty while the diagram loads. */
   altText(): string {
     return this.alt;
+  }
+
+  /** The card as the PNG export sees it. */
+  exportItem(): ExportItem {
+    const hasChart = this.status === 'ready' && this.chart !== null && !this.chartEl.hidden;
+    const chart = this.chart;
+    return {
+      id: this.id,
+      type: this.def.type,
+      title: this.titleEl.textContent ?? this.def.label,
+      subtitle: this.subEl.hidden ? '' : (this.subEl.textContent ?? ''),
+      note: this.noteEl.hidden ? '' : (this.noteEl.textContent ?? ''),
+      alt: this.alt,
+      ready: this.status !== 'loading',
+      width: hasChart ? this.chartEl.clientWidth : 0,
+      height: hasChart ? this.chartEl.clientHeight : 0,
+      image: (scale, background) =>
+        hasChart && chart ? chart.getDataURL({ type: 'png', pixelRatio: scale, backgroundColor: background }) : null,
+    };
   }
 
   private setAlt(text: string): void {
@@ -403,14 +430,27 @@ export class DiagramList {
 
   /**
    * Alt text of one diagram of the active view: by diagram id or by position (0 = first).
-   * Returns null when no such diagram exists. T4 (PNG export) uses this.
+   * Returns null when no such diagram exists.
    */
   altText(target: string | number): string | null {
-    const cards = [...this.cards.values()];
-    const order = [...this.container.querySelectorAll<HTMLElement>('.diagram')].map((e) => e.dataset.id);
-    cards.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
-    const card = typeof target === 'number' ? cards[target] : this.cards.get(target);
+    const card = typeof target === 'number' ? this.ordered()[target] : this.cards.get(target);
     return card ? card.altText() : null;
+  }
+
+  /** Export view of all cards, in the order on the page. */
+  exportItems(): ExportItem[] {
+    return this.ordered().map((c) => c.exportItem());
+  }
+
+  /** Export view of one card: by diagram id or by position (0 = first). */
+  exportItem(target: string | number): ExportItem | null {
+    const card = typeof target === 'number' ? this.ordered()[target] : this.cards.get(target);
+    return card ? card.exportItem() : null;
+  }
+
+  private ordered(): DiagramCard[] {
+    const order = [...this.container.querySelectorAll<HTMLElement>('.diagram')].map((e) => e.dataset.id);
+    return [...this.cards.values()].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
   }
 
   /** Write the sums of all cards to the container attributes. */

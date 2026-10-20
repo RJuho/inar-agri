@@ -20,6 +20,7 @@ import {
   viewToHash,
 } from './state';
 import { DiagramList } from './ui/diagrams';
+import { compositePng, DEFAULT_SCALE, diagramPng, download, slug, type PngResult } from './export';
 import { ParamsForm } from './ui/params';
 import { Tabs } from './ui/tabs';
 
@@ -123,6 +124,9 @@ export async function start(): Promise<void> {
         statusEl.textContent = baseStatus;
       }, 4000);
     },
+    downloadAll() {
+      void savePng('all');
+    },
   });
 
   const form = new ParamsForm(byId('params'), meta, (params) => {
@@ -131,6 +135,42 @@ export async function start(): Promise<void> {
     activeView(store).params = clean;
     commit();
   });
+
+  /** Show a short message in the status line, then the normal text again. */
+  const flash = (text: string, error = false) => {
+    statusEl.textContent = text;
+    statusEl.classList.toggle('error', error);
+    setTimeout(() => {
+      statusEl.textContent = baseStatus;
+      statusEl.classList.remove('error');
+    }, 4000);
+  };
+
+  /** PNG of one diagram (id or index) or of all diagrams ("all") of the active view. */
+  const exportPng = async (target: string | number = 'all', scale = DEFAULT_SCALE): Promise<PngResult> => {
+    const view = activeView(store);
+    if (target === 'all') return compositePng(view, meta, diagrams.exportItems(), scale);
+    const item = diagrams.exportItem(target);
+    if (!item) throw new Error(`No diagram ${JSON.stringify(target)} in view ${view.name}.`);
+    return diagramPng(item, view.name, scale);
+  };
+
+  const savePng = async (target: string | number) => {
+    const view = activeView(store);
+    try {
+      const { dataUrl } = await exportPng(target);
+      let part = 'all';
+      if (target !== 'all') {
+        const items = diagrams.exportItems();
+        const i = items.findIndex((it) => it.id === target);
+        part = `${i + 1}-${items[i]?.type ?? 'diagram'}`;
+      }
+      download(dataUrl, `inar-agri_${slug(view.name)}_${part}.png`);
+    } catch (err) {
+      console.warn(err);
+      flash(`Cannot make the PNG image: ${err instanceof Error ? err.message : String(err)}`, true);
+    }
+  };
 
   const diagrams = new DiagramList(chartEl, meta, {
     move(id, step) {
@@ -141,11 +181,26 @@ export async function start(): Promise<void> {
       removeDiagram(activeView(store), id);
       commit();
     },
+    png(id) {
+      void savePng(id);
+    },
   });
 
   // Hook for scripts and tests: the alt text of a diagram of the active view (id or index).
   const hook = ((window as unknown as { __inar?: Record<string, unknown> }).__inar ??= {});
   hook.altText = (target: string | number) => diagrams.altText(target);
+  // PNG data URL and alt text of one diagram (id or index) or of all diagrams ("all").
+  hook.exportPng = exportPng;
+  // The active view and its diagrams, for scripts/screenshot.ts --list.
+  hook.view = () => {
+    const view = activeView(store);
+    return {
+      id: view.id,
+      name: view.name,
+      params: structuredClone(view.params),
+      diagrams: diagrams.exportItems().map((d, index) => ({ index, id: d.id, type: d.type, title: d.title, ready: d.ready })),
+    };
+  };
 
   function render(): void {
     const view = activeView(store);

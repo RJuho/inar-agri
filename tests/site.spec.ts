@@ -1,6 +1,10 @@
 // End-to-end tests for the first page of the data website.
 import { test, expect, type Page } from '@playwright/test';
 import { DuckDBInstance } from '@duckdb/node-api';
+import { execFile } from 'node:child_process';
+import { readFile, rm } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { promisify } from 'node:util';
 
 const OBS_FILE = 'db/observations.parquet';
 const READY_TIMEOUT = 60_000;
@@ -341,4 +345,116 @@ test.describe('diagram types', () => {
     await expect(label.locator('.check-emoji')).toHaveAttribute('aria-hidden', 'true');
     await expect(page.getByRole('checkbox', { name: 'Qvidja', exact: true })).toBeVisible();
   });
+});
+
+/** Text chunks (tEXt and iTXt, no compression) of a PNG file, by keyword. */
+function pngText(png: Buffer): Record<string, string> {
+  const out: Record<string, string> = {};
+  let pos = 8;
+  while (pos + 12 <= png.length) {
+    const len = png.readUInt32BE(pos);
+    const type = png.toString('latin1', pos + 4, pos + 8);
+    const data = png.subarray(pos + 8, pos + 8 + len);
+    if (type === 'iTXt') {
+      const k = data.indexOf(0);
+      // Skip: separator, compression flag, method, language tag and its 0, translated keyword and its 0.
+      let p = k + 3;
+      p = data.indexOf(0, p) + 1;
+      p = data.indexOf(0, p) + 1;
+      out[data.toString('latin1', 0, k)] = data.toString('utf8', p);
+    }
+    if (type === 'IEND') break;
+    pos += 12 + len;
+  }
+  return out;
+}
+
+const pngWidth = (png: Buffer) => png.readUInt32BE(16);
+const pngHeight = (png: Buffer) => png.readUInt32BE(20);
+
+interface ExportHook {
+  __inar: { exportPng(t: string | number, s: number): Promise<{ dataUrl: string; alt: string }> };
+}
+
+async function exportPng(page: Page, target: string | number, scale = 3) {
+  const r = await page.evaluate(([t, s]) => (globalThis as unknown as ExportHook).__inar.exportPng(t, s), [target, scale] as const);
+  return { png: Buffer.from(r.dataUrl.slice(r.dataUrl.indexOf(',') + 1), 'base64'), alt: r.alt };
+}
+
+const EXPORT_VIEW = {
+  id: 'export1',
+  name: 'Export view',
+  params: { sites: [3, 4], variables: ['nee_f', 'ta'], xVariable: 'ta', yearFrom: 2022, yearTo: 2023, aggregation: 'day' },
+  diagrams: [
+    { id: 'm1', type: 'monthly' },
+    { id: 'c1', type: 'cumulative' },
+  ],
+};
+
+test.describe('PNG export', () => {
+  let errors: string[];
+
+  test.beforeEach(async ({ page }) => {
+    errors = trackErrors(page);
+    await page.goto('/' + viewHash(EXPORT_VIEW));
+    await waitReady(page);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+  });
+
+  test('one diagram: width is 3x the chart width and the description is the alt text', async ({ page }) => {
+    const chartW = await page.locator('.diagram-chart').first().evaluate((el) => el.clientWidth);
+    const { png, alt } = await exportPng(page, 0);
+    expect(pngWidth(png)).toBe(3 * chartW);
+    const text = pngText(png);
+    expect(alt).toBe(await page.evaluate(() => (globalThis as unknown as { __inar: { altText(t: number): string } }).__inar.altText(0)));
+    expect(text.Description).toBe(alt);
+    expect(text.Title).toContain('Export view');
+    // By id: the import gives new ids, so read the id of the second card.
+    const id = (await page.locator('.diagram').nth(1).getAttribute('data-id')) ?? '';
+    expect((await exportPng(page, id)).alt).toContain('Cumulative NEE');
+  });
+
+  test('all diagrams: one image, at least as high as the diagrams, with all alt texts', async ({ page }) => {
+    const one = await exportPng(page, 0);
+    const two = await exportPng(page, 1);
+    const all = await exportPng(page, 'all');
+    expect(pngHeight(all.png)).toBeGreaterThanOrEqual(pngHeight(one.png) + pngHeight(two.png));
+    expect(pngWidth(all.png)).toBeGreaterThanOrEqual(pngWidth(one.png));
+    const text = pngText(all.png);
+    expect(text.Title).toBe('Export view');
+    expect(text.Description).toBe(all.alt);
+    expect(all.alt).toContain(one.alt);
+    expect(all.alt).toContain(two.alt);
+    expect(all.alt).toContain('Haltiala and Qvidja');
+  });
+
+  test('PNG button and "Download all" save PNG files', async ({ page }) => {
+    const [one] = await Promise.all([page.waitForEvent('download'), page.locator('.diagram [data-action="png"]').first().click()]);
+    expect(one.suggestedFilename()).toBe('inar-agri_export-view_1-monthly.png');
+    const [all] = await Promise.all([page.waitForEvent('download'), page.locator('[data-action="png-all"]').click()]);
+    expect(all.suggestedFilename()).toBe('inar-agri_export-view_all.png');
+    const bytes = await readFile(await all.path());
+    expect(pngText(bytes).Title).toBe('Export view');
+  });
+});
+
+test('screenshot script writes a PNG and an alt text file', async ({ baseURL }) => {
+  test.setTimeout(240_000);
+  const out = join('test-results', 'screenshot-test', 'shot.png');
+  await rm(dirname(out), { recursive: true, force: true });
+  const run = promisify(execFile);
+  const view = JSON.stringify({ name: 'Script view', params: EXPORT_VIEW.params, diagrams: EXPORT_VIEW.diagrams });
+  const { stdout } = await run('node', ['scripts/screenshot.ts', '--url', `${baseURL}/`, '--view', view, '--out', out, '--scale', '2'], {
+    timeout: 200_000,
+  });
+  expect(stdout).toContain('PNG:');
+  const png = await readFile(out);
+  const alt = (await readFile(out.replace(/\.png$/, '.alt.txt'), 'utf8')).trim();
+  expect(pngText(png).Title).toBe('Script view');
+  expect(pngText(png).Description).toBe(alt);
+  expect(alt).toContain('Monthly means');
+  expect(alt).toContain('Cumulative NEE');
 });
