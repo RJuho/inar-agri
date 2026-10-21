@@ -4,7 +4,7 @@
 import { existsSync } from 'node:fs';
 import { DuckDBTimestampValue } from '@duckdb/node-api';
 import * as v from 'valibot';
-import { CORE_COLUMNS } from './registry.ts';
+import { ALL_COLUMNS } from './registry.ts';
 
 const nonEmpty = v.pipe(v.string(), v.nonEmpty());
 const SITE_CODES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'] as const;
@@ -49,7 +49,7 @@ export const SourceSchema = v.pipe(
     stepMin: v.picklist([5, 10, 15, 30]),
     rank: v.pipe(v.number(), v.integer(), v.minValue(1)),
     aggregate: v.optional(v.object({ method: v.literal('mean'), minCount: v.pipe(v.number(), v.integer(), v.minValue(1)) })),
-    columns: v.object(Object.fromEntries(CORE_COLUMNS.map((c) => [c, v.optional(ColumnMapSchema)]))),
+    columns: v.object(Object.fromEntries(ALL_COLUMNS.map((c) => [c, v.optional(ColumnMapSchema)]))),
   }),
   v.check((s) => Object.keys(s.columns).length > 0, 'a source needs at least one column mapping'),
   v.check((s) => s.stepMin === 30 || s.aggregate !== undefined, 'a source with a step below 30 min needs an aggregate rule'),
@@ -82,7 +82,7 @@ const HALF_HOUR_MICROS = 30n * 60n * 1_000_000n;
 const range = (min: number, max: number) => v.nullable(v.pipe(v.number(), v.finite(), v.minValue(min), v.maxValue(max)));
 
 /** One output row, in the column order of the observations table. */
-export const OBSERVATION_COLUMNS = ['site_id', 'ts_start', ...CORE_COLUMNS] as const;
+export const OBSERVATION_COLUMNS = ['site_id', 'ts_start', ...ALL_COLUMNS] as const;
 export const ObservationRowSchema = v.strictTuple([
   v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(255)),
   v.pipe(
@@ -95,6 +95,15 @@ export const ObservationRowSchema = v.strictTuple([
   range(-60, 60), // ta
   range(-40, 60), // tsoil
   range(0, 1), // swc
+  range(-50, 1500), // sw_in
+  range(-50, 3000), // ppfd
+  range(0, 105), // rh
+  range(0, 100), // vpd
+  range(0, 5), // ustar
+  v.nullable(v.picklist([0, 1, 2])), // nee_ssitc
+  range(-100, 100), // gpp_src
+  range(-100, 100), // reco_src
+  range(-10, 10), // ch4
 ]);
 
 /** Physical range issues are warnings. Every other issue is an error. */

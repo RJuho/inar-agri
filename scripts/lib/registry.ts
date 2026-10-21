@@ -6,8 +6,12 @@
 // source file (trimmed, decimal comma replaced by a point, empty = NULL).
 // Use num("col") to get a DOUBLE with the sentinels -9999, NA and inf as NULL.
 
+/** Strict core: present at all six sites. */
 export const CORE_COLUMNS = ['nee', 'nee_f', 'nee_qc', 'ta', 'tsoil', 'swc'] as const;
-export type CoreColumn = (typeof CORE_COLUMNS)[number];
+/** Optional columns: present at some sites only, NULL elsewhere. Inputs of scripts/calc.ts. */
+export const OPTIONAL_COLUMNS = ['sw_in', 'ppfd', 'rh', 'vpd', 'ustar', 'nee_ssitc', 'gpp_src', 'reco_src', 'ch4'] as const;
+export const ALL_COLUMNS = [...CORE_COLUMNS, ...OPTIONAL_COLUMNS] as const;
+export type CoreColumn = (typeof ALL_COLUMNS)[number];
 
 export type SiteCode = 'anttila' | 'sarkisuo' | 'haltiala' | 'qvidja' | 'viikki' | 'maktau';
 
@@ -130,6 +134,9 @@ function anttilaLike(site: SiteCode, code: string, dir: string, year: number): S
         },
         nee_f: { sourceColumns: ['co2_flux_final_gf_ensemble'], expr: 'num("co2_flux_final_gf_ensemble")' },
         nee_qc: { sourceColumns: ['co2_flux_final_gap'], expr: 'num("co2_flux_final_gap")', note: '0 = measured, 1 = gap-filled.' },
+        gpp_src: { sourceColumns: ['GPP_gf_ensemble_NT'], expr: 'num("GPP_gf_ensemble_NT")', note: 'Night-time partitioning of the data provider. GPP >= 0, NEE = Reco - GPP.' },
+        reco_src: { sourceColumns: ['Reco_gf_ensemble_NT'], expr: 'num("Reco_gf_ensemble_NT")', note: 'Night-time partitioning of the data provider.' },
+        ch4: { sourceColumns: ['ch4_flux_final_gf_ensemble'], expr: 'num("ch4_flux_final_gf_ensemble")', note: 'Gap-filled CH4 flux. Unit row: µmol m-2 s-1.' },
       },
     },
     {
@@ -140,6 +147,9 @@ function anttilaLike(site: SiteCode, code: string, dir: string, year: number): S
         ta: { sourceColumns: ['TA_1_1_1'], expr: 'num("TA_1_1_1")' },
         tsoil: { sourceColumns: ['TS_1_1_1'], expr: 'num("TS_1_1_1")', depthCm: null, note: 'Depth not in the source files.' },
         swc: { sourceColumns: ['SWC_1_1_1'], expr: 'num("SWC_1_1_1")', depthCm: null, note: 'Depth not in the source files.' },
+        sw_in: { sourceColumns: ['SWIN_1_1_1'], expr: 'num("SWIN_1_1_1")' },
+        ppfd: { sourceColumns: ['PPFD_1_1_1'], expr: 'num("PPFD_1_1_1")' },
+        rh: { sourceColumns: ['RH_1_1_1'], expr: 'num("RH_1_1_1")' },
       },
     },
   ];
@@ -150,6 +160,8 @@ function viikkiEc(year: number): Source {
   const nee = 'NEE (mg CO2 m-2 s-1)';
   const neeF = year === 2024 ? 'NEE _gapfilled (mg CO2 m-2 s-1)' : 'NEE_gapfilled (mg CO2 m-2 s-1)';
   const tair = year <= 2023 ? 'Tair  (?C)' : 'Tair (?C)';
+  const rh = year <= 2023 ? 'RH(%)' : 'RH (%)';
+  const ppfd = year === 2025 ? 'PPFD (umol/m2s)' : 'PAR (umol/m2s)';
   const soil2022: Partial<Record<CoreColumn, ColumnMap>> =
     year === 2022
       ? {
@@ -175,6 +187,9 @@ function viikkiEc(year: number): Source {
       },
       nee_qc: { sourceColumns: [nee], expr: `CASE WHEN num("${nee}") IS NOT NULL THEN 0 ELSE 1 END`, note: '0 where a measured NEE exists.' },
       ta: { sourceColumns: [tair], expr: `num("${tair}")` },
+      sw_in: { sourceColumns: ['SWin (W/m2)'], expr: 'num("SWin (W/m2)")' },
+      ppfd: { sourceColumns: [ppfd], expr: `num("${ppfd}")` },
+      rh: { sourceColumns: [rh], expr: `num("${rh}")` },
       ...soil2022,
     },
   };
@@ -197,6 +212,8 @@ const maktauSoil = (rank: number): Partial<Record<CoreColumn, ColumnMap>> => ({
   ta: { sourceColumns: ['TA_1_1_1'], expr: 'num("TA_1_1_1")', zeroIsNull: true, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
   tsoil: { sourceColumns: ['TS_1_1_1'], expr: 'num("TS_1_1_1")', zeroIsNull: true, depthCm: 10, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
   swc: { sourceColumns: ['SWC_1_1_1'], expr: 'num("SWC_1_1_1")', zeroIsNull: true, depthCm: 10, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
+  sw_in: { sourceColumns: ['SW_IN_1_1_1'], expr: 'num("SW_IN_1_1_1")', note: `Rank ${rank}.` },
+  rh: { sourceColumns: ['RH_1_1_1'], expr: 'num("RH_1_1_1")', zeroIsNull: true, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
 });
 
 export const SOURCES: Source[] = [
@@ -215,6 +232,8 @@ export const SOURCES: Source[] = [
       ta: { sourceColumns: ['TA_F'], expr: 'num("TA_F")' },
       tsoil: { sourceColumns: ['TS_010_F'], expr: 'num("TS_010_F")', depthCm: 10 },
       swc: { sourceColumns: ['SWC_010_F'], expr: 'num("SWC_010_F")', depthCm: 10 },
+      ppfd: { sourceColumns: ['PPFD_IN_F'], expr: 'num("PPFD_IN_F")', note: 'Gap-filled.' },
+      vpd: { sourceColumns: ['VPD_F'], expr: 'num("VPD_F")', note: 'Gap-filled. hPa.' },
     },
   },
   {
@@ -228,6 +247,15 @@ export const SOURCES: Source[] = [
       ta: { sourceColumns: ['TA_F'], expr: 'num("TA_F")' },
       tsoil: { sourceColumns: ['TS_1'], expr: 'num("TS_1")', depthCm: 5 },
       swc: { sourceColumns: ['SM'], expr: 'num("SM")', depthCm: 10 },
+      sw_in: { sourceColumns: ['SW_IN_F'], expr: 'num("SW_IN_F")', note: 'Gap-filled.' },
+      rh: { sourceColumns: ['RH_F'], expr: 'num("RH_F")', note: 'Gap-filled.' },
+      vpd: { sourceColumns: ['VPD_F'], expr: 'num("VPD_F")', note: 'Gap-filled. hPa.' },
+      ustar: { sourceColumns: ['USTAR'], expr: 'num("USTAR")' },
+      gpp_src: {
+        sourceColumns: ['GPP'], expr: '-num("GPP")', factor: -1,
+        note: 'Daytime partitioning of the data provider. The source GPP is negative (uptake). The factor -1 gives GPP >= 0 like the other sites.',
+      },
+      reco_src: { sourceColumns: ['RECO'], expr: 'num("RECO")', note: 'Daytime partitioning of the data provider.' },
     },
   },
   viikkiEc(2022), viikkiEc(2023), viikkiEc(2024), viikkiEc(2025),
@@ -237,7 +265,10 @@ export const SOURCES: Source[] = [
     delim: ',', headerLines: 1, decimalComma: false,
     timestampColumn: 'TIMESTAMP_START', timestampFormats: [COMPACT], timestampIsEnd: false, stepMin: 30, rank: 1,
     columns: {
-      nee: { sourceColumns: ['FC'], expr: 'num("FC")', note: 'Measured CO2 flux. No gap-filled series exists.' },
+      nee: { sourceColumns: ['FC'], expr: 'num("FC")', note: 'Measured CO2 flux, not quality filtered. No gap-filled series exists.' },
+      nee_ssitc: { sourceColumns: ['FC_SSITC_TEST'], expr: 'num("FC_SSITC_TEST")', note: 'Quality flag of FC: 0 best, 1 good, 2 poor. NULL for some FC rows.' },
+      ustar: { sourceColumns: ['USTAR'], expr: 'num("USTAR")' },
+      vpd: { sourceColumns: ['VPD'], expr: 'num("VPD")', note: 'hPa.' },
       ...maktauSoil(1),
     },
   },
@@ -261,4 +292,13 @@ export const VARIABLES = [
   { column: 'ta', type: 'DOUBLE', unit: '°C', description: 'Air temperature.' },
   { column: 'tsoil', type: 'DOUBLE', unit: '°C', description: 'Soil temperature of the shallowest sensor. Depth per site in site_variables.parquet.' },
   { column: 'swc', type: 'DOUBLE', unit: 'm3 m-3', description: 'Volumetric soil water content of the shallowest sensor. Depth per site in site_variables.parquet.' },
+  { column: 'sw_in', type: 'DOUBLE', unit: 'W m-2', description: 'Incoming shortwave radiation. Not at Haltiala. Särkisuo 2022 has few values.' },
+  { column: 'ppfd', type: 'DOUBLE', unit: 'µmol m-2 s-1', description: 'Incoming photosynthetic photon flux density. Not at Qvidja and Maktau.' },
+  { column: 'rh', type: 'DOUBLE', unit: '%', description: 'Relative humidity. Not at Haltiala.' },
+  { column: 'vpd', type: 'DOUBLE', unit: 'hPa', description: 'Vapour pressure deficit from the source file. Haltiala, Qvidja, Maktau only.' },
+  { column: 'ustar', type: 'DOUBLE', unit: 'm s-1', description: 'Friction velocity. Qvidja and Maktau only.' },
+  { column: 'nee_ssitc', type: 'UTINYINT', unit: '-', description: 'Quality flag of the measured CO2 flux (Foken scheme: 0 best, 1 good, 2 poor). Maktau only.' },
+  { column: 'gpp_src', type: 'DOUBLE', unit: 'µmol CO2 m-2 s-1', description: 'Gross primary production from the data provider, GPP >= 0 (uptake). Anttila, Särkisuo (night-time method), Qvidja (daytime method, sign changed).' },
+  { column: 'reco_src', type: 'DOUBLE', unit: 'µmol CO2 m-2 s-1', description: 'Ecosystem respiration from the data provider. Anttila, Särkisuo, Qvidja.' },
+  { column: 'ch4', type: 'DOUBLE', unit: 'µmol CH4 m-2 s-1', description: 'Gap-filled methane flux. Anttila and Särkisuo only.' },
 ] as const;

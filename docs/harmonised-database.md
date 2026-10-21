@@ -121,9 +121,26 @@ To add an output column, add it to `CORE_COLUMNS` and `VARIABLES` in the registr
 - Depth of `TS_1_1_1` and `SWC_1_1_1` at Anttila and Särkisuo.
 - Maktau soil temperature in the meteo file has values near 1 °C in 2016-2017 and 2024. These pass the range check but look like sensor faults.
 
+## Optional columns (added 2026-10-21)
+
+These columns are NULL at the sites that do not measure them. They are the inputs of `scripts/calc.ts` (see `docs/calculated.md`). `OPTIONAL_COLUMNS` in the registry lists them; the build treats them like the core columns (merge by rank, conflicts, range warnings).
+
+| Column | Unit | Sites | Source columns |
+|---|---|---|---|
+| `sw_in` | W m-2 | Anttila, Särkisuo (`SWIN_1_1_1`; Särkisuo 2022 has 3 234 values only), Qvidja (`SW_IN_F`), Viikki (`SWin (W/m2)`), Maktau (`SW_IN_1_1_1`, continuous then meteo) | |
+| `ppfd` | µmol m-2 s-1 | Anttila, Särkisuo (`PPFD_1_1_1`), Haltiala (`PPFD_IN_F`), Viikki (`PAR (umol/m2s)`, 2025 `PPFD (umol/m2s)`) | |
+| `rh` | % | Anttila, Särkisuo (`RH_1_1_1`), Qvidja (`RH_F`), Viikki (`RH(%)` / `RH (%)`), Maktau (`RH_1_1_1`, 0 = NULL) | |
+| `vpd` | hPa | Haltiala (`VPD_F`), Qvidja (`VPD_F`), Maktau (`VPD`) | |
+| `ustar` | m s-1 | Qvidja (`USTAR`), Maktau (`USTAR`) | |
+| `nee_ssitc` | - | Maktau (`FC_SSITC_TEST`: 0 best, 1 good, 2 poor) | |
+| `gpp_src` | µmol CO2 m-2 s-1 | Anttila, Särkisuo (`GPP_gf_ensemble_NT`), Qvidja (`GPP` × −1: the source gives uptake as negative) | |
+| `reco_src` | µmol CO2 m-2 s-1 | Anttila, Särkisuo (`Reco_gf_ensemble_NT`), Qvidja (`RECO`) | |
+| `ch4` | µmol CH4 m-2 s-1 | Anttila, Särkisuo (`ch4_flux_final_gf_ensemble`) | |
+
+Known range warnings: Qvidja `vpd` below 0 in 2 018 rows (gap-filled values), Maktau `sw_in` above 1 500 W m-2 in 4 rows. Qvidja `ustar` has 76 268 merge conflicts: the duplicate rows of 2018-2023 differ in USTAR; the first row wins.
+
 ## Later extensions
 
-- Variables present at two or more sites, as nullable columns: PPFD, SW_IN, RH, VPD, pressure, precipitation, LE, H, CH4 and N2O fluxes, GPP and RECO.
-- Haltiala `NEE_F1` to `NEE_F10` for annual uncertainty.
-- Management tables from the Haltiala and Qvidja xlsx files.
+- More variables as nullable columns: pressure, precipitation, LE, H, N2O flux.
+- Management tables from the Haltiala and Qvidja xlsx files (the carbon values are in `scripts/lib/calc/management.ts`).
 - The Maktau 1-hour meteo file as a separate table.

@@ -18,7 +18,7 @@ Site codes: Ant = Anttila, Sar = Särkisuo, Hal = Haltiala, Qvi = Qvidja, Vii = 
 | VPD | from TA and RH | from TA and RH | ✓ | ✓ | from TA and RH | ✓ | 6 (3 calculated) |
 | Precipitation | ✓ | ✓ | – | ✓ | ✓ | ✓ | 5 |
 | SW_OUT, LW, net radiation | ✓ | ✓ | – | ✓ SW_OUT, NETRAD | ✓ | ✓ | 5 |
-| Wind, USTAR | flux file | flux file | – | ✓ | WS, WD | ✓ | 5 |
+| Wind, USTAR | – | – | – | ✓ | WS, WD | ✓ | 3 |
 | Air pressure | ✓ | ✓ | – | – | ✓ | ✓ | 4 |
 | LE / H | ✓ | ✓ | – | ✓ | – | ✓ (LE often -9999) | 4 |
 | Soil heat flux | ✓ | ✓ | – | – | column almost empty | ✓ `G` | 3 |
@@ -44,7 +44,7 @@ No Finnish site has NDVI, LAI, canopy height or a biomass time series.
 ### Harvest and yield records
 
 - **Qvidja** (`Qvidja_management.xlsx`): harvest amount in kg/ha with a DM fraction per cut, 2018 to 2024 (no rows for 2025). Sums of amounts above zero per year: 2018 2 054, 2019 10 359, 2020 6 885, 2021 3 526, 2022 2 639, 2023 1 841, 2024 3 937 kg/ha. Rows with amount 0 are cleaning cuts (`puhdistusniitto`). The file also has grazing (animal, days) and fertilisation. Make sure that `Amount` is fresh mass before you multiply it by the DM fraction.
-- **Haltiala** (`haltiala_smear_management.xlsx`): 7 rows, 2021 only. One harvest value: 7 187 kg DW/ha (3 595 kg C/ha), barley, 2021-09-08, from manual plots. The parcel cards PDF (`haltiala_smear_Lohkokortit_2025.pdf`) is not parsed and can have data for other years.
+- **Haltiala** (`haltiala_smear_management.xlsx`): 37 rows, 2021 to 2025. Harvest values: 2021 7 187 kg DW/ha (3 595 kg C/ha, barley, manual plots), 2022 6 903 kg DW/ha grain (3 452 kg C/ha, oats, straw left), 2025 3 608 kg DW/ha (oats, no C value). 2023: manure 2 × 10 m3/ha, grass failed, no harvest. 2024: sunflower crushed, no harvest. The parcel card PDF (`haltiala_smear_Lohkokortit_2025.pdf`) repeats the 2025 yield (117 260 kg on 32.5 ha). The carbon values are in `scripts/lib/calc/management.ts`.
 - **Viikki**: `EC/Management Information.docx`, not parsed.
 - **Maktau**: text only (stover burning, weeding, ploughing).
 - **Anttila, Särkisuo**: no management file.

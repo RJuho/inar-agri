@@ -6,6 +6,8 @@
   "description": "Harmonised eddy-covariance database for six agricultural sites. DuckDB + Valibot build script.",
   "scripts": {
     "build:db": "node scripts/build-db.ts",
+    "calc": "node scripts/calc.ts",
+    "test:unit": "node --test 'scripts/lib/calc/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "site:sync": "node scripts/sync-site-data.ts && node scripts/sync-site-duckdb.ts",
     "site:dev": "npm run site:sync && astro dev --root site --host",

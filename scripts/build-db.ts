@@ -9,9 +9,10 @@
 
 import { createReadStream } from 'node:fs';
 import { mkdir, stat, writeFile } from 'node:fs/promises';
-import { DuckDBInstance, type DuckDBConnection, type DuckDBValue } from '@duckdb/node-api';
+import { DuckDBInstance, type DuckDBConnection } from '@duckdb/node-api';
 import * as v from 'valibot';
-import { CORE_COLUMNS, REGISTRY, VARIABLES, type CoreColumn } from './lib/registry.ts';
+import { ALL_COLUMNS, REGISTRY, VARIABLES, type CoreColumn } from './lib/registry.ts';
+import { fail, fmt, ident, lit, log, num, numOrNull, one, rows, str, table } from './lib/duck.ts';
 import {
   OBSERVATION_COLUMNS,
   ObservationRowSchema,
@@ -33,37 +34,11 @@ type SourceReport = Report['sources'][number];
 
 // ---------- small helpers ----------
 
-function lit(x: string | number | boolean | null | undefined): string {
-  if (x === null || x === undefined) return 'NULL';
-  if (typeof x === 'number') return Number.isFinite(x) ? String(x) : 'NULL';
-  if (typeof x === 'boolean') return x ? 'TRUE' : 'FALSE';
-  return `'${x.replace(/'/g, "''")}'`;
-}
-const ident = (x: string): string => `"${x.replace(/"/g, '""')}"`;
-
-function plain(value: DuckDBValue): unknown {
-  if (typeof value === 'bigint') return Number(value);
-  if (value !== null && typeof value === 'object') return String(value);
-  return value;
-}
-
-async function rows(conn: DuckDBConnection, sql: string): Promise<Record<string, unknown>[]> {
-  const reader = await conn.runAndReadAll(sql);
-  return reader.getRowObjects().map((o) => Object.fromEntries(Object.entries(o).map(([k, val]) => [k, plain(val)])));
-}
-
-async function one(conn: DuckDBConnection, sql: string): Promise<Record<string, unknown>> {
-  const r = await rows(conn, sql);
-  if (r.length !== 1) throw new Error(`expected one row, got ${r.length}: ${sql}`);
-  return r[0]!;
-}
-
-const num = (x: unknown): number => (typeof x === 'number' ? x : Number(x));
-const numOrNull = (x: unknown): number | null => (x === null || x === undefined ? null : num(x));
-const str = (x: unknown): string => String(x);
+/** DuckDB type of an output column, from VARIABLES. */
+const COLUMN_TYPE: Record<string, string> = Object.fromEntries(VARIABLES.map((x) => [x.column, x.type]));
 
 function mappings(src: Source): [CoreColumn, ColumnMap][] {
-  return CORE_COLUMNS.flatMap((c) => {
+  return ALL_COLUMNS.flatMap((c) => {
     const m = src.columns[c];
     return m ? [[c, m] as [CoreColumn, ColumnMap]] : [];
   });
@@ -83,15 +58,6 @@ async function countLines(path: string): Promise<number> {
     if (buf.length > 0) last = buf[buf.length - 1]!;
   }
   return lines + (last === 10 ? 0 : 1);
-}
-
-function log(msg: string): void {
-  process.stderr.write(`${msg}\n`);
-}
-
-function fail(msg: string): never {
-  process.stderr.write(`\nERROR: ${msg}\n`);
-  process.exit(1);
 }
 
 // ---------- step 1: read one source file into stage_<id> ----------
@@ -160,8 +126,8 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
      FROM ${ident(`raw_${src.id}`)}`,
   );
 
-  // Stage: one row per period with the six core columns. Missing columns are NULL.
-  const allCols = CORE_COLUMNS.map((c) => {
+  // Stage: one row per period with all output columns. Missing columns are NULL.
+  const allCols = ALL_COLUMNS.map((c) => {
     const m = src.columns[c];
     return m ? `${colExpr(m)} AS ${ident(c)}` : `NULL::DOUBLE AS ${ident(c)}`;
   });
@@ -171,10 +137,10 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
     stageSql = `
       WITH r AS (SELECT source_row, ts_parsed, ts_local, ${allCols.join(', ')} FROM ${ident(`raw_${src.id}`)} WHERE ts_local IS NOT NULL),
       d AS (SELECT ts_parsed, ts_local, min(source_row) AS source_row,
-                   ${CORE_COLUMNS.map((c) => `any_value(${ident(c)} ORDER BY source_row) AS ${ident(c)}`).join(', ')}
+                   ${ALL_COLUMNS.map((c) => `any_value(${ident(c)} ORDER BY source_row) AS ${ident(c)}`).join(', ')}
             FROM r GROUP BY ts_parsed, ts_local)
       SELECT ts_local, min(source_row) AS source_row,
-             ${CORE_COLUMNS.map((c) => `CASE WHEN count(${ident(c)}) >= ${minCount} THEN round(avg(${ident(c)}), 10) END AS ${ident(c)}`).join(', ')}
+             ${ALL_COLUMNS.map((c) => `CASE WHEN count(${ident(c)}) >= ${minCount} THEN round(avg(${ident(c)}), 10) END AS ${ident(c)}`).join(', ')}
       FROM d GROUP BY ts_local`;
   } else {
     stageSql = `SELECT ts_local, source_row, ${allCols.join(', ')} FROM ${ident(`raw_${src.id}`)} WHERE ts_local IS NOT NULL`;
@@ -213,20 +179,20 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
 
 async function mergeSite(conn: DuckDBConnection, site: Site, sources: Source[]): Promise<Record<CoreColumn, number>> {
   const union = sources
-    .map((s) => `SELECT ${s.rank} AS rank, source_row, ts_local, ${CORE_COLUMNS.map(ident).join(', ')} FROM ${ident(`stage_${s.id}`)}`)
+    .map((s) => `SELECT ${s.rank} AS rank, source_row, ts_local, ${ALL_COLUMNS.map(ident).join(', ')} FROM ${ident(`stage_${s.id}`)}`)
     .join('\n UNION ALL ');
   await conn.run(`
     CREATE TABLE ${ident(`merged_${site.code}`)} AS
     SELECT ${site.siteId} AS site_id, ts_local,
-           ${CORE_COLUMNS.map((c) => `any_value(${ident(c)} ORDER BY rank, source_row) AS ${ident(c)}`).join(', ')},
-           ${CORE_COLUMNS.map((c) => `count(DISTINCT ${ident(c)}) > 1 AS ${ident(`conflict_${c}`)}`).join(', ')}
+           ${ALL_COLUMNS.map((c) => `any_value(${ident(c)} ORDER BY rank, source_row) AS ${ident(c)}`).join(', ')},
+           ${ALL_COLUMNS.map((c) => `count(DISTINCT ${ident(c)}) > 1 AS ${ident(`conflict_${c}`)}`).join(', ')}
     FROM (${union})
     GROUP BY ts_local`);
   const r = await one(
     conn,
-    `SELECT ${CORE_COLUMNS.map((c) => `count(*) FILTER (WHERE ${ident(`conflict_${c}`)}) AS ${ident(c)}`).join(', ')} FROM ${ident(`merged_${site.code}`)}`,
+    `SELECT ${ALL_COLUMNS.map((c) => `count(*) FILTER (WHERE ${ident(`conflict_${c}`)}) AS ${ident(c)}`).join(', ')} FROM ${ident(`merged_${site.code}`)}`,
   );
-  return Object.fromEntries(CORE_COLUMNS.map((c) => [c, num(r[c])])) as Record<CoreColumn, number>;
+  return Object.fromEntries(ALL_COLUMNS.map((c) => [c, num(r[c])])) as Record<CoreColumn, number>;
 }
 
 // ---------- step 3: Valibot pass over every output row ----------
@@ -264,31 +230,20 @@ async function validateRows(conn: DuckDBConnection): Promise<Validation> {
 type ColStat = { n_valid: number; min: number | null; max: number | null; mean: number | null };
 
 function statSelect(): string {
-  return CORE_COLUMNS.map(
+  return ALL_COLUMNS.map(
     (c) => `count(${ident(c)}) AS ${ident(`nv_${c}`)}, min(${ident(c)}) AS ${ident(`min_${c}`)}, max(${ident(c)}) AS ${ident(`max_${c}`)}, avg(${ident(c)}) AS ${ident(`mean_${c}`)}`,
   ).join(', ');
 }
 
 function colStats(r: Record<string, unknown>): Record<string, ColStat> {
   const out: Record<string, ColStat> = {};
-  for (const c of CORE_COLUMNS) {
+  for (const c of ALL_COLUMNS) {
     out[c] = { n_valid: num(r[`nv_${c}`]), min: numOrNull(r[`min_${c}`]), max: numOrNull(r[`max_${c}`]), mean: numOrNull(r[`mean_${c}`]) };
   }
   return out;
 }
 
 // ---------- report rendering ----------
-
-function fmt(x: number | null | undefined): string {
-  if (x === null || x === undefined) return '';
-  if (Number.isInteger(x)) return String(x);
-  return String(Number(x.toPrecision(5)));
-}
-
-function table(headers: string[], body: (string | number | null)[][]): string {
-  const line = (cells: (string | number | null)[]) => `| ${cells.map((c) => (c === null ? '' : String(c))).join(' | ')} |`;
-  return [line(headers), `|${headers.map(() => '---').join('|')}|`, ...body.map(line)].join('\n');
-}
 
 function renderMarkdown(report: Report): string {
   const parts: string[] = [];
@@ -317,7 +272,7 @@ function renderMarkdown(report: Report): string {
     parts.push(
       table(
         ['Column', 'Valid', 'Valid %', 'Min', 'Max', 'Mean', 'Conflicts', 'Range warnings'],
-        CORE_COLUMNS.map((c) => {
+        ALL_COLUMNS.map((c) => {
           const cs = s.columns[c]!;
           return [c, cs.n_valid, fmt(s.rows ? Number(((100 * cs.n_valid) / s.rows).toFixed(1)) : 0), fmt(cs.min), fmt(cs.max), fmt(cs.mean), cs.conflicts, cs.rangeWarnings];
         }),
@@ -328,11 +283,11 @@ function renderMarkdown(report: Report): string {
     parts.push('');
     parts.push(
       table(
-        ['Year', 'Rows', ...CORE_COLUMNS],
+        ['Year', 'Rows', ...ALL_COLUMNS],
         s.years.map((y) => [
           y.year,
           y.rows,
-          ...CORE_COLUMNS.map((c) => {
+          ...ALL_COLUMNS.map((c) => {
             const cs = y.columns[c]!;
             return cs.n_valid === 0 ? '0' : `${cs.n_valid} · ${fmt(cs.min)} … ${fmt(cs.max)}`;
           }),
@@ -410,7 +365,7 @@ async function main(): Promise<void> {
     ${registry.sites
       .map(
         (site) =>
-          `SELECT site_id, ts_local - to_minutes(${site.utcOffsetMin}) AS ts_start, ${CORE_COLUMNS.map(ident).join(', ')} FROM ${ident(`merged_${site.code}`)}`,
+          `SELECT site_id, ts_local - to_minutes(${site.utcOffsetMin}) AS ts_start, ${ALL_COLUMNS.map(ident).join(', ')} FROM ${ident(`merged_${site.code}`)}`,
       )
       .join('\n UNION ALL ')}`);
   await conn.run(`
@@ -419,8 +374,7 @@ async function main(): Promise<void> {
     CREATE TABLE obs AS
     WITH grid AS (SELECT site_id, unnest(generate_series(t0, t1, ${STEP})) AS ts_start FROM span)
     SELECT g.site_id::UTINYINT AS site_id, g.ts_start::TIMESTAMP AS ts_start,
-           m.nee::DOUBLE AS nee, m.nee_f::DOUBLE AS nee_f, m.nee_qc::UTINYINT AS nee_qc,
-           m.ta::DOUBLE AS ta, m.tsoil::DOUBLE AS tsoil, m.swc::DOUBLE AS swc
+           ${ALL_COLUMNS.map((c) => `m.${ident(c)}::${COLUMN_TYPE[c] ?? 'DOUBLE'} AS ${ident(c)}`).join(', ')}
     FROM grid g LEFT JOIN merged m USING (site_id, ts_start)
     ORDER BY g.site_id, g.ts_start`);
 
@@ -494,7 +448,7 @@ async function main(): Promise<void> {
     const conflict = conflicts.get(site.siteId)!;
     const warnings = validation.warnings.get(site.siteId) ?? new Map<string, number>();
     const columns: Report['sites'][number]['columns'] = {};
-    for (const c of CORE_COLUMNS) columns[c] = { ...stats[c]!, conflicts: conflict[c], rangeWarnings: warnings.get(c) ?? 0 };
+    for (const c of ALL_COLUMNS) columns[c] = { ...stats[c]!, conflicts: conflict[c], rangeWarnings: warnings.get(c) ?? 0 };
     return {
       siteId: site.siteId,
       code: site.code,

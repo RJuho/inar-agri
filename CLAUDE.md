@@ -82,6 +82,13 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Output: `db/observations.parquet` (one row per site and 30-min period, UTC `ts_start`, strict core columns `nee`, `nee_f`, `nee_qc`, `ta`, `tsoil`, `swc`), `db/sites.parquet` (geolocation index), `db/variables.parquet`, `db/site_variables.parquet`, `db/report.md`.
 - The Parquet files are not in git. Run the build to create them. Read the report for counts, conflicts and warnings.
 
+## Calculated products (`data/calculated/`)
+
+- Design, formulas, assumptions and validation: `docs/calculated.md`. Source article: Hu et al. 2024 (`data/s43247-024-01202-3.pdf`, `.htm`). Build: `npm run calc` (runs `scripts/calc.ts`, about 7 s, needs `db/*.parquet`). Unit tests: `npm run test:unit`.
+- Code: `scripts/lib/calc/` (`constants.ts` all parameters, `lloyd-taylor.ts` fitter, `partition.ts` night-time partitioning, `ustar.ts` and `mds.ts` Maktau filter and gap filling, `management.ts` harvest and manure carbon table, `schemas.ts`, `report.ts`), shared helpers in `scripts/lib/duck.ts`.
+- Output (not in git): `fluxes_30min.parquet` (NEE, gap-filled NEE, Reco, GPP per 30 min, GPP ≥ 0, `nee_f = reco - gpp`), `daily.csv`, `monthly.csv`, `annual.csv` (g C m-2), `necb.csv` (NECB = −NEE − C_harvest + C_exo − C_CH4, positive = gain), `management_carbon.csv`, fit diagnostics, validation tables, `report.md`.
+- The harmonised database has optional columns for this: `sw_in`, `ppfd`, `rh`, `vpd`, `ustar`, `nee_ssitc`, `gpp_src`, `reco_src`, `ch4` (NULL where a site lacks them).
+
 ## Website (`site/`)
 
 - Static Astro site (Astro 7.4.1). Apache ECharts draws the charts. DuckDB-WASM reads the Parquet files in the browser. Vanilla TypeScript and vanilla CSS only. Do not add a UI framework.
