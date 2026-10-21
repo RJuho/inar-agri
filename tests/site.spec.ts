@@ -290,7 +290,7 @@ test.describe('views and diagrams', () => {
   });
 });
 
-const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint', 'response', 'budget'] as const;
+const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint', 'response', 'budget', 'coverage'] as const;
 const SITE_NAMES = ['Anttila', 'Särkisuo', 'Haltiala', 'Qvidja', 'Viikki', 'Maktau'];
 
 /** A view with one diagram of `type`. */
@@ -384,6 +384,16 @@ test.describe('diagram types', () => {
         expect(titles).toContain('µmol CO₂ m⁻² s⁻¹');
         expect(titles).not.toContain('m-2');
         expect(titles).toContain('m³ m⁻³');
+      } else if (type === 'coverage') {
+        // The y axis lists the sites and the colour is a share in percent. No variable unit is shown.
+        expect(axes.y.every((n) => n === 'Site')).toBe(true);
+        expect(all).toContain('Month (');
+        const titles = await card.locator('.diagram-chart').evaluate((el) => {
+          const chart = (el as unknown as { __chart: { getOption(): { title?: Array<{ text?: string }> } } }).__chart;
+          return (chart.getOption().title ?? []).map((t) => t.text ?? '').join(' | ');
+        });
+        expect(titles).toContain('NEE, gap-filled — coverage');
+        expect(titles).toContain('Soil water content — coverage');
       } else {
         expect(all).toContain('µmol CO₂ m⁻² s⁻¹');
         expect(all).not.toContain('m-2');
@@ -595,6 +605,50 @@ test.describe('diagram types', () => {
     expect(xLabels.length).toBeGreaterThan(0);
     for (const label of xLabels) expect(label).toMatch(/^\d{4}\*$/);
     await expect(page.locator('.diagram-sub')).toContainText('Measured NEE has gaps');
+  });
+
+  test('coverage gives the share of half hours per site and month', async ({ page }) => {
+    const base = typeView('coverage', ['nee', 'nee_f']);
+    // Qvidja (4) and Viikki (5), 2022 to 2023 = 24 months.
+    await page.goto('/' + viewHash({ ...base, params: { ...base.params, sites: [4, 5], yearFrom: 2022, yearTo: 2023 } }));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    // One heatmap series per variable.
+    await expect(card).toHaveAttribute('data-series', '2');
+    const got = await card.locator('.diagram-chart').evaluate((el) => {
+      type Item = { value: [number, number, number] };
+      type Option = { xAxis: Array<{ data: string[] }>; yAxis: Array<{ data: string[] }>; series: Array<{ name: string; data: Item[] }> };
+      const o = (el as unknown as { __chart: { getOption(): Option } }).__chart.getOption();
+      const mean = (s: { data: Item[] }, row: number) => {
+        const v = s.data.filter((d) => d.value[1] === row).map((d) => d.value[2]);
+        return v.reduce((a, b) => a + b, 0) / v.length;
+      };
+      const rows = o.yAxis[0]?.data ?? [];
+      const q = rows.indexOf('Qvidja');
+      const vi = rows.indexOf('Viikki');
+      return {
+        months: o.xAxis[0]?.data ?? [],
+        rows,
+        qvidjaNeeF: mean(o.series[1] as { data: Item[] }, q),
+        viikkiNee: mean(o.series[0] as { data: Item[] }, vi),
+        viikkiNeeF: mean(o.series[1] as { data: Item[] }, vi),
+      };
+    });
+    expect(got.months.length).toBe(24);
+    expect(got.months[0]).toBe('2022-01');
+    expect(got.months[23]).toBe('2023-12');
+    expect(got.rows).toEqual(['Qvidja', 'Viikki']);
+    // Qvidja gap-filled NEE is near complete. Viikki measured NEE is about 20 % of the periods.
+    expect(got.qvidjaNeeF).toBeGreaterThan(90);
+    expect(got.viikkiNee).toBeGreaterThan(8);
+    expect(got.viikkiNee).toBeLessThan(40);
+    expect(got.viikkiNeeF).toBeGreaterThan(got.viikkiNee);
+    await expect(page.locator('.diagram-sub')).toContainText('Share of the half hours');
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('Coverage heatmap: months on the x axis, sites on the y axis, one panel per variable (2)');
+    // The two y axes have the same name, so the axes sentence gives it one time.
+    expect(alt).toContain('y axis: Site.');
   });
 
   test('scatter with only the x variable shows a note', async ({ page }) => {
