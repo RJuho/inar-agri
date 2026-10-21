@@ -290,7 +290,7 @@ test.describe('views and diagrams', () => {
   });
 });
 
-const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint', 'response'] as const;
+const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint', 'response', 'budget'] as const;
 const SITE_NAMES = ['Anttila', 'Särkisuo', 'Haltiala', 'Qvidja', 'Viikki', 'Maktau'];
 
 /** A view with one diagram of `type`. */
@@ -370,6 +370,10 @@ test.describe('diagram types', () => {
       const all = [...axes.y, ...axes.x].join(' | ').replace(/\s*\n\s*/g, ' ');
       if (type === 'cumulative') {
         expect(all).toContain('g C m⁻²');
+      } else if (type === 'budget') {
+        // Annual sums of the fluxes only. The other variables are not shown.
+        expect(all).toContain('g C m⁻² yr⁻¹');
+        expect(all).not.toContain('m-2');
       } else if (type === 'fingerprint') {
         // The y axis is the time of day. The unit is on the colour scale label of each variable block.
         expect(all).toContain('Time of day');
@@ -510,6 +514,87 @@ test.describe('diagram types', () => {
     await waitReady(page);
     await expect(card).toHaveAttribute('data-series', '0');
     await expect(page.locator('.diagram-note')).toContainText('x variable');
+  });
+
+  test('budget without a flux shows a note, not an error', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('budget', ['ta', 'swc'])));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    await expect(card).toHaveAttribute('data-series', '0');
+    await expect(card.locator('.diagram-note')).toContainText('Select a flux variable');
+  });
+
+  test('budget sums match annual.csv and marks partial years', async ({ page }) => {
+    // Anttila (site 1), two full years. Qvidja (site 4), 2018 starts in May: partial.
+    const base = typeView('budget', ['nee_f', 'gpp', 'reco']);
+    await page.goto('/' + viewHash({ ...base, params: { ...base.params, sites: [1, 4] } }));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    // 2 Anttila years + 8 Qvidja years, 3 bar series per site.
+    await expect(card).toHaveAttribute('data-rows', '10');
+    await expect(card).toHaveAttribute('data-series', '6');
+    await expect(page.locator('.diagram-sub')).toContainText('GPP is drawn negative');
+    await expect(page.locator('.diagram-sub')).toContainText('* partial year');
+    const option = await card.locator('.diagram-chart').evaluate((el) => {
+      type Item = number | null | { value: number; itemStyle?: { opacity?: number; decal?: unknown } };
+      type Series = { type: string; name: string; xAxisIndex: number; data?: Item[] };
+      const chart = (el as unknown as { __chart: { getOption(): { series: Series[]; xAxis: Array<{ data: string[] }>; legend: Array<{ data: string[] }> } } }).__chart;
+      const o = chart.getOption();
+      return {
+        series: o.series.filter((s) => s.type === 'bar').map((s) => ({ name: s.name, panel: s.xAxisIndex, data: s.data ?? [] })),
+        xLabels: o.xAxis.map((a) => a.data),
+        legend: o.legend[0]?.data ?? [],
+      };
+    });
+    expect(option.legend).toEqual(['NEE, gap-filled', 'GPP, calculated', 'Reco, calculated']);
+    // Panel 0 = Anttila: full years, plain values. Panel 1 = Qvidja: 2018 is partial.
+    expect(option.xLabels[0]).toEqual(['2022', '2023']);
+    expect(option.xLabels[1]?.[0]).toBe('2018*');
+    const qvidjaNee = option.series.find((s) => s.panel === 1 && s.name === 'NEE, gap-filled');
+    const first = qvidjaNee?.data[0] as { value: number; itemStyle: { opacity: number; decal: unknown } };
+    expect(first.itemStyle.opacity).toBe(0.45);
+    expect(first.itemStyle.decal).toBeTruthy();
+    // The sums match the calculated annual table within 1.5 % (the local-year definition differs a little).
+    const csv = await readFile('data/calculated/annual.csv', 'utf8');
+    const [header, ...lines] = csv.trim().split('\n') as [string, ...string[]];
+    const cols = header.split(',');
+    const rows = lines.map((l) => Object.fromEntries(l.split(',').map((v, i) => [cols[i], v])) as Record<string, string>);
+    const anttila = (year: number) => rows.find((r) => r.site_id === '1' && r.year === String(year)) as Record<string, string>;
+    type Item = number | null | { value: number };
+    const value = (name: string, i: number) => {
+      const d = (option.series.find((s) => s.panel === 0 && s.name === name) as { data: Item[] }).data[i];
+      return typeof d === 'number' ? d : (d as { value: number }).value;
+    };
+    for (const [i, year] of [2022, 2023].entries()) {
+      const ref = anttila(year);
+      const close = (a: number, b: number) => expect(Math.abs(a - b) / Math.abs(b)).toBeLessThan(0.015);
+      close(value('NEE, gap-filled', i), Number(ref.nee_f_gc));
+      // GPP is drawn negative.
+      close(-value('GPP, calculated', i), Number(ref.gpp_gc));
+      close(value('Reco, calculated', i), Number(ref.reco_gc));
+    }
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('Annual carbon budget: one panel per site (2)');
+    expect(alt).toMatch(/Anttila: 2022 NEE gap-filled -?\d+, GPP \d+, Reco \d+/);
+  });
+
+  test('budget marks measured NEE as partial where it has gaps', async ({ page }) => {
+    const base = typeView('budget', ['nee', 'nee_f']);
+    await page.goto('/' + viewHash({ ...base, params: { ...base.params, sites: [3] } }));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    await expect(card).toHaveAttribute('data-series', '2');
+    const xLabels = await card.locator('.diagram-chart').evaluate((el) => {
+      const chart = (el as unknown as { __chart: { getOption(): { xAxis: Array<{ data: string[] }> } } }).__chart;
+      return chart.getOption().xAxis[0]?.data ?? [];
+    });
+    // Haltiala: every year has a gap in the measured NEE, so every year label has "*".
+    expect(xLabels.length).toBeGreaterThan(0);
+    for (const label of xLabels) expect(label).toMatch(/^\d{4}\*$/);
+    await expect(page.locator('.diagram-sub')).toContainText('Measured NEE has gaps');
   });
 
   test('scatter with only the x variable shows a note', async ({ page }) => {
