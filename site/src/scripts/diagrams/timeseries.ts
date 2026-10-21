@@ -8,7 +8,7 @@ import { toFloat64, type Meta } from '../db';
 import { AGGREGATION_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, stepExpr, whereClause } from './sql';
+import { col, periodMs, stepExpr, whereClause } from './sql';
 import {
   axisName,
   displayUnit,
@@ -260,6 +260,10 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
     tMin = Math.min(tMin, s.t[0] as number);
     tMax = Math.max(tMax, s.t[s.t.length - 1] as number);
   }
+  // A period limit sets the axis end, also when there is no data near it.
+  const period = periodMs(ctx.params);
+  if (period.from !== null) tMin = period.from;
+  if (period.to !== null) tMax = period.to;
 
   const axisIdx = vars.map((_, i) => i);
   const last = vars.length - 1;

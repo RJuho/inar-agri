@@ -485,6 +485,23 @@ test.describe('diagram types', () => {
     await expect(card.locator('.diagram-note')).toContainText('need one or more flux variables');
   });
 
+  test('time series and fingerprint axes start at the from year, also without data there', async ({ page }) => {
+    // Anttila and Särkisuo have data from 2022 only.
+    const view = { ...typeView('timeseries', ['nee']), params: { ...typeView('timeseries').params, sites: [1, 2], variables: ['nee'], yearFrom: 2019 } };
+    view.diagrams = [...view.diagrams, { id: 'fp', type: 'fingerprint' }];
+    await page.goto('/' + viewHash(view));
+    await waitReady(page);
+    const info = await page.locator('.diagram-chart').evaluateAll((els) =>
+      els.map((el) => {
+        type Option = { xAxis?: Array<{ min?: number; data?: string[] }> };
+        const x = (el as unknown as { __chart: { getOption(): Option } }).__chart.getOption().xAxis?.[0];
+        return { min: x?.min ?? null, first: x?.data?.[0] ?? null };
+      }),
+    );
+    expect(info[0]?.min).toBe(Date.UTC(2019, 0, 1));
+    expect(info[1]?.first).toBe('2019-01-01');
+  });
+
   test('fingerprint bins the days to at most 400 columns and has one colour scale per variable', async ({ page }) => {
     const view = { ...typeView('fingerprint', ['nee_f', 'ta']), params: { ...typeView('fingerprint').params, sites: [4], variables: ['nee_f', 'ta'], yearFrom: 2022, yearTo: 2023 } };
     await page.goto('/' + viewHash(view));

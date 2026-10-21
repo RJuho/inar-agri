@@ -36,6 +36,16 @@ export function periodBounds(params: ViewParams): { from: [number, number] | nul
   return { from, to };
 }
 
+/**
+ * Start (inclusive) and end (exclusive) of the period as epoch ms of local wall time,
+ * the same base as `epoch_ms(tl)`. null = no limit on that side.
+ */
+export function periodMs(params: ViewParams): { from: number | null; to: number | null } {
+  const { from, to } = periodBounds(params);
+  const ms = ([y, m]: [number, number]) => Date.UTC(y, m - 1, 1);
+  return { from: from ? ms(from) : null, to: to ? ms(to) : null };
+}
+
 const ts = ([y, m]: [number, number]) => `make_timestamp(${y}, ${m}, 1, 0, 0, 0)`;
 
 /** WHERE clause for the sites and the period of the view. Returns null when no site is selected. */

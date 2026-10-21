@@ -3,7 +3,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DuckDBInstance } from '@duckdb/node-api';
-import { meanExpr, stepExpr } from './sql.ts';
+import { meanExpr, periodMs, stepExpr } from './sql.ts';
+import { defaultParams } from '../state.ts';
 import type { Variable } from '../state.ts';
 
 /** Run `expr` on one column `name` with the given values and return the result as a number (NaN = NULL). */
@@ -49,4 +50,10 @@ test('wind direction gets the circular mean in degrees 0 to 360', async () => {
 
 test('the helpers accept only whitelisted variable names', () => {
   assert.throws(() => stepExpr('x; DROP TABLE obs' as Variable), /Unknown variable/);
+});
+
+test('periodMs gives the period limits as epoch ms of local wall time', () => {
+  const p = { ...defaultParams([1]), yearFrom: 2019, monthFrom: 3, yearTo: 2023, monthTo: 12 };
+  assert.deepEqual(periodMs(p), { from: Date.UTC(2019, 2, 1), to: Date.UTC(2024, 0, 1) });
+  assert.deepEqual(periodMs({ ...p, yearTo: null, monthTo: null }), { from: Date.UTC(2019, 2, 1), to: null });
 });

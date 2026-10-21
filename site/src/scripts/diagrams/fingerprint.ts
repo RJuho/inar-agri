@@ -13,7 +13,7 @@ import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, meanExpr, whereClause } from './sql';
+import { col, meanExpr, periodBounds, whereClause } from './sql';
 import {
   FIXED_GRID,
   FLUX_VARS,
@@ -115,11 +115,16 @@ function query(params: ViewParams): string | null {
   // r: first and last day with a value of one of the variables. b: days per column.
   // c: mean per site, column and half hour. q: quantiles of the cell values per variable, for the
   // colour range. The last SELECT adds d0, bin and the quantiles to each row.
+  // A period limit sets the first or last day, also when there is no data near it.
   const hasValue = vars.map((v) => `${v} IS NOT NULL`).join(' OR ');
+  const { from, to } = periodBounds(params);
+  // min() and max() also around the constants: r must have one row, also when both limits are set.
+  const d0 = from ? `min(make_date(${from[0]}, ${from[1]}, 1))` : 'min(tl::DATE)';
+  const d1 = to ? `max((make_date(${to[0]}, ${to[1]}, 1) - INTERVAL 1 DAY)::DATE)` : 'max(tl::DATE)';
   return `WITH r AS (
-      SELECT min(tl::DATE) AS d0, max(tl::DATE) AS d1 FROM obs WHERE ${where} AND (${hasValue})
+      SELECT ${d0} AS d0, ${d1} AS d1 FROM obs WHERE ${where} AND (${hasValue})
     ), b AS (
-      SELECT d0, greatest(1, ceil((date_diff('day', d0, d1) + 1) / ${MAX_COLUMNS}.0))::INTEGER AS bin FROM r
+      SELECT d0, d1, greatest(1, ceil((date_diff('day', d0, d1) + 1) / ${MAX_COLUMNS}.0))::INTEGER AS bin FROM r
     ), c AS (
       SELECT site_id, date_diff('day', b.d0, tl::DATE) // b.bin AS x, hour(tl) * 2 + minute(tl) // 30 AS slot,
         ${vars.map((v) => `${meanExpr(v)} AS ${v}`).join(', ')}
@@ -129,7 +134,7 @@ function query(params: ViewParams): string | null {
       SELECT ${vars.map((v) => `quantile_cont(${v}, ${Q_LO}) AS ${v}__lo, quantile_cont(${v}, ${Q_HI}) AS ${v}__hi`).join(', ')} FROM c
     )
     SELECT c.site_id::DOUBLE AS site_id, c.x::DOUBLE AS x, c.slot::DOUBLE AS slot, ${vars.map((v) => `c.${v}`).join(', ')},
-      epoch_ms(b.d0::TIMESTAMP)::DOUBLE AS d0, b.bin::DOUBLE AS bin, q.*
+      epoch_ms(b.d0::TIMESTAMP)::DOUBLE AS d0, epoch_ms(b.d1::TIMESTAMP)::DOUBLE AS d1, b.bin::DOUBLE AS bin, q.*
     FROM c, b, q ORDER BY 1, 2, 3`;
 }
 
@@ -162,7 +167,9 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Fingerpri
   const read = (name: string) => toFloat64(table.getChild(name), n);
   const day0 = read('d0')[0] as number;
   const bin = read('bin')[0] as number;
-  let columns = 0;
+  // Columns from the first to the last day, also the empty columns at the ends.
+  const day1 = read('d1')[0] as number;
+  let columns = Math.floor(Math.round((day1 - day0) / (24 * 3600 * 1000)) / bin) + 1;
   for (let i = 0; i < n; i++) if ((x[i] as number) + 1 > columns) columns = (x[i] as number) + 1;
   // Panel order: variable blocks, in each block the sites in the order of sites.parquet.
   const order = new Map(meta.sites.map((s, i) => [s.siteId, i]));
