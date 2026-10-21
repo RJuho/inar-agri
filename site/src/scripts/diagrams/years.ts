@@ -1,5 +1,6 @@
 // Years overlay: one panel per variable, x = day of the year, one line per site and year.
 // The colour follows the site. Earlier years have lighter lines.
+// With one or two selected sites, each year has its own colour. The second site has dashed lines.
 // Raw data is shown as daily means, so that the chart stays fast.
 import * as echarts from 'echarts/core';
 import { LineChart } from 'echarts/charts';
@@ -70,6 +71,23 @@ export interface YearsData extends Prepared {
   groups: Group[];
   /** Years in the data, sorted. */
   years: number[];
+  /** `year`: one colour per year (one or two selected sites). `site`: one colour per site. */
+  colorBy: 'year' | 'site';
+  /** Labels of the sites with solid and dashed lines (year mode with two sites). */
+  lineSites?: [string, string];
+}
+
+/** Largest number of selected sites that gives one colour per year. */
+export const YEAR_COLOR_MAX_SITES = 2;
+
+/**
+ * Colour of each year: the theme series colours for up to 8 years, else evenly spaced hues,
+ * so that no colour repeats.
+ */
+export function yearColors(years: number[], tokens: Tokens): Map<number, string> {
+  const n = years.length;
+  const many = n > tokens.series.length;
+  return new Map(years.map((y, i) => [y, many ? `hsl(${Math.round((360 * i) / n)}, 65%, 50%)` : (tokens.series[i] as string)]));
 }
 
 /**
@@ -96,16 +114,24 @@ export function yearsQuery(params: ViewParams): string | null {
 
 export function prepareYears(table: Table | null, params: ViewParams, meta: Meta): YearsData {
   const step = yearStep(params.aggregation);
-  const base = { variables: params.variables, step, groups: [] as Group[], years: [] as number[] };
+  const colorBy: YearsData['colorBy'] = params.sites.length <= YEAR_COLOR_MAX_SITES ? 'year' : 'site';
+  const base = { variables: params.variables, step, groups: [] as Group[], years: [] as number[], colorBy };
   if (table === null) return { ...base, rowCount: 0, seriesCount: 0, note: emptyNote(params) };
   const groups = readGroups(table, params.variables, true, YEAR_MAX_STEP[step]);
   const years = [...new Set(groups.map((g) => g.year))].sort((a, b) => a - b);
   let seriesCount = 0;
   for (const v of params.variables) for (const g of groups) if (hasValues(g, v)) seriesCount++;
   const data: YearsData = { ...base, groups, years, rowCount: table.numRows, seriesCount };
+  const names = siteNames(meta, params);
+  const shown = meta.sites.filter((s) => groups.some((g) => g.siteId === s.siteId)).map((s) => names.get(s.siteId) ?? s.name);
+  if (colorBy === 'year' && shown.length === 2) data.lineSites = [shown[0] as string, shown[1] as string];
   if (table.numRows === 0) data.note = 'No data for these sites and years.';
   if (params.aggregation === 'raw') data.subtitle = 'Raw data is shown as daily means.';
   if (step === 'week') data.subtitle = WEEK_SPLIT_TEXT;
+  if (colorBy === 'year') {
+    const key = data.lineSites ? ` Solid line: ${data.lineSites[0]}; dashed line: ${data.lineSites[1]}.` : '';
+    data.subtitle = joinSubtitle(data.subtitle, `Colour = year.${key}`);
+  }
   data.subtitle = joinSubtitle(data.subtitle, signNote(params.variables), params.events ? eventsKeyText(meta, params) : undefined);
   return data;
 }
@@ -252,6 +278,10 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
   const ranks = yearRanks(data.groups);
+  const byYear = data.colorBy === 'year';
+  const yColors = yearColors(data.years, tokens);
+  // Site of the dashed lines: the second shown site, in the order of sites.parquet.
+  const dashedSite = byYear ? meta.sites.filter((s) => data.groups.some((g) => g.siteId === s.siteId))[1]?.siteId : undefined;
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
   const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - y.left - STACK.right));
@@ -259,21 +289,26 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
     data.groups.forEach((g, gi) => {
       if (!hasValues(g, v)) return;
       const [rank, count] = ranks.get(g) ?? [0, 1];
+      const color = (byYear ? yColors.get(g.year) : colors.get(g.siteId)) ?? tokens.text;
       info.push({ siteId: g.siteId, site: names.get(g.siteId) ?? String(g.siteId), year: g.year, unit: displayUnit(meta, v) });
       series.push({
         type: 'line',
-        name: names.get(g.siteId) ?? String(g.siteId),
+        name: byYear ? String(g.year) : (names.get(g.siteId) ?? String(g.siteId)),
         datasetIndex: gi,
         encode: { x: 'x', y: v },
         xAxisIndex: panel,
         yAxisIndex: panel,
-        color: colors.get(g.siteId),
+        color,
         showSymbol: false,
         symbol: 'none',
         connectNulls: false,
-        lineStyle: { width: 1.5, opacity: yearOpacity(rank, count) },
+        lineStyle: {
+          width: 1.5,
+          opacity: byYear ? 1 : yearOpacity(rank, count),
+          ...(g.siteId === dashedSite ? { type: 'dashed' } : {}),
+        },
         emphasis: { focus: 'series', lineStyle: { width: 2.5, opacity: 1 } },
-        ...eventMarkers(marks.byGroup.get(g) ?? [], colors.get(g.siteId) ?? tokens.text, tokens, panel === 0),
+        ...eventMarkers(marks.byGroup.get(g) ?? [], color, tokens, panel === 0),
       });
     });
   });
@@ -281,7 +316,9 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
+    legend: byYear
+      ? { ...siteLegend(meta, ctx.params, tokens, new Set(), y.left, STACK.right), data: data.years.map(String) }
+      : siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
       ...y.layout.title[i],
@@ -312,7 +349,9 @@ export const years: DiagramDef<YearsData> = {
   describe: (data) =>
     `One panel per variable. The x axis is the day of the year, ${YEAR_STEP_TEXT[data.step]}. ` +
     `Each line is one site and year: ${data.years.length} years (${data.years[0] ?? ''} to ${data.years[data.years.length - 1] ?? ''}). ` +
-    `The colour shows the site, and lighter lines are earlier years.` +
+    (data.colorBy === 'year'
+      ? `The colour shows the year.` + (data.lineSites ? ` Solid lines are ${data.lineSites[0]}, dashed lines are ${data.lineSites[1]}.` : '')
+      : `The colour shows the site, and lighter lines are earlier years.`) +
     (data.step === 'week' ? ' A week over 1 January is split: each part is in its own year.' : '') +
     stepStatNote(data.variables, data.step),
 };

@@ -435,6 +435,37 @@ test.describe('diagram types', () => {
     await expect(page.locator('.diagram-sub')).toContainText('daily means');
   });
 
+  test('years overlay gives each year its own colour for one or two sites', async ({ page }) => {
+    type Series = { name?: string; color?: string; lineStyle?: { opacity?: number; type?: string }; xAxisIndex?: number; datasetIndex?: number };
+    const seriesOf = () =>
+      page.locator('.diagram-chart').evaluate((el) => {
+        const chart = (el as unknown as { __chart: { getOption(): { series?: Series[] } } }).__chart;
+        return (chart.getOption().series ?? []).filter((s) => s.datasetIndex !== undefined && s.xAxisIndex === 0);
+      });
+    const base = typeView('years', ['nee_f']).params;
+    // Qvidja (site 4) only: one colour per year, no fade.
+    await page.goto('/' + viewHash({ ...typeView('years'), id: 'y1', params: { ...base, sites: [4] } }));
+    await waitReady(page);
+    let series = await seriesOf();
+    expect(series.length).toBeGreaterThan(2);
+    expect(new Set(series.map((s) => s.color)).size).toBe(series.length);
+    expect(series.every((s) => s.lineStyle?.opacity === 1)).toBe(true);
+    await expect(page.locator('.diagram-sub')).toContainText('Colour = year.');
+    // Two sites: the same year has the same colour, the second site has dashed lines.
+    await page.goto('/' + viewHash({ ...typeView('years'), id: 'y2', params: { ...base, sites: [1, 2] } }));
+    await waitReady(page);
+    series = await seriesOf();
+    expect(series.filter((s) => s.lineStyle?.type === 'dashed').length).toBe(series.length / 2);
+    expect(new Set(series.map((s) => s.color)).size).toBe(series.length / 2);
+    await expect(page.locator('.diagram-sub')).toContainText('dashed line');
+    // Three sites: one colour per site.
+    await page.goto('/' + viewHash({ ...typeView('years'), id: 'y3', params: { ...base, sites: [1, 2, 4] } }));
+    await waitReady(page);
+    series = await seriesOf();
+    expect(new Set(series.map((s) => s.color)).size).toBe(3);
+    await expect(page.locator('.diagram-sub')).not.toContainText('Colour = year.');
+  });
+
   test('cumulative without a flux shows a note, not an error', async ({ page }) => {
     await page.goto('/' + viewHash(typeView('cumulative', ['ta', 'swc'])));
     await waitReady(page);
