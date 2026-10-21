@@ -152,7 +152,7 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
   const vars = data.variables;
   const y = yLayout(data, ctx.height);
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const ranks = yearRanks(data.groups);
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
@@ -184,7 +184,7 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
   series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
     title: vars.map((v, i) => ({
       ...y.layout.title[i],
       text: sumTitle(v),
@@ -208,8 +208,8 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
 }
 
 /** Last value of each site-year line, for the alt text. */
-function totalsText(data: CumulativeData, meta: Meta): string {
-  const names = siteNames(meta);
+function totalsText(data: CumulativeData, meta: Meta, params: ViewParams): string {
+  const names = siteNames(meta, params);
   return data.variables
     .map((v) => {
       const parts: string[] = [];
@@ -256,7 +256,7 @@ export const cumulative: DiagramDef<CumulativeData> = {
         : '';
     return (
       `Running sum of ${what} per site and year in ${unitsText(data.variables)}, the day of the year on the x axis, ` +
-      `one line per site and year. ${other ? 'Only fluxes are summed: NEE, GPP, Reco, CH4. ' : ''}${sign}${totalsText(data, ctx.meta)}`
+      `one line per site and year. ${other ? 'Only fluxes are summed: NEE, GPP, Reco, CH4. ' : ''}${sign}${totalsText(data, ctx.meta, ctx.params)}`
     );
   },
 };

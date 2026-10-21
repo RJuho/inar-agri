@@ -163,7 +163,7 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
   const y = yLayout(data, meta, ctx.height);
   const layout = stackLayout(vars.length, ctx.height, LAYOUT, y.left);
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const last = vars.length - 1;
   const series: unknown[] = [];
   /** For each series index: the curve of a mean line, or null for a band part. */
@@ -194,7 +194,7 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, STAT), textStyle: titleStyle(tokens) })),
     grid: layout.grid,
@@ -241,8 +241,8 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
 }
 
 /** Hour (local time) of the highest and lowest mean, for the alt text. */
-function peakText(data: DiurnalData, meta: Meta): string {
-  const names = siteNames(meta);
+function peakText(data: DiurnalData, meta: Meta, params: ViewParams): string {
+  const names = siteNames(meta, params);
   const v = data.variables[0];
   if (!v) return '';
   const parts: string[] = [];
@@ -270,5 +270,5 @@ export const diurnal: DiagramDef<DiurnalData> = {
   height: (params) => stackHeight(params.variables.length, PANEL_H, LAYOUT),
   describe: (data, ctx) =>
     `One panel per variable, the hour of the day (site local time) on the x axis, one line per site for the mean ` +
-    `and a band for the 25th to 75th percentile.${peakText(data, ctx.meta)}`,
+    `and a band for the 25th to 75th percentile.${peakText(data, ctx.meta, ctx.params)}`,
 };

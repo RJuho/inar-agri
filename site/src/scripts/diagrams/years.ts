@@ -174,7 +174,7 @@ function refPeriod(ms: number, step: YearStep): [number, number] {
 /** Tooltip for site-year lines. `info` of each series index gives the site and year. */
 export function siteYearTooltip(ctx: BuildContext, step: YearStep, info: SeriesInfo[], marks: YearMark[] = []) {
   const colors = siteColors(ctx.meta, ctx.tokens);
-  const names = siteNames(ctx.meta);
+  const names = siteNames(ctx.meta, ctx.params);
   return {
     ...tooltipBase(ctx.tokens, 'axis'),
     axisPointer: { type: 'line', lineStyle: { color: ctx.tokens.axis } },
@@ -249,7 +249,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const vars = data.variables;
   const y = yLayout(data, ctx);
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const ranks = yearRanks(data.groups);
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
@@ -280,7 +280,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
       ...y.layout.title[i],

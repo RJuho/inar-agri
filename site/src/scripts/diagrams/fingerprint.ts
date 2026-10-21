@@ -359,7 +359,7 @@ function build(data: FingerprintData, ctx: BuildContext): EChartsCoreOption {
   const rows = panelRows(data);
   const last = rows.length - 1;
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const dates = Array.from({ length: data.columns }, (_, i) => columnDate(data, i));
   const plan = xLabelPlan(dates, data.bin);
   const blocks = blockParts(data, ctx, lay);

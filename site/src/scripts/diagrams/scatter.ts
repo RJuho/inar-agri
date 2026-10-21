@@ -161,7 +161,7 @@ function yLayout(data: ScatterData, meta: Meta) {
 function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const cols = columns(ctx.width, data.ys.length);
   const y = yLayout(data, meta);
   const panelW = (Math.max(ctx.width, 200) - y.left - L.right - (cols - 1) * (L.gapX + y.left)) / cols;
@@ -205,7 +205,7 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right),
     title,
     grid,
     xAxis,
@@ -254,8 +254,8 @@ function pearson(x: Float64Array, y: Float64Array): number {
   return den > 0 ? cov / den : Number.NaN;
 }
 
-function describe(data: ScatterData, meta: Meta): string {
-  const names = siteNames(meta);
+function describe(data: ScatterData, meta: Meta, params: ViewParams): string {
+  const names = siteNames(meta, params);
   const parts = data.ys.map((v) => {
     const rs = data.sites
       .map((s) => ({ s, r: pearson(s.x, s.values[v] as Float64Array) }))
@@ -278,5 +278,5 @@ export const scatter: DiagramDef<ScatterData> = {
   widthDependent: true,
   height: (params, _data, width) => totalHeight(yVars(params).length, width),
   statsVariables: (params) => [params.xVariable, ...yVars(params)],
-  describe: (data, ctx) => describe(data, ctx.meta),
+  describe: (data, ctx) => describe(data, ctx.meta, ctx.params),
 };

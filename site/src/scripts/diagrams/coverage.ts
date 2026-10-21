@@ -22,6 +22,8 @@ import {
   gridLeftFor,
   groupDigits,
   panelTitle,
+  siteLabel,
+  siteNames,
   textWidth,
   timeAxisName,
   titleStyle,
@@ -173,8 +175,8 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): CoverageD
 const share = (c: Cell) => (c.expected > 0 ? (100 * c.n) / c.expected : 0);
 
 /** Width of the widest site name (the y tick labels). */
-function labelWidth(data: CoverageData, meta: Meta): number {
-  const names = meta.sites.filter((s) => data.siteIds.includes(s.siteId)).map((s) => s.name);
+function labelWidth(data: CoverageData, meta: Meta, params: ViewParams): number {
+  const names = meta.sites.filter((s) => data.siteIds.includes(s.siteId)).map((s) => siteLabel(s, params));
   return Math.ceil(Math.max(0, ...names.map((t) => textWidth(t))));
 }
 
@@ -194,8 +196,8 @@ function layout(data: CoverageData, left: number) {
 }
 
 /** Left margin of all panels: the site names and the y axis name. */
-function leftFor(data: CoverageData, meta: Meta): { width: number; left: number } {
-  const width = labelWidth(data, meta);
+function leftFor(data: CoverageData, meta: Meta, params: ViewParams): { width: number; left: number } {
+  const width = labelWidth(data, meta, params);
   return { width, left: Math.max(LAYOUT.left, gridLeftFor(width, 1)) };
 }
 
@@ -232,10 +234,10 @@ function visualMap(data: CoverageData, tokens: BuildContext['tokens'], lay: Retu
 
 function build(data: CoverageData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
-  const y = leftFor(data, meta);
+  const y = leftFor(data, meta, ctx.params);
   const lay = layout(data, y.left);
   const last = data.variables.length - 1;
-  const names = new Map(meta.sites.map((s) => [s.siteId, s.name]));
+  const names = siteNames(meta, ctx.params);
   const rowNames = data.siteIds.map((id) => names.get(id) ?? String(id));
   const show = xLabelShow(data.months);
   const cellW = (ctx.width - y.left - LAYOUT.right) / Math.max(1, data.months.length);
@@ -324,7 +326,7 @@ export const coverage: DiagramDef<CoverageData> = {
   showsEvents: false,
   widthDependent: true,
   relayout: (data, ctx) => {
-    const y = leftFor(data, ctx.meta);
+    const y = leftFor(data, ctx.meta, ctx.params);
     const lay = layout(data, y.left);
     return { grid: lay.grid, title: lay.title, visualMap: visualMap(data, ctx.tokens, lay, y.left) };
   },

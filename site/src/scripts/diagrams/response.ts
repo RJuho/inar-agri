@@ -315,7 +315,7 @@ function binRangeText(data: ResponseData, k: number): string {
 function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const cols = columns(ctx.width, data.ys.length);
   const y = yLayout(data, meta);
   const panelW = (Math.max(ctx.width, 200) - y.left - L.right - (cols - 1) * (L.gapX + y.left)) / cols;
@@ -396,7 +396,7 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right),
     title,
     grid,
     xAxis,
@@ -431,8 +431,8 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
 }
 
 /** Fit parameters per panel and site, for the alt text. */
-function fitsText(data: ResponseData, meta: Meta): string {
-  const names = siteNames(meta);
+function fitsText(data: ResponseData, meta: Meta, params: ViewParams): string {
+  const names = siteNames(meta, params);
   const parts: string[] = [];
   for (const v of data.ys) {
     const unit = displayUnit(meta, v);
@@ -447,13 +447,13 @@ function fitsText(data: ResponseData, meta: Meta): string {
   return parts.length ? ` Fitted curves (dashed): ${parts.join(' ')}` : ' No fitted curve for these variables.';
 }
 
-function describe(data: ResponseData, meta: Meta): string {
+function describe(data: ResponseData, meta: Meta, params: ViewParams): string {
   const xText = varLabel(data.x);
   const range = data.rowCount ? ` from ${formatValue(data.lo)} to ${formatValue(data.hi)} ${displayUnit(meta, data.x)}` : '';
   return (
     `Response curve of each other variable against ${xText} (x axis, ${BINS} bins${range}${data.daytime ? ', daytime rows only' : ''}), ` +
     `one panel per variable, one line per site for the mean per bin and a band for the 25th to 75th percentile, ` +
-    `${groupDigits(data.rowCount)} bin rows.${fitsText(data, meta)}`
+    `${groupDigits(data.rowCount)} bin rows.${fitsText(data, meta, params)}`
   );
 }
 
@@ -467,5 +467,5 @@ export const response: DiagramDef<ResponseData> = {
   showsEvents: false,
   height: (params, _data, width) => totalHeight(yVars(params).length, width),
   statsVariables: (params) => [params.xVariable, ...yVars(params)],
-  describe: (data, ctx) => describe(data, ctx.meta),
+  describe: (data, ctx) => describe(data, ctx.meta, ctx.params),
 };

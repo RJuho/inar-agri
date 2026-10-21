@@ -13,7 +13,10 @@ import {
   eventsInRange,
   eventSymbol,
   formatValue,
+  selectedSiteLabels,
   shortDetail,
+  siteLabel,
+  siteNames,
   X_NAME_TITLE_ID,
   yearsText,
 } from './diagrams/common';
@@ -107,7 +110,7 @@ export function listText(items: string[]): string {
 
 /** Names of the selected sites, in the order of sites.parquet. */
 export function siteListText(params: ViewParams, meta: Meta): string {
-  const names = meta.sites.filter((s) => params.sites.includes(s.siteId)).map((s) => s.name);
+  const names = selectedSiteLabels(meta, params);
   return names.length === 0 ? 'no sites' : `${names.length === 1 ? 'site' : 'sites'} ${listText(names)}`;
 }
 
@@ -119,8 +122,8 @@ function signed(v: number): string {
 }
 
 /** One sentence per variable with the statistics of each site. */
-export function statsText(stats: SiteStats[], variables: Variable[], meta: Meta): string {
-  const name = new Map(meta.sites.map((s) => [s.siteId, s.name]));
+export function statsText(stats: SiteStats[], variables: Variable[], meta: Meta, params: ViewParams): string {
+  const name = siteNames(meta, params);
   const order = new Map(meta.sites.map((s, i) => [s.siteId, i]));
   const sentences: string[] = [];
   for (const v of variables) {
@@ -189,10 +192,10 @@ export function eventsText(params: ViewParams, meta: Meta, markers: boolean): st
     const list = events.filter((e) => e.siteId === site.siteId);
     if (list.length === 0) continue;
     const parts = list.map((e) => `${eventLabel(e.type).toLowerCase()} ${eventDateText(e)} (${shortDetail(e.detail)})`);
-    out.push(`Management events at ${site.name} (${list.length}): ${parts.join('; ')}.`);
+    out.push(`Management events at ${siteLabel(site, params)} (${list.length}): ${parts.join('; ')}.`);
   }
   const without = meta.sites.filter((s) => params.sites.includes(s.siteId) && !events.some((e) => e.siteId === s.siteId));
-  if (without.length > 0) out.push(`No management events for ${listText(without.map((s) => s.name))} in this period.`);
+  if (without.length > 0) out.push(`No management events for ${listText(without.map((s) => siteLabel(s, params)))} in this period.`);
   return out.join(' ');
 }
 
@@ -209,7 +212,7 @@ export function composeAlt(
 ): string {
   const head = `${label}: ${listText(variables.map((v) => VARIABLE_LABELS[v]))} at ${siteListText(params, meta)}, ${yearsText(params)}.`;
   const axesPart = axes ? ` ${axes}` : '';
-  const body = stats.length > 0 ? ` ${statsText(stats, variables, meta)}` : '';
+  const body = stats.length > 0 ? ` ${statsText(stats, variables, meta, params)}` : '';
   const events = params.events ? ` ${eventsText(params, meta, markers)}` : '';
   return `${head} ${describe}${axesPart}${body}${events}`.trim();
 }

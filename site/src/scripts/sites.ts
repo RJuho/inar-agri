@@ -1,5 +1,7 @@
 // Site emojis from CLAUDE.md, by site code (sites.code).
-// Use them in the site selector only. Chart legends and alt text use the plain site names.
+// The site selector always shows them. The charts and the alt text show them only when the
+// view option "Site emojis" (`params.emojis`) is on; see `siteLabel()` in `diagrams/common.ts`.
+// The data export and the file names use the plain site names.
 
 export const SITE_EMOJI: Readonly<Record<string, string>> = {
   anttila: '👱🏻‍♂️🫛',

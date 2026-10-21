@@ -117,6 +117,7 @@ export class ParamsForm {
     for (const group of VARIABLE_GROUPS) varGroups.append(this.variableGroup(group.label, group.variables, params.variables));
     const events = el('div', 'var-events');
     events.append(checkbox('events', 'on', 'Events', params.events, '', 'Management events (harvest, sowing, ...) as markers'));
+    events.append(checkbox('emojis', 'on', 'Site emojis', params.emojis, '', 'Emoji before the site name in the charts and the alt text'));
     vars.append(events);
 
     const years: Array<[string, string]> = [['', 'All']];
@@ -207,6 +208,7 @@ export class ParamsForm {
       monthTo: range.monthTo,
       aggregation: String(fd.get('aggregation')) as Aggregation,
       events: fd.get('events') === 'on',
+      emojis: fd.get('emojis') === 'on',
     };
   }
 }

@@ -77,6 +77,8 @@ export interface ViewParams {
   aggregation: Aggregation;
   /** Show the management events (harvest, sowing, ...) as markers. */
   events: boolean;
+  /** Put the site emoji before the site name in the charts and the alt text. */
+  emojis: boolean;
 }
 
 export interface Diagram {
@@ -124,6 +126,7 @@ export function defaultParams(allSites: number[]): ViewParams {
     monthTo: null,
     aggregation: 'raw',
     events: false,
+    emojis: false,
   };
 }
 
@@ -212,6 +215,7 @@ export function parseParams(x: unknown): ViewParams | null {
   const aggregation = (AGGREGATIONS as readonly unknown[]).includes(x.aggregation) ? (x.aggregation as Aggregation) : null;
   if (aggregation === null) return null;
   const events = x.events === true;
+  const emojis = x.emojis === true;
   // Fixed key order: sameView() compares the JSON text.
   return {
     sites,
@@ -223,6 +227,7 @@ export function parseParams(x: unknown): ViewParams | null {
     monthTo: range.monthTo,
     aggregation,
     events,
+    emojis,
   };
 }
 

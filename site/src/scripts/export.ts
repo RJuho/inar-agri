@@ -6,7 +6,7 @@
 import type { Meta } from './db';
 import { addTextChunks, bytesToDataUrl, dataUrlToBytes } from './png';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type View, type ViewParams } from './state';
-import { displayUnit, yearsText } from './diagrams/common';
+import { displayUnit, selectedSiteLabels, yearsText } from './diagrams/common';
 import { listText } from './alttext';
 
 /** One diagram card, as the export sees it. */
@@ -71,7 +71,7 @@ function cleanScale(scale: unknown): number {
 /** Parameters of the view in one line: sites, variables with units, years and step. */
 export function paramsLine(view: View, meta: Meta, types: string[]): string {
   const p = view.params;
-  const sites = meta.sites.filter((s) => p.sites.includes(s.siteId)).map((s) => s.name);
+  const sites = selectedSiteLabels(meta, p);
   const vars = p.variables.map((v) => `${VARIABLE_LABELS[v]} (${displayUnit(meta, v)})`);
   const parts = [
     `Sites: ${sites.length ? listText(sites) : 'none'}`,

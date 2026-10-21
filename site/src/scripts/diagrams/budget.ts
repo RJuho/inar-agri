@@ -300,7 +300,7 @@ function build(data: BudgetData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = varColors(tokens);
   const siteColor = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const yl = yLayout(data);
   const panels = data.blocks.map((b) => blockPanels(data, b));
   const { cols, rows } = rowsOf(
@@ -447,8 +447,8 @@ function build(data: BudgetData, ctx: BuildContext): EChartsCoreOption {
 const sumText = (sum: number) => (Math.abs(sum) >= 10 ? String(Math.round(sum)) : formatValue(sum));
 
 /** Annual sums per site and year, for the alt text. A partial year has "*". */
-function sumsText(data: BudgetData, meta: Meta): string {
-  const names = siteNames(meta);
+function sumsText(data: BudgetData, meta: Meta, params: ViewParams): string {
+  const names = siteNames(meta, params);
   const parts = data.sites.map((s) => {
     const years = s.years
       .map((y) => {
@@ -481,5 +481,5 @@ export const budget: DiagramDef<BudgetData> = {
   statsVariables: sumVars,
   describe: (data, ctx) =>
     `Annual carbon budget: one panel per site (${data.sites.length}), years on the x axis, one bar per flux variable; ` +
-    `annual sums in g C m⁻²; GPP is drawn negative; partial years are lighter and marked with *.${sumsText(data, ctx.meta)}`,
+    `annual sums in g C m⁻²; GPP is drawn negative; partial years are lighter and marked with *.${sumsText(data, ctx.meta, ctx.params)}`,
 };

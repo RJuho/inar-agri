@@ -1382,6 +1382,49 @@ test.describe('events', () => {
   });
 });
 
+test.describe('site emojis', () => {
+  let errors: string[];
+
+  test.beforeEach(async ({ page }) => {
+    errors = trackErrors(page);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+  });
+
+  test('emojis on: the legend and the alt text start the site names with the emoji', async ({ page }) => {
+    const view = {
+      id: 'em1',
+      name: 'Emojis',
+      params: { sites: [3, 4], variables: ['nee_f'], xVariable: 'ta', yearFrom: 2022, yearTo: 2022, aggregation: 'day', emojis: true },
+      diagrams: [{ id: 'd1', type: 'timeseries' }],
+    };
+    await page.goto('/' + viewHash(view));
+    await waitReady(page);
+    await expect(page.locator('input[name="emojis"]')).toBeChecked();
+    const legend = await page.locator('.diagram-chart').first().evaluate((el) => {
+      const c = (el as unknown as { __chart: { getOption(): { legend: Array<{ data: string[] }> } } }).__chart;
+      return c.getOption().legend.flatMap((l) => l.data);
+    });
+    expect(legend).toEqual(['🧚🌾 Haltiala', '🐂🐝 Qvidja']);
+    const alt = await page.evaluate(() => (globalThis as unknown as { __inar: { altText(t: number): string } }).__inar.altText(0));
+    expect(alt).toContain('🐂🐝 Qvidja');
+    expect(alt).toContain('🧚🌾 Haltiala');
+    expect(alt).toBe(await altOf(page, 0));
+  });
+
+  test('default view: no emoji in the alt text, and the checkbox is off', async ({ page }) => {
+    await page.goto('/');
+    await waitReady(page);
+    await expect(page.locator('input[name="emojis"]')).not.toBeChecked();
+    const alt = await page.evaluate(() => (globalThis as unknown as { __inar: { altText(t: number): string } }).__inar.altText(0));
+    expect(alt).toContain('Qvidja');
+    expect(alt).not.toContain('🐂🐝');
+    expect(alt).not.toContain('🧚🌾');
+  });
+});
+
 test.describe('loading bar', () => {
   test('shows a progress bar while the data loads and removes it when ready', async ({ page }) => {
     const errors = trackErrors(page);

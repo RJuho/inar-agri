@@ -99,7 +99,7 @@ function yLayout(data: YearsData, meta: Meta) {
 function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const years = data.years;
   const yl = yLayout(data, meta);
   // Use the default left margin for the panel count, so that the chart height (from `height()`) fits.
@@ -192,7 +192,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   series.push(...zeroLines);
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.groups.map((g) => g.siteId)), yl.left, L.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), yl.left, L.right),
     title,
     grid,
     xAxis,

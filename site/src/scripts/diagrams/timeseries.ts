@@ -245,7 +245,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
   const vars = data.variables;
   const y = yLayout(data, meta, ctx.height);
   const layout = panelLayout(vars.length, ctx.height, y.left);
-  const siteName = new Map(meta.sites.map((s) => [s.siteId, s.name]));
+  const siteName = siteNames(meta, ctx.params);
   // Colour follows the site: slot = position of the site in sites.parquet.
   const siteColor = new Map(meta.sites.map((s, i) => [s.siteId, tokens.series[i % tokens.series.length]]));
   const unit = (v: Variable) => displayUnit(meta, v);
@@ -293,7 +293,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
       itemHeight: 4,
       textStyle: { color: tokens.text },
       inactiveColor: tokens.grid,
-      data: meta.sites.filter((s) => shown.has(s.siteId)).map((s) => s.name),
+      data: meta.sites.filter((s) => shown.has(s.siteId)).map((s) => siteName.get(s.siteId) ?? s.name),
     },
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
@@ -316,7 +316,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
     })),
     yAxis: vars.map((_, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number))),
     axisPointer: { link: [{ xAxisIndex: 'all' }], lineStyle: { color: tokens.axis } },
-    tooltip: tooltip(data, tokens, nSites, unit, (from, to) => eventTooltipLines(allMarks, from, to, siteNames(meta), markColors)),
+    tooltip: tooltip(data, tokens, nSites, unit, (from, to) => eventTooltipLines(allMarks, from, to, siteName, markColors)),
     dataZoom: [
       { type: 'inside', xAxisIndex: axisIdx, start: zoom.start, end: zoom.end, filterMode: 'filter' },
       {

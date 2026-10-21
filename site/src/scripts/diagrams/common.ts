@@ -6,6 +6,7 @@ import { MarkAreaComponent, MarkLineComponent } from 'echarts/components';
 import { toFloat64, type Meta, type Site, type SiteEvent } from '../db';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
+import { siteEmoji } from '../sites';
 import { periodBounds } from './sql';
 
 // Event markers are drawn with markLine (start day) and markArea (multi-day events).
@@ -58,8 +59,24 @@ export function siteColors(meta: Meta, tokens: Tokens): Map<number, string> {
   return new Map(meta.sites.map((s, i) => [s.siteId, tokens.series[i % tokens.series.length] as string]));
 }
 
-export function siteNames(meta: Meta): Map<number, string> {
-  return new Map(meta.sites.map((s) => [s.siteId, s.name]));
+/**
+ * Site name for the charts and the alt text. When the view option "Site emojis" is on,
+ * the site emoji and a space come before the name, for example "🐂🐝 Qvidja".
+ * The data export and the file names do not use this: they keep the plain name.
+ */
+export function siteLabel(site: Site, params: ViewParams): string {
+  const emoji = params.emojis ? siteEmoji(site.code) : '';
+  return emoji ? `${emoji} ${site.name}` : site.name;
+}
+
+/** Site labels (`siteLabel()`) by site key. */
+export function siteNames(meta: Meta, params: ViewParams): Map<number, string> {
+  return new Map(meta.sites.map((s) => [s.siteId, siteLabel(s, params)]));
+}
+
+/** Site labels (`siteLabel()`) of the selected sites, in the order of sites.parquet. */
+export function selectedSiteLabels(meta: Meta, params: ViewParams): string[] {
+  return meta.sites.filter((s) => params.sites.includes(s.siteId)).map((s) => siteLabel(s, params));
 }
 
 /** Raw unit string from variables.parquet, for example `µmol CO2 m-2 s-1`. The data export uses it. */
@@ -378,7 +395,7 @@ export function titleStyle(tokens: Tokens, size = 13) {
 }
 
 /** Scroll legend at the top. It lists the shown sites in the order of sites.parquet. */
-export function siteLegend(meta: Meta, tokens: Tokens, shown: Set<number>, left: number, right: number) {
+export function siteLegend(meta: Meta, params: ViewParams, tokens: Tokens, shown: Set<number>, left: number, right: number) {
   return {
     type: 'scroll',
     top: 0,
@@ -394,7 +411,7 @@ export function siteLegend(meta: Meta, tokens: Tokens, shown: Set<number>, left:
     itemHeight: 4,
     textStyle: { color: tokens.text },
     inactiveColor: tokens.grid,
-    data: meta.sites.filter((s) => shown.has(s.siteId)).map((s) => s.name),
+    data: meta.sites.filter((s) => shown.has(s.siteId)).map((s) => siteLabel(s, params)),
   };
 }
 

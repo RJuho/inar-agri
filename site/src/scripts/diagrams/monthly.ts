@@ -132,7 +132,7 @@ function build(data: MonthlyData, ctx: BuildContext): EChartsCoreOption {
   const y = yLayout(data, meta, ctx.height);
   const layout = stackLayout(vars.length, ctx.height, LAYOUT, y.left);
   const colors = siteColors(meta, tokens);
-  const names = siteNames(meta);
+  const names = siteNames(meta, ctx.params);
   const last = vars.length - 1;
   const series: unknown[] = [];
   /** Display unit for each series index. */
@@ -157,7 +157,7 @@ function build(data: MonthlyData, ctx: BuildContext): EChartsCoreOption {
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, STAT), textStyle: titleStyle(tokens) })),
     grid: layout.grid,
