@@ -76,12 +76,72 @@ function siteUrl(path: string): string {
   return new URL(`${base}${path}`, window.location.href).toString();
 }
 
+/**
+ * Load progress: 0 to 1, or null when the size is not known.
+ * The downloads give 0 to 0.9. The table build gives the last part.
+ */
+export type LoadProgress = (fraction: number | null) => void;
+
+let progressCb: LoadProgress | null = null;
+/** Bytes received and expected per download. Expected 0 = not known yet (no headers or no Content-Length). */
+const downloads = new Map<string, { loaded: number; total: number }>();
+
+/** Set the function that gets the load progress of the first data load. */
+export function setLoadProgress(cb: LoadProgress | null): void {
+  progressCb = cb;
+}
+
+function reportDownloads(): void {
+  if (!progressCb) return;
+  let loaded = 0;
+  let total = 0;
+  for (const d of downloads.values()) {
+    if (d.total <= 0) return progressCb(null);
+    loaded += d.loaded;
+    total += d.total;
+  }
+  progressCb(total > 0 ? (0.9 * Math.min(loaded, total)) / total : null);
+}
+
+/** Read the body of a response and count the bytes for the progress bar. */
+async function readBody(res: Response, key: string): Promise<Uint8Array<ArrayBuffer>> {
+  // A Content-Length with a Content-Encoding counts compressed bytes, but the body gives decoded bytes.
+  const total = res.headers.get('Content-Encoding') ? 0 : Number(res.headers.get('Content-Length')) || 0;
+  const entry = { loaded: 0, total };
+  downloads.set(key, entry);
+  if (!res.body) {
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    entry.loaded = bytes.length;
+    reportDownloads();
+    return bytes;
+  }
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    entry.loaded += value.length;
+    reportDownloads();
+  }
+  const out = new Uint8Array(entry.loaded);
+  let offset = 0;
+  for (const c of chunks) {
+    out.set(c, offset);
+    offset += c.length;
+  }
+  return out;
+}
+
+/** Progress key of the DuckDB WASM download. */
+const WASM_KEY = 'duckdb.wasm';
+
 async function fetchBuffer(file: string): Promise<Uint8Array> {
   const res = await fetch(siteUrl(`data/${file}`));
   if (!res.ok) {
     throw new Error(`Cannot load ${file}: HTTP ${res.status}. Run "npm run build:db" and then the site build.`);
   }
-  return new Uint8Array(await res.arrayBuffer());
+  return readBody(res, file);
 }
 
 /** The bundles in public/duckdb/. The package version in the path makes a long cache safe. */
@@ -100,7 +160,7 @@ function localBundles(): duckdb.DuckDBBundles {
 async function wasmBlobUrl(url: string): Promise<string> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Cannot load ${url}: HTTP ${res.status}. Run "npm run site:sync".`);
-  const bytes = new Uint8Array(await res.arrayBuffer());
+  const bytes = await readBody(res, WASM_KEY);
   let wasm: Blob = new Blob([bytes]);
   if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
     wasm = await new Response(wasm.stream().pipeThrough(new DecompressionStream('gzip'))).blob();
@@ -147,6 +207,8 @@ let dbPromise: Promise<duckdb.AsyncDuckDB> | null = null;
  */
 function getDB(): Promise<duckdb.AsyncDuckDB> {
   dbPromise ??= (async () => {
+    // Register all downloads first. Else the small files end before the large files start, and the bar jumps.
+    for (const key of [WASM_KEY, ...PARQUET_FILES]) downloads.set(key, { loaded: 0, total: 0 });
     const [db, buffers] = await Promise.all([startDuckDB(), Promise.all(PARQUET_FILES.map(fetchBuffer))]);
     await Promise.all(PARQUET_FILES.map((f, i) => db.registerFileBuffer(f, buffers[i])));
     const conn = await db.connect();
@@ -162,6 +224,7 @@ function getDB(): Promise<duckdb.AsyncDuckDB> {
     } finally {
       await conn.close();
     }
+    progressCb?.(1);
     return db;
   })();
   dbPromise.catch(() => {

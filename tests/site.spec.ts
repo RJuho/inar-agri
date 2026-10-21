@@ -1089,3 +1089,22 @@ test.describe('events', () => {
     }
   });
 });
+
+test.describe('loading bar', () => {
+  test('shows a progress bar while the data loads and removes it when ready', async ({ page }) => {
+    const errors = trackErrors(page);
+    // Hold back one data file, so that the bar stays on the page for some time.
+    await page.route('**/data/observations.parquet', async (route) => {
+      await new Promise((r) => setTimeout(r, 1500));
+      await route.continue();
+    });
+    await page.goto('/');
+    const loader = page.locator('#loader[role="progressbar"]');
+    await expect(loader).toBeVisible();
+    await expect(page.getByText('Loading data…')).toHaveCount(0);
+    await expect(page.locator('#chart')).toHaveAttribute('data-status', 'ready', { timeout: READY_TIMEOUT });
+    await expect(page.locator('#loader')).toHaveCount(0);
+    await expect(page.locator('#status')).toContainText('Loaded in');
+    expect(errors).toEqual([]);
+  });
+});

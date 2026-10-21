@@ -82,6 +82,44 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
+/* Progress bar of the first data load (app.ts). It replaces a "Loading" text. */
+.loader {
+  position: relative;
+  height: 6px;
+  max-width: 480px;
+  margin: 0 0 16px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--grid-line);
+}
+
+.loader-bar {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--series-1);
+  transition: width 0.2s ease-out;
+}
+
+/* Size not known: a short bar moves from left to right. */
+.loader[data-indeterminate] .loader-bar {
+  width: 30%;
+  animation: loader-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes loader-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.status:empty {
+  display: none;
+}
+
 .status.error {
   color: var(--error);
   font-weight: 600;
@@ -479,6 +517,51 @@ select:disabled {
 .diagram[data-status='loading'] .diagram-chart {
   opacity: 0.5;
   transition: opacity 0.2s;
+}
+
+/* A thin moving bar at the top of a card while its data loads.
+   The gradient moves inside the bar, so the card needs no overflow rule (tooltips stay visible). */
+.diagram {
+  position: relative;
+}
+
+.diagram[data-status='loading']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(90deg, transparent 0 35%, var(--series-1) 35% 65%, transparent 65% 100%) 0 0 / 300% 100%;
+  animation: card-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes card-slide {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader[data-indeterminate] .loader-bar {
+    width: 100%;
+    animation: loader-pulse 1.6s ease-in-out infinite;
+  }
+
+  .diagram[data-status='loading']::before {
+    background: var(--series-1);
+    animation: loader-pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes loader-pulse {
+    50% {
+      opacity: 0.4;
+    }
+  }
 }
 
 .diagram-sub {

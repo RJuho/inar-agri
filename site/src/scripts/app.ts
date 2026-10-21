@@ -1,6 +1,6 @@
 // Page start: load the data, read the views from Web storage and the URL hash,
 // and connect the add-diagram list, the tabs, the parameter form and the diagrams.
-import { loadMeta } from './db';
+import { loadMeta, setLoadProgress } from './db';
 import { setYearBounds } from './diagrams/sql';
 import { DIAGRAM_DEFS, DIAGRAM_TYPES } from './diagrams/registry';
 import {
@@ -45,17 +45,36 @@ export async function start(): Promise<void> {
   const chartEl = byId<HTMLElement>('chart');
   const addEl = byId<HTMLSelectElement>('add-diagram');
 
+  const loaderEl = byId<HTMLElement>('loader');
+  const barEl = loaderEl.querySelector<HTMLElement>('.loader-bar');
+  let shown = 0;
+  setLoadProgress((fraction) => {
+    // null = size not known: the bar moves back and forth. The bar never goes back.
+    if (fraction === null) {
+      loaderEl.dataset.indeterminate = '';
+      loaderEl.removeAttribute('aria-valuenow');
+      return;
+    }
+    delete loaderEl.dataset.indeterminate;
+    shown = Math.max(shown, fraction);
+    barEl?.style.setProperty('width', `${(shown * 100).toFixed(1)}%`);
+    loaderEl.setAttribute('aria-valuenow', String(Math.round(shown * 100)));
+  });
+
   const t0 = performance.now();
   let meta;
   try {
     meta = await loadMeta();
   } catch (err) {
     console.error(err);
+    loaderEl.remove();
     statusEl.textContent = `Cannot show the data: ${err instanceof Error ? err.message : String(err)}`;
     statusEl.classList.add('error');
     chartEl.dataset.status = 'error';
     return;
   }
+  setLoadProgress(null);
+  loaderEl.remove();
   setYearBounds(meta.yearMin, meta.yearMax);
   const loadSec = ((performance.now() - t0) / 1000).toFixed(1);
   const baseStatus =

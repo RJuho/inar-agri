@@ -20,7 +20,18 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
         how we calculate GPP and Reco. The time axis shows site local time. Each view (tab) has its own data
         parameters and diagrams. The views stay in this browser.
       </p>
-      <p id="status" class="status" role="status" aria-live="polite">Loading data…</p>
+      <div
+        id="loader"
+        class="loader"
+        role="progressbar"
+        aria-label="Loading data"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        data-indeterminate
+      >
+        <div class="loader-bar"></div>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
     </header>
     <div class="toolbar">
       <label class="field">
@@ -45,6 +56,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
         statusEl.textContent = `Cannot show the data: ${err instanceof Error ? err.message : String(err)}`;
         statusEl.classList.add('error');
       }
+      document.getElementById('loader')?.remove();
       document.getElementById('chart')?.setAttribute('data-status', 'error');
     });
   </script>
