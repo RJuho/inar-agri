@@ -457,6 +457,9 @@ test.describe('diagram types', () => {
     series = await seriesOf();
     expect(series.filter((s) => s.lineStyle?.type === 'dashed').length).toBe(series.length / 2);
     expect(new Set(series.map((s) => s.color)).size).toBe(series.length / 2);
+    // The series and legend names give the site and the year.
+    expect(series.map((s) => s.name)).toContain('Anttila 2022');
+    expect(series.map((s) => s.name)).toContain('Särkisuo 2023');
     await expect(page.locator('.diagram-sub')).toContainText('dashed line');
     // Three sites: one colour per site.
     await page.goto('/' + viewHash({ ...typeView('years'), id: 'y3', params: { ...base, sites: [1, 2, 4] } }));

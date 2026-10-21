@@ -282,6 +282,13 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const yColors = yearColors(data.years, tokens);
   // Site of the dashed lines: the second shown site, in the order of sites.parquet.
   const dashedSite = byYear ? meta.sites.filter((s) => data.groups.some((g) => g.siteId === s.siteId))[1]?.siteId : undefined;
+  // Series name: the site, the year, or with two sites in year mode the site and the year.
+  const twoSites = dashedSite !== undefined;
+  const seriesName = (g: Group) => {
+    const site = names.get(g.siteId) ?? String(g.siteId);
+    if (!byYear) return site;
+    return twoSites ? `${site} ${g.year}` : String(g.year);
+  };
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
   const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - y.left - STACK.right));
@@ -293,7 +300,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
       info.push({ siteId: g.siteId, site: names.get(g.siteId) ?? String(g.siteId), year: g.year, unit: displayUnit(meta, v) });
       series.push({
         type: 'line',
-        name: byYear ? String(g.year) : (names.get(g.siteId) ?? String(g.siteId)),
+        name: seriesName(g),
         datasetIndex: gi,
         encode: { x: 'x', y: v },
         xAxisIndex: panel,
@@ -317,7 +324,12 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   return {
     ...baseOption(tokens),
     legend: byYear
-      ? { ...siteLegend(meta, ctx.params, tokens, new Set(), y.left, STACK.right), data: data.years.map(String) }
+      ? {
+          ...siteLegend(meta, ctx.params, tokens, new Set(), y.left, STACK.right),
+          // With two sites, the legend marks are lines without a symbol, so that the dashed site is visible.
+          ...(twoSites ? { icon: undefined, itemWidth: 24, itemHeight: 10, itemStyle: { opacity: 0 }, lineStyle: { opacity: 1 } } : {}),
+          data: [...new Set(data.groups.map(seriesName))],
+        }
       : siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
