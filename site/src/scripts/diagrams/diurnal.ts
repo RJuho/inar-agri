@@ -176,13 +176,15 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
       const color = colors.get(s.siteId);
       const stack = `iqr-${panel}-${s.siteId}`;
       const common = { name, xAxisIndex: panel, yAxisIndex: panel, color, showSymbol: false, symbol: 'none', emphasis: { disabled: true }, silent: true };
-      // Band: an invisible line at q1, then q3 - q1 stacked on it with a fill.
-      series.push({ ...common, type: 'line', data: curve.q1, stack, lineStyle: { opacity: 0 } });
+      // Band: an invisible line at q1, then q3 - q1 stacked on it with a fill. `stackStrategy: 'all'`
+      // stacks also when q1 is negative (the default stacks values of the same sign only).
+      series.push({ ...common, type: 'line', data: curve.q1, stack, stackStrategy: 'all', lineStyle: { opacity: 0 } });
       series.push({
         ...common,
         type: 'line',
         data: curve.q3.map((q3, i) => q3 - (curve.q1[i] as number)),
         stack,
+        stackStrategy: 'all',
         lineStyle: { opacity: 0 },
         areaStyle: { color, opacity: 0.14 },
       });
