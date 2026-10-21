@@ -14,6 +14,7 @@ import { diurnal } from './diurnal';
 import { scatter } from './scatter';
 import { cumulative } from './cumulative';
 import { fingerprint } from './fingerprint';
+import { response } from './response';
 
 /** Data that a diagram type made from its query result. */
 export interface Prepared {
@@ -74,7 +75,7 @@ export interface DiagramDef<D extends Prepared = Prepared> {
 }
 
 // Each def has its own data type. The registry stores them with the base type.
-const DEFS = [timeseries, years, yearPanels, monthly, diurnal, scatter, cumulative, fingerprint] as unknown as DiagramDef[];
+const DEFS = [timeseries, years, yearPanels, monthly, diurnal, scatter, cumulative, fingerprint, response] as unknown as DiagramDef[];
 
 export const DIAGRAM_DEFS: ReadonlyMap<string, DiagramDef> = new Map(DEFS.map((d) => [d.type, d]));
 export const DIAGRAM_TYPES: ReadonlySet<string> = new Set(DIAGRAM_DEFS.keys());

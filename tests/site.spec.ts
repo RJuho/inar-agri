@@ -290,7 +290,7 @@ test.describe('views and diagrams', () => {
   });
 });
 
-const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint'] as const;
+const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint', 'response'] as const;
 const SITE_NAMES = ['Anttila', 'Särkisuo', 'Haltiala', 'Qvidja', 'Viikki', 'Maktau'];
 
 /** A view with one diagram of `type`. */
@@ -448,6 +448,68 @@ test.describe('diagram types', () => {
     await expect(card).toHaveAttribute('data-status', 'ready');
     await expect(card).toHaveAttribute('data-series', '0');
     await expect(card.locator('.diagram-note')).toContainText('Too many panels: 30');
+  });
+
+  test('response fits a light response per site and shows the bins in the tooltip', async ({ page }) => {
+    const base = typeView('response', ['nee_f', 'gpp']);
+    const view = { ...base, params: { ...base.params, sites: [1, 2, 3, 5], xVariable: 'ppfd' } };
+    await page.goto('/' + viewHash(view));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    // 2 variables × 4 sites with PPFD.
+    await expect(card).toHaveAttribute('data-series', '8');
+    expect(Number(await card.getAttribute('data-rows'))).toBeGreaterThan(100);
+    await expect(page.locator('.diagram-sub')).toContainText('Daytime rows only (PPFD > 0)');
+    await expect(page.locator('.diagram-sub')).toContainText('fitted light response');
+    const info = await card.locator('.diagram-chart').evaluate((el) => {
+      type Option = { series?: Array<{ lineStyle?: { type?: string }; data?: unknown[] }>; graphic?: Array<{ elements?: unknown[] }> };
+      const chart = (el as unknown as { __chart: { getOption(): Option } }).__chart;
+      const o = chart.getOption();
+      return {
+        dashed: (o.series ?? []).filter((s) => s.lineStyle?.type === 'dashed').length,
+        texts: (o.graphic ?? []).reduce((n, g) => n + (g.elements?.length ?? 0), 0),
+      };
+    });
+    // One dashed fit line and one text line per site and panel.
+    expect(info.dashed).toBe(8);
+    expect(info.texts).toBe(8);
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('Fitted curves (dashed)');
+    expect(alt).toMatch(/Anttila: α = 0\.0\d+, β = \d+(\.\d+)? µmol CO₂ m⁻² s⁻¹, γ = /);
+    expect(alt).toContain('GPP, calculated, light response');
+    // Tooltip: bin range, then mean, percentiles and count per site.
+    const canvas = card.locator('.diagram-chart canvas').first();
+    const box = await canvas.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) await canvas.hover({ position: { x: box.width * 0.3, y: box.height * 0.5 } });
+    await expect(card.locator('.diagram-chart').getByText(/n = \d/)).toBeVisible();
+    await expect(card.locator('.diagram-chart').getByText(/PPFD \d+ to \d+/)).toBeVisible();
+  });
+
+  test('response fits the Q10 model for Reco against air temperature', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('response', ['reco'])));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    await expect(card).toHaveAttribute('data-series', '6');
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('Q₁₀ model');
+    expect(alt).toMatch(/Qvidja: Q₁₀ = [1-4]\.\d+, R₁₀ = \d/);
+  });
+
+  test('response without a fit and with only the x variable', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('response', ['nee_f', 'ta'], 'day')));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    await expect(page.locator('.diagram-sub')).toContainText('from daily means');
+    await expect(page.locator('.diagram-sub')).not.toContainText('Dashed line');
+    expect((await card.locator('.diagram-alt p').textContent()) ?? '').toContain('No fitted curve');
+    await page.goto('/' + viewHash(typeView('response', ['ta'])));
+    await waitReady(page);
+    await expect(card).toHaveAttribute('data-series', '0');
+    await expect(page.locator('.diagram-note')).toContainText('x variable');
   });
 
   test('scatter with only the x variable shows a note', async ({ page }) => {
