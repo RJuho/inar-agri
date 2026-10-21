@@ -5,6 +5,7 @@ import 'katex/dist/katex.min.css';
 import Base from '../layouts/Base.astro';
 import { readCsv, readJson, type Row } from '../lib/csv';
 import { tex } from '../lib/tex';
+import { budgetFigure, budgetRows } from '../lib/budgetFigure';
 
 // ---------- Data ----------
 
@@ -167,6 +168,12 @@ const annualRows = [...annual].sort(bySiteYear('site_code'));
 const necbRows = [...necb].sort(bySiteYear('site_code'));
 const mgmtRows = [...mgmt].sort((a, b) => bySiteYear('site')(a, b) || (a.date ?? '').localeCompare(b.date ?? ''));
 const valPartRows = [...valPart].sort(bySiteYear('site_code'));
+
+// ---------- Figure: annual carbon balance (SVG, rendered at build time) ----------
+
+const budget = budgetFigure(budgetRows(annual, necb, SITE_NAMES));
+const budgetUnreliable = budget.rows.filter((r) => !r.reliable).length;
+const budgetNoNecb = [...new Set(budget.rows.filter((r) => r.necb === null).map((r) => r.site))];
 
 const inputs = [
   { site: 'anttila', night: 'sw_in', vpd: 'Magnus', ustar: 'no', neeF: 'provider', src: 'yes (night-time method)' },
@@ -549,6 +556,26 @@ const toc = [
           </tbody>
         </table>
       </div>
+
+      <h3 id="results-figure">Annual carbon balance per site and year</h3>
+      <figure class="budget">
+        <div class="budget-wrap">
+          <Fragment set:html={budget.svg} />
+        </div>
+        <figcaption>
+          <p>
+            <strong>{budget.summary}</strong> GPP and C<sub>exo</sub> are drawn negative, Reco and C<sub>harvest</sub>
+            {' '}positive. The circle is NEE = Reco − GPP. The diamond is −NECB = NEE + C<sub>harvest</sub> − C<sub>exo</sub>
+            {' '}+ C<sub>CH4</sub>, thus a diamond below zero means that the field gains carbon (C<sub>CH4</sub> is at most
+            10 g C m<sup>−2</sup> and is not drawn). A filled diamond is a complete NECB. A hollow diamond is a lower
+            bound or a partial NECB (an organic input without carbon content, grazing, or no harvest data).
+            {budgetNoNecb.length > 0 && ` ${budgetNoNecb.join(', ')} has no NECB and no diamond. `}
+            Only full calendar years with an annual NEE sum are shown. A year with * ({budgetUnreliable} of
+            {' '}{budget.rows.length}) has lighter bars: its annual NEE is not reliable (see the table above). Values in
+            g C m<sup>−2</sup> yr<sup>−1</sup>.
+          </p>
+        </figcaption>
+      </figure>
 
       <h3 id="results-necb">Net ecosystem carbon balance</h3>
       <div class="table-wrap">

@@ -211,6 +211,49 @@
   background: var(--surface-raised);
 }
 
+/* ---------- Figure: annual carbon balance (SVG made at build time) ---------- */
+
+.budget {
+  margin: 0 0 16px;
+}
+
+/* The SVG scales with the page. On a narrow screen it keeps 720 px and scrolls, like the tables. */
+.budget-wrap {
+  max-width: 1100px;
+  overflow-x: auto;
+}
+
+.budget-figure {
+  display: block;
+  min-width: 720px;
+  height: auto;
+}
+
+/* ECharts writes fixed colours into the SVG. The page tokens replace the text colour
+   and the sentinel colour of the NECB marker (#7a7974), so the figure reads in dark mode. */
+.budget-figure text {
+  fill: var(--text-primary);
+}
+
+.budget-figure path[fill='#7a7974'] {
+  fill: var(--text-primary);
+}
+
+.budget-figure path[stroke='#7a7974'] {
+  stroke: var(--text-primary);
+}
+
+.budget figcaption {
+  max-width: 72ch;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.budget figcaption p {
+  margin: 8px 0 0;
+  max-width: none;
+}
+
 /* ---------- Formulas ---------- */
 
 .katex {
