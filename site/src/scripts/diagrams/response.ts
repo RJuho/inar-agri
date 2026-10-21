@@ -11,7 +11,7 @@ import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
 import type { Aggregation, Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, whereClause } from './sql';
+import { CIRCULAR_VARS, col, meanExpr, stepExpr, whereClause } from './sql';
 import { evalFit, fitLight, fitQ10, fitText, MIN_BINS, type Fit } from './fit';
 import {
   FIXED_GRID,
@@ -28,6 +28,7 @@ import {
   nameLines,
   panelTitle,
   signNote,
+  statText,
   siteColors,
   siteLegend,
   siteNames,
@@ -76,13 +77,14 @@ const STEP_TEXT: Record<Aggregation, string> = {
   week: 'weekly means',
   month: 'monthly means',
 };
-/** Statistic in the panel titles. */
-const STAT_TEXT_BIN: Record<Aggregation, string> = {
-  raw: 'mean per bin of 30-min values',
-  day: 'mean per bin of daily means',
-  week: 'mean per bin of weekly means',
-  month: 'mean per bin of monthly means',
-};
+/**
+ * Statistic in the panel title of `v`, for example "mean per bin of daily means".
+ * Precipitation gives "daily sums"; wind direction gives a circular mean.
+ */
+function binStat(v: Variable, a: Aggregation): string {
+  const mean = CIRCULAR_VARS.has(v) ? 'circular mean' : 'mean';
+  return `${mean} per bin of ${a === 'raw' ? '30-min values' : `${statText(v, a)}s`}`;
+}
 
 /** Binned statistics of one site and one y variable. Index = bin, NaN = no bin. */
 interface Curve {
@@ -126,12 +128,16 @@ function query(params: ViewParams): string | null {
   const src =
     params.aggregation === 'raw'
       ? `SELECT site_id, ${x} AS x, ${ys.join(', ')} FROM obs WHERE ${where} AND ${x} IS NOT NULL${day} AND (${anyY})`
-      : `SELECT site_id, avg(${x}) AS x, ${ys.map((v) => `avg(${v}) AS ${v}`).join(', ')} FROM obs
+      : `SELECT site_id, ${stepExpr(x)} AS x, ${ys.map((v) => `${stepExpr(v)} AS ${v}`).join(', ')} FROM obs
          WHERE ${where}${day} GROUP BY site_id, date_trunc('${params.aggregation}', tl)
-         HAVING avg(${x}) IS NOT NULL`;
+         HAVING ${stepExpr(x)} IS NOT NULL`;
   const stats = ys.map(
     (v) =>
-      `count(${v})::DOUBLE AS ${v}__n, avg(${v}) AS ${v}, quantile_cont(${v}, 0.25) AS ${v}__q1, quantile_cont(${v}, 0.75) AS ${v}__q3`,
+      `count(${v})::DOUBLE AS ${v}__n, ${meanExpr(v)} AS ${v}, ` +
+      // Directions (wd): no band, because quartiles of angles are wrong near north.
+      (CIRCULAR_VARS.has(v)
+        ? `NULL::DOUBLE AS ${v}__q1, NULL::DOUBLE AS ${v}__q3`
+        : `quantile_cont(${v}, 0.25) AS ${v}__q1, quantile_cont(${v}, 0.75) AS ${v}__q3`),
   );
   return `WITH src AS (${src}),
     q AS (SELECT quantile_cont(x, 0.01) AS lo, quantile_cont(x, 0.99) AS hi FROM src),
@@ -321,7 +327,6 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
   const panelW = (Math.max(ctx.width, 200) - y.left - L.right - (cols - 1) * (L.gapX + y.left)) / cols;
   const xUnit = displayUnit(meta, data.x);
   const xName = axisName(meta, data.x, panelW);
-  const stat = STAT_TEXT_BIN[data.aggregation];
   const grid: unknown[] = [];
   const title: unknown[] = [];
   const xAxis: unknown[] = [];
@@ -337,11 +342,11 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
     const left = y.left + c * (panelW + L.gapX + y.left);
     grid.push({ top, left, width: panelW, height: L.panel, ...FIXED_GRID });
     // Panel label and statistic. The unit is in the y axis name.
-    title.push({ top: top - 24, left: left - 8, text: panelTitle(v, stat), textStyle: titleStyle(tokens) });
+    title.push({ top: top - 24, left: left - 8, text: panelTitle(v, binStat(v, data.aggregation)), textStyle: titleStyle(tokens) });
     // The axis lines stay at the bottom and the left edge of the panel, not at 0.
     const edge = { axisLine: { show: true, onZero: false, lineStyle: { color: tokens.axis } } };
-    xAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...xAxisName(tokens, xName) }));
-    yAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }));
+    xAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...xAxisName(tokens, xName) }, data.x));
+    yAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }, v));
     const unit = displayUnit(meta, v);
     // Fit text at the top of the panel: right for NEE (the curve goes to the bottom right),
     // left for GPP and Reco (the curve goes to the top right).
@@ -416,9 +421,12 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
           if (!line || p.dataIndex !== k) continue;
           const m = line.curve.mean[k] as number;
           if (!Number.isFinite(m)) continue;
+          const q1 = line.curve.q1[k] as number;
+          const q3 = line.curve.q3[k] as number;
+          const band = Number.isFinite(q1) && Number.isFinite(q3) ? `(${formatValue(q1)} to ${formatValue(q3)}) ` : '';
           rows.push(
             `${p.marker}${esc(p.seriesName)}&nbsp;&nbsp;<b>${formatValue(m)}</b> ` +
-              `(${formatValue(line.curve.q1[k] as number)} to ${formatValue(line.curve.q3[k] as number)}) ${esc(line.unit)}, n = ${groupDigits(line.curve.n[k] as number)}` +
+              `${band}${esc(line.unit)}, n = ${groupDigits(line.curve.n[k] as number)}` +
               (line.curve.fit ? `<br/>&nbsp;&nbsp;&nbsp;&nbsp;fit ${formatValue(evalFit(line.curve.fit, data.centres[k] as number))}: ${esc(fitText(line.curve.fit, '', false))}` : ''),
           );
         }

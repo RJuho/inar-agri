@@ -4,17 +4,17 @@
 
 /** Variables that the user can select. Only these names go into SQL. Order = panel order. */
 export const VARIABLES = [
-  'nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4',
-  'ta', 'sw_in', 'ppfd', 'rh', 'vpd', 'ustar',
-  'tsoil', 'swc',
+  'nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4', 'n2o', 'le',
+  'ta', 'sw_in', 'ppfd', 'rh', 'vpd', 'ustar', 'precip', 'pa', 'ws', 'wd', 'netrad', 'sw_out',
+  'tsoil', 'swc', 'g',
 ] as const;
 export type Variable = (typeof VARIABLES)[number];
 
 /** Checkbox groups of the parameter form. */
 export const VARIABLE_GROUPS: readonly { label: string; variables: readonly Variable[] }[] = [
-  { label: 'Fluxes', variables: ['nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4'] },
-  { label: 'Meteorology', variables: ['ta', 'sw_in', 'ppfd', 'rh', 'vpd', 'ustar'] },
-  { label: 'Soil', variables: ['tsoil', 'swc'] },
+  { label: 'Fluxes', variables: ['nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4', 'n2o', 'le'] },
+  { label: 'Meteorology', variables: ['ta', 'sw_in', 'ppfd', 'rh', 'vpd', 'ustar', 'precip', 'pa', 'ws', 'wd', 'netrad', 'sw_out'] },
+  { label: 'Soil', variables: ['tsoil', 'swc', 'g'] },
 ];
 
 /** Variables of the default view. */
@@ -29,14 +29,23 @@ export const VARIABLE_LABELS: Record<Variable, string> = {
   gpp_src: 'GPP, data provider',
   reco_src: 'Reco, data provider',
   ch4: 'CH4 flux',
+  n2o: 'N2O flux',
+  le: 'Latent heat flux',
   ta: 'Air temperature',
   sw_in: 'Shortwave radiation',
   ppfd: 'PPFD',
   rh: 'Relative humidity',
   vpd: 'Vapour pressure deficit',
   ustar: 'Friction velocity u*',
+  precip: 'Precipitation',
+  pa: 'Air pressure',
+  ws: 'Wind speed',
+  wd: 'Wind direction',
+  netrad: 'Net radiation',
+  sw_out: 'Outgoing shortwave radiation',
   tsoil: 'Soil temperature',
   swc: 'Soil water content',
+  g: 'Soil heat flux',
 };
 
 /** Sites that have the variable, for variables that only some sites have. Shown as a hint. */
@@ -49,6 +58,15 @@ export const VARIABLE_SITES: Partial<Record<Variable, string>> = {
   rh: 'not Haltiala',
   vpd: 'Haltiala, Qvidja, Maktau',
   ustar: 'Qvidja, Maktau',
+  n2o: 'Anttila, Särkisuo, Viikki',
+  le: 'Anttila, Särkisuo, Qvidja, Maktau',
+  precip: 'not Haltiala',
+  pa: 'Anttila, Särkisuo, Viikki (2022–2023), Maktau',
+  ws: 'Qvidja, Viikki, Maktau',
+  wd: 'Qvidja, Viikki, Maktau',
+  netrad: 'Anttila, Särkisuo, Qvidja, Maktau',
+  sw_out: 'Anttila, Särkisuo, Qvidja, Viikki',
+  g: 'Anttila, Särkisuo, Viikki, Maktau',
 };
 
 export const AGGREGATIONS = ['raw', 'day', 'week', 'month'] as const;

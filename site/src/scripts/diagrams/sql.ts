@@ -1,9 +1,9 @@
 // SQL parts that all diagram types use.
 // Only whitelisted variable names and integers go into the SQL text.
-import { VARIABLES, type Variable, type ViewParams } from '../state';
+import { VARIABLES, type Variable, type ViewParams } from '../state.ts';
 
 /** Return the variable name only when it is in the whitelist. */
-export function col(v: Variable): string {
+export function col<V extends Variable>(v: V): V {
   if (!(VARIABLES as readonly string[]).includes(v)) throw new Error(`Unknown variable: ${String(v)}`);
   return v;
 }
@@ -47,4 +47,28 @@ export function whereClause(params: ViewParams): string | null {
   if (from) parts.push(`tl >= ${ts(from)}`);
   if (to) parts.push(`tl < ${ts(to)}`);
   return parts.join(' AND ');
+}
+
+/** Variables that are an amount per period (mm per 30 min). A time step gives their sum. */
+export const SUM_VARS: ReadonlySet<Variable> = new Set<Variable>(['precip']);
+/** Directions in degrees (0 = north, 90 = east). Their mean is a circular mean. */
+export const CIRCULAR_VARS: ReadonlySet<Variable> = new Set<Variable>(['wd']);
+
+/**
+ * SQL expression for the mean of `v` over a group of rows. Directions (`wd`) get the circular
+ * mean in degrees 0 to 360: the direction of the mean unit vector. The other variables get avg().
+ * Use it for statistics that are a mean also for `precip` (mean per half hour, per bin).
+ */
+export function meanExpr(v: Variable): string {
+  const c = col(v);
+  if (CIRCULAR_VARS.has(v)) return `((degrees(atan2(avg(sin(radians(${c}))), avg(cos(radians(${c}))))) + 360) % 360)`;
+  return `avg(${c})`;
+}
+
+/**
+ * SQL expression for the value of `v` in one time step (day, ISO week, month): the sum for
+ * `SUM_VARS` (precipitation), else `meanExpr()`. A step with gaps gives a sum that is too low.
+ */
+export function stepExpr(v: Variable): string {
+  return SUM_VARS.has(v) ? `sum(${col(v)})` : meanExpr(v);
 }

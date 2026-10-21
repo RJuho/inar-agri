@@ -8,10 +8,10 @@ import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
 import type { Aggregation, Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, whereClause } from './sql';
+import { col, stepExpr, whereClause } from './sql';
 import {
   FIXED_GRID,
-  STAT_TEXT,
+  statText,
   X_NAME_SPACE,
   axisName,
   baseOption,
@@ -72,9 +72,9 @@ function query(params: ViewParams): string | null {
   const inner =
     params.aggregation === 'raw'
       ? `SELECT site_id, ${x} AS x, ${ys.join(', ')} FROM obs WHERE ${where} AND ${x} IS NOT NULL AND (${anyY})`
-      : `SELECT site_id, avg(${x}) AS x, ${ys.map((v) => `avg(${v}) AS ${v}`).join(', ')} FROM obs
+      : `SELECT site_id, ${stepExpr(x)} AS x, ${ys.map((v) => `${stepExpr(v)} AS ${v}`).join(', ')} FROM obs
          WHERE ${where} GROUP BY site_id, date_trunc('${params.aggregation}', tl)
-         HAVING avg(${x}) IS NOT NULL`;
+         HAVING ${stepExpr(x)} IS NOT NULL`;
   return `SELECT site_id::DOUBLE AS site_id, x, ${ys.join(', ')}
     FROM (SELECT * FROM (${inner}) USING SAMPLE reservoir(${SAMPLE_ROWS} ROWS) REPEATABLE (1))
     ORDER BY site_id`;
@@ -167,7 +167,6 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
   const panelW = (Math.max(ctx.width, 200) - y.left - L.right - (cols - 1) * (L.gapX + y.left)) / cols;
   const xUnit = displayUnit(meta, data.x);
   const xName = axisName(meta, data.x, panelW);
-  const stat = STAT_TEXT[data.aggregation];
   const grid: unknown[] = [];
   const title: unknown[] = [];
   const xAxis: unknown[] = [];
@@ -181,11 +180,11 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
     const left = y.left + c * (panelW + L.gapX + y.left);
     grid.push({ top, left, width: panelW, height: L.panel, ...FIXED_GRID });
     // Panel label and statistic. The unit is in the y axis name.
-    title.push({ top: top - 24, left: left - 8, text: panelTitle(v, stat), textStyle: titleStyle(tokens) });
+    title.push({ top: top - 24, left: left - 8, text: panelTitle(v, statText(v, data.aggregation)), textStyle: titleStyle(tokens) });
     // The axis lines stay at the bottom and the left edge of the panel, not at 0.
     const edge = { axisLine: { show: true, onZero: false, lineStyle: { color: tokens.axis } } };
-    xAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...xAxisName(tokens, xName) }));
-    yAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }));
+    xAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...xAxisName(tokens, xName) }, data.x));
+    yAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }, v));
     data.sites.forEach((s, di) => {
       if (!s.values[v]?.some(Number.isFinite)) return;
       panelOf.push(v);

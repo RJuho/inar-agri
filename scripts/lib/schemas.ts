@@ -105,6 +105,15 @@ export const ObservationRowSchema = v.strictTuple([
   range(-100, 100), // gpp_src
   range(-100, 100), // reco_src
   range(-10, 10), // ch4
+  range(0, 100), // precip
+  range(50, 110), // pa
+  range(0, 60), // ws
+  range(0, 360), // wd
+  range(-400, 1200), // netrad
+  range(-50, 1200), // sw_out
+  range(-300, 1000), // le
+  range(-300, 500), // g
+  range(-2000, 2000), // n2o
 ]);
 
 /** Physical range issues are warnings. Every other issue is an error. */

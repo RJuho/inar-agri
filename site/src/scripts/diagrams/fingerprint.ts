@@ -13,7 +13,7 @@ import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, whereClause } from './sql';
+import { col, meanExpr, whereClause } from './sql';
 import {
   FIXED_GRID,
   FLUX_VARS,
@@ -122,7 +122,7 @@ function query(params: ViewParams): string | null {
       SELECT d0, greatest(1, ceil((date_diff('day', d0, d1) + 1) / ${MAX_COLUMNS}.0))::INTEGER AS bin FROM r
     ), c AS (
       SELECT site_id, date_diff('day', b.d0, tl::DATE) // b.bin AS x, hour(tl) * 2 + minute(tl) // 30 AS slot,
-        ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
+        ${vars.map((v) => `${meanExpr(v)} AS ${v}`).join(', ')}
       FROM obs, b WHERE ${where} GROUP BY ALL
       HAVING ${vars.map((v) => `count(${v})`).join(' + ')} > 0
     ), q AS (

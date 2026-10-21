@@ -9,7 +9,7 @@ import type { Meta } from '../db';
 import type { Variable, ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, whereClause } from './sql';
+import { col, stepExpr, whereClause } from './sql';
 import {
   DAY,
   REF_END,
@@ -33,7 +33,8 @@ import {
   nameLines,
   panelTitle,
   signNote,
-  STAT_TEXT,
+  statText,
+  stepStatNote,
   tickLabelWidth,
   valueWithUnit,
   X_NAME_SPACE,
@@ -89,7 +90,7 @@ export function yearsQuery(params: ViewParams): string | null {
         ? refDateSql(`greatest(date_trunc('week', tl), date_trunc('year', tl))`)
         : refDateSql('tl');
   return `SELECT site_id::DOUBLE AS site_id, year(tl)::DOUBLE AS yr, ${x} AS x,
-      ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
+      ${vars.map((v) => `${stepExpr(v)} AS ${v}`).join(', ')}
     FROM obs WHERE ${where} GROUP BY 1, 2, 3 ORDER BY 1, 2, 3`;
 }
 
@@ -284,12 +285,12 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
       ...y.layout.title[i],
-      text: panelTitle(v, STAT_TEXT[data.step]),
+      text: panelTitle(v, statText(v, data.step)),
       textStyle: { fontSize: 13, fontWeight: 600, color: tokens.text },
     })),
     grid: y.layout.grid,
     xAxis: stackDayAxes(tokens, vars.length, dayOfYearAxisName(meta, ctx.params)),
-    yAxis: vars.map((_, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number))),
+    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v)),
     tooltip: siteYearTooltip(ctx, data.step, info, marks.all),
     dataset: data.groups.map((g) => ({
       dimensions: [{ name: 'x', type: 'time' }, ...vars.map((v) => ({ name: v, type: 'float' }))],
@@ -312,5 +313,6 @@ export const years: DiagramDef<YearsData> = {
     `One panel per variable. The x axis is the day of the year, ${YEAR_STEP_TEXT[data.step]}. ` +
     `Each line is one site and year: ${data.years.length} years (${data.years[0] ?? ''} to ${data.years[data.years.length - 1] ?? ''}). ` +
     `The colour shows the site, and lighter lines are earlier years.` +
-    (data.step === 'week' ? ' A week over 1 January is split: each part is in its own year.' : ''),
+    (data.step === 'week' ? ' A week over 1 January is split: each part is in its own year.' : '') +
+    stepStatNote(data.variables, data.step),
 };

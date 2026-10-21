@@ -1,5 +1,6 @@
 // Monthly means: grouped bars, one panel per variable, one bar per site in each calendar month.
 // The mean uses all 30-minute values of the selected years. The step setting does not apply.
+// Precipitation: the mean of the monthly sums. Wind direction: the circular mean.
 import * as echarts from 'echarts/core';
 import { BarChart, LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
@@ -7,7 +8,7 @@ import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
 import type { Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, whereClause } from './sql';
+import { CIRCULAR_VARS, SUM_VARS, col, whereClause } from './sql';
 import {
   MONTH_NAMES,
   STACK,
@@ -42,6 +43,13 @@ echarts.use([BarChart, LineChart]);
 
 /** Panel statistic in the title. The step setting does not apply. */
 const STAT = 'monthly mean of 30-min values';
+
+/** Statistic in the panel title of `v`. */
+function statOf(v: Variable): string {
+  if (SUM_VARS.has(v)) return 'mean of the monthly sums';
+  if (CIRCULAR_VARS.has(v)) return 'monthly circular mean of 30-min values';
+  return STAT;
+}
 /** Stack layout with space below the bottom panel for the month labels and the x axis name. */
 const LAYOUT = { ...STACK, bottom: X_NAME_SPACE + 4 };
 /** Panel height in px. */
@@ -57,8 +65,26 @@ function query(params: ViewParams): string | null {
   const where = whereClause(params);
   if (where === null || params.variables.length === 0) return null;
   const vars = params.variables.map(col);
-  return `SELECT site_id::DOUBLE AS site_id, month(tl)::DOUBLE AS m, ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
-    FROM obs WHERE ${where} GROUP BY 1, 2 ORDER BY 1, 2`;
+  // Two levels: first per site and month of a year (mo), then per calendar month. The parts
+  // per month (sums and counts) give the same mean as avg() of all 30-min values.
+  // Precipitation: mean of the monthly sums. Wind direction: circular mean of all values.
+  const inner: string[] = [];
+  const outer: string[] = [];
+  for (const v of vars) {
+    if (SUM_VARS.has(v)) {
+      inner.push(`sum(${v}) AS ${v}__s`);
+      outer.push(`avg(${v}__s) AS ${v}`);
+    } else if (CIRCULAR_VARS.has(v)) {
+      inner.push(`sum(sin(radians(${v}))) AS ${v}__s, sum(cos(radians(${v}))) AS ${v}__c`);
+      outer.push(`((degrees(atan2(sum(${v}__s), sum(${v}__c))) + 360) % 360) AS ${v}`);
+    } else {
+      inner.push(`sum(${v}) AS ${v}__s, count(${v}) AS ${v}__n`);
+      outer.push(`sum(${v}__s) / nullif(sum(${v}__n), 0) AS ${v}`);
+    }
+  }
+  return `SELECT site_id::DOUBLE AS site_id, month(mo)::DOUBLE AS m, ${outer.join(', ')}
+    FROM (SELECT site_id, date_trunc('month', tl) AS mo, ${inner.join(', ')} FROM obs WHERE ${where} GROUP BY 1, 2)
+    GROUP BY 1, 2 ORDER BY 1, 2`;
 }
 
 function prepare(table: Table | null, params: ViewParams, _meta: Meta): MonthlyData {
@@ -159,7 +185,7 @@ function build(data: MonthlyData, ctx: BuildContext): EChartsCoreOption {
     ...baseOption(tokens),
     legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
     // Panel label and statistic. The unit is in the y axis name.
-    title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, STAT), textStyle: titleStyle(tokens) })),
+    title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, statOf(v)), textStyle: titleStyle(tokens) })),
     grid: layout.grid,
     xAxis: vars.map((_, i) => ({
       type: 'category',
@@ -171,8 +197,8 @@ function build(data: MonthlyData, ctx: BuildContext): EChartsCoreOption {
       axisLabel: { show: i === last, color: tokens.textMuted, hideOverlap: true },
       ...(i === last ? xAxisName(tokens, 'Month') : {}),
     })),
-    yAxis: vars.map((_, i) =>
-      valueAxis(tokens, i, { scale: false, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }),
+    yAxis: vars.map((v, i) =>
+      valueAxis(tokens, i, { scale: false, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }, v),
     ),
     tooltip: {
       ...tooltipBase(tokens, 'axis'),
@@ -203,5 +229,6 @@ export const monthly: DiagramDef<MonthlyData> = {
   height: (params) => stackHeight(params.variables.length, PANEL_H, LAYOUT),
   describe: (data) =>
     `Grouped bars: one panel per variable, twelve calendar months on the x axis, one bar per site (${data.sites.length} sites). ` +
-    `Each bar is the mean of all values in that month over the selected years.`,
+    `Each bar is the mean of all values in that month over the selected years` +
+      (data.variables.some((v) => SUM_VARS.has(v)) ? '; for precipitation it is the mean of the monthly sums.' : '.'),
 };

@@ -1,12 +1,12 @@
 {
-  "builtAt": "2026-10-21T08:26:10.955Z",
+  "builtAt": "2026-10-21T11:18:19.760Z",
   "duckdb": "v1.5.6",
   "node": "v26.10.0",
   "outputs": [
     {
       "file": "db/observations.parquet",
       "rows": 537980,
-      "bytes": 16025772
+      "bytes": 23105969
     },
     {
       "file": "db/sites.parquet",
@@ -15,13 +15,13 @@
     },
     {
       "file": "db/variables.parquet",
-      "rows": 17,
-      "bytes": 1989
+      "rows": 26,
+      "bytes": 2137
     },
     {
       "file": "db/site_variables.parquet",
-      "rows": 118,
-      "bytes": 5767
+      "rows": 185,
+      "bytes": 7272
     },
     {
       "file": "db/events.parquet",
@@ -235,6 +235,78 @@
           "mean": 0.0005013094218036473,
           "conflicts": 0,
           "rangeWarnings": 0
+        },
+        "precip": {
+          "n_valid": 34982,
+          "min": 0,
+          "max": 14.8,
+          "mean": 0.02866045394774486,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "pa": {
+          "n_valid": 34884,
+          "min": 95.2117,
+          "max": 102.9961,
+          "mean": 99.90163546898302,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "ws": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "wd": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "netrad": {
+          "n_valid": 34711,
+          "min": -145.0429,
+          "max": 714.263,
+          "mean": 39.90859770389844,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "sw_out": {
+          "n_valid": 34883,
+          "min": -13.5084,
+          "max": 507.7159,
+          "mean": 31.44014061577255,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "le": {
+          "n_valid": 35040,
+          "min": -20.30633,
+          "max": 537.52899,
+          "mean": 22.63396487867288,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "g": {
+          "n_valid": 34883,
+          "min": -41.1148,
+          "max": 99.677,
+          "mean": 0.6833694693690293,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "n2o": {
+          "n_valid": 35040,
+          "min": -2.10414,
+          "max": 30.6435,
+          "mean": 0.20006297945205317,
+          "conflicts": 0,
+          "rangeWarnings": 0
         }
       },
       "years": [
@@ -331,6 +403,60 @@
               "min": -0.00097903,
               "max": -0.0003324,
               "mean": -0.00056289
+            },
+            "precip": {
+              "n_valid": 4,
+              "min": 0,
+              "max": 0,
+              "mean": 0
+            },
+            "pa": {
+              "n_valid": 4,
+              "min": 98.9632,
+              "max": 99.0855,
+              "mean": 99.026825
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 4,
+              "min": -1.3226,
+              "max": -0.7539,
+              "mean": -1.081
+            },
+            "sw_out": {
+              "n_valid": 4,
+              "min": 0.4019,
+              "max": 0.57,
+              "mean": 0.482275
+            },
+            "le": {
+              "n_valid": 4,
+              "min": -0.53086621,
+              "max": 0.5996747,
+              "mean": -0.06657467750000001
+            },
+            "g": {
+              "n_valid": 4,
+              "min": -2.5795,
+              "max": -1.77,
+              "mean": -2.279925
+            },
+            "n2o": {
+              "n_valid": 4,
+              "min": 0.47142,
+              "max": 0.59921,
+              "mean": 0.524405
             }
           }
         },
@@ -427,6 +553,60 @@
               "min": -0.04126011,
               "max": 0.10018079,
               "mean": 0.0004621841718036517
+            },
+            "precip": {
+              "n_valid": 17520,
+              "min": 0,
+              "max": 8.7,
+              "mean": 0.026015981735159968
+            },
+            "pa": {
+              "n_valid": 17422,
+              "min": 95.2117,
+              "max": 102.9961,
+              "mean": 99.96113799219354
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 17335,
+              "min": -93.7283,
+              "max": 714.263,
+              "mean": 41.795848018459786
+            },
+            "sw_out": {
+              "n_valid": 17421,
+              "min": -13.5084,
+              "max": 507.7159,
+              "mean": 31.940855616784166
+            },
+            "le": {
+              "n_valid": 17520,
+              "min": -20.30633,
+              "max": 385.430114,
+              "mean": 22.987578922522264
+            },
+            "g": {
+              "n_valid": 17421,
+              "min": -41.1148,
+              "max": 99.677,
+              "mean": 0.7895861489007522
+            },
+            "n2o": {
+              "n_valid": 17520,
+              "min": -2.10414,
+              "max": 30.6435,
+              "mean": 0.2772240724885833
             }
           }
         },
@@ -523,6 +703,60 @@
               "min": -0.04168855,
               "max": 0.09505636,
               "mean": 0.0005406866299383461
+            },
+            "precip": {
+              "n_valid": 17458,
+              "min": 0,
+              "max": 14.8,
+              "mean": 0.0313208844082944
+            },
+            "pa": {
+              "n_valid": 17458,
+              "min": 95.6266,
+              "max": 102.6768,
+              "mean": 99.84245608317123
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 17372,
+              "min": -145.0429,
+              "max": 669.4501,
+              "mean": 38.03480505986645
+            },
+            "sw_out": {
+              "n_valid": 17458,
+              "min": -11.5085,
+              "max": 415.4306,
+              "mean": 30.94757992324437
+            },
+            "le": {
+              "n_valid": 17516,
+              "min": -19.806224,
+              "max": 537.52899,
+              "mean": 22.285454037726574
+            },
+            "g": {
+              "n_valid": 17458,
+              "min": -27.2347,
+              "max": 62.6808,
+              "mean": 0.5780568564554938
+            },
+            "n2o": {
+              "n_valid": 17516,
+              "min": -1.78235,
+              "max": 7.97052,
+              "mean": 0.12281019810458976
             }
           }
         }
@@ -656,6 +890,78 @@
           "mean": 0.02762295253064727,
           "conflicts": 0,
           "rangeWarnings": 0
+        },
+        "precip": {
+          "n_valid": 30944,
+          "min": 0,
+          "max": 10.1,
+          "mean": 0.02826396070320612,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "pa": {
+          "n_valid": 30225,
+          "min": 95.1193,
+          "max": 102.8961,
+          "mean": 99.88620590570711,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "ws": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "wd": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "netrad": {
+          "n_valid": 16615,
+          "min": -99.7937,
+          "max": 539.4318,
+          "mean": 11.914721131507566,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "sw_out": {
+          "n_valid": 16613,
+          "min": -8.4339,
+          "max": 464.3909,
+          "mean": 23.960926611689644,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "le": {
+          "n_valid": 35040,
+          "min": -21.73535,
+          "max": 440.45781,
+          "mean": 24.56853344092173,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "g": {
+          "n_valid": 29151,
+          "min": -30.3287,
+          "max": 42.4339,
+          "mean": -0.37980049397962196,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "n2o": {
+          "n_valid": 29040,
+          "min": -9.853290000000001,
+          "max": 61.17792,
+          "mean": 1.1880386429063723,
+          "conflicts": 0,
+          "rangeWarnings": 0
         }
       },
       "years": [
@@ -748,6 +1054,60 @@
               "mean": 0.429772975
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 4,
+              "min": 0,
+              "max": 0,
+              "mean": 0
+            },
+            "pa": {
+              "n_valid": 4,
+              "min": 98.8673,
+              "max": 98.9888,
+              "mean": 98.93062499999999
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 4,
+              "min": -1.0794494,
+              "max": 0.6826068,
+              "mean": 0.0012754075000000475
+            },
+            "g": {
+              "n_valid": 4,
+              "min": -2.4817,
+              "max": -2.403,
+              "mean": -2.4439
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -848,6 +1208,60 @@
               "min": -0.0058367,
               "max": 0.50377995,
               "mean": 0.03109318571242647
+            },
+            "precip": {
+              "n_valid": 17520,
+              "min": 0,
+              "max": 10.1,
+              "mean": 0.030256849315068668
+            },
+            "pa": {
+              "n_valid": 17390,
+              "min": 95.1193,
+              "max": 102.8961,
+              "mean": 99.88731550891275
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 3238,
+              "min": -98.7473,
+              "max": 128.998,
+              "mean": -7.526666213712169
+            },
+            "sw_out": {
+              "n_valid": 3238,
+              "min": -3.1715,
+              "max": 61.3634,
+              "mean": 2.1758976528721434
+            },
+            "le": {
+              "n_valid": 17520,
+              "min": -17.80823,
+              "max": 392.61221,
+              "mean": 23.459393933345815
+            },
+            "g": {
+              "n_valid": 17302,
+              "min": -18.4244,
+              "max": 42.4339,
+              "mean": -0.2339699803490905
+            },
+            "n2o": {
+              "n_valid": 11524,
+              "min": -1.18678,
+              "max": 52.424640000000004,
+              "mean": 1.7538476874349163
             }
           }
         },
@@ -944,6 +1358,60 @@
               "min": -0.01828185,
               "max": 0.21022916,
               "mean": 0.025339841821192106
+            },
+            "precip": {
+              "n_valid": 13420,
+              "min": 0,
+              "max": 6.3,
+              "mean": 0.02567064083457535
+            },
+            "pa": {
+              "n_valid": 12831,
+              "min": 95.5561,
+              "max": 102.6116,
+              "mean": 99.88499994544435
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 13377,
+              "min": -99.7937,
+              "max": 539.4318,
+              "mean": 16.620650130821428
+            },
+            "sw_out": {
+              "n_valid": 13375,
+              "min": -8.4339,
+              "max": 464.3909,
+              "mean": 29.23493960373834
+            },
+            "le": {
+              "n_valid": 17516,
+              "min": -21.73535,
+              "max": 440.45781,
+              "mean": 25.68353647842259
+            },
+            "g": {
+              "n_valid": 11845,
+              "min": -30.3287,
+              "max": 39.7599,
+              "mean": -0.592118193330519
+            },
+            "n2o": {
+              "n_valid": 17516,
+              "min": -9.853290000000001,
+              "max": 61.17792,
+              "mean": 0.8157856496916941
             }
           }
         }
@@ -1077,6 +1545,78 @@
           "mean": null,
           "conflicts": 0,
           "rangeWarnings": 0
+        },
+        "precip": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "pa": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "ws": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "wd": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "netrad": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "sw_out": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "le": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "g": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "n2o": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
         }
       },
       "years": [
@@ -1169,6 +1709,60 @@
               "mean": null
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -1269,6 +1863,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -1361,6 +2009,60 @@
               "mean": null
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -1461,6 +2163,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -1553,6 +2309,60 @@
               "mean": null
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -1690,6 +2500,78 @@
           "mean": null,
           "conflicts": 0,
           "rangeWarnings": 0
+        },
+        "precip": {
+          "n_valid": 122904,
+          "min": 0,
+          "max": 19.92,
+          "mean": 0.04065962051682571,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "pa": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "ws": {
+          "n_valid": 126098,
+          "min": 0.00662151,
+          "max": 9.70228,
+          "mean": 1.6736790099158665,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "wd": {
+          "n_valid": 126098,
+          "min": 0.00111908,
+          "max": 359.99,
+          "mean": 182.530779200521,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "netrad": {
+          "n_valid": 129493,
+          "min": -342.83,
+          "max": 628.37,
+          "mean": 39.70068258515893,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "sw_out": {
+          "n_valid": 126758,
+          "min": 0,
+          "max": 531.43,
+          "mean": 26.322984269237725,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "le": {
+          "n_valid": 134108,
+          "min": -52.55616219267333,
+          "max": 395.2385207822666,
+          "mean": 23.862323530307304,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "g": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "n2o": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
         }
       },
       "years": [
@@ -1782,6 +2664,60 @@
               "mean": 3.596230114668303
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 11063,
+              "min": 0,
+              "max": 19.92,
+              "mean": 0.030937358763445708
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 11044,
+              "min": 0.00832908,
+              "max": 8.98983,
+              "mean": 1.694767336822707
+            },
+            "wd": {
+              "n_valid": 11044,
+              "min": 0.158861,
+              "max": 359.979,
+              "mean": 180.41172474248492
+            },
+            "netrad": {
+              "n_valid": 11054,
+              "min": -120.94,
+              "max": 588.09,
+              "mean": 50.4571539714133
+            },
+            "sw_out": {
+              "n_valid": 11054,
+              "min": 0,
+              "max": 170.28,
+              "mean": 27.390902840600532
+            },
+            "le": {
+              "n_valid": 11376,
+              "min": -24.076682808175278,
+              "max": 345.8206601151611,
+              "mean": 36.53162398419153
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -1882,6 +2818,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 16461,
+              "min": 0,
+              "max": 14.72,
+              "mean": 0.045030678573597854
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 16436,
+              "min": 0.027345,
+              "max": 8.4198,
+              "mean": 1.6143917251581914
+            },
+            "wd": {
+              "n_valid": 16436,
+              "min": 0.043366,
+              "max": 359.977,
+              "mean": 174.28195742889983
+            },
+            "netrad": {
+              "n_valid": 16460,
+              "min": -276.89,
+              "max": 628.37,
+              "mean": 40.87477764277023
+            },
+            "sw_out": {
+              "n_valid": 16460,
+              "min": 0,
+              "max": 291.45,
+              "mean": 26.28469258809242
+            },
+            "le": {
+              "n_valid": 17520,
+              "min": -24.56408225528444,
+              "max": 382.68445008260824,
+              "mean": 25.519522581987186
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -1974,6 +2964,60 @@
               "mean": 3.5052754274345106
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 17558,
+              "min": 0,
+              "max": 11.21,
+              "mean": 0.044876979154800864
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 16621,
+              "min": 0.0192046,
+              "max": 9.69287,
+              "mean": 1.8101899112267683
+            },
+            "wd": {
+              "n_valid": 16621,
+              "min": 0.0191234,
+              "max": 359.89,
+              "mean": 194.98636514647808
+            },
+            "netrad": {
+              "n_valid": 17554,
+              "min": -308.63,
+              "max": 577.59,
+              "mean": 36.903091033382196
+            },
+            "sw_out": {
+              "n_valid": 17554,
+              "min": 0,
+              "max": 427.89,
+              "mean": 22.915901788766227
+            },
+            "le": {
+              "n_valid": 17568,
+              "min": -24.644192109222224,
+              "max": 305.21946839031943,
+              "mean": 26.34268916308879
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -2074,6 +3118,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 16922,
+              "min": 0,
+              "max": 12.120000000000005,
+              "mean": 0.04048221250443183
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 14581,
+              "min": 0.00662151,
+              "max": 7.76871,
+              "mean": 1.6866970174411933
+            },
+            "wd": {
+              "n_valid": 14581,
+              "min": 0.0774763,
+              "max": 359.973,
+              "mean": 186.8585469997451
+            },
+            "netrad": {
+              "n_valid": 16914,
+              "min": -149.04,
+              "max": 583.41,
+              "mean": 34.87652181624695
+            },
+            "sw_out": {
+              "n_valid": 16914,
+              "min": 0,
+              "max": 238.13,
+              "mean": 23.92222833155978
+            },
+            "le": {
+              "n_valid": 17520,
+              "min": -24.321254147397777,
+              "max": 300.68108246175,
+              "mean": 19.5886381302685
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -2166,6 +3264,60 @@
               "mean": 2.729953335461232
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 10897,
+              "min": 0,
+              "max": 9.359999999999983,
+              "mean": 0.035591447187299244
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 17478,
+              "min": 0.00812833,
+              "max": 7.81824,
+              "mean": 1.626417471142583
+            },
+            "wd": {
+              "n_valid": 17478,
+              "min": 0.00111908,
+              "max": 359.988,
+              "mean": 184.97009605603526
+            },
+            "netrad": {
+              "n_valid": 17516,
+              "min": -342.83,
+              "max": 597.35,
+              "mean": 38.87035053665213
+            },
+            "sw_out": {
+              "n_valid": 17516,
+              "min": 0,
+              "max": 434.52,
+              "mean": 26.388841630509262
+            },
+            "le": {
+              "n_valid": 17520,
+              "min": -23.33378892596111,
+              "max": 349.5054926166667,
+              "mean": 19.697057711607236
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -2266,6 +3418,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 16535,
+              "min": 0,
+              "max": 8.280000000000001,
+              "mean": 0.03925188993045045
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 16516,
+              "min": 0.00763338,
+              "max": 8.30002,
+              "mean": 1.6945162138326328
+            },
+            "wd": {
+              "n_valid": 16516,
+              "min": 0.00743595,
+              "max": 359.98,
+              "mean": 174.10613666256637
+            },
+            "netrad": {
+              "n_valid": 16531,
+              "min": -167.08,
+              "max": 622.29,
+              "mean": 38.61588470146998
+            },
+            "sw_out": {
+              "n_valid": 16531,
+              "min": 0,
+              "max": 531.43,
+              "mean": 30.16568205190252
+            },
+            "le": {
+              "n_valid": 17520,
+              "min": -24.837363141681664,
+              "max": 300.07816237298755,
+              "mean": 21.165307944354335
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -2362,6 +3568,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17087,
+              "min": 0,
+              "max": 16.73999999999998,
+              "mean": 0.04262304676069503
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 17051,
+              "min": 0.0213739,
+              "max": 9.70228,
+              "mean": 1.6890425222274392
+            },
+            "wd": {
+              "n_valid": 17051,
+              "min": 0.0284595,
+              "max": 359.99,
+              "mean": 178.90811463491875
+            },
+            "netrad": {
+              "n_valid": 17083,
+              "min": -166.25,
+              "max": 590.9,
+              "mean": 39.0743083767487
+            },
+            "sw_out": {
+              "n_valid": 17083,
+              "min": 0,
+              "max": 456.46,
+              "mean": 27.060392788152008
+            },
+            "le": {
+              "n_valid": 17568,
+              "min": -51.318809599620145,
+              "max": 359.4814538829222,
+              "mean": 21.754135784289875
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -2454,6 +3714,60 @@
               "mean": 4.567610259677244
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 16381,
+              "min": 0,
+              "max": 4.660000000000002,
+              "mean": 0.041240461510286
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 16371,
+              "min": 0.0194222,
+              "max": 8.16842,
+              "mean": 1.5822190953026793
+            },
+            "wd": {
+              "n_valid": 16371,
+              "min": 0.0117518,
+              "max": 359.979,
+              "mean": 185.4096543730191
+            },
+            "netrad": {
+              "n_valid": 16381,
+              "min": -228.26,
+              "max": 593.55,
+              "mean": 41.87725169403567
+            },
+            "sw_out": {
+              "n_valid": 13646,
+              "min": 0,
+              "max": 218.78,
+              "mean": 27.199832918071362
+            },
+            "le": {
+              "n_valid": 17516,
+              "min": -52.55616219267333,
+              "max": 395.2385207822666,
+              "mean": 24.74172681614333
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -2591,6 +3905,78 @@
           "mean": null,
           "conflicts": 0,
           "rangeWarnings": 0
+        },
+        "precip": {
+          "n_valid": 70028,
+          "min": 0,
+          "max": 23.1,
+          "mean": 0.04374393099902806,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "pa": {
+          "n_valid": 34014,
+          "min": 96.16,
+          "max": 104.72,
+          "mean": 101.18937437525783,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "ws": {
+          "n_valid": 67525,
+          "min": 0,
+          "max": 13.1,
+          "mean": 3.231041836356898,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "wd": {
+          "n_valid": 67526,
+          "min": 0,
+          "max": 360,
+          "mean": 190.27706364955722,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "netrad": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "sw_out": {
+          "n_valid": 68214,
+          "min": -19.74,
+          "max": 479.83,
+          "mean": 21.573016682792293,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "le": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "g": {
+          "n_valid": 39948,
+          "min": -37.441795,
+          "max": 102.028195,
+          "mean": 1.7201315118058613,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "n2o": {
+          "n_valid": 70128,
+          "min": -1.0798723104537298,
+          "max": 59.36932383613933,
+          "mean": 0.6000671011012434,
+          "conflicts": 0,
+          "rangeWarnings": 0
         }
       },
       "years": [
@@ -2687,6 +4073,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 4,
+              "min": 0,
+              "max": 0,
+              "mean": 0
+            },
+            "pa": {
+              "n_valid": 4,
+              "min": 100.22,
+              "max": 100.27,
+              "mean": 100.24
+            },
+            "ws": {
+              "n_valid": 4,
+              "min": 1.1,
+              "max": 2.2,
+              "mean": 1.425
+            },
+            "wd": {
+              "n_valid": 4,
+              "min": 308,
+              "max": 329,
+              "mean": 322.5
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 4,
+              "min": -3.69,
+              "max": -3.18,
+              "mean": -3.3874999999999997
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "n2o": {
+              "n_valid": 4,
+              "min": 0.10888023992911186,
+              "max": 0.110246290868607,
+              "mean": 0.10937507668188945
             }
           }
         },
@@ -2783,6 +4223,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17448,
+              "min": 0,
+              "max": 21.5,
+              "mean": 0.04077258138468613
+            },
+            "pa": {
+              "n_valid": 16500,
+              "min": 96.16,
+              "max": 104.72,
+              "mean": 101.2725284848485
+            },
+            "ws": {
+              "n_valid": 16500,
+              "min": 0,
+              "max": 12.9,
+              "mean": 3.285200000000003
+            },
+            "wd": {
+              "n_valid": 16500,
+              "min": 0,
+              "max": 360,
+              "mean": 191.3610303030303
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 16642,
+              "min": -10.16,
+              "max": 441.38,
+              "mean": 28.199322797740663
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 9629,
+              "min": -37.441795,
+              "max": 102.028195,
+              "mean": 3.6300314507278064
+            },
+            "n2o": {
+              "n_valid": 17520,
+              "min": -1.0798723104537298,
+              "max": 59.36932383613933,
+              "mean": 1.2082177431711945
             }
           }
         },
@@ -2879,6 +4373,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17509,
+              "min": 0,
+              "max": 16.4,
+              "mean": 0.04828373979096482
+            },
+            "pa": {
+              "n_valid": 17510,
+              "min": 97.14,
+              "max": 104.11,
+              "mean": 101.11123358081021
+            },
+            "ws": {
+              "n_valid": 17514,
+              "min": 0,
+              "max": 13.1,
+              "mean": 3.1971908187735583
+            },
+            "wd": {
+              "n_valid": 17514,
+              "min": 0,
+              "max": 360,
+              "mean": 184.61345209546647
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 17063,
+              "min": -16.39,
+              "max": 479.83,
+              "mean": 21.07209224638097
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 13609,
+              "min": -35.94403333,
+              "max": 78.19818,
+              "mean": 1.2576780655862396
+            },
+            "n2o": {
+              "n_valid": 17520,
+              "min": -0.6020409197282621,
+              "max": 4.125074500715698,
+              "mean": 0.4007679611872929
             }
           }
         },
@@ -2975,6 +4523,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17557,
+              "min": 0,
+              "max": 9.8,
+              "mean": 0.04413624195477607
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 17501,
+              "min": 0,
+              "max": 11,
+              "mean": 3.1503514084909483
+            },
+            "wd": {
+              "n_valid": 17502,
+              "min": 0,
+              "max": 360,
+              "mean": 187.93617872243172
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 17308,
+              "min": -14.06,
+              "max": 466.43,
+              "mean": 21.623104344811857
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 8040,
+              "min": -32.5,
+              "max": 81.1,
+              "mean": 1.553955223880592
+            },
+            "n2o": {
+              "n_valid": 17568,
+              "min": -0.4540089519005749,
+              "max": 13.651206688932817,
+              "mean": 0.3285632101106126
             }
           }
         },
@@ -3071,6 +4673,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17510,
+              "min": 0,
+              "max": 23.1,
+              "mean": 0.041781838949172125
+            },
+            "pa": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "ws": {
+              "n_valid": 16006,
+              "min": 0,
+              "max": 12.3,
+              "mean": 3.30093090091216
+            },
+            "wd": {
+              "n_valid": 16006,
+              "min": 0,
+              "max": 360,
+              "mean": 197.88348119455205
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 17197,
+              "min": -19.74,
+              "max": 310.25,
+              "mean": 15.612977844972903
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 8670,
+              "min": -33.1,
+              "max": 81.5,
+              "mean": 0.4789734717416328
+            },
+            "n2o": {
+              "n_valid": 17516,
+              "min": -0.8076970894962852,
+              "max": 21.233937495739895,
+              "mean": 0.46354419674226205
             }
           }
         }
@@ -3134,11 +4790,11 @@
           "rangeWarnings": 0
         },
         "sw_in": {
-          "n_valid": 182064,
+          "n_valid": 168612,
           "min": 0,
           "max": 1570,
-          "mean": 197.17186284060054,
-          "conflicts": 484,
+          "mean": 210.6155432413195,
+          "conflicts": 479,
           "rangeWarnings": 4
         },
         "ppfd": {
@@ -3198,6 +4854,78 @@
           "rangeWarnings": 0
         },
         "ch4": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "precip": {
+          "n_valid": 168609,
+          "min": 0,
+          "max": 29,
+          "mean": 0.021048698468053306,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "pa": {
+          "n_valid": 175143,
+          "min": 88.7,
+          "max": 90.4,
+          "mean": 89.62351335765653,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "ws": {
+          "n_valid": 146377,
+          "min": 0.007,
+          "max": 5.6,
+          "mean": 1.3773922405842483,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "wd": {
+          "n_valid": 82710,
+          "min": 0,
+          "max": 360,
+          "mean": 116.67533671865624,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "netrad": {
+          "n_valid": 25616,
+          "min": -135.6669,
+          "max": 958.8847,
+          "mean": 111.26214649416922,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "sw_out": {
+          "n_valid": 0,
+          "min": null,
+          "max": null,
+          "mean": null,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "le": {
+          "n_valid": 35021,
+          "min": -155.45,
+          "max": 546.6,
+          "mean": 30.640784100967988,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "g": {
+          "n_valid": 163543,
+          "min": -103.3,
+          "max": 81.6,
+          "mean": -1.1060261888310998,
+          "conflicts": 0,
+          "rangeWarnings": 0
+        },
+        "n2o": {
           "n_valid": 0,
           "min": null,
           "max": null,
@@ -3300,6 +5028,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 6261,
+              "min": 0,
+              "max": 21,
+              "mean": 0.025075866475003993
+            },
+            "pa": {
+              "n_valid": 6261,
+              "min": 88.9,
+              "max": 90.3,
+              "mean": 89.61026992493127
+            },
+            "ws": {
+              "n_valid": 6212,
+              "min": 0.007,
+              "max": 4.061,
+              "mean": 1.6005885383129435
+            },
+            "wd": {
+              "n_valid": 6212,
+              "min": 0.027,
+              "max": 359.1,
+              "mean": 114.5829341596905
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 5869,
+              "min": -44.19,
+              "max": 79.82,
+              "mean": -2.1900550349292858
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -3396,6 +5178,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17520,
+              "min": 0,
+              "max": 27,
+              "mean": 0.02254566210045662
+            },
+            "pa": {
+              "n_valid": 17520,
+              "min": 88.9,
+              "max": 90.2,
+              "mean": 89.64299086757902
+            },
+            "ws": {
+              "n_valid": 17330,
+              "min": 0.007,
+              "max": 5.6,
+              "mean": 1.6062216387766877
+            },
+            "wd": {
+              "n_valid": 17282,
+              "min": 0.057,
+              "max": 360,
+              "mean": 117.40168446939013
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 15888,
+              "min": -59.22,
+              "max": 65.68,
+              "mean": -4.364878839375639
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -3440,10 +5276,10 @@
               "mean": 0.06293419383048748
             },
             "sw_in": {
-              "n_valid": 17568,
+              "n_valid": 17550,
               "min": 0,
               "max": 1229,
-              "mean": 206.99282193477032
+              "mean": 206.8434727635336
             },
             "ppfd": {
               "n_valid": 0,
@@ -3492,6 +5328,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17550,
+              "min": 0,
+              "max": 29,
+              "mean": 0.022165242165242165
+            },
+            "pa": {
+              "n_valid": 17568,
+              "min": 89,
+              "max": 90.3,
+              "mean": 89.676542577416
+            },
+            "ws": {
+              "n_valid": 17169,
+              "min": 0.007,
+              "max": 4.206,
+              "mean": 1.3997098840934146
+            },
+            "wd": {
+              "n_valid": 17169,
+              "min": 0.07,
+              "max": 360,
+              "mean": 110.4313731725786
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 15478,
+              "min": -70.06,
+              "max": 72.19,
+              "mean": -4.3281088641943235
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -3536,10 +5426,10 @@
               "mean": 0.05680627097521475
             },
             "sw_in": {
-              "n_valid": 17520,
-              "min": 0,
+              "n_valid": 16949,
+              "min": 0.03,
               "max": 1132,
-              "mean": 204.63564245974567
+              "mean": 211.44221476193547
             },
             "ppfd": {
               "n_valid": 0,
@@ -3584,6 +5474,60 @@
               "mean": null
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 16949,
+              "min": 0,
+              "max": 23,
+              "mean": 0.016343147088323795
+            },
+            "pa": {
+              "n_valid": 16986,
+              "min": 88.9,
+              "max": 90.2,
+              "mean": 89.62732250088439
+            },
+            "ws": {
+              "n_valid": 16637,
+              "min": 0.007,
+              "max": 4.947,
+              "mean": 1.4903785538258019
+            },
+            "wd": {
+              "n_valid": 16637,
+              "min": 0.07,
+              "max": 359.9,
+              "mean": 109.55308673438697
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 16904,
+              "min": -103.3,
+              "max": 81.6,
+              "mean": -0.6496212730714739
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -3684,6 +5628,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17520,
+              "min": 0,
+              "max": 24,
+              "mean": 0.02711187214611872
+            },
+            "pa": {
+              "n_valid": 17520,
+              "min": 88.7,
+              "max": 90.3,
+              "mean": 89.62905821917938
+            },
+            "ws": {
+              "n_valid": 16546,
+              "min": 0.007,
+              "max": 4.281,
+              "mean": 1.2971613683065408
+            },
+            "wd": {
+              "n_valid": 16546,
+              "min": 0,
+              "max": 359.8,
+              "mean": 111.31112625407923
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 428,
+              "min": -56.75,
+              "max": 216.7,
+              "mean": 24.413808411214962
+            },
+            "g": {
+              "n_valid": 17465,
+              "min": -56.92,
+              "max": 75.99,
+              "mean": -1.4867597480675665
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -3776,6 +5774,60 @@
               "mean": null
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 17520,
+              "min": 0,
+              "max": 16,
+              "mean": 0.034703196347031964
+            },
+            "pa": {
+              "n_valid": 17520,
+              "min": 89,
+              "max": 90.3,
+              "mean": 89.61356735159823
+            },
+            "ws": {
+              "n_valid": 14842,
+              "min": 0.007,
+              "max": 4.132,
+              "mean": 1.173095472308317
+            },
+            "wd": {
+              "n_valid": 7038,
+              "min": 0.062,
+              "max": 359.6,
+              "mean": 143.85662773515176
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 14119,
+              "min": -155.45,
+              "max": 546.6,
+              "mean": 32.99026205821936
+            },
+            "g": {
+              "n_valid": 17374,
+              "min": -78.79,
+              "max": 64.17,
+              "mean": -1.5995223897778272
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -3876,6 +5928,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17568,
+              "min": 0,
+              "max": 19,
+              "mean": 0.016962659380692167
+            },
+            "pa": {
+              "n_valid": 17568,
+              "min": 88.9,
+              "max": 90.3,
+              "mean": 89.60928392531892
+            },
+            "ws": {
+              "n_valid": 15688,
+              "min": 0.007,
+              "max": 4.632,
+              "mean": 1.0725561575726668
+            },
+            "wd": {
+              "n_valid": 1783,
+              "min": 0.07,
+              "max": 359,
+              "mean": 180.53067526640586
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 6621,
+              "min": -89.88,
+              "max": 529.04,
+              "mean": 38.19360519558971
+            },
+            "g": {
+              "n_valid": 17294,
+              "min": -63.37,
+              "max": 63.78,
+              "mean": -0.5606211981033801
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -3968,6 +6074,60 @@
               "mean": null
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 17520,
+              "min": 0,
+              "max": 12,
+              "mean": 0.015924657534246576
+            },
+            "pa": {
+              "n_valid": 17520,
+              "min": 89,
+              "max": 90.4,
+              "mean": 89.61543949771952
+            },
+            "ws": {
+              "n_valid": 16227,
+              "min": 0.007,
+              "max": 4.44,
+              "mean": 1.3257495532137809
+            },
+            "wd": {
+              "n_valid": 39,
+              "min": 341.4,
+              "max": 358.1,
+              "mean": 350.9205128205127
+            },
+            "netrad": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 2593,
+              "min": -133.1,
+              "max": 489.82,
+              "mean": 19.183220208252997
+            },
+            "g": {
+              "n_valid": 17349,
+              "min": -44.83,
+              "max": 66.36,
+              "mean": -0.75214329356158
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -4068,6 +6228,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 17520,
+              "min": 0,
+              "max": 23,
+              "mean": 0.010502283105022832
+            },
+            "pa": {
+              "n_valid": 17520,
+              "min": 88.8,
+              "max": 90.2,
+              "mean": 89.59809360730516
+            },
+            "ws": {
+              "n_valid": 15556,
+              "min": 0.007,
+              "max": 5.094,
+              "mean": 1.453368218050915
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 3328,
+              "min": -126.2661,
+              "max": 925.7053,
+              "mean": 103.85981943813105
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 5807,
+              "min": -89.07,
+              "max": 435.69,
+              "mean": 14.271243327019112
+            },
+            "g": {
+              "n_valid": 17393,
+              "min": -37.14,
+              "max": 73.18,
+              "mean": 0.30040717530041244
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -4112,10 +6326,10 @@
               "mean": 0.06922999455364062
             },
             "sw_in": {
-              "n_valid": 17520,
-              "min": 0,
+              "n_valid": 5795,
+              "min": 0.028,
               "max": 1158,
-              "mean": 140.23124316136855
+              "mean": 369.10087437446157
             },
             "ppfd": {
               "n_valid": 0,
@@ -4164,6 +6378,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 5792,
+              "min": 0,
+              "max": 15,
+              "mean": 0.011912983425414365
+            },
+            "pa": {
+              "n_valid": 11137,
+              "min": 89,
+              "max": 90.4,
+              "mean": 89.58003950794856
+            },
+            "ws": {
+              "n_valid": 2342,
+              "min": 0.007,
+              "max": 4.426,
+              "mean": 1.7155964987190413
+            },
+            "wd": {
+              "n_valid": 2,
+              "min": 353.1,
+              "max": 353.2,
+              "mean": 353.15
+            },
+            "netrad": {
+              "n_valid": 5230,
+              "min": -130.3213,
+              "max": 958.8847,
+              "mean": 179.25627830564991
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 1345,
+              "min": -39.35,
+              "max": 493.44,
+              "mean": 36.02567286245352
+            },
+            "g": {
+              "n_valid": 5760,
+              "min": -32.22,
+              "max": 76.12,
+              "mean": 6.593393923611107
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         },
@@ -4208,10 +6476,10 @@
               "mean": 0.06401203102891621
             },
             "sw_in": {
-              "n_valid": 17568,
+              "n_valid": 16430,
               "min": 0,
               "max": 1096,
-              "mean": 197.01054094795123
+              "mean": 207.0135267194022
             },
             "ppfd": {
               "n_valid": 0,
@@ -4256,6 +6524,60 @@
               "mean": null
             },
             "ch4": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "precip": {
+              "n_valid": 16430,
+              "min": 0,
+              "max": 18,
+              "mean": 0.02519780888618381
+            },
+            "pa": {
+              "n_valid": 17564,
+              "min": 89,
+              "max": 90.3,
+              "mean": 89.63455363243118
+            },
+            "ws": {
+              "n_valid": 7385,
+              "min": 0.007,
+              "max": 3.762,
+              "mean": 1.4153647935003424
+            },
+            "wd": {
+              "n_valid": 2,
+              "min": 7.817,
+              "max": 358,
+              "mean": 182.9085
+            },
+            "netrad": {
+              "n_valid": 16600,
+              "min": -135.6669,
+              "max": 862.2957,
+              "mean": 90.9732513968746
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 4108,
+              "min": -74.22,
+              "max": 413.03,
+              "mean": 39.650119279454685
+            },
+            "g": {
+              "n_valid": 16310,
+              "min": -54.47,
+              "max": 79.12,
+              "mean": 0.6566636419374642
+            },
+            "n2o": {
               "n_valid": 0,
               "min": null,
               "max": null,
@@ -4356,6 +6678,60 @@
               "min": null,
               "max": null,
               "mean": null
+            },
+            "precip": {
+              "n_valid": 459,
+              "min": 0,
+              "max": 4,
+              "mean": 0.008714596949891068
+            },
+            "pa": {
+              "n_valid": 459,
+              "min": 89.2,
+              "max": 89.8,
+              "mean": 89.51350762527235
+            },
+            "ws": {
+              "n_valid": 443,
+              "min": 0.008,
+              "max": 3.049,
+              "mean": 1.6268939051918718
+            },
+            "wd": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "netrad": {
+              "n_valid": 458,
+              "min": -130.5057,
+              "max": 829.3008,
+              "mean": 123.9723947114433
+            },
+            "sw_out": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "le": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
+            },
+            "g": {
+              "n_valid": 459,
+              "min": -21.06,
+              "max": 53.22,
+              "mean": 4.093718954248365
+            },
+            "n2o": {
+              "n_valid": 0,
+              "min": null,
+              "max": null,
+              "mean": null
             }
           }
         }
@@ -4410,6 +6786,18 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "le": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 1000
         }
       }
     },
@@ -4458,6 +6846,36 @@
         "rh": {
           "n_valid": 17419,
           "n_sentinel": 101,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "precip": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "pa": {
+          "n_valid": 17422,
+          "n_sentinel": 98,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "netrad": {
+          "n_valid": 17335,
+          "n_sentinel": 185,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 17421,
+          "n_sentinel": 99,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
+          "n_valid": 17421,
+          "n_sentinel": 99,
           "n_zero_nulled": 0,
           "factor": null
         }
@@ -4510,6 +6928,18 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "le": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 1000
         }
       }
     },
@@ -4556,6 +6986,36 @@
           "factor": null
         },
         "rh": {
+          "n_valid": 17462,
+          "n_sentinel": 58,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "precip": {
+          "n_valid": 17462,
+          "n_sentinel": 58,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "pa": {
+          "n_valid": 17462,
+          "n_sentinel": 58,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "netrad": {
+          "n_valid": 17376,
+          "n_sentinel": 144,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 17462,
+          "n_sentinel": 58,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
           "n_valid": 17462,
           "n_sentinel": 58,
           "n_zero_nulled": 0,
@@ -4610,6 +7070,18 @@
           "n_sentinel": 6000,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "le": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 11520,
+          "n_sentinel": 6000,
+          "n_zero_nulled": 0,
+          "factor": 1000
         }
       }
     },
@@ -4656,6 +7128,36 @@
           "factor": null
         },
         "rh": {
+          "n_valid": 17302,
+          "n_sentinel": 218,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "precip": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "pa": {
+          "n_valid": 17394,
+          "n_sentinel": 126,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "netrad": {
+          "n_valid": 3234,
+          "n_sentinel": 14286,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 3234,
+          "n_sentinel": 14286,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
           "n_valid": 17302,
           "n_sentinel": 218,
           "n_zero_nulled": 0,
@@ -4710,6 +7212,18 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "le": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 1000
         }
       }
     },
@@ -4758,6 +7272,36 @@
         "rh": {
           "n_valid": 13237,
           "n_sentinel": 4283,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "precip": {
+          "n_valid": 13424,
+          "n_sentinel": 4096,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "pa": {
+          "n_valid": 12831,
+          "n_sentinel": 4689,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "netrad": {
+          "n_valid": 13381,
+          "n_sentinel": 4139,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 13379,
+          "n_sentinel": 4141,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
+          "n_valid": 11849,
+          "n_sentinel": 5671,
           "n_zero_nulled": 0,
           "factor": null
         }
@@ -4908,6 +7452,42 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "precip": {
+          "n_valid": 216756,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "ws": {
+          "n_valid": 222515,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "wd": {
+          "n_valid": 222515,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "netrad": {
+          "n_valid": 229943,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 224473,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "le": {
+          "n_valid": 237555,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
         }
       }
     },
@@ -4976,6 +7556,48 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "precip": {
+          "n_valid": 17448,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "pa": {
+          "n_valid": 16500,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "ws": {
+          "n_valid": 16500,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "wd": {
+          "n_valid": 16500,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 16642,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
+          "n_valid": 9629,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 22.720559834594326
         }
       }
     },
@@ -5032,6 +7654,48 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "precip": {
+          "n_valid": 17509,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "pa": {
+          "n_valid": 17514,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "ws": {
+          "n_valid": 17514,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "wd": {
+          "n_valid": 17514,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 17063,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
+          "n_valid": 13607,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 22.720559834594326
         }
       }
     },
@@ -5088,6 +7752,42 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "precip": {
+          "n_valid": 17557,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "ws": {
+          "n_valid": 17501,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "wd": {
+          "n_valid": 17502,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 17308,
+          "n_sentinel": 7,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
+          "n_valid": 8040,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 17568,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 22.720559834594326
         }
       }
     },
@@ -5144,6 +7844,42 @@
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "precip": {
+          "n_valid": 17514,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "ws": {
+          "n_valid": 16010,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "wd": {
+          "n_valid": 16010,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "sw_out": {
+          "n_valid": 17201,
+          "n_sentinel": 3,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "g": {
+          "n_valid": 8672,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "n2o": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 22.720559834594326
         }
       }
     },
@@ -5262,7 +7998,7 @@
           "factor": null
         },
         "sw_in": {
-          "n_valid": 99500,
+          "n_valid": 86670,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
@@ -5288,6 +8024,12 @@
         "nee_ssitc": {
           "n_valid": 44537,
           "n_sentinel": 54963,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "le": {
+          "n_valid": 35021,
+          "n_sentinel": 64479,
           "n_zero_nulled": 0,
           "factor": null
         }
@@ -5324,7 +8066,7 @@
           "factor": null
         },
         "sw_in": {
-          "n_valid": 182064,
+          "n_valid": 168609,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
@@ -5333,6 +8075,42 @@
           "n_valid": 168609,
           "n_sentinel": 0,
           "n_zero_nulled": 13455,
+          "factor": null
+        },
+        "precip": {
+          "n_valid": 168609,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "pa": {
+          "n_valid": 175143,
+          "n_sentinel": 0,
+          "n_zero_nulled": 6921,
+          "factor": null
+        },
+        "ws": {
+          "n_valid": 146377,
+          "n_sentinel": 0,
+          "n_zero_nulled": 18119,
+          "factor": null
+        },
+        "wd": {
+          "n_valid": 82710,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "netrad": {
+          "n_valid": 25616,
+          "n_sentinel": 156443,
+          "n_zero_nulled": 5,
+          "factor": null
+        },
+        "g": {
+          "n_valid": 163543,
+          "n_sentinel": 0,
+          "n_zero_nulled": 18521,
           "factor": null
         }
       }

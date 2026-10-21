@@ -8,7 +8,7 @@ import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
 import type { Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, whereClause } from './sql';
+import { CIRCULAR_VARS, col, meanExpr, whereClause } from './sql';
 import {
   STACK,
   X_NAME_SPACE,
@@ -73,9 +73,14 @@ interface DiurnalData extends Prepared {
 function query(params: ViewParams): string | null {
   const where = whereClause(params);
   if (where === null || params.variables.length === 0) return null;
-  const parts = params.variables
-    .map(col)
-    .map((v) => `avg(${v}) AS ${v}, quantile_cont(${v}, 0.25) AS ${v}__q1, quantile_cont(${v}, 0.75) AS ${v}__q3`);
+  // Directions (wd) get a circular mean and no band: quartiles of angles are wrong near north.
+  const parts = params.variables.map((v) => {
+    const c = col(v);
+    const band = CIRCULAR_VARS.has(v)
+      ? `NULL::DOUBLE AS ${c}__q1, NULL::DOUBLE AS ${c}__q3`
+      : `quantile_cont(${c}, 0.25) AS ${c}__q1, quantile_cont(${c}, 0.75) AS ${c}__q3`;
+    return `${meanExpr(v)} AS ${c}, ${band}`;
+  });
   return `SELECT site_id::DOUBLE AS site_id, (hour(tl) * 2 + minute(tl) // 30)::DOUBLE AS slot, ${parts.join(', ')}
     FROM obs WHERE ${where} GROUP BY 1, 2 ORDER BY 1, 2`;
 }
@@ -196,7 +201,7 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
     ...baseOption(tokens),
     legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
     // Panel label and statistic. The unit is in the y axis name.
-    title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, STAT), textStyle: titleStyle(tokens) })),
+    title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, CIRCULAR_VARS.has(v) ? `circular ${STAT}` : STAT), textStyle: titleStyle(tokens) })),
     grid: layout.grid,
     xAxis: vars.map((_, i) => ({
       type: 'category',
@@ -212,7 +217,7 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
       // Time base on the bottom panel only.
       ...(i === last ? xAxisName(tokens, timeAxisName(meta, ctx.params, 'Hour of day')) : {}),
     })),
-    yAxis: vars.map((_, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number))),
+    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v)),
     tooltip: {
       ...tooltipBase(tokens, 'axis'),
       axisPointer: { type: 'line', lineStyle: { color: tokens.axis } },
@@ -227,10 +232,10 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
           if (!line) continue;
           const m = line.curve.mean[p.dataIndex] as number;
           if (!Number.isFinite(m)) continue;
-          rows.push(
-            `${p.marker}${esc(p.seriesName)}&nbsp;&nbsp;<b>${formatValue(m)}</b> ` +
-              `(${formatValue(line.curve.q1[p.dataIndex] as number)} to ${formatValue(line.curve.q3[p.dataIndex] as number)}) ${esc(line.unit)}`,
-          );
+          const q1 = line.curve.q1[p.dataIndex] as number;
+          const q3 = line.curve.q3[p.dataIndex] as number;
+          const band = Number.isFinite(q1) && Number.isFinite(q3) ? `(${formatValue(q1)} to ${formatValue(q3)}) ` : '';
+          rows.push(`${p.marker}${esc(p.seriesName)}&nbsp;&nbsp;<b>${formatValue(m)}</b> ${band}${esc(line.unit)}`);
         }
         return `<b>${esc(first.name)} local time</b><br/>${rows.join('<br/>') || 'No data'}`;
       },

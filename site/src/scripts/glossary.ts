@@ -116,7 +116,7 @@ export const REFERENCES: Record<RefId, Reference> = {
 };
 
 /** Articles that define one or more of the variables. The others are in the collection, but not cited. */
-export const CITED_REFS: readonly RefId[] = ['heimsch2021', 'heimsch2024', 'shurpali2025', 'vira2025', 'rasanen2026', 'ke2025'];
+export const CITED_REFS: readonly RefId[] = ['heimsch2021', 'heimsch2024', 'shurpali2025', 'vira2025', 'rasanen2026', 'ke2025', 'vettikkat2026'];
 
 /** Limits of the summary length in characters (code points). */
 export const SUMMARY_MIN = 200;
@@ -174,6 +174,18 @@ export const GLOSSARY: Record<Variable, GlossaryEntry> = {
       'The net methane flux between the field and the air. A positive value is emission. Wet soil without oxygen can emit CH₄, and dry mineral soil can take up a small quantity. Eddy covariance measures it at Anttila and Särkisuo only.',
     sources: ['shurpali2025', 'heimsch2024'],
   },
+  n2o: {
+    term: 'Nitrous oxide flux (N₂O)',
+    summary:
+      'The net N₂O flux between the field and the air, in nmol N₂O m⁻² s⁻¹. A positive value is emission. N₂O is a strong greenhouse gas (GWP 273). Emission peaks come after fertilisation and after rain on wet soil. For the Viikki data, we assume the unit µg N₂O m⁻² s⁻¹.',
+    sources: ['shurpali2025', 'heimsch2024'],
+  },
+  le: {
+    term: 'Latent heat flux (LE)',
+    summary:
+      'The energy that evapotranspiration takes from the field, in W m⁻². Eddy covariance measures it from the water vapour flux. A positive LE is upward. Evapotranspiration in mm = LE × time / 2.45 MJ kg⁻¹. When the soil is dry, LE decreases and more energy goes to sensible heat.',
+    sources: ['rasanen2026', 'heimsch2021', 'heimsch2024'],
+  },
   ta: {
     term: 'Air temperature (Ta, Tair)',
     summary:
@@ -210,6 +222,42 @@ export const GLOSSARY: Record<Variable, GlossaryEntry> = {
       'A measure of the turbulence of the air near the ground, in m s⁻¹. When u* is below a threshold of the site, eddy covariance gives a flux that is too low. Thus we remove these periods from NEE, and then gap filling fills them.',
     sources: ['heimsch2024', 'shurpali2025', 'vira2025', 'rasanen2026'],
   },
+  precip: {
+    term: 'Precipitation (P)',
+    summary:
+      'The water from rain and snow that falls on the field, in mm per 30 min. A daily, weekly or monthly step gives the sum, not the mean. Rain gauges catch too little snow. At Viikki, P is rain plus snow. Rain after a dry period can increase respiration and N₂O emission.',
+    sources: ['heimsch2021', 'heimsch2024', 'shurpali2025', 'rasanen2026'],
+  },
+  pa: {
+    term: 'Air pressure (PA)',
+    summary:
+      'The pressure of the air at the tower, in kPa. Near sea level it is approximately 100 kPa. At Maktau, which is at a higher elevation, it is approximately 90 kPa. The eddy covariance software uses PA to calculate the air density and the gas fluxes.',
+    sources: ['rasanen2026', 'heimsch2024'],
+  },
+  ws: {
+    term: 'Wind speed (WS)',
+    summary:
+      'The horizontal speed of the wind at the tower, in m s⁻¹. The sonic anemometer of the eddy covariance system measures it. With u*, wind speed shows the turbulence. Low wind at night often gives low turbulence and gaps in NEE. Strong wind dries the soil and the plants.',
+    sources: ['rasanen2026', 'heimsch2024', 'ke2025', 'vettikkat2026'],
+  },
+  wd: {
+    term: 'Wind direction (WD)',
+    summary:
+      'The direction from which the wind comes, in degrees from north: 0 = north, 90 = east, 180 = south. A daily value is a circular mean, thus 350° and 10° give 0°. Sector filtering removes the periods when the wind comes from outside the field, for example from a road or a building.',
+    sources: ['heimsch2021', 'heimsch2024', 'shurpali2025', 'ke2025', 'rasanen2026'],
+  },
+  netrad: {
+    term: 'Net radiation (Rn)',
+    summary:
+      'The net radiation energy at the surface, in W m⁻²: Rn = SW_in − SW_out + LW_in − LW_out. A positive value is energy into the surface. Rn gives the energy for the latent heat flux (LE), the sensible heat flux and the soil heat flux (G). At night Rn is usually negative.',
+    sources: ['rasanen2026', 'heimsch2021', 'shurpali2025'],
+  },
+  sw_out: {
+    term: 'Outgoing shortwave radiation (SW_out)',
+    summary:
+      'The solar radiation that the surface reflects up, in W m⁻². The albedo is SW_out / SW_in. A green crop reflects approximately 20 %, bare soil less and fresh snow up to 90 %. Thus SW_out shows the snow cover, the growth of the crop and the harvest.',
+    sources: ['rasanen2026', 'heimsch2021', 'heimsch2024'],
+  },
   tsoil: {
     term: 'Soil temperature (Ts, Tsoil)',
     summary:
@@ -221,6 +269,12 @@ export const GLOSSARY: Record<Variable, GlossaryEntry> = {
     summary:
       'The volume of water per volume of soil, in m³ m⁻³, at the shallowest sensor. Other names are soil moisture and SMC. Dry soil stops plant growth and wet soil decreases oxygen. Both change respiration and the CH₄ flux.',
     sources: ['heimsch2024', 'shurpali2025', 'rasanen2026'],
+  },
+  g: {
+    term: 'Soil heat flux (G)',
+    summary:
+      'The flow of heat into or out of the soil, in W m⁻². Heat flux plates a few cm below the surface measure it. A positive G is heat into the soil. G is usually a small part of Rn. It is positive in the day and in spring, and negative at night and in autumn.',
+    sources: ['rasanen2026', 'heimsch2021'],
   },
 };
 

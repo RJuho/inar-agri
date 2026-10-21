@@ -5,11 +5,16 @@
 // Column expressions are SQL. They see the cleaned text columns of the
 // source file (trimmed, decimal comma replaced by a point, empty = NULL).
 // Use num("col") to get a DOUBLE with the sentinels -9999, NA and inf as NULL.
+// `ts_parsed` is the parsed source timestamp (local time, as in the file). An
+// expression can use a window function, for example a rule per local day.
 
 /** Strict core: present at all six sites. */
 export const CORE_COLUMNS = ['nee', 'nee_f', 'nee_qc', 'ta', 'tsoil', 'swc'] as const;
 /** Optional columns: present at some sites only, NULL elsewhere. Inputs of scripts/calc.ts. */
-export const OPTIONAL_COLUMNS = ['sw_in', 'ppfd', 'rh', 'vpd', 'ustar', 'nee_ssitc', 'gpp_src', 'reco_src', 'ch4'] as const;
+export const OPTIONAL_COLUMNS = [
+  'sw_in', 'ppfd', 'rh', 'vpd', 'ustar', 'nee_ssitc', 'gpp_src', 'reco_src', 'ch4',
+  'precip', 'pa', 'ws', 'wd', 'netrad', 'sw_out', 'le', 'g', 'n2o',
+] as const;
 export const ALL_COLUMNS = [...CORE_COLUMNS, ...OPTIONAL_COLUMNS] as const;
 export type CoreColumn = (typeof ALL_COLUMNS)[number];
 
@@ -75,6 +80,10 @@ export type Registry = { sites: Site[]; sources: Source[] };
 export const MG_CO2_TO_UMOL = 1000 / 44.0095;
 /** Viikki WFPS (%) to m3 m-3: porosity 0.509433962 (= 1 - 1.3 / 2.65, columns of the 2022 and 2023 files) / 100. */
 export const VIIKKI_WFPS_TO_SWC = 0.509433962 / 100;
+/** 1 µmol = 1000 nmol. Anttila and Särkisuo give N2O in µmol m-2 s-1 (unit row). */
+export const UMOL_TO_NMOL = 1000;
+/** 1 µg N2O = 1000 / 44.013 nmol N2O. Assumption: the Viikki N2O header "ug m-2 s-1" means µg N2O, not µg N2O-N. */
+export const UG_N2O_TO_NMOL = 1000 / 44.013;
 
 const ISO_SECONDS = '%Y-%m-%d %H:%M:%S';
 const ISO_MINUTES = '%Y-%m-%d %H:%M';
@@ -137,6 +146,11 @@ function anttilaLike(site: SiteCode, code: string, dir: string, year: number): S
         gpp_src: { sourceColumns: ['GPP_gf_ensemble_NT'], expr: 'num("GPP_gf_ensemble_NT")', note: 'Night-time partitioning of the data provider. GPP >= 0, NEE = Reco - GPP.' },
         reco_src: { sourceColumns: ['Reco_gf_ensemble_NT'], expr: 'num("Reco_gf_ensemble_NT")', note: 'Night-time partitioning of the data provider.' },
         ch4: { sourceColumns: ['ch4_flux_final_gf_ensemble'], expr: 'num("ch4_flux_final_gf_ensemble")', note: 'Gap-filled CH4 flux. Unit row: µmol m-2 s-1.' },
+        le: { sourceColumns: ['LE_final_gf_ensemble'], expr: 'num("LE_final_gf_ensemble")', note: 'Gap-filled LE (ensemble). Unit row: W m-2.' },
+        n2o: {
+          sourceColumns: ['n2o_flux_final_gf_ensemble'], expr: `num("n2o_flux_final_gf_ensemble") * ${UMOL_TO_NMOL}`, factor: UMOL_TO_NMOL,
+          note: 'Gap-filled N2O flux. Unit row: µmol m-2 s-1, converted to nmol.',
+        },
       },
     },
     {
@@ -150,6 +164,11 @@ function anttilaLike(site: SiteCode, code: string, dir: string, year: number): S
         sw_in: { sourceColumns: ['SWIN_1_1_1'], expr: 'num("SWIN_1_1_1")' },
         ppfd: { sourceColumns: ['PPFD_1_1_1'], expr: 'num("PPFD_1_1_1")' },
         rh: { sourceColumns: ['RH_1_1_1'], expr: 'num("RH_1_1_1")' },
+        precip: { sourceColumns: ['P_RAIN_1_1_1'], expr: 'num("P_RAIN_1_1_1")', note: 'Rain gauge, mm per 30 min.' },
+        pa: { sourceColumns: ['PA_1_1_1'], expr: 'num("PA_1_1_1")' },
+        netrad: { sourceColumns: ['RN_1_1_1'], expr: 'num("RN_1_1_1")' },
+        sw_out: { sourceColumns: ['SWOUT_1_1_1'], expr: 'num("SWOUT_1_1_1")' },
+        g: { sourceColumns: ['SHF_1_1_1'], expr: 'num("SHF_1_1_1")', depthCm: null, note: 'Heat flux plate 1. Depth not in the source files.' },
       },
     },
   ];
@@ -162,6 +181,12 @@ function viikkiEc(year: number): Source {
   const tair = year <= 2023 ? 'Tair  (?C)' : 'Tair (?C)';
   const rh = year <= 2023 ? 'RH(%)' : 'RH (%)';
   const ppfd = year === 2025 ? 'PPFD (umol/m2s)' : 'PAR (umol/m2s)';
+  const precip = year === 2024 ? 'P(mm)' : 'P (mm)';
+  const swOut = year <= 2023 ? 'Swout (W/m2)' : 'SWout (W/m2)';
+  const hf = year === 2024 ? 'HF(W/m2)' : 'HF (W/m2)';
+  const n2o = 'N2O_gapfilled (ug m-2 s-1)';
+  // Air pressure is only in the 2022 and 2023 files.
+  const pair: Partial<Record<CoreColumn, ColumnMap>> = year <= 2023 ? { pa: { sourceColumns: ['Pair'], expr: 'num("Pair")', note: 'Only 2022 and 2023.' } } : {};
   const soil2022: Partial<Record<CoreColumn, ColumnMap>> =
     year === 2022
       ? {
@@ -190,6 +215,16 @@ function viikkiEc(year: number): Source {
       sw_in: { sourceColumns: ['SWin (W/m2)'], expr: 'num("SWin (W/m2)")' },
       ppfd: { sourceColumns: [ppfd], expr: `num("${ppfd}")` },
       rh: { sourceColumns: [rh], expr: `num("${rh}")` },
+      precip: { sourceColumns: [precip], expr: `num("${precip}")`, note: 'Total precipitation, mm per 30 min. Equals rainfall + snowfall in the file.' },
+      ...pair,
+      ws: { sourceColumns: ['WS (m/s)'], expr: 'num("WS (m/s)")' },
+      wd: { sourceColumns: ['WD (deg)'], expr: 'num("WD (deg)")' },
+      sw_out: { sourceColumns: [swOut], expr: `num("${swOut}")` },
+      g: { sourceColumns: [hf], expr: `num("${hf}")`, depthCm: null, note: 'Heat flux plate. Depth not in the source files.' },
+      n2o: {
+        sourceColumns: [n2o], expr: `num("${n2o}") * ${UG_N2O_TO_NMOL}`, factor: UG_N2O_TO_NMOL,
+        note: 'Gap-filled N2O flux. Assumption: header unit ug m-2 s-1 = µg N2O (not N2O-N), converted with M(N2O) = 44.013 g mol-1.',
+      },
       ...soil2022,
     },
   };
@@ -208,13 +243,72 @@ function viikkiPit(year: number): Source {
   };
 }
 
+/**
+ * Rows where TA_1_1_1 and RH_1_1_1 are both exact 0 are logger fill rows (mainly 2023-02-24 to 2024-02,
+ * in both Maktau files). In these rows TA, RH, TS, SWC, SW_IN, P_RAIN, WS and G are 0 (SW_IN is 0 also at
+ * midday: 2 043 day rows). NETRAD_1_1_1 and PA_1_1_1 are not affected: they have normal values there
+ * (night mean of NETRAD -56 W m-2 in fill rows and in other rows).
+ * Use `${MAKTAU_FILL_ROW} THEN NULL` in a CASE, so that a missing TA or RH does not remove the value.
+ */
+const MAKTAU_FILL_ROW = 'num("TA_1_1_1") = 0 AND num("RH_1_1_1") = 0';
+
 const maktauSoil = (rank: number): Partial<Record<CoreColumn, ColumnMap>> => ({
   ta: { sourceColumns: ['TA_1_1_1'], expr: 'num("TA_1_1_1")', zeroIsNull: true, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
   tsoil: { sourceColumns: ['TS_1_1_1'], expr: 'num("TS_1_1_1")', zeroIsNull: true, depthCm: 10, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
   swc: { sourceColumns: ['SWC_1_1_1'], expr: 'num("SWC_1_1_1")', zeroIsNull: true, depthCm: 10, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
-  sw_in: { sourceColumns: ['SW_IN_1_1_1'], expr: 'num("SW_IN_1_1_1")', note: `Rank ${rank}.` },
+  sw_in: {
+    sourceColumns: ['SW_IN_1_1_1', 'TA_1_1_1', 'RH_1_1_1'],
+    expr: `CASE WHEN ${MAKTAU_FILL_ROW} THEN NULL ELSE num("SW_IN_1_1_1") END`,
+    note: `Rank ${rank}. NULL in logger fill rows (TA and RH exact 0): SW_IN is 0 there also at midday.`,
+  },
   rh: { sourceColumns: ['RH_1_1_1'], expr: 'num("RH_1_1_1")', zeroIsNull: true, note: `Rank ${rank}. Exact 0 is a logger fill value.` },
 });
+
+/**
+ * Wind vane fault. From 2019-06 the meteo WD_1_1_1 stays at one value for days or months
+ * (for example 0.89° in 2021, 351° in 2022, 22.6° from 2024-07). The daily SD of WD is below 0.5°
+ * on 1 421 days; before 2019 only 1 day has an SD below 5°. Rule: WD is NULL on a local day
+ * (date of ts_parsed) where the SD of WD (rows with WS not 0) is below 5°. The SD is the smaller
+ * of the SD of WD and of (WD + 180) mod 360, so that a vane near north (0°/360°) gives a small SD too.
+ */
+const MAKTAU_WD_DAY = 'PARTITION BY CAST(ts_parsed AS DATE)';
+const maktauWdSd = (shift: string): string =>
+  `stddev_samp(CASE WHEN num("WS_1_1_1") <> 0 THEN (num("WD_1_1_1")${shift}) % 360 END) OVER (${MAKTAU_WD_DAY})`;
+const MAKTAU_WD_STUCK = `coalesce(least(${maktauWdSd('')}, ${maktauWdSd(' + 180')}), 999) < 5`;
+/**
+ * Anemometer fault. From 2023-07-19 to 2024-06-30 WS_1_1_1 reads low: the ratio of WS to the
+ * EC USTAR is 0.5 to 2.5 (3.3 to 4.4 before and after), and 30 to 70 % of the midday values
+ * are below 0.2 m s-1 in 2023-10 to 2024-04. The sensor reads normal again from 2024-07-25.
+ * USTAR has too many gaps for a row rule, so the rule is a date range (no WS data from 2023-03-08 to 2023-07-18).
+ */
+const MAKTAU_WS_BAD = "ts_parsed >= TIMESTAMP '2023-07-01' AND ts_parsed < TIMESTAMP '2024-07-01'";
+/** Meteo file only. The continuous file has no usable WS, and its NETRAD_1_1_1 is a copy of SW_IN. */
+const maktauMeteo: Partial<Record<CoreColumn, ColumnMap>> = {
+  precip: {
+    sourceColumns: ['P_RAIN_1_1_1', 'TA_1_1_1', 'RH_1_1_1'],
+    expr: `CASE WHEN ${MAKTAU_FILL_ROW} THEN NULL ELSE num("P_RAIN_1_1_1") END`,
+    note: 'mm per 30 min. NULL in logger fill rows (TA and RH exact 0), mainly 2023. A real 0 elsewhere stays 0.',
+  },
+  pa: { sourceColumns: ['PA_1_1_1'], expr: 'num("PA_1_1_1")', zeroIsNull: true, note: 'Meteo file only. Exact 0 is a logger fill value.' },
+  ws: {
+    sourceColumns: ['WS_1_1_1'],
+    expr: `CASE WHEN ${MAKTAU_WS_BAD} THEN NULL ELSE num("WS_1_1_1") END`,
+    zeroIsNull: true,
+    note: 'Exact 0 is a logger fill value. NULL from 2023-07 to 2024-06 (anemometer reads low). The WS column of the continuous file is not a speed.',
+  },
+  wd: {
+    sourceColumns: ['WD_1_1_1', 'WS_1_1_1'],
+    expr: `CASE WHEN num("WS_1_1_1") <> 0 AND NOT (${MAKTAU_WD_STUCK}) THEN num("WD_1_1_1") END`,
+    note: 'NULL where WS_1_1_1 is exact 0 (fill value, WD is then 0 too) and on days with a stuck vane (daily SD of WD below 5°). 0° is a valid direction, so no zero rule on WD.',
+  },
+  netrad: {
+    sourceColumns: ['NETRAD_1_1_1'],
+    expr: 'num("NETRAD_1_1_1")',
+    zeroIsNull: true,
+    note: 'Meteo file only (the continuous NETRAD_1_1_1 is a copy of SW_IN). Kept in logger fill rows: the values there are normal. Exact 0 (5 rows) is a fill value.',
+  },
+  g: { sourceColumns: ['G_1_1_1'], expr: 'num("G_1_1_1")', zeroIsNull: true, depthCm: null, note: 'Meteo file only. Exact 0 is a logger fill value.' },
+};
 
 export const SOURCES: Source[] = [
   ...anttilaLike('anttila', 'FI-Ant', 'Anttila', 2022),
@@ -256,6 +350,12 @@ export const SOURCES: Source[] = [
         note: 'Daytime partitioning of the data provider. The source GPP is negative (uptake). The factor -1 gives GPP >= 0 like the other sites.',
       },
       reco_src: { sourceColumns: ['RECO'], expr: 'num("RECO")', note: 'Daytime partitioning of the data provider.' },
+      precip: { sourceColumns: ['P'], expr: 'num("P")', note: 'mm per 30 min.' },
+      ws: { sourceColumns: ['WS'], expr: 'num("WS")' },
+      wd: { sourceColumns: ['WD'], expr: 'num("WD")' },
+      netrad: { sourceColumns: ['NETRAD'], expr: 'num("NETRAD")' },
+      sw_out: { sourceColumns: ['SW_OUT'], expr: 'num("SW_OUT")' },
+      le: { sourceColumns: ['LE_F'], expr: 'num("LE_F")', note: 'Gap-filled LE (LE_F).' },
     },
   },
   viikkiEc(2022), viikkiEc(2023), viikkiEc(2024), viikkiEc(2025),
@@ -269,6 +369,7 @@ export const SOURCES: Source[] = [
       nee_ssitc: { sourceColumns: ['FC_SSITC_TEST'], expr: 'num("FC_SSITC_TEST")', note: 'Quality flag of FC: 0 best, 1 good, 2 poor. NULL for some FC rows.' },
       ustar: { sourceColumns: ['USTAR'], expr: 'num("USTAR")' },
       vpd: { sourceColumns: ['VPD'], expr: 'num("VPD")', note: 'hPa.' },
+      le: { sourceColumns: ['LE'], expr: 'num("LE")', note: 'Measured LE only, not gap-filled. Few values.' },
       ...maktauSoil(1),
     },
   },
@@ -276,7 +377,7 @@ export const SOURCES: Source[] = [
     id: 'maktau_meteo_30min', site: 'maktau', path: 'data/Maktau/Maktau_meteo_30_min_KE-Mkt.csv',
     delim: ',', headerLines: 1, decimalComma: false,
     timestampColumn: 'TIMESTAMP_START', timestampFormats: [COMPACT], timestampIsEnd: false, stepMin: 30, rank: 2,
-    columns: maktauSoil(2),
+    columns: { ...maktauSoil(2), ...maktauMeteo },
   },
 ];
 
@@ -301,4 +402,13 @@ export const VARIABLES = [
   { column: 'gpp_src', type: 'DOUBLE', unit: 'µmol CO2 m-2 s-1', description: 'Gross primary production from the data provider, GPP >= 0 (uptake). Anttila, Särkisuo (night-time method), Qvidja (daytime method, sign changed).' },
   { column: 'reco_src', type: 'DOUBLE', unit: 'µmol CO2 m-2 s-1', description: 'Ecosystem respiration from the data provider. Anttila, Särkisuo, Qvidja.' },
   { column: 'ch4', type: 'DOUBLE', unit: 'µmol CH4 m-2 s-1', description: 'Gap-filled methane flux. Anttila and Särkisuo only.' },
+  { column: 'precip', type: 'DOUBLE', unit: 'mm', description: 'Precipitation, sum per 30-minute period. Not at Haltiala.' },
+  { column: 'pa', type: 'DOUBLE', unit: 'kPa', description: 'Air pressure. Anttila, Särkisuo, Viikki (2022-2023), Maktau.' },
+  { column: 'ws', type: 'DOUBLE', unit: 'm s-1', description: 'Wind speed. Qvidja, Viikki, Maktau.' },
+  { column: 'wd', type: 'DOUBLE', unit: 'degrees', description: 'Wind direction, degrees from north (clockwise). Qvidja, Viikki, Maktau.' },
+  { column: 'netrad', type: 'DOUBLE', unit: 'W m-2', description: 'Net radiation. Anttila, Särkisuo, Qvidja, Maktau.' },
+  { column: 'sw_out', type: 'DOUBLE', unit: 'W m-2', description: 'Outgoing (reflected) shortwave radiation. Anttila, Särkisuo, Qvidja, Viikki.' },
+  { column: 'le', type: 'DOUBLE', unit: 'W m-2', description: 'Latent heat flux. Gap-filled at Anttila, Särkisuo and Qvidja; measured only at Maktau.' },
+  { column: 'g', type: 'DOUBLE', unit: 'W m-2', description: 'Soil heat flux. Positive = into the soil. Anttila, Särkisuo, Viikki, Maktau.' },
+  { column: 'n2o', type: 'DOUBLE', unit: 'nmol N2O m-2 s-1', description: 'Gap-filled nitrous oxide flux. Positive = emission. Anttila, Särkisuo, Viikki.' },
 ] as const;

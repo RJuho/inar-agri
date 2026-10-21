@@ -126,8 +126,8 @@ test.describe('first page', () => {
   });
 
   test('variable info toggle shows the summary', async ({ page }) => {
-    // One info button per variable (15 variables in state.ts).
-    await expect(page.locator('.var-info-btn')).toHaveCount(15);
+    // One info button per variable (24 variables in state.ts).
+    await expect(page.locator('.var-info-btn')).toHaveCount(24);
     const box = page.locator('input[name="variable"][value="nee"]');
     const checked = await box.isChecked();
     const btn = page.locator('button.var-info-btn[aria-controls="var-info-nee"]');
@@ -1069,10 +1069,41 @@ test.describe('new variables and weekly step', () => {
     for (const legend of ['Fluxes', 'Meteorology', 'Soil']) {
       await expect(page.locator('#params legend', { hasText: legend })).toBeVisible();
     }
-    for (const v of ['gpp', 'reco', 'ch4', 'sw_in', 'ustar']) {
+    for (const v of ['gpp', 'reco', 'ch4', 'n2o', 'le', 'sw_in', 'ustar', 'precip', 'pa', 'ws', 'wd', 'netrad', 'sw_out', 'g']) {
       await expect(page.locator(`input[name="variable"][value="${v}"]`)).toHaveCount(1);
     }
     await expect(page.locator('select option[value="week"]')).toHaveCount(1);
+  });
+
+  test('daily precipitation is the sum per day, not the mean', async ({ page }) => {
+    // Viikki (site 5), 2023.
+    const base = stepView('w-precip', [5], ['precip'], 'day');
+    const view = { ...base, params: { ...base.params, yearFrom: 2023, yearTo: 2023 } };
+    await page.goto('/' + viewHash(view));
+    await waitReady(page);
+    const card = page.locator('.diagram[data-type="timeseries"]');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    const chart = card.locator('.diagram-chart');
+    const { titles, dailyMax } = await chart.evaluate((el) => {
+      const c = (el as unknown as {
+        __chart: { getOption(): { title: Array<{ text?: string }>; dataset: Array<{ source: { precip: ArrayLike<number> } }> } };
+      }).__chart;
+      const o = c.getOption();
+      let max = -Infinity;
+      for (const d of o.dataset) for (const v of Array.from(d.source.precip)) if (Number.isFinite(v)) max = Math.max(max, v);
+      return { titles: o.title.map((t) => t.text ?? ''), dailyMax: max };
+    });
+    expect(titles).toContain('Precipitation — daily sum');
+    // The statistics of the alt text come from the 30-min values: "max <value> on <date>".
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('Precipitation is the sum per step');
+    const m = /Precipitation \([^)]*\): .*? max ([\d.]+) on/.exec(alt);
+    expect(m).not.toBeNull();
+    const halfHourMax = Number(m?.[1]);
+    expect(halfHourMax).toBeGreaterThan(0);
+    // A daily sum of a rain day is much larger than the largest 30-min value. A daily mean is smaller.
+    // Viikki 2023: 30-min max about 16 mm, daily max about 41 mm.
+    expect(dailyMax).toBeGreaterThan(1.5 * halfHourMax);
   });
 
   test('weekly rows lie between daily and monthly rows', async ({ page }) => {
@@ -1196,9 +1227,11 @@ test.describe('variables page', () => {
     expect(foreign).toEqual([]);
   });
 
-  test('lists the 15 variables and has no script', async ({ page }) => {
+  test('lists the 24 variables and has no script', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Variables');
-    await expect(page.locator('.glossary dt')).toHaveCount(15);
+    await expect(page.locator('.glossary dt')).toHaveCount(24);
+    await expect(page.locator('#var-precip')).toHaveCount(1);
+    await expect(page.locator('#var-n2o')).toHaveCount(1);
     await expect(page.locator('#var-nee')).toHaveCount(1);
     await expect(page.locator('#var-swc')).toHaveCount(1);
     await expect(page.locator('script')).toHaveCount(0);
@@ -1206,7 +1239,7 @@ test.describe('variables page', () => {
 
   test('has the reference list with DOI links', async ({ page }) => {
     const refs = page.locator('section:has(> #references) ol.references li');
-    await expect(refs).toHaveCount(6);
+    await expect(refs).toHaveCount(7);
     for (const li of await refs.all()) {
       expect(await li.locator('a[href^="https://doi.org/10."]').count()).toBeGreaterThan(0);
     }

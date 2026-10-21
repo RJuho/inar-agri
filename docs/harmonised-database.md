@@ -106,7 +106,7 @@ Each rule runs in SQL. The report gives its counts.
 1. **Read as text, cast as number.** Every file is read with `all_varchar=true` and the encoding of the source (`utf-8`, or `latin-1` for the Viikki EC files). The text is trimmed. Empty text is NULL. In the Viikki EC files the decimal comma becomes a point. The macro `num(x)` casts to DOUBLE and returns NULL for the sentinels `-9999` (in any textual form such as `-9999.0000`), `NA`, `inf` and `nan`. The report counts the sentinels per source column.
 2. **Timestamps.** Each source has a list of `strptime` formats, tried in order. Viikki EC files use `d.m.yyyy H:MM`. Qvidja and Maktau use `YYYYMMDDHHMM`. A row whose stamp does not parse or is not on a 30-minute boundary is rejected and counted. `ts_start` = local stamp minus the UTC offset of the site.
 3. **Deterministic merge.** All sources of a site are stacked. For each period and column the first non-NULL value wins, in the order of source rank and then file row. The report counts, per site and column, the periods where two sources give different non-NULL values (conflicts). Exact duplicate rows (Qvidja 2018-2023 has every row twice) give no conflict.
-4. **Maktau zero fill.** In both Maktau files, an exact 0 in `TA_1_1_1`, `TS_1_1_1` or `SWC_1_1_1` is a logger fill value and becomes NULL. The site is tropical lowland, so 0 °C and 0.000 m3 m-3 do not occur. The report counts the zeros per source column.
+4. **Maktau zero fill.** In both Maktau files, an exact 0 in `TA_1_1_1`, `TS_1_1_1` or `SWC_1_1_1` is a logger fill value and becomes NULL. The site is tropical lowland, so 0 °C and 0.000 m3 m-3 do not occur. The report counts the zeros per source column. Other Maktau rules (fill rows, stuck wind vane, low wind speed) are in the section "Optional columns".
 5. **Viikki pit to 30 minutes.** The pit stamps the end of each 5-minute period. The build subtracts one microsecond and takes the 30-minute bucket, so the stamps 00:05 to 00:30 fall into the period that starts at 00:00. Duplicate 5-minute stamps are reduced to one row first. The period value is the mean of at least 3 of the 6 values, rounded to 10 decimals to remove binary summation noise. Otherwise it is NULL.
 6. **Unit factor.** Viikki NEE (all years, mg CO2 to µmol) and Viikki WFPS 2022 (% to m3 m-3) have a factor. The factor is a field in the registry and appears in `site_variables.parquet` and in the report.
 7. **Grid completion.** Missing periods between the first and the last period of a site get a row with NULL values.
@@ -162,10 +162,37 @@ These columns are NULL at the sites that do not measure them. They are the input
 | `gpp_src` | µmol CO2 m-2 s-1 | Anttila, Särkisuo (`GPP_gf_ensemble_NT`), Qvidja (`GPP` × −1: the source gives uptake as negative) | |
 | `reco_src` | µmol CO2 m-2 s-1 | Anttila, Särkisuo (`Reco_gf_ensemble_NT`), Qvidja (`RECO`) | |
 | `ch4` | µmol CH4 m-2 s-1 | Anttila, Särkisuo (`ch4_flux_final_gf_ensemble`) | |
+| `precip` | mm (sum per 30 min) | Anttila, Särkisuo (`P_RAIN_1_1_1`), Qvidja (`P`), Viikki (`P (mm)`, 2024 `P(mm)`; = rainfall + snowfall), Maktau (meteo `P_RAIN_1_1_1`) | Maktau: NULL in logger fill rows (see below) |
+| `pa` | kPa | Anttila, Särkisuo (`PA_1_1_1`), Viikki (`Pair`, 2022-2023 only), Maktau (meteo `PA_1_1_1`, 0 = NULL) | |
+| `ws` | m s-1 | Qvidja (`WS`), Viikki (`WS (m/s)`), Maktau (meteo `WS_1_1_1`, 0 = NULL) | The continuous Maktau `WS` is not a speed (33 % negative). It is not used. Maktau: NULL from 2023-07 to 2024-06 (see below). |
+| `wd` | degrees from north | Qvidja (`WD`), Viikki (`WD (deg)`), Maktau (meteo `WD_1_1_1`) | Maktau: NULL where `WS_1_1_1` is exact 0 and on days with a stuck vane (see below). 0° is a valid direction, so no zero rule on WD itself. |
+| `netrad` | W m-2 | Anttila, Särkisuo (`RN_1_1_1`), Qvidja (`NETRAD`), Maktau (meteo `NETRAD_1_1_1`, 14 % of periods, 0 = NULL) | The continuous Maktau `NETRAD_1_1_1` is a copy of SW_IN. It is not used. |
+| `sw_out` | W m-2 | Anttila, Särkisuo (`SWOUT_1_1_1`), Qvidja (`SW_OUT`), Viikki (`Swout (W/m2)` 2022-2023, `SWout (W/m2)` 2024-2025) | |
+| `le` | W m-2 | Anttila, Särkisuo (`LE_final_gf_ensemble`, gap-filled), Qvidja (`LE_F`, gap-filled), Maktau (continuous `LE`, measured only, 19 % of periods) | |
+| `g` | W m-2, positive = into the soil | Anttila, Särkisuo (`SHF_1_1_1`), Viikki (`HF (W/m2)`, 2024 `HF(W/m2)`), Maktau (meteo `G_1_1_1`, 0 = NULL) | Sign checked: summer midday mean is positive, night mean negative. |
+| `n2o` | nmol N2O m-2 s-1, positive = emission | Anttila, Särkisuo (`n2o_flux_final_gf_ensemble` × 1000, µmol in the unit row), Viikki (`N2O_gapfilled (ug m-2 s-1)` × 1000 / 44.013) | Viikki assumption: the header unit is µg N2O, not µg N2O-N. If it is N2O-N, multiply by 44.013 / 28.013. |
+
+Maktau logger fill rows: in the meteo file, `TA_1_1_1` and `RH_1_1_1` are both exact 0 in about 13 400 rows, mainly from 2023-02-24 to 2024-02 (the continuous file has the same rows). In these rows TA, RH, TS, SWC, SW_IN, P_RAIN, WS and G are 0. SW_IN is 0 also at midday (2 043 rows from 09 to 15 h). A real 0 is normal for precipitation and for SW_IN at night, so the build sets `precip` and `sw_in` to NULL only in these rows. Maktau 2023 thus has precipitation for 33 % of the year only (69 mm). Do not use the Maktau 2023 annual sum. `NETRAD_1_1_1` and `PA_1_1_1` are not affected: in the fill rows the night mean of NETRAD is -56 W m-2, the same as in the other rows, and the midday values are normal. Thus the build keeps `netrad` in these rows.
+
+Maktau net radiation 2023: the meteo file has NETRAD for part of each day only in 2023-05 to 2024-01 (many weeks have daytime values only). The values are plausible (Rn / SW_IN = 0.6 to 0.8 at midday, night -40 to -80 W m-2), but a weekly or monthly mean of these weeks is too high (up to 480 W m-2). Use only days with full coverage for means.
+
+Maktau wind direction: the vane of `WD_1_1_1` is stuck from 2019-06. WD stays at one value for days or months (0.89° in 2021, 351° in 2022 to 2023, 22.6° from 2024-07). The daily SD of WD is below 0.5° on 1 421 days; in 2014 to 2018 only 1 day has an SD below 5°. Rule: WD is NULL on a local day where the SD of WD (rows with WS not 0) is below 5°. The SD is the smaller of the SD of WD and of (WD + 180) mod 360, so that a vane near north gives a small SD too. This removes 68 450 values. Valid WD after the rule: 2014 to 2018 nearly complete, 2019 7 038, 2020 1 783, 2021 39, 2022 to 2025 4.
+
+Maktau wind speed: `WS_1_1_1` reads too low from 2023-07-19 to 2024-06-30. The ratio of WS to the EC friction velocity USTAR is 0.5 to 2.5 (3.3 to 4.4 before and after), and in 2023-10 to 2024-04 30 to 70 % of the midday values are below 0.2 m s-1. From 2024-07-25 the ratio is normal again. USTAR has too many gaps for a row rule, so the rule is a date range: WS is NULL from 2023-07-01 to 2024-06-30 (4 783 values).
+
+Maktau latent heat flux: the high `le` in 2023-11 and 2023-12 (daily means up to 240 W m-2) is not a fault. These are daytime values only, in the wet season after heavy rain (53 mm in 2023-11), and LE + H is near Rn on the days with Rn. Maktau `pa` from the continuous file (1 165 more periods) is not used, because the meteo file is preferred and the merge takes one source per column by rank.
+
+Qvidja duplicate rows: the merge takes the first non-NULL value per column, so the new columns use the same deduplication. The new columns have no merge conflicts.
+
+Not added, because fewer than three sites have usable data:
+
+- Snow depth (`D_SNOW_1_1_1` at Anttila and Särkisuo, `Snow Depth` at Viikki).
+- Sensible heat flux H (Qvidja `H` is not gap-filled and partly empty; Maktau `H` only).
+- Longwave in and out (Anttila, Särkisuo only; the Viikki `LWin` and `LWout` columns are the raw thermopile signal, not the radiation).
 
 Known range warnings: Qvidja `vpd` below 0 in 2 018 rows (gap-filled values), Maktau `sw_in` above 1 500 W m-2 in 4 rows. Qvidja `ustar` has 76 268 merge conflicts: the duplicate rows of 2018-2023 differ in USTAR; the first row wins.
 
 ## Later extensions
 
-- More variables as nullable columns: pressure, precipitation, LE, H, N2O flux.
+- More variables as nullable columns: snow depth, H, longwave radiation (see above).
 - The Maktau 1-hour meteo file as a separate table.

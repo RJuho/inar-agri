@@ -5,6 +5,7 @@
 // The rows are the same as in the time series diagram: same sites, variables, years
 // (site local time) and step. Step "day", "week" and "month" give the mean per local
 // day, local ISO week (start Monday 00:00) or local month, as in the diagram.
+// Exceptions: precipitation (precip) gives the sum, wind direction (wd) the circular mean.
 //
 // Columns, in this order:
 //   site_code     text   Site code from sites.parquet, for example "qvidja".
@@ -18,8 +19,8 @@
 // Units are in variables.parquet. The Parquet file also has them as key/value
 // metadata (keys "unit:<column>"). The CSV file has a header row only, no units row.
 import { copyToBuffer, query, type Meta } from './db';
-import { col, whereClause } from './diagrams/sql';
-import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type View, type ViewParams } from './state';
+import { CIRCULAR_VARS, SUM_VARS, col, stepExpr, whereClause } from './diagrams/sql';
+import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type View, type ViewParams } from './state';
 import { yearsText } from './diagrams/common';
 import { slug, sourceFiles } from './export';
 import { zipStore } from './zip';
@@ -43,19 +44,26 @@ const MIME: Record<DataFormat | 'zip', string> = {
   zip: 'application/zip',
 };
 
-/** Description text of the mean for each step. */
-const MEAN_TEXT: Record<Exclude<Aggregation, 'raw'>, string> = {
-  day: 'Mean per local day.',
-  week: 'Mean per local ISO week (start Monday 00:00 local time).',
-  month: 'Mean per local month.',
+/** Description text of the period of each step. */
+const PERIOD_TEXT: Record<Exclude<Aggregation, 'raw'>, string> = {
+  day: 'local day',
+  week: 'local ISO week (start Monday 00:00 local time)',
+  month: 'local month',
 };
+
+/** Description text of the step value of column `c`: "Mean per local day.", "Sum per local day." or a circular mean. */
+export function stepText(c: string, a: Exclude<Aggregation, 'raw'>): string {
+  const v = c as Variable;
+  const stat = SUM_VARS.has(v) ? 'Sum' : CIRCULAR_VARS.has(v) ? 'Circular mean' : 'Mean';
+  return `${stat} per ${PERIOD_TEXT[a]}.`;
+}
 
 /** SQL string literal. */
 const lit = (s: string) => `'${s.replace(/'/g, "''")}'`;
 
 /** The columns with values. nee_qc is added for raw data when nee is selected. */
 export function valueColumns(params: ViewParams): string[] {
-  const vars = params.variables.map(col);
+  const vars: string[] = params.variables.map(col);
   if (params.aggregation === 'raw' && vars.includes('nee')) vars.push('nee_qc');
   return vars;
 }
@@ -76,7 +84,7 @@ export function exportSql(params: ViewParams, siteId?: number): string | null {
   // Step 'week' = ISO week, start Monday 00:00 site local time.
   const unit = params.aggregation;
   return `SELECT ${siteCols}, a.t - to_minutes(s.utc_offset_min::INT) AS ts_start_utc, a.t AS ts_local, ${vars.map((v) => `a.${v}`).join(', ')}
-    FROM (SELECT site_id, date_trunc('${unit}', tl)::TIMESTAMP AS t, ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
+    FROM (SELECT site_id, date_trunc('${unit}', tl)::TIMESTAMP AS t, ${params.variables.map((v) => `${stepExpr(v)} AS ${v}`).join(', ')}
           FROM obs WHERE ${where} GROUP BY ALL) a
     JOIN ${sitesTable} s USING (site_id)
     ORDER BY a.site_id, a.t`;
@@ -106,7 +114,7 @@ function kvMetadata(view: View, meta: Meta): string {
   for (const c of valueColumns(p)) {
     kv[`unit:${c}`] = unit(c);
     const label = (VARIABLE_LABELS as Record<string, string>)[c];
-    kv[`description:${c}`] = (label ? `${label}. ` : '') + (meta.variables.get(c)?.description ?? '') + (p.aggregation === 'raw' ? '' : ` ${MEAN_TEXT[p.aggregation]}`);
+    kv[`description:${c}`] = (label ? `${label}. ` : '') + (meta.variables.get(c)?.description ?? '') + (p.aggregation === 'raw' ? '' : ` ${stepText(c, p.aggregation)}`);
   }
   return `{${Object.entries(kv)
     .map(([k, v]) => `${lit(k)}: ${lit(v)}`)

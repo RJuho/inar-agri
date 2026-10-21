@@ -20,7 +20,8 @@ import {
   hasValues,
   nameLines,
   panelTitle,
-  STAT_TEXT,
+  statText,
+  stepStatNote,
   tickLabelWidth,
   X_NAME_TITLE_ID,
   YEAR_STEP_TEXT,
@@ -127,7 +128,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
     title.push({
       top: blockTop + 2,
       left: yl.left - 8,
-      text: panelTitle(v, STAT_TEXT[data.step]),
+      text: panelTitle(v, statText(v, data.step)),
       textStyle: { fontSize: 13, fontWeight: 600, color: tokens.text },
     });
     // X axis name: one time, at the centre below the last panel row of the variable.
@@ -162,7 +163,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
           axisTick: { show: c === 0, inside: false, lineStyle: { color: tokens.axis } },
           // Shared y axis: the name on the first column only.
           ...(c === 0 ? yAxisName(tokens, yl.names[vi] as string, yl.widths[vi] as number) : {}),
-        }),
+        }, v),
       );
       const zero = zeroLineSeries(meta, tokens, v, gi, [y.min, y.max]);
       if (zero) zeroLines.push(zero);
@@ -219,5 +220,6 @@ export const yearPanels: DiagramDef<YearsData> = {
     `Small multiples: one panel per year (${data.years[0] ?? ''} to ${data.years[data.years.length - 1] ?? ''}), side by side, ` +
     `one row of panels per variable. Each panel starts on 1 January and has one line per site, ` +
     `${YEAR_STEP_TEXT[data.step]}. All panels of a variable have the same y axis.` +
-    (data.step === 'week' ? ' A week over 1 January is split: each part is in its own year.' : ''),
+    (data.step === 'week' ? ' A week over 1 January is split: each part is in its own year.' : '') +
+    stepStatNote(data.variables, data.step),
 };

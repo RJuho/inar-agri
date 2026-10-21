@@ -8,7 +8,7 @@ import { toFloat64, type Meta } from '../db';
 import { AGGREGATION_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
-import { col, whereClause } from './sql';
+import { col, stepExpr, whereClause } from './sql';
 import {
   axisName,
   displayUnit,
@@ -26,7 +26,8 @@ import {
   signNote,
   siteColors,
   siteNames,
-  STAT_TEXT,
+  statText,
+  stepStatNote,
   tickLabelWidth,
   timeAxisName,
   timeMarks,
@@ -216,7 +217,7 @@ function sqlFor(params: ViewParams): string | null {
   // Step 'week' = ISO week, start Monday 00:00 site local time.
   const unit = params.aggregation;
   return `SELECT site_id::DOUBLE AS site_id, epoch_ms(date_trunc('${unit}', tl))::DOUBLE AS t,
-      ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
+      ${vars.map((v) => `${stepExpr(v)} AS ${v}`).join(', ')}
     FROM obs WHERE ${where} GROUP BY ALL ORDER BY site_id, t`;
 }
 
@@ -298,7 +299,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
       ...layout.title[i],
-      text: panelTitle(v, STAT_TEXT[data.aggregation]),
+      text: panelTitle(v, statText(v, data.aggregation)),
       textStyle: { fontSize: 13, fontWeight: 600, color: tokens.text },
     })),
     grid: layout.grid,
@@ -314,7 +315,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
       // Time base on the bottom panel only.
       ...(i === last ? xAxisName(tokens, timeAxisName(meta, ctx.params)) : {}),
     })),
-    yAxis: vars.map((_, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number))),
+    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v)),
     axisPointer: { link: [{ xAxisIndex: 'all' }], lineStyle: { color: tokens.axis } },
     tooltip: tooltip(data, tokens, nSites, unit, (from, to) => eventTooltipLines(allMarks, from, to, siteName, markColors)),
     dataZoom: [
@@ -413,7 +414,7 @@ function tooltip(
               `${p.marker}${esc(p.seriesName)}&nbsp;&nbsp;${valueWithUnit(p.value[p.encode.y[0] as number] as number, unit(v))}`,
           );
         if (rows.length === 0) return;
-        const head = `<span style="color:${tokens.textMuted}">${esc(panelTitle(v, STAT_TEXT[data.aggregation]))}</span>`;
+        const head = `<span style="color:${tokens.textMuted}">${esc(panelTitle(v, statText(v, data.aggregation)))}</span>`;
         blocks.push(`${head}<br/>${rows.join('<br/>')}`);
       });
       const [from, to] = periodOf(first.axisValue, data.aggregation);
@@ -432,7 +433,8 @@ export const timeseries: DiagramDef<TimeseriesData> = {
   showsEvents: true,
   relayout: (data, ctx) => panelLayout(data.variables.length, ctx.height, yLayout(data, ctx.meta, ctx.height).left),
   describe: (data) =>
-    `One panel per variable, one line per site, ${AGGREGATION_LABELS[data.aggregation].toLowerCase()}, time axis in site local time.`,
+    `One panel per variable, one line per site, ${AGGREGATION_LABELS[data.aggregation].toLowerCase()}, time axis in site local time.` +
+    stepStatNote(data.variables, data.aggregation),
   // Same panel height as the first version of the page: five panels in about 1100 px.
   height: (params) => (params.variables.length === 0 ? 160 : LAYOUT.top + LAYOUT.bottom + params.variables.length * 202),
 };

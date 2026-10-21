@@ -7,7 +7,7 @@ import { toFloat64, type Meta, type Site, type SiteEvent } from '../db';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import { siteEmoji } from '../sites';
-import { periodBounds } from './sql';
+import { CIRCULAR_VARS, SUM_VARS, periodBounds } from './sql';
 
 // Event markers are drawn with markLine (start day) and markArea (multi-day events).
 echarts.use([MarkLineComponent, MarkAreaComponent]);
@@ -106,6 +106,7 @@ export function unitText(unit: string): string {
     .split(' ')
     .map((tok) => {
       if (/^(CO2|CH4|N2O|H2O)/.test(tok)) return formulaText(tok);
+      if (tok === 'degrees') return '°';
       const m = /^([A-Za-zµ]+)(-?\d+)$/.exec(tok);
       return m ? `${m[1]}${[...(m[2] as string)].map(sup).join('')}` : tok;
     })
@@ -134,10 +135,25 @@ export const VARIABLE_SYMBOLS: Record<Variable, string> = {
   rh: 'RH',
   vpd: 'VPD',
   ustar: 'u*',
+  n2o: 'F N₂O',
+  le: 'LE',
+  precip: 'P',
+  pa: 'PA',
+  ws: 'WS',
+  wd: 'WD',
+  netrad: 'Rn',
+  sw_out: 'SWout',
+  g: 'G',
 };
 
-/** Flux variables. They have a sign convention and a zero line. */
-export const FLUX_VARS: ReadonlySet<Variable> = new Set<Variable>(['nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4']);
+/**
+ * Variables with a sign convention: gas fluxes and energy fluxes. They have a zero line, and the
+ * fingerprint gives them a diverging colour scale around 0. The carbon sums (cumulative, budget)
+ * do not use this set: they have their own list of carbon and CH4 fluxes.
+ */
+export const FLUX_VARS: ReadonlySet<Variable> = new Set<Variable>([
+  'nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4', 'n2o', 'le', 'netrad', 'g',
+]);
 
 /** Font of the axis names and of the tick labels (ECharts default size 12). */
 const NAME_SIZE = 11;
@@ -306,6 +322,10 @@ export function signNote(vars: readonly Variable[]): string | undefined {
   if (vars.some((v) => v === 'nee' || v === 'nee_f')) parts.push('NEE < 0 = net CO₂ uptake by the ecosystem');
   if (vars.some((v) => v === 'gpp' || v === 'gpp_src' || v === 'reco' || v === 'reco_src')) parts.push('GPP and Reco ≥ 0');
   if (vars.includes('ch4')) parts.push('F CH₄ > 0 = emission to the atmosphere');
+  if (vars.includes('n2o')) parts.push('F N₂O > 0 = emission to the atmosphere');
+  if (vars.includes('le')) parts.push('LE > 0 = upward (evapotranspiration)');
+  if (vars.includes('netrad')) parts.push('Rn > 0 = energy into the surface');
+  if (vars.includes('g')) parts.push('G > 0 = heat into the soil');
   return parts.length ? `Sign convention: ${parts.join('; ')}.` : undefined;
 }
 
@@ -358,6 +378,29 @@ export const STAT_TEXT: Record<Aggregation, string> = {
   week: 'weekly mean',
   month: 'monthly mean',
 };
+
+/**
+ * Statistic of a step for one variable: `STAT_TEXT`, but "sum" for precipitation ("daily sum")
+ * and "circular mean" for wind direction. Raw data stays "30-min values".
+ */
+export function statText(v: Variable, a: Aggregation): string {
+  if (a === 'raw') return STAT_TEXT[a];
+  if (SUM_VARS.has(v)) return STAT_TEXT[a].replace('mean', 'sum');
+  if (CIRCULAR_VARS.has(v)) return STAT_TEXT[a].replace('mean', 'circular mean');
+  return STAT_TEXT[a];
+}
+
+/**
+ * Sentence for the alt text when a time step does not give the mean of a variable:
+ * precipitation gives the sum, wind direction the circular mean. Empty for raw data.
+ */
+export function stepStatNote(vars: readonly Variable[], a: Aggregation): string {
+  if (a === 'raw') return '';
+  const parts: string[] = [];
+  if (vars.some((v) => SUM_VARS.has(v))) parts.push('Precipitation is the sum per step, not the mean');
+  if (vars.some((v) => CIRCULAR_VARS.has(v))) parts.push('wind direction is the circular mean');
+  return parts.length ? ` ${parts.join('; ')}.` : '';
+}
 
 /** Panel title: full label and the statistic, without the unit (the unit is in the y axis name). */
 export function panelTitle(v: Variable, stat: string): string {
@@ -437,10 +480,30 @@ export function tooltipBase(tokens: Tokens, trigger: 'axis' | 'item') {
 }
 
 /**
+ * Fixed value axis settings per variable. They replace the data range (`scale`, `min`, `max`).
+ * Wind direction is a circle: the axis shows 0 to 360° with a tick at each 90° (N, E, S, W).
+ */
+export const VARIABLE_AXIS: Partial<Record<Variable, Record<string, unknown>>> = {
+  wd: { scale: false, min: 0, max: 360, interval: 90 },
+};
+
+/**
  * Value axis with an axis line and outside ticks. Give the axis name in `extra`,
  * for example `yAxisName(tokens, axisName(meta, v, panelH), labelWidth)`.
+ * Give `variable` when the axis shows one variable. Then the fixed settings of
+ * `VARIABLE_AXIS` (for example 0 to 360° for `wd`) replace the range in `extra`.
  */
-export function valueAxis(tokens: Tokens, gridIndex: number, extra: Record<string, unknown> = {}) {
+export function valueAxis(tokens: Tokens, gridIndex: number, extra: Record<string, unknown> = {}, variable?: Variable) {
+  const fixed = variable ? VARIABLE_AXIS[variable] : undefined;
+  if (fixed) {
+    // A fixed interval needs no `splitNumber`.
+    const { splitNumber: _unused, ...rest } = extra;
+    return valueAxisBase(tokens, gridIndex, { ...rest, ...fixed });
+  }
+  return valueAxisBase(tokens, gridIndex, extra);
+}
+
+function valueAxisBase(tokens: Tokens, gridIndex: number, extra: Record<string, unknown>) {
   return {
     type: 'value',
     gridIndex,

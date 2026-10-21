@@ -5,7 +5,7 @@
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from './db';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from './state';
-import { col, whereClause } from './diagrams/sql';
+import { CIRCULAR_VARS, col, meanExpr, whereClause } from './diagrams/sql';
 import {
   displayUnit,
   eventDateText,
@@ -50,15 +50,17 @@ export function statsQuery(params: ViewParams, variables: Variable[]): string | 
   if (where === null || variables.length === 0) return null;
   const parts = variables.map((v) => {
     const c = col(v);
+    // A linear trend of a direction has no meaning: wd gets no trend.
+    const trendOk = CIRCULAR_VARS.has(v) ? 'false' : 'true';
     return `SELECT '${c}' AS variable, b.site_id::DOUBLE AS site_id, b.n, b.mean, b.vmin, b.vmax, b.tmin, b.tmax,
         coalesce(t.trend, 'NaN'::DOUBLE) AS trend, coalesce(t.years, 0)::DOUBLE AS years
       FROM (
-        SELECT site_id, count(${c})::DOUBLE AS n, avg(${c}) AS mean, min(${c}) AS vmin, max(${c}) AS vmax,
+        SELECT site_id, count(${c})::DOUBLE AS n, ${meanExpr(v)} AS mean, min(${c}) AS vmin, max(${c}) AS vmax,
           epoch_ms(arg_min(tl, ${c}))::DOUBLE AS tmin, epoch_ms(arg_max(tl, ${c}))::DOUBLE AS tmax
         FROM obs WHERE ${where} AND ${c} IS NOT NULL GROUP BY site_id
       ) b
       LEFT JOIN (
-        SELECT site_id, CASE WHEN count(*) >= 3 THEN regr_slope(m, yr) END AS trend, count(*) AS years
+        SELECT site_id, CASE WHEN count(*) >= 3 AND ${trendOk} THEN regr_slope(m, yr) END AS trend, count(*) AS years
         FROM (
           SELECT site_id, year(tl) AS yr, avg(${c}) AS m
           FROM obs WHERE ${where} AND ${c} IS NOT NULL

@@ -112,12 +112,15 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
   // Column expression with the zero rule applied.
   const colExpr = (m: ColumnMap): string => (m.zeroIsNull ? `nullif(${m.expr}, 0)` : m.expr);
 
+  // The expressions are computed in a subquery first. Then an expression can use a
+  // window function (for example a daily rule), which is not allowed inside count().
+  const exprSql = maps.flatMap(([c, m]) => [`${colExpr(m)} AS ${ident(`ev_${c}`)}`, `${m.expr} AS ${ident(`ee_${c}`)}`]);
   const statSql = maps.flatMap(([c, m]) => {
     const first = m.sourceColumns[0]!;
     return [
-      `count(${colExpr(m)}) AS ${ident(`nv_${c}`)}`,
+      `count(${ident(`ev_${c}`)}) AS ${ident(`nv_${c}`)}`,
       `count(*) FILTER (WHERE ${ident(first)} IS NOT NULL AND num(${ident(first)}) IS NULL) AS ${ident(`ns_${c}`)}`,
-      m.zeroIsNull ? `count(*) FILTER (WHERE ${m.expr} = 0) AS ${ident(`nz_${c}`)}` : `0 AS ${ident(`nz_${c}`)}`,
+      m.zeroIsNull ? `count(*) FILTER (WHERE ${ident(`ee_${c}`)} = 0) AS ${ident(`nz_${c}`)}` : `0 AS ${ident(`nz_${c}`)}`,
     ];
   });
   const s = await one(
@@ -125,7 +128,7 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
     `SELECT count(*) AS rows_read, count(ts_local) AS rows_ok,
             count(ts_parsed) FILTER (WHERE ts_local IS NOT NULL) - count(DISTINCT ts_parsed) FILTER (WHERE ts_local IS NOT NULL) AS dup_stamps,
             ${statSql.join(', ')}
-     FROM ${ident(`raw_${src.id}`)}`,
+     FROM (SELECT *, ${exprSql.join(', ')} FROM ${ident(`raw_${src.id}`)})`,
   );
 
   // Stage: one row per period with all output columns. Missing columns are NULL.
