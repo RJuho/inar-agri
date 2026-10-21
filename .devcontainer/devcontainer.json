@@ -18,7 +18,8 @@
 				"ms-vscode.vscode-typescript-next",
 				"astro-build.astro-vscode",
 				"svelte.svelte-vscode",
-				"biomejs.biome"
+				"biomejs.biome",
+				"mechatroner.rainbow-csv"
 			]
 		}
 	},

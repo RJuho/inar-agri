@@ -8,6 +8,29 @@ A harmonised eddy-covariance database and a browser tool for six agricultural fl
 
 This tool was made for the University of Helsinki Autumn School 2026 on [Analysis of Atmosphere-Surface Interactions and Feedbacks](https://www.atm.helsinki.fi/peex/index.php/portfolio-items/autumn-2026-school-on-analysis-of-atmosphere-surface-interactions-and-feedbacks/).
 
+## Start with Claude Code
+
+This project is also a demo of modern tools for data work. Claude Code runs in a dev container. Thus Claude can access only the project files, not your computer.
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/) and [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+2. Open the project folder in VS Code. Run the command "Dev Containers: Rebuild Container". VS Code also shows a prompt for this when you open the folder.
+3. In the container terminal, download or update the agent skills:
+
+   ```sh
+   npx skills experimental_install   # install the skills in skills-lock.json
+   npx skills update                 # update the skills
+   ```
+
+4. Start Claude Code:
+
+   ```sh
+   claude --allow-dangerously-skip-permissions
+   ```
+
+   This is safe enough here, because all commands run inside the container.
+
+Then ask Claude a question, for example: "Is all datasets where they should be?"
+
 ## Sites
 
 | Site | Code | Ecosystem | Data |
