@@ -460,6 +460,13 @@ test.describe('diagram types', () => {
     // The series and legend names give the site and the year.
     expect(series.map((s) => s.name)).toContain('Anttila 2022');
     expect(series.map((s) => s.name)).toContain('Särkisuo 2023');
+    // The legend wraps and lists all site-years.
+    const legend = await page.locator('.diagram-chart').evaluate((el) => {
+      const chart = (el as unknown as { __chart: { getOption(): { legend?: Array<{ type?: string; data?: string[] }> } } }).__chart;
+      return chart.getOption().legend?.[0];
+    });
+    expect(legend?.type).toBe('plain');
+    expect(legend?.data?.length).toBe(series.length);
     await expect(page.locator('.diagram-sub')).toContainText('dashed line');
     // Three sites: one colour per site.
     await page.goto('/' + viewHash({ ...typeView('years'), id: 'y3', params: { ...base, sites: [1, 2, 4] } }));

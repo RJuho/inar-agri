@@ -54,6 +54,7 @@ import {
   siteNames,
   stackHeight,
   stackLayout,
+  textWidth,
   STACK,
   tooltipBase,
   valueAxis,
@@ -75,7 +76,43 @@ export interface YearsData extends Prepared {
   colorBy: 'year' | 'site';
   /** Labels of the sites with solid and dashed lines (year mode with two sites). */
   lineSites?: [string, string];
+  /** Site with dashed lines (year mode with two sites). */
+  dashedSite?: number;
+  /** Legend entries in order. Each entry is the name of its series. */
+  legend: string[];
 }
+
+/** Legend row height in px. */
+const LEGEND_ROW_H = 22;
+/** Largest left margin of the panels that the legend row count expects. */
+const LEGEND_LEFT_MAX = 96;
+/** Font of the legend text (the ECharts default). */
+const LEGEND_FONT = '12px sans-serif';
+
+/** Width in px of the legend marks: lines with two sites, else short bars. */
+const legendItemWidth = (data: YearsData) => (data.dashedSite !== undefined ? 24 : 14);
+
+/**
+ * Number of legend rows at the given chart width. The legend wraps, so that all entries show
+ * (also in the PNG export).
+ */
+export function legendRows(data: YearsData, width: number): number {
+  const room = width - LEGEND_LEFT_MAX + 8 - STACK.right;
+  let rows = 1;
+  let x = 0;
+  for (const name of data.legend) {
+    const w = legendItemWidth(data) + 5 + textWidth(name, LEGEND_FONT) + 2;
+    if (x > 0 && x + w > room) {
+      rows++;
+      x = 0;
+    }
+    x += w + 10;
+  }
+  return rows;
+}
+
+/** Panel layout with space for all legend rows. */
+const yearsStack = (data: YearsData, width: number) => ({ ...YEAR_STACK, top: YEAR_STACK.top + (legendRows(data, width) - 1) * LEGEND_ROW_H });
 
 /** Largest number of selected sites that gives one colour per year. */
 export const YEAR_COLOR_MAX_SITES = 2;
@@ -115,7 +152,7 @@ export function yearsQuery(params: ViewParams): string | null {
 export function prepareYears(table: Table | null, params: ViewParams, meta: Meta): YearsData {
   const step = yearStep(params.aggregation);
   const colorBy: YearsData['colorBy'] = params.sites.length <= YEAR_COLOR_MAX_SITES ? 'year' : 'site';
-  const base = { variables: params.variables, step, groups: [] as Group[], years: [] as number[], colorBy };
+  const base = { variables: params.variables, step, groups: [] as Group[], years: [] as number[], colorBy, legend: [] as string[] };
   if (table === null) return { ...base, rowCount: 0, seriesCount: 0, note: emptyNote(params) };
   const groups = readGroups(table, params.variables, true, YEAR_MAX_STEP[step]);
   const years = [...new Set(groups.map((g) => g.year))].sort((a, b) => a - b);
@@ -123,8 +160,13 @@ export function prepareYears(table: Table | null, params: ViewParams, meta: Meta
   for (const v of params.variables) for (const g of groups) if (hasValues(g, v)) seriesCount++;
   const data: YearsData = { ...base, groups, years, rowCount: table.numRows, seriesCount };
   const names = siteNames(meta, params);
-  const shown = meta.sites.filter((s) => groups.some((g) => g.siteId === s.siteId)).map((s) => names.get(s.siteId) ?? s.name);
-  if (colorBy === 'year' && shown.length === 2) data.lineSites = [shown[0] as string, shown[1] as string];
+  const shownSites = meta.sites.filter((s) => groups.some((g) => g.siteId === s.siteId));
+  const shown = shownSites.map((s) => names.get(s.siteId) ?? s.name);
+  if (colorBy === 'year' && shown.length === 2) {
+    data.lineSites = [shown[0] as string, shown[1] as string];
+    data.dashedSite = shownSites[1]?.siteId;
+  }
+  data.legend = colorBy === 'site' ? shown : [...new Set(groups.map((g) => seriesNameOf(data, names, g)))];
   if (table.numRows === 0) data.note = 'No data for these sites and years.';
   if (params.aggregation === 'raw') data.subtitle = 'Raw data is shown as daily means.';
   if (step === 'week') data.subtitle = WEEK_SPLIT_TEXT;
@@ -134,6 +176,13 @@ export function prepareYears(table: Table | null, params: ViewParams, meta: Meta
   }
   data.subtitle = joinSubtitle(data.subtitle, signNote(params.variables), params.events ? eventsKeyText(meta, params) : undefined);
   return data;
+}
+
+/** Series name: the site, the year, or with two sites in year mode the site and the year. */
+function seriesNameOf(data: YearsData, names: Map<number, string>, g: Group): string {
+  const site = names.get(g.siteId) ?? String(g.siteId);
+  if (data.colorBy === 'site') return site;
+  return data.dashedSite !== undefined ? `${site} ${g.year}` : String(g.year);
 }
 
 /** Subtitle for weekly means on a day-of-year axis. */
@@ -248,19 +297,26 @@ export const YEAR_STACK = { ...STACK, bottom: X_NAME_SPACE + 6 };
  * `nameOf(i, panelH)` gives the y axis name of panel `i`. All panels use the same left margin,
  * so that the x axes line up.
  */
-export function stackYLayout(height: number, extents: Array<[number, number]>, nameOf: (i: number, panelH: number) => string) {
+export function stackYLayout(
+  height: number,
+  extents: Array<[number, number]>,
+  nameOf: (i: number, panelH: number) => string,
+  stack = YEAR_STACK,
+) {
   const n = extents.length;
-  const panelH = stackLayout(n, height, YEAR_STACK).grid[0]?.height ?? 40;
+  const panelH = stackLayout(n, height, stack).grid[0]?.height ?? 40;
   const names = extents.map((_, i) => nameOf(i, panelH));
   const widths = extents.map((e) => tickLabelWidth(e));
-  const left = Math.max(YEAR_STACK.left, ...names.map((nm, i) => gridLeftFor(widths[i] as number, nameLines(nm))));
-  return { layout: stackLayout(n, height, YEAR_STACK, left), names, widths, left };
+  const left = Math.max(stack.left, ...names.map((nm, i) => gridLeftFor(widths[i] as number, nameLines(nm))));
+  return { layout: stackLayout(n, height, stack, left), names, widths, left };
 }
 
 /** Y layout of the years overlay: one panel per variable, name `axisName()`. */
 function yLayout(data: YearsData, ctx: BuildContext) {
   const extents = data.variables.map((v) => extent(data.groups, v));
-  return { extents, ...stackYLayout(ctx.height, extents, (i, panelH) => axisName(ctx.meta, data.variables[i] as Variable, panelH)) };
+  const stack = yearsStack(data, ctx.width);
+  const name = (i: number, panelH: number) => axisName(ctx.meta, data.variables[i] as Variable, panelH);
+  return { extents, ...stackYLayout(ctx.height, extents, name, stack) };
 }
 
 /** Day-of-year x axes of stacked panels. Labels and the axis name on the bottom panel only. */
@@ -280,15 +336,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const ranks = yearRanks(data.groups);
   const byYear = data.colorBy === 'year';
   const yColors = yearColors(data.years, tokens);
-  // Site of the dashed lines: the second shown site, in the order of sites.parquet.
-  const dashedSite = byYear ? meta.sites.filter((s) => data.groups.some((g) => g.siteId === s.siteId))[1]?.siteId : undefined;
-  // Series name: the site, the year, or with two sites in year mode the site and the year.
-  const twoSites = dashedSite !== undefined;
-  const seriesName = (g: Group) => {
-    const site = names.get(g.siteId) ?? String(g.siteId);
-    if (!byYear) return site;
-    return twoSites ? `${site} ${g.year}` : String(g.year);
-  };
+  const twoSites = data.dashedSite !== undefined;
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
   const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - y.left - STACK.right));
@@ -300,7 +348,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
       info.push({ siteId: g.siteId, site: names.get(g.siteId) ?? String(g.siteId), year: g.year, unit: displayUnit(meta, v) });
       series.push({
         type: 'line',
-        name: seriesName(g),
+        name: seriesNameOf(data, names, g),
         datasetIndex: gi,
         encode: { x: 'x', y: v },
         xAxisIndex: panel,
@@ -312,7 +360,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
         lineStyle: {
           width: 1.5,
           opacity: byYear ? 1 : yearOpacity(rank, count),
-          ...(g.siteId === dashedSite ? { type: 'dashed' } : {}),
+          ...(g.siteId === data.dashedSite ? { type: 'dashed' } : {}),
         },
         emphasis: { focus: 'series', lineStyle: { width: 2.5, opacity: 1 } },
         ...eventMarkers(marks.byGroup.get(g) ?? [], color, tokens, panel === 0),
@@ -323,14 +371,15 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
   return {
     ...baseOption(tokens),
-    legend: byYear
-      ? {
-          ...siteLegend(meta, ctx.params, tokens, new Set(), y.left, STACK.right),
-          // With two sites, the legend marks are lines without a symbol, so that the dashed site is visible.
-          ...(twoSites ? { icon: undefined, itemWidth: 24, itemHeight: 10, itemStyle: { opacity: 0 }, lineStyle: { opacity: 1 } } : {}),
-          data: [...new Set(data.groups.map(seriesName))],
-        }
-      : siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
+    legend: {
+      ...siteLegend(meta, ctx.params, tokens, new Set(), y.left, STACK.right),
+      // A plain legend wraps to more rows. `yearsStack()` gives the space for the rows.
+      type: 'plain',
+      itemGap: 10,
+      // With two sites, the legend marks are lines without a symbol, so that the dashed site is visible.
+      ...(twoSites ? { icon: undefined, itemWidth: legendItemWidth(data), itemHeight: 10, itemStyle: { opacity: 0 }, lineStyle: { opacity: 1 } } : {}),
+      data: data.legend,
+    },
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
       ...y.layout.title[i],
@@ -356,8 +405,10 @@ export const years: DiagramDef<YearsData> = {
   prepare: prepareYears,
   build,
   showsEvents: true,
+  widthDependent: true,
   relayout: (data, ctx) => yLayout(data, ctx).layout,
-  height: (params) => stackHeight(params.variables.length, 190, YEAR_STACK),
+  height: (params, data, width) =>
+    stackHeight(params.variables.length, 190, data && !data.note ? yearsStack(data, width) : YEAR_STACK),
   describe: (data) =>
     `One panel per variable. The x axis is the day of the year, ${YEAR_STEP_TEXT[data.step]}. ` +
     `Each line is one site and year: ${data.years.length} years (${data.years[0] ?? ''} to ${data.years[data.years.length - 1] ?? ''}). ` +
