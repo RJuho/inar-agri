@@ -7,13 +7,14 @@ import { toFloat64, type Meta } from './db';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from './state';
 import { col, whereClause } from './diagrams/sql';
 import {
+  displayUnit,
   eventDateText,
   eventLabel,
   eventsInRange,
   eventSymbol,
   formatValue,
   shortDetail,
-  unitOf,
+  X_NAME_TITLE_ID,
   yearsText,
 } from './diagrams/common';
 
@@ -123,7 +124,7 @@ export function statsText(stats: SiteStats[], variables: Variable[], meta: Meta)
   const order = new Map(meta.sites.map((s, i) => [s.siteId, i]));
   const sentences: string[] = [];
   for (const v of variables) {
-    const unit = unitOf(meta, v);
+    const unit = displayUnit(meta, v);
     const rows = stats
       .filter((s) => s.variable === v && s.count > 0)
       .sort((a, b) => (order.get(a.siteId) ?? 0) - (order.get(b.siteId) ?? 0));
@@ -139,6 +140,35 @@ export function statsText(stats: SiteStats[], variables: Variable[], meta: Meta)
     sentences.push(`${VARIABLE_LABELS[v]} (${unit}): ${parts.join('; ')}.`);
   }
   return sentences.join(' ');
+}
+
+const asList = (part: unknown): unknown[] => (Array.isArray(part) ? part : part ? [part] : []);
+
+/** Names of the axes in an option part (`xAxis` or `yAxis`): unique, in order, on one line. */
+function axisNames(axes: unknown[], key: 'name' | 'text' = 'name'): string[] {
+  const names = axes
+    .map((a) => (a && typeof a === 'object' ? (a as Record<string, unknown>)[key] : undefined))
+    .filter((n): n is string => typeof n === 'string' && n.trim() !== '')
+    .map((n) => n.replace(/\s*\n\s*/g, ' ').trim());
+  return [...new Set(names)];
+}
+
+/**
+ * Sentence that names the axes of a chart, from its ECharts option, for example
+ * "X axis: Date (local time, UTC+2); y axis: NEE (µmol CO₂ m⁻² s⁻¹)."
+ * It reads the same names that the chart shows: `xAxis[].name`, `yAxis[].name` and the titles
+ * with an id that starts with `X_NAME_TITLE_ID` (x axis name for many panels). Empty when the axes have no names.
+ */
+export function axesText(option: unknown): string {
+  const o = (option ?? {}) as { xAxis?: unknown; yAxis?: unknown; title?: unknown };
+  const xTitles = asList(o.title).filter(
+    (t) => t && typeof t === 'object' && String((t as { id?: unknown }).id ?? '').startsWith(X_NAME_TITLE_ID),
+  );
+  const xNames = [...new Set([...axisNames(asList(o.xAxis)), ...axisNames(xTitles, 'text')])];
+  const part = (axis: 'x' | 'y', names: string[]) =>
+    names.length === 0 ? '' : `${axis} ${names.length === 1 ? 'axis' : 'axes'}: ${names.join(', ')}`;
+  const text = [part('x', xNames), part('y', axisNames(asList(o.yAxis)))].filter(Boolean).join('; ');
+  return text ? `${text.charAt(0).toUpperCase()}${text.slice(1)}.` : '';
 }
 
 /**
@@ -166,7 +196,7 @@ export function eventsText(params: ViewParams, meta: Meta, markers: boolean): st
   return out.join(' ');
 }
 
-/** Alt text: type sentence, sites and years, then statistics, then the events when `params.events` is on. */
+/** Alt text: type sentence, sites and years, axis names (`axesText()`), then statistics, then the events when `params.events` is on. */
 export function composeAlt(
   label: string,
   describe: string,
@@ -175,9 +205,11 @@ export function composeAlt(
   stats: SiteStats[],
   variables: Variable[],
   markers = false,
+  axes = '',
 ): string {
   const head = `${label}: ${listText(variables.map((v) => VARIABLE_LABELS[v]))} at ${siteListText(params, meta)}, ${yearsText(params)}.`;
+  const axesPart = axes ? ` ${axes}` : '';
   const body = stats.length > 0 ? ` ${statsText(stats, variables, meta)}` : '';
   const events = params.events ? ` ${eventsText(params, meta, markers)}` : '';
-  return `${head} ${describe}${body}${events}`.trim();
+  return `${head} ${describe}${axesPart}${body}${events}`.trim();
 }

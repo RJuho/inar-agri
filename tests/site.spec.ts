@@ -344,6 +344,43 @@ test.describe('diagram types', () => {
     });
   }
 
+  for (const type of ALL_TYPES) {
+    test(`${type} has axis names with display units and an axes sentence in the alt text`, async ({ page }) => {
+      await page.goto('/' + viewHash(typeView(type, ['nee_f', 'ta', 'swc'])));
+      await waitReady(page);
+      const card = page.locator('.diagram');
+      await expect(card).toHaveAttribute('data-status', 'ready');
+      const axes = await card.locator('.diagram-chart').evaluate((el) => {
+        type Axis = { name?: string; show?: boolean; axisLabel?: { show?: boolean } };
+        type Title = { id?: string; text?: string };
+        const chart = (el as unknown as { __chart: { getOption(): { xAxis?: Axis[]; yAxis?: Axis[]; title?: Title[] } } }).__chart;
+        const o = chart.getOption();
+        const labelled = (a: Axis) => a.show !== false && a.axisLabel?.show !== false;
+        return {
+          y: (o.yAxis ?? []).filter(labelled).map((a) => a.name ?? ''),
+          x: (o.xAxis ?? []).map((a) => a.name ?? '').filter((n) => n.trim() !== ''),
+          // yearPanels: one x axis name for many panels, as a title with an id.
+          xTitles: (o.title ?? []).filter((t) => (t.id ?? '').startsWith('x-axis-name')).map((t) => t.text ?? ''),
+        };
+      });
+      expect(axes.y.length).toBeGreaterThan(0);
+      for (const name of axes.y) expect(name.trim()).not.toBe('');
+      expect(axes.x.length + axes.xTitles.length).toBeGreaterThan(0);
+      // Display units (`unitText()`): super- and subscripts, not the raw unit strings.
+      const all = [...axes.y, ...axes.x].join(' | ').replace(/\s*\n\s*/g, ' ');
+      if (type === 'cumulative') {
+        expect(all).toContain('g C m⁻²');
+      } else {
+        expect(all).toContain('µmol CO₂ m⁻² s⁻¹');
+        expect(all).not.toContain('m-2');
+        expect(all).toContain('m³ m⁻³');
+      }
+      const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+      expect(alt).toMatch(/X ax(is|es): /);
+      expect(alt).toMatch(/y ax(is|es): /);
+    });
+  }
+
   test('years types show raw data as daily means', async ({ page }) => {
     await page.goto('/' + viewHash(typeView('yearPanels')));
     await waitReady(page);

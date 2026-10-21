@@ -11,27 +11,53 @@ import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
   STACK,
+  X_NAME_SPACE,
+  axisName,
   baseOption,
+  displayUnit,
   emptyNote,
   esc,
   formatValue,
+  gridLeftFor,
+  joinSubtitle,
+  nameLines,
+  panelTitle,
+  signNote,
   siteColors,
   siteLegend,
   siteNames,
   stackHeight,
   stackLayout,
+  tickLabelWidth,
+  timeAxisName,
   titleStyle,
-  titleText,
   tooltipBase,
-  unitOf,
   valueAxis,
   varLabel,
+  xAxisName,
+  yAxisName,
+  zeroLineSeries,
 } from './common';
 
 echarts.use([LineChart]);
 
 const SLOTS = 48;
-const SLOT_LABELS = Array.from({ length: SLOTS }, (_, i) => `${String(Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`);
+const slotLabel = (i: number) => `${String(Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`;
+const SLOT_LABELS = Array.from({ length: SLOTS }, (_, i) => slotLabel(i));
+/**
+ * Categories of the x axis: the 48 half hours and one more category "24:00" at the right end.
+ * It has no data. It lets the axis show the full day, with labels 00, 03 … 24.
+ */
+const AXIS_LABELS = [...SLOT_LABELS, '24:00'];
+/** Category step of a tick and a label: 6 half hours = 3 h. ECharts `interval` = categories to skip. */
+const TICK_EVERY = 6;
+
+/** Panel statistic in the title. The step setting does not apply. */
+const STAT = 'mean per half hour';
+/** Stack layout with space below the bottom panel for the hour labels and the x axis name. */
+const LAYOUT = { ...STACK, bottom: X_NAME_SPACE + 4 };
+/** Panel height in px. */
+const PANEL_H = 170;
 
 interface Curve {
   mean: number[];
@@ -89,16 +115,53 @@ function prepare(table: Table | null, params: ViewParams, _meta: Meta): DiurnalD
     sites,
     rowCount: n,
     seriesCount,
-    subtitle: 'Mean (line) and 25th to 75th percentile (band) per half hour, site local time, all values in the selected years.',
+    subtitle: joinSubtitle(
+      signNote(params.variables),
+      'Mean (line) and 25th to 75th percentile (band) per half hour, site local time, all values in the selected years.',
+    ),
   };
   if (n === 0) data.note = 'No data for these sites and years.';
   return data;
 }
 
+/** Min and max of the band and the mean of `v` in all sites. [0, 1] when there are none. */
+function valueExtent(data: DiurnalData, v: Variable): [number, number] {
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const s of data.sites) {
+    const c = s.curves[v];
+    if (!c) continue;
+    for (const a of [c.mean, c.q1, c.q3]) {
+      for (const y of a) {
+        if (y < lo) lo = y;
+        if (y > hi) hi = y;
+      }
+    }
+  }
+  return lo <= hi ? [lo, hi] : [0, 1];
+}
+
+/** Panel height in px, the same formula as `stackLayout()`. */
+function panelHeight(n: number, height: number): number {
+  const k = Math.max(n, 1);
+  return Math.max(40, (height - LAYOUT.top - LAYOUT.bottom - LAYOUT.gap * k) / k);
+}
+
+/** Y axis names, tick label widths and the shared left margin of all panels. */
+function yLayout(data: DiurnalData, meta: Meta, height: number) {
+  const panelH = panelHeight(data.variables.length, height);
+  const extents = data.variables.map((v) => valueExtent(data, v));
+  const names = data.variables.map((v) => axisName(meta, v, panelH));
+  const widths = extents.map((e) => tickLabelWidth(e));
+  const left = Math.max(LAYOUT.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
+  return { extents, names, widths, left };
+}
+
 function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const vars = data.variables;
-  const layout = stackLayout(vars.length, ctx.height);
+  const y = yLayout(data, meta, ctx.height);
+  const layout = stackLayout(vars.length, ctx.height, LAYOUT, y.left);
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta);
   const last = vars.length - 1;
@@ -124,25 +187,30 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
         areaStyle: { color, opacity: 0.14 },
       });
       series.push({ ...common, silent: false, type: 'line', data: curve.mean, lineStyle: { width: 2 }, z: 3 });
-      lines.push(null, null, { curve, unit: unitOf(meta, v) });
+      lines.push(null, null, { curve, unit: displayUnit(meta, v) });
     }
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), STACK.left, STACK.right),
-    title: vars.map((v, i) => ({ ...layout.title[i], text: titleText(varLabel(v), unitOf(meta, v)), textStyle: titleStyle(tokens) })),
+    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
+    // Panel label and statistic. The unit is in the y axis name.
+    title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, STAT), textStyle: titleStyle(tokens) })),
     grid: layout.grid,
     xAxis: vars.map((_, i) => ({
       type: 'category',
       gridIndex: i,
-      data: SLOT_LABELS,
+      data: AXIS_LABELS,
       boundaryGap: false,
-      axisLine: { lineStyle: { color: tokens.axis } },
-      axisTick: { show: i === last, interval: 5 },
-      axisLabel: { show: i === last, color: tokens.textMuted, interval: 5 },
-      splitLine: { show: true, interval: 5, lineStyle: { color: tokens.grid, width: 1 } },
+      // The axis stays at the bottom of the panel. The zero line series marks y = 0.
+      axisLine: { onZero: false, lineStyle: { color: tokens.axis } },
+      axisTick: { show: i === last, interval: TICK_EVERY - 1 },
+      // Label = hour only: 00, 03 … 24.
+      axisLabel: { show: i === last, color: tokens.textMuted, interval: TICK_EVERY - 1, formatter: (s: string) => s.slice(0, 2) },
+      splitLine: { show: true, interval: TICK_EVERY - 1, lineStyle: { color: tokens.grid, width: 1 } },
+      // Time base on the bottom panel only.
+      ...(i === last ? xAxisName(tokens, timeAxisName(meta, ctx.params, 'Hour of day')) : {}),
     })),
-    yAxis: vars.map((_, i) => valueAxis(tokens, i)),
+    yAxis: vars.map((_, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number))),
     tooltip: {
       ...tooltipBase(tokens, 'axis'),
       axisPointer: { type: 'line', lineStyle: { color: tokens.axis } },
@@ -153,6 +221,7 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
         const rows: string[] = [];
         for (const p of list) {
           const line = lines[p.seriesIndex];
+          if (p.dataIndex >= SLOTS) continue;
           if (!line) continue;
           const m = line.curve.mean[p.dataIndex] as number;
           if (!Number.isFinite(m)) continue;
@@ -164,7 +233,8 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
         return `<b>${esc(first.name)} local time</b><br/>${rows.join('<br/>') || 'No data'}`;
       },
     },
-    series,
+    // The zero lines come after all data series, so they do not change the series index.
+    series: [...series, ...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? [])],
   };
 }
 
@@ -194,8 +264,8 @@ export const diurnal: DiagramDef<DiurnalData> = {
   query,
   prepare,
   build,
-  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height),
-  height: (params) => stackHeight(params.variables.length, 170),
+  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height, LAYOUT, yLayout(data, ctx.meta, ctx.height).left),
+  height: (params) => stackHeight(params.variables.length, PANEL_H, LAYOUT),
   describe: (data, ctx) =>
     `One panel per variable, the hour of the day (site local time) on the x axis, one line per site for the mean ` +
     `and a band for the 25th to 75th percentile.${peakText(data, ctx.meta)}`,

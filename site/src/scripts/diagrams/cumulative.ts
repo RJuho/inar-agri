@@ -13,12 +13,14 @@ import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
   DAY_STEP,
+  axisNameText,
+  dayOfYearAxisName,
   eventMarkers,
   eventsKeyText,
+  extent,
   joinSubtitle,
   STACK,
   baseOption,
-  dayOfYearAxis,
   hasValues,
   readGroups,
   refDateSql,
@@ -26,15 +28,25 @@ import {
   siteLegend,
   siteNames,
   stackHeight,
-  stackLayout,
-  titleStyle,
-  titleText,
+  unitText,
   valueAxis,
+  VARIABLE_SYMBOLS,
   varLabel,
+  yAxisName,
   yearOpacity,
+  zeroLineSeries,
   type Group,
 } from './common';
-import { refYearPx, siteYearTooltip, yearEventMarks, yearRanks, type SeriesInfo } from './years';
+import {
+  refYearPx,
+  siteYearTooltip,
+  stackDayAxes,
+  stackYLayout,
+  yearEventMarks,
+  yearRanks,
+  YEAR_STACK,
+  type SeriesInfo,
+} from './years';
 
 echarts.use([LineChart]);
 
@@ -51,13 +63,40 @@ const FLUXES: Partial<Record<Variable, string>> = {
 const FLUX_VARS = Object.keys(FLUXES) as Variable[];
 const NEE_VARS: Variable[] = ['nee', 'nee_f'];
 
-/** Unit of the running sum of `v`. */
+/** Unit of the running sum of `v`, raw form. Use `unitText()` for display. */
 const unitOfSum = (v: Variable) => FLUXES[v] ?? '';
 
-/** Units of the variables as text, for example "g C m-2" or "g C m-2 and g CH4-C m-2". */
+/** Display units of the variables as text, for example "g C m⁻²" or "g C m⁻² and g CH₄-C m⁻²". */
 function unitsText(vars: Variable[]): string {
-  const units = [...new Set(vars.map(unitOfSum))];
+  const units = [...new Set(vars.map((v) => unitText(unitOfSum(v))))];
   return units.join(' and ');
+}
+
+/** Panel title: "Cumulative NEE, gap-filled — running sum per year". The unit is in the y axis name. */
+const sumTitle = (v: Variable) => `Cumulative ${varLabel(v)} — running sum per year`;
+
+/** Y axis name, for example `Cumulative NEE (g C m⁻²)`. `room` = panel height in px. */
+const sumAxisName = (v: Variable, room: number) => axisNameText(`Cumulative ${VARIABLE_SYMBOLS[v]}`, unitText(unitOfSum(v)), room);
+
+/** Sign convention of the running sums, for the subtitle. */
+function sumSignNote(vars: Variable[]): string | undefined {
+  const parts: string[] = [];
+  if (vars.some((v) => NEE_VARS.includes(v))) parts.push('cumulative NEE < 0 = net carbon uptake by the ecosystem');
+  if (vars.some((v) => v === 'gpp' || v === 'gpp_src' || v === 'reco' || v === 'reco_src')) parts.push('GPP and Reco ≥ 0');
+  if (vars.includes('ch4')) parts.push('cumulative F CH₄ > 0 = net emission to the atmosphere');
+  return parts.length ? `Sign convention: ${parts.join('; ')}.` : undefined;
+}
+
+/** Y range of a sum panel: the data range with 0, because the axis starts at 0 (`scale: false`). */
+function sumExtent(groups: Group[], v: Variable): [number, number] {
+  const [lo, hi] = extent(groups, v);
+  return [Math.min(lo, 0), Math.max(hi, 0)];
+}
+
+/** Y layout: one panel per summed variable. */
+function yLayout(data: CumulativeData, height: number) {
+  const extents = data.variables.map((v) => sumExtent(data.groups, v));
+  return { extents, ...stackYLayout(height, extents, (i, panelH) => sumAxisName(data.variables[i] as Variable, panelH)) };
 }
 
 interface CumulativeData extends Prepared {
@@ -97,8 +136,8 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Cumulativ
   for (const v of vars) for (const g of groups) if (hasValues(g, v)) seriesCount++;
   const onlyNee = vars.every((v) => NEE_VARS.includes(v));
   const notes = [`Running sum per site and year in ${unitsText(vars)}, from the first day with data.`];
-  if (onlyNee) notes.push('Negative = net uptake.');
-  else if (vars.some((v) => NEE_VARS.includes(v))) notes.push('Negative NEE = net uptake.');
+  const sign = sumSignNote(vars);
+  if (sign) notes.push(sign);
   if (vars.includes('nee')) notes.push('Measured NEE has gaps, so its sum is not an annual balance.');
   if (params.variables.length > vars.length) notes.push('Only fluxes are summed: NEE, GPP, Reco, CH4. The other variables are not shown.');
   const subtitle = joinSubtitle(notes.join(' '), params.events ? eventsKeyText(meta, params) : undefined);
@@ -111,20 +150,19 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Cumulativ
 function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const vars = data.variables;
-  const layout = stackLayout(vars.length, ctx.height);
+  const y = yLayout(data, ctx.height);
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta);
   const ranks = yearRanks(data.groups);
-  const last = vars.length - 1;
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
-  const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - STACK.left - STACK.right));
+  const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - y.left - STACK.right));
   vars.forEach((v, panel) => {
     data.groups.forEach((g, gi) => {
       if (!hasValues(g, v)) return;
       const [rank, count] = ranks.get(g) ?? [0, 1];
       const name = names.get(g.siteId) ?? String(g.siteId);
-      info.push({ siteId: g.siteId, site: name, year: g.year, unit: unitOfSum(v) });
+      info.push({ siteId: g.siteId, site: name, year: g.year, unit: unitText(unitOfSum(v)) });
       series.push({
         type: 'line',
         name,
@@ -142,16 +180,22 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
       });
     });
   });
+  // The zero lines come after all data series, so that the tooltip index `info` stays correct.
+  series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.groups.map((g) => g.siteId)), STACK.left, STACK.right),
-    title: vars.map((v, i) => ({ ...layout.title[i], text: titleText(`Cumulative ${varLabel(v)}`, unitOfSum(v)), textStyle: titleStyle(tokens) })),
-    grid: layout.grid,
-    xAxis: vars.map((_, i) => dayOfYearAxis(tokens, i, i === last)),
+    legend: siteLegend(meta, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
+    title: vars.map((v, i) => ({
+      ...y.layout.title[i],
+      text: sumTitle(v),
+      textStyle: { fontSize: 13, fontWeight: 600, color: tokens.text },
+    })),
+    grid: y.layout.grid,
+    xAxis: stackDayAxes(tokens, vars.length, dayOfYearAxisName(meta, ctx.params)),
     yAxis: vars.map((_, i) =>
       valueAxis(tokens, i, {
         scale: false,
-        splitLine: { lineStyle: { color: tokens.grid, width: 1 } },
+        ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number),
       }),
     ),
     tooltip: siteYearTooltip(ctx, 'day', info, marks.all),
@@ -185,7 +229,7 @@ function totalsText(data: CumulativeData, meta: Meta): string {
         const end = new Date(lastX).toISOString().slice(5, 10);
         parts.push(`${names.get(g.siteId) ?? g.siteId} ${g.year} ${Math.round(lastValue)} (to ${end})`);
       }
-      return parts.length ? `Cumulative ${varLabel(v)} at the last day with data, ${unitOfSum(v)}: ${parts.join('; ')}.` : '';
+      return parts.length ? `Cumulative ${varLabel(v)} at the last day with data, ${unitText(unitOfSum(v))}: ${parts.join('; ')}.` : '';
     })
     .filter(Boolean)
     .join(' ');
@@ -198,8 +242,8 @@ export const cumulative: DiagramDef<CumulativeData> = {
   prepare,
   build,
   showsEvents: true,
-  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height),
-  height: (params) => stackHeight(Math.max(1, sumVars(params).length), 260),
+  relayout: (data, ctx) => yLayout(data, ctx.height).layout,
+  height: (params) => stackHeight(Math.max(1, sumVars(params).length), 260, YEAR_STACK),
   statsVariables: sumVars,
   describe: (data, ctx) => {
     const onlyNee = data.variables.every((v) => NEE_VARS.includes(v));

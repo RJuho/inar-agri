@@ -10,30 +10,46 @@ import type { Aggregation, Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
+  FIXED_GRID,
+  STAT_TEXT,
+  X_NAME_SPACE,
+  axisName,
   baseOption,
+  displayUnit,
   emptyNote,
   esc,
   formatValue,
+  gridLeftFor,
   groupDigits,
+  joinSubtitle,
+  nameLines,
+  panelTitle,
+  signNote,
   siteColors,
   siteLegend,
   siteNames,
+  tickLabelWidth,
   titleStyle,
-  titleText,
   tooltipBase,
-  unitOf,
   valueAxis,
   varLabel,
+  xAxisName,
+  yAxisName,
 } from './common';
 
 echarts.use([ScatterChart]);
 
 const SAMPLE_ROWS = 20_000;
-const L = { legend: 30, head: 30, panel: 260, xLabels: 40, left: 56, right: 16, gapX: 40 };
+/**
+ * Layout in px. `xLabels` is the space below each panel for the tick labels and the x axis name.
+ * `left` is the smallest left margin of a panel; `yLayout()` makes it larger for the y axis names.
+ */
+const L = { legend: 30, head: 30, panel: 260, xLabels: X_NAME_SPACE + 4, left: 56, right: 16, gapX: 24 };
 
 interface ScatterData extends Prepared {
   x: Variable;
   ys: Variable[];
+  aggregation: Aggregation;
   sites: Array<{ siteId: number; x: Float64Array; values: Partial<Record<Variable, Float64Array>> }>;
 }
 
@@ -66,7 +82,7 @@ function query(params: ViewParams): string | null {
 
 function prepare(table: Table | null, params: ViewParams, _meta: Meta): ScatterData {
   const ys = yVars(params);
-  const base = { x: params.xVariable, ys, sites: [] as ScatterData['sites'] };
+  const base = { x: params.xVariable, ys, aggregation: params.aggregation, sites: [] as ScatterData['sites'] };
   if (table === null) {
     const note =
       params.sites.length > 0 && ys.length === 0
@@ -96,7 +112,10 @@ function prepare(table: Table | null, params: ViewParams, _meta: Meta): ScatterD
     sites,
     rowCount: n,
     seriesCount,
-    subtitle: `x = ${varLabel(params.xVariable)}. ${n >= SAMPLE_ROWS ? `Random sample of ${groupDigits(SAMPLE_ROWS)} ${step}.` : `All ${step}.`}`,
+    subtitle: joinSubtitle(
+      `x = ${varLabel(params.xVariable)}. ${n >= SAMPLE_ROWS ? `Random sample of ${groupDigits(SAMPLE_ROWS)} ${step}.` : `All ${step}.`}`,
+      signNote([params.xVariable, ...ys]),
+    ),
   };
   if (n === 0) data.note = 'No data for these sites and years.';
   return data;
@@ -112,13 +131,43 @@ function totalHeight(nY: number, width: number): number {
   return L.legend + rows * (L.head + L.panel + L.xLabels);
 }
 
+/** Min and max of the finite values of `v` in all sites. [0, 1] when there are none. */
+function valueExtent(data: ScatterData, v: Variable): [number, number] {
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const s of data.sites) {
+    const a = s.values[v];
+    if (!a) continue;
+    for (let i = 0; i < a.length; i++) {
+      const y = a[i] as number;
+      if (y < lo) lo = y;
+      if (y > hi) hi = y;
+    }
+  }
+  return lo <= hi ? [lo, hi] : [0, 1];
+}
+
+/**
+ * Y axis names, tick label widths and the left margin of the panels. All panels use the same
+ * left margin, so that the columns have the same width and line up.
+ */
+function yLayout(data: ScatterData, meta: Meta) {
+  const names = data.ys.map((v) => axisName(meta, v, L.panel));
+  const widths = data.ys.map((v) => tickLabelWidth(valueExtent(data, v), 4));
+  const left = Math.max(L.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
+  return { names, widths, left };
+}
+
 function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta);
   const cols = columns(ctx.width, data.ys.length);
-  const panelW = (Math.max(ctx.width, 200) - L.left - L.right - (cols - 1) * (L.gapX + L.left)) / cols;
-  const xUnit = unitOf(meta, data.x);
+  const y = yLayout(data, meta);
+  const panelW = (Math.max(ctx.width, 200) - y.left - L.right - (cols - 1) * (L.gapX + y.left)) / cols;
+  const xUnit = displayUnit(meta, data.x);
+  const xName = axisName(meta, data.x, panelW);
+  const stat = STAT_TEXT[data.aggregation];
   const grid: unknown[] = [];
   const title: unknown[] = [];
   const xAxis: unknown[] = [];
@@ -129,20 +178,14 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
     const r = Math.floor(i / cols);
     const c = i % cols;
     const top = L.legend + r * (L.head + L.panel + L.xLabels) + L.head;
-    const left = L.left + c * (panelW + L.gapX + L.left);
-    grid.push({ top, left, width: panelW, height: L.panel });
-    title.push({ top: top - 24, left: left - 8, text: titleText(varLabel(v), unitOf(meta, v)), textStyle: titleStyle(tokens) });
-    xAxis.push(
-      valueAxis(tokens, i, {
-        name: titleText(varLabel(data.x), xUnit),
-        nameLocation: 'middle',
-        nameGap: 24,
-        nameTextStyle: { color: tokens.textMuted, rich: { u: { color: tokens.textMuted } } },
-        axisLine: { show: true, lineStyle: { color: tokens.axis } },
-        splitNumber: 4,
-      }),
-    );
-    yAxis.push(valueAxis(tokens, i, { splitNumber: 4 }));
+    const left = y.left + c * (panelW + L.gapX + y.left);
+    grid.push({ top, left, width: panelW, height: L.panel, ...FIXED_GRID });
+    // Panel label and statistic. The unit is in the y axis name.
+    title.push({ top: top - 24, left: left - 8, text: panelTitle(v, stat), textStyle: titleStyle(tokens) });
+    // The axis lines stay at the bottom and the left edge of the panel, not at 0.
+    const edge = { axisLine: { show: true, onZero: false, lineStyle: { color: tokens.axis } } };
+    xAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...xAxisName(tokens, xName) }));
+    yAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }));
     data.sites.forEach((s, di) => {
       if (!s.values[v]?.some(Number.isFinite)) return;
       panelOf.push(v);
@@ -162,7 +205,7 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), L.left, L.right),
+    legend: siteLegend(meta, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right),
     title,
     grid,
     xAxis,
@@ -174,7 +217,7 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
         return (
           `${p.marker}<b>${esc(p.seriesName)}</b><br/>` +
           `${esc(varLabel(data.x))}: ${formatValue(p.value[0] as number)} ${esc(xUnit)}<br/>` +
-          `${esc(varLabel(v))}: ${formatValue(p.value[p.encode.y[0] as number] as number)} ${esc(unitOf(meta, v))}`
+          `${esc(varLabel(v))}: ${formatValue(p.value[p.encode.y[0] as number] as number)} ${esc(displayUnit(meta, v))}`
         );
       },
     },

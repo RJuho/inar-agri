@@ -5,19 +5,37 @@ import { LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
-import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
+import { AGGREGATION_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
+  axisName,
+  displayUnit,
+  esc,
   eventMarkers,
   eventsInRange,
   eventsKeyText,
   eventTooltipLines,
+  FIXED_GRID,
+  gridLeftFor,
+  joinSubtitle,
+  nameLines,
+  panelTitle,
   setLabelRows,
+  signNote,
   siteColors,
   siteNames,
+  STAT_TEXT,
+  tickLabelWidth,
+  timeAxisName,
   timeMarks,
+  valueAxis,
+  valueWithUnit,
+  X_NAME_SPACE,
+  xAxisName,
+  yAxisName,
+  zeroLineSeries,
   type EventMark,
 } from './common';
 
@@ -29,12 +47,15 @@ const DAY = 24 * 60 * MINUTE;
 /** Longest normal step between two rows. A longer step is a gap. */
 const MAX_STEP: Record<Aggregation, number> = { raw: 30 * MINUTE, day: DAY, week: 7 * DAY, month: 31 * DAY };
 
-/** Layout in px. The bottom space holds the axis labels and the zoom slider. */
-const LAYOUT = { top: 24, bottom: 64, gap: 34, left: 56, right: 16 };
 /** Zoom slider position in px from the bottom. */
 const SLIDER = { bottom: 8, height: 22 };
 /** Band at the bottom with the slider. The PNG export removes it (with the slider). */
 const SLIDER_BAND = SLIDER.bottom + SLIDER.height + 2;
+/**
+ * Layout in px. The bottom space holds the axis labels, the x axis name and the zoom slider.
+ * `left` is the smallest left margin; `yLayout()` makes it larger for the y axis names.
+ */
+const LAYOUT = { top: 24, bottom: X_NAME_SPACE + SLIDER_BAND, gap: 34, left: 56, right: 16 };
 
 /**
  * Downsampler for the line series. It keeps, per pixel frame, the value that is
@@ -69,15 +90,49 @@ function extremeSampler(frame: ArrayLike<number>): number {
   return best;
 }
 
-/** Grid and title positions for `n` panels in a chart of the given height. */
-function panelLayout(n: number, height: number) {
+/** Panel height in px for `n` panels in a chart of the given height. */
+function panelHeight(n: number, height: number): number {
   const k = Math.max(n, 1);
-  const panelH = Math.max(40, (height - LAYOUT.top - LAYOUT.bottom - LAYOUT.gap * k) / k);
+  return Math.max(40, (height - LAYOUT.top - LAYOUT.bottom - LAYOUT.gap * k) / k);
+}
+
+/** Grid and title positions for `n` panels in a chart of the given height. `left` comes from `yLayout()`. */
+function panelLayout(n: number, height: number, left: number) {
+  const panelH = panelHeight(n, height);
   const tops = Array.from({ length: n }, (_, i) => LAYOUT.top + LAYOUT.gap * (i + 1) + panelH * i);
   return {
-    grid: tops.map((top) => ({ top, height: panelH, left: LAYOUT.left, right: LAYOUT.right })),
-    title: tops.map((top) => ({ top: top - 24, left: LAYOUT.left - 8 })),
+    grid: tops.map((top) => ({ top, height: panelH, left, right: LAYOUT.right, ...FIXED_GRID })),
+    title: tops.map((top) => ({ top: top - 24, left: left - 8 })),
   };
+}
+
+/** Min and max of the finite values of `v` in all sites. [0, 1] when there are none. */
+function valueExtent(data: TimeseriesData, v: Variable): [number, number] {
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const s of data.sites) {
+    const a = s.values[v];
+    if (!a) continue;
+    for (let i = 0; i < a.length; i++) {
+      const y = a[i] as number;
+      if (y < lo) lo = y;
+      if (y > hi) hi = y;
+    }
+  }
+  return lo <= hi ? [lo, hi] : [0, 1];
+}
+
+/**
+ * Y axis names, tick label widths and the shared left margin. All panels use the
+ * same left margin, so that the time axes line up.
+ */
+function yLayout(data: TimeseriesData, meta: Meta, height: number) {
+  const panelH = panelHeight(data.variables.length, height);
+  const extents = data.variables.map((v) => valueExtent(data, v));
+  const names = data.variables.map((v) => axisName(meta, v, panelH));
+  const widths = extents.map((e) => tickLabelWidth(e));
+  const left = Math.max(LAYOUT.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
+  return { extents, names, widths, left };
 }
 
 /** Time label in site local time. The epoch values hold local wall time, so read them as UTC. */
@@ -87,12 +142,6 @@ function timeLabel(ms: number, aggregation: Aggregation): string {
   if (aggregation === 'week') return `Week of ${iso.slice(0, 10)}`;
   if (aggregation === 'day') return iso.slice(0, 10);
   return `${iso.slice(0, 16).replace('T', ' ')} local time`;
-}
-
-function formatValue(v: number): string {
-  if (!Number.isFinite(v)) return '–';
-  const abs = Math.abs(v);
-  return v.toFixed(abs >= 100 ? 0 : abs >= 10 ? 1 : abs >= 1 ? 2 : 3);
 }
 
 /**
@@ -187,22 +236,19 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Timeserie
   );
   const data: TimeseriesData = { ...base, sites, rowCount: n, seriesCount: sites.length * params.variables.length };
   if (n === 0) data.note = 'No data for these sites and years.';
-  if (params.events) data.subtitle = eventsKeyText(meta, params);
+  data.subtitle = joinSubtitle(signNote(params.variables), params.events ? eventsKeyText(meta, params) : undefined);
   return data;
-}
-
-function panelTitle(v: Variable, aggregation: Aggregation): string {
-  return aggregation === 'raw' ? VARIABLE_LABELS[v] : `${VARIABLE_LABELS[v]}, ${AGGREGATION_LABELS[aggregation].toLowerCase()}`;
 }
 
 function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta, zoom } = ctx;
   const vars = data.variables;
-  const layout = panelLayout(vars.length, ctx.height);
+  const y = yLayout(data, meta, ctx.height);
+  const layout = panelLayout(vars.length, ctx.height, y.left);
   const siteName = new Map(meta.sites.map((s) => [s.siteId, s.name]));
   // Colour follows the site: slot = position of the site in sites.parquet.
   const siteColor = new Map(meta.sites.map((s, i) => [s.siteId, tokens.series[i % tokens.series.length]]));
-  const unit = (v: Variable) => meta.variables.get(v)?.unit ?? '';
+  const unit = (v: Variable) => displayUnit(meta, v);
   const shown = new Set(data.sites.map((s) => s.siteId));
 
   // One shared time range, so that all panels line up at full zoom.
@@ -224,7 +270,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
   const marks = new Map<number, EventMark[]>();
   for (const s of data.sites) marks.set(s.siteId, timeMarks(events.filter((e) => e.siteId === s.siteId)));
   const allMarks = [...marks.entries()].flatMap(([siteId, list]) => list.map((mark) => ({ siteId, mark })));
-  if (tMax > tMin) setLabelRows(allMarks.map((m) => m.mark), (ctx.width - LAYOUT.left - LAYOUT.right) / (tMax - tMin));
+  if (tMax > tMin) setLabelRows(allMarks.map((m) => m.mark), (ctx.width - y.left - LAYOUT.right) / (tMax - tMin));
   const markColors = siteColors(meta, tokens);
 
   return {
@@ -237,7 +283,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
     legend: {
       type: 'scroll',
       top: 0,
-      left: LAYOUT.left - 8,
+      left: y.left - 8,
       right: LAYOUT.right,
       pageIconColor: tokens.textMuted,
       pageIconInactiveColor: tokens.grid,
@@ -249,16 +295,11 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
       inactiveColor: tokens.grid,
       data: meta.sites.filter((s) => shown.has(s.siteId)).map((s) => s.name),
     },
-    // Panel label, then the unit in muted text on the same line.
+    // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
       ...layout.title[i],
-      text: `${panelTitle(v, data.aggregation)}  {u|${unit(v)}}`,
-      textStyle: {
-        fontSize: 13,
-        fontWeight: 600,
-        color: tokens.text,
-        rich: { u: { fontSize: 12, fontWeight: 400, color: tokens.textMuted } },
-      },
+      text: panelTitle(v, STAT_TEXT[data.aggregation]),
+      textStyle: { fontSize: 13, fontWeight: 600, color: tokens.text },
     })),
     grid: layout.grid,
     xAxis: vars.map((_, i) => ({
@@ -270,16 +311,10 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
       axisTick: { show: i === last },
       axisLabel: { show: i === last, color: tokens.textMuted, hideOverlap: true },
       splitLine: { show: true, lineStyle: { color: tokens.grid, width: 1 } },
+      // Time base on the bottom panel only.
+      ...(i === last ? xAxisName(tokens, timeAxisName(meta, ctx.params)) : {}),
     })),
-    yAxis: vars.map((_, i) => ({
-      type: 'value',
-      gridIndex: i,
-      scale: true,
-      splitNumber: 3,
-      axisLine: { show: false },
-      axisLabel: { color: tokens.textMuted },
-      splitLine: { lineStyle: { color: tokens.grid, width: 1 } },
-    })),
+    yAxis: vars.map((_, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number))),
     axisPointer: { link: [{ xAxisIndex: 'all' }], lineStyle: { color: tokens.axis } },
     tooltip: tooltip(data, tokens, nSites, unit, (from, to) => eventTooltipLines(allMarks, from, to, siteNames(meta), markColors)),
     dataZoom: [
@@ -291,7 +326,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
         end: zoom.end,
         bottom: SLIDER.bottom,
         height: SLIDER.height,
-        left: LAYOUT.left,
+        left: y.left,
         right: LAYOUT.right,
         showDataShadow: false,
         labelFormatter: (v: number) => new Date(v).toISOString().slice(0, 10),
@@ -305,24 +340,28 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
       source: { t: s.t, ...s.values },
     })),
     // Series order: variable-major, then site. Index = panel * nSites + site.
-    series: vars.flatMap((v, panel) =>
-      data.sites.map((s, di) => ({
-        type: 'line',
-        name: siteName.get(s.siteId) ?? String(s.siteId),
-        datasetIndex: di,
-        encode: { x: 't', y: v },
-        xAxisIndex: panel,
-        yAxisIndex: panel,
-        color: siteColor.get(s.siteId),
-        showSymbol: false,
-        symbol: 'none',
-        connectNulls: false,
-        sampling: extremeSampler,
-        lineStyle: { width: 1 },
-        emphasis: { disabled: true },
-        ...eventMarkers(marks.get(s.siteId) ?? [], markColors.get(s.siteId) ?? tokens.text, tokens, panel === 0),
-      })),
-    ),
+    // The zero lines come after all data series, so they do not change this index.
+    series: [
+      ...vars.flatMap((v, panel) =>
+        data.sites.map((s, di) => ({
+          type: 'line',
+          name: siteName.get(s.siteId) ?? String(s.siteId),
+          datasetIndex: di,
+          encode: { x: 't', y: v },
+          xAxisIndex: panel,
+          yAxisIndex: panel,
+          color: siteColor.get(s.siteId),
+          showSymbol: false,
+          symbol: 'none',
+          connectNulls: false,
+          sampling: extremeSampler,
+          lineStyle: { width: 1 },
+          emphasis: { disabled: true },
+          ...eventMarkers(marks.get(s.siteId) ?? [], markColors.get(s.siteId) ?? tokens.text, tokens, panel === 0),
+        })),
+      ),
+      ...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []),
+    ],
   };
 }
 
@@ -371,10 +410,10 @@ function tooltip(
           .filter((p) => Number.isFinite(p.value[p.encode.y[0] as number]))
           .map(
             (p) =>
-              `${p.marker}${echarts.format.encodeHTML(p.seriesName)}&nbsp;&nbsp;<b>${formatValue(p.value[p.encode.y[0] as number] as number)}</b>`,
+              `${p.marker}${esc(p.seriesName)}&nbsp;&nbsp;${valueWithUnit(p.value[p.encode.y[0] as number] as number, unit(v))}`,
           );
         if (rows.length === 0) return;
-        const head = `<span style="color:${tokens.textMuted}">${panelTitle(v, data.aggregation)}, ${echarts.format.encodeHTML(unit(v))}</span>`;
+        const head = `<span style="color:${tokens.textMuted}">${esc(panelTitle(v, STAT_TEXT[data.aggregation]))}</span>`;
         blocks.push(`${head}<br/>${rows.join('<br/>')}`);
       });
       const [from, to] = periodOf(first.axisValue, data.aggregation);
@@ -391,7 +430,7 @@ export const timeseries: DiagramDef<TimeseriesData> = {
   prepare,
   build,
   showsEvents: true,
-  relayout: (data, ctx) => panelLayout(data.variables.length, ctx.height),
+  relayout: (data, ctx) => panelLayout(data.variables.length, ctx.height, yLayout(data, ctx.meta, ctx.height).left),
   describe: (data) =>
     `One panel per variable, one line per site, ${AGGREGATION_LABELS[data.aggregation].toLowerCase()}, time axis in site local time.`,
   // Same panel height as the first version of the page: five panels in about 1100 px.

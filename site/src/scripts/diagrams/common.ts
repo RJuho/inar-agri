@@ -3,7 +3,7 @@
 import * as echarts from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { MarkAreaComponent, MarkLineComponent } from 'echarts/components';
-import { toFloat64, type Meta, type SiteEvent } from '../db';
+import { toFloat64, type Meta, type Site, type SiteEvent } from '../db';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import { periodBounds } from './sql';
@@ -62,8 +62,294 @@ export function siteNames(meta: Meta): Map<number, string> {
   return new Map(meta.sites.map((s) => [s.siteId, s.name]));
 }
 
+/** Raw unit string from variables.parquet, for example `µmol CO2 m-2 s-1`. The data export uses it. */
 export function unitOf(meta: Meta, v: Variable): string {
   return meta.variables.get(v)?.unit ?? '';
+}
+
+/** Super- and subscript digits. Index = digit. */
+const SUP_DIGITS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const SUB_DIGITS = '₀₁₂₃₄₅₆₇₈₉';
+const sup = (c: string) => (c === '-' ? '⁻' : (SUP_DIGITS[Number(c)] ?? c));
+const sub = (c: string) => SUB_DIGITS[Number(c)] ?? c;
+/** Chemical formulas in units and symbols. Their digits are subscripts. */
+const FORMULA = /\b(CO2|CH4|N2O|H2O)\b/g;
+
+/** Chemical formula with subscript digits: CO2 → CO₂, CH4 → CH₄. */
+export function formulaText(s: string): string {
+  return s.replace(FORMULA, (f) => f.replace(/\d/g, sub));
+}
+
+/**
+ * Display form of a unit, with Unicode super- and subscripts: `µmol CO2 m-2 s-1` → `µmol CO₂ m⁻² s⁻¹`,
+ * `m3 m-3` → `m³ m⁻³`, `g CH4-C m-2` → `g CH₄-C m⁻²`. Only for display: the data export keeps the raw unit.
+ */
+export function unitText(unit: string): string {
+  return unit
+    .split(' ')
+    .map((tok) => {
+      if (/^(CO2|CH4|N2O|H2O)/.test(tok)) return formulaText(tok);
+      const m = /^([A-Za-zµ]+)(-?\d+)$/.exec(tok);
+      return m ? `${m[1]}${[...(m[2] as string)].map(sup).join('')}` : tok;
+    })
+    .join(' ');
+}
+
+/** Display unit of a variable, for axis names and tooltips. */
+export function displayUnit(meta: Meta, v: Variable): string {
+  return unitText(unitOf(meta, v));
+}
+
+/** Short symbol of each variable for the axis names. Plain text that all fonts have. */
+export const VARIABLE_SYMBOLS: Record<Variable, string> = {
+  nee: 'NEE',
+  nee_f: 'NEE',
+  gpp: 'GPP',
+  reco: 'Reco',
+  gpp_src: 'GPP',
+  reco_src: 'Reco',
+  ch4: 'F CH₄',
+  ta: 'Tair',
+  tsoil: 'Tsoil',
+  swc: 'SWC',
+  sw_in: 'SWin',
+  ppfd: 'PPFD',
+  rh: 'RH',
+  vpd: 'VPD',
+  ustar: 'u*',
+};
+
+/** Flux variables. They have a sign convention and a zero line. */
+export const FLUX_VARS: ReadonlySet<Variable> = new Set<Variable>(['nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4']);
+
+/** Font of the axis names and of the tick labels (ECharts default size 12). */
+const NAME_SIZE = 11;
+const NAME_FONT = `${NAME_SIZE}px system-ui, sans-serif`;
+const LABEL_FONT = '12px system-ui, sans-serif';
+/** Line height of a two-line axis name. */
+const NAME_LINE = 13;
+
+/** Width in px of a text, measured with the ECharts text measurer. */
+export function textWidth(text: string, font = LABEL_FONT): number {
+  return echarts.format.getTextRect(text, font).width;
+}
+
+/**
+ * Axis name text "<symbol> (<unit>)", for example `NEE (µmol CO₂ m⁻² s⁻¹)`. When the text is longer
+ * than `room` px (the panel height for a y axis), the unit goes on a second line.
+ */
+export function axisNameText(symbol: string, unit: string, room = Infinity): string {
+  if (!unit) return symbol;
+  const one = `${symbol} (${unit})`;
+  return textWidth(one, NAME_FONT) + 8 <= room ? one : `${symbol}\n(${unit})`;
+}
+
+/** Y axis name of a variable, for example `NEE (µmol CO₂ m⁻² s⁻¹)`. `room` = panel height in px. */
+export function axisName(meta: Meta, v: Variable, room = Infinity): string {
+  return axisNameText(VARIABLE_SYMBOLS[v], displayUnit(meta, v), room);
+}
+
+/** Number of lines of an axis name. */
+export const nameLines = (name: string) => name.split('\n').length;
+
+/**
+ * Width in px of the widest y tick label for values in `[lo, hi]`. It is an estimate:
+ * ECharts selects the ticks itself, so this function measures nice values with
+ * about `splitNumber` steps and adds the thousands separators of ECharts.
+ */
+export function tickLabelWidth([lo, hi]: [number, number], splitNumber = 3): number {
+  const span = hi - lo || Math.abs(hi) || 1;
+  const step = niceStep(span / splitNumber);
+  // ECharts can select a step down to about half of this step (for example 0.05 in place of 0.1).
+  // Count the decimals of that smaller step, so that the estimate is not too small.
+  const decimals = Math.max(0, -Math.floor(Math.log10(niceStep(span / (2 * splitNumber))) + 1e-9));
+  const label = (v: number) => {
+    const [i, f] = Math.abs(v).toFixed(decimals).split('.') as [string, string | undefined];
+    return `${v < 0 ? '-' : ''}${i.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${f ? `.${f}` : ''}`;
+  };
+  const a = Math.floor(lo / step) * step;
+  const b = Math.ceil(hi / step) * step;
+  return Math.ceil(Math.max(textWidth(label(a)), textWidth(label(b)), textWidth(label(a + step))));
+}
+
+/** Distance in px from the axis line to a y axis name, so that the name clears the tick labels. */
+export function yNameGap(labelWidth: number): number {
+  // 8 px label margin of ECharts, then 6 px space.
+  return Math.ceil(labelWidth) + 14;
+}
+
+/**
+ * Grid `left` in px for y axes with names: space for the tick labels, the name (one or two lines)
+ * and 4 px at the chart edge. Use the largest value of all panels, so that the panels line up.
+ */
+export function gridLeftFor(labelWidth: number, lines = 1): number {
+  return yNameGap(labelWidth) + lines * NAME_LINE + 4;
+}
+
+/**
+ * Grid option part that turns off the automatic outer bounds of ECharts 6. Without it, ECharts makes a
+ * grid smaller when its tick labels or axis name go outside the chart, and the panels do not line up.
+ * Use it with a `left` margin from `gridLeftFor()`.
+ */
+export const FIXED_GRID = { outerBoundsMode: 'none' } as const;
+
+/**
+ * Option part of a y axis name: name at the middle of the axis, turned 90°, in muted text.
+ * Give it to `valueAxis()` in `extra`. `labelWidth` is the widest tick label (`tickLabelWidth()`).
+ */
+export function yAxisName(tokens: Tokens, name: string, labelWidth: number) {
+  return {
+    name,
+    nameLocation: 'middle',
+    nameRotate: 90,
+    nameGap: yNameGap(labelWidth),
+    nameTextStyle: { color: tokens.textMuted, fontSize: NAME_SIZE, lineHeight: NAME_LINE, align: 'center' },
+  };
+}
+
+/**
+ * Option part of an x axis name: name at the middle below the axis, in muted text.
+ * `gap` is the distance in px from the axis line (the tick labels take about 22 px).
+ */
+export function xAxisName(tokens: Tokens, name: string, gap = 28) {
+  return {
+    name,
+    nameLocation: 'middle',
+    nameGap: gap,
+    nameTextStyle: { color: tokens.textMuted, fontSize: NAME_SIZE, lineHeight: NAME_LINE },
+  };
+}
+
+/** Space in px below the x axis line for the tick labels and the x axis name of `xAxisName()`. */
+export const X_NAME_SPACE = 44;
+
+/**
+ * Id prefix of a title element that is an x axis name. Use it when one name is for many small
+ * panels (`yearPanels`). `axesText()` in alttext.ts reads these titles as x axis names.
+ */
+export const X_NAME_TITLE_ID = 'x-axis-name';
+
+/**
+ * X axis name of a time axis in site local time. One UTC offset for all selected sites gives
+ * "Date (local time, UTC+2)". Different offsets give "Date (site local time: UTC+2 Finland, UTC+3 Maktau)".
+ */
+export function timeAxisName(meta: Meta, params: ViewParams, what = 'Date'): string {
+  return `${what} (${localTimeText(meta, params)})`;
+}
+
+/**
+ * X axis name of a day-of-year axis (reference year, month labels), for example
+ * "Day of year (month labels; local time, UTC+2)". Mixed UTC offsets give the site local time text.
+ */
+export function dayOfYearAxisName(meta: Meta, params: ViewParams): string {
+  return `Day of year (month labels; ${localTimeText(meta, params)})`;
+}
+
+const COUNTRY_NAMES: Record<string, string> ={ FI: 'Finland', KE: 'Kenya' };
+
+/** "local time, UTC+2" or "site local time: UTC+2 Finland, UTC+3 Maktau" for the selected sites. */
+export function localTimeText(meta: Meta, params: ViewParams): string {
+  const selected = new Set(params.sites);
+  const byOffset = new Map<number, Site[]>();
+  for (const s of meta.sites) {
+    if (!selected.has(s.siteId)) continue;
+    const list = byOffset.get(s.utcOffsetMin) ?? [];
+    list.push(s);
+    byOffset.set(s.utcOffsetMin, list);
+  }
+  const offsets = [...byOffset.keys()].sort((a, b) => a - b);
+  if (offsets.length === 0) return 'local time';
+  if (offsets.length === 1) return `local time, ${utcText(offsets[0] as number)}`;
+  const parts = offsets.map((o) => {
+    const sites = byOffset.get(o) as Site[];
+    const country = sites[0]?.country ?? '';
+    const where =
+      sites.length > 1 && sites.every((s) => s.country === country)
+        ? (COUNTRY_NAMES[country] ?? country)
+        : sites.map((s) => s.name).join(', ');
+    return `${utcText(o)} ${where}`;
+  });
+  return `site local time: ${parts.join(', ')}`;
+}
+
+/** "UTC+2", "UTC+5:30" or "UTC" for an offset in minutes. */
+export function utcText(min: number): string {
+  if (min === 0) return 'UTC';
+  const h = Math.floor(Math.abs(min) / 60);
+  const m = Math.abs(min) % 60;
+  return `UTC${min < 0 ? '−' : '+'}${h}${m ? `:${String(m).padStart(2, '0')}` : ''}`;
+}
+
+/**
+ * Sign convention for the subtitle, when one or more flux variables are shown, else undefined.
+ * Add it with `joinSubtitle()`.
+ */
+export function signNote(vars: readonly Variable[]): string | undefined {
+  const parts: string[] = [];
+  if (vars.some((v) => v === 'nee' || v === 'nee_f')) parts.push('NEE < 0 = net CO₂ uptake by the ecosystem');
+  if (vars.some((v) => v === 'gpp' || v === 'gpp_src' || v === 'reco' || v === 'reco_src')) parts.push('GPP and Reco ≥ 0');
+  if (vars.includes('ch4')) parts.push('F CH₄ > 0 = emission to the atmosphere');
+  return parts.length ? `Sign convention: ${parts.join('; ')}.` : undefined;
+}
+
+/** True when the panel of `v` gets a zero line: flux variables and temperatures (°C). */
+export function hasZeroLine(meta: Meta, v: Variable): boolean {
+  return FLUX_VARS.has(v) || unitOf(meta, v) === '°C';
+}
+
+/**
+ * Series that draws a thin solid line at y = 0 in one panel. It has no data, so it does not
+ * change the axis range, the tooltip or `data-series`. Put it after all data series, so that
+ * the series index of the data series does not change. Returns null when the panel has no zero
+ * line (`hasZeroLine()`) or when 0 is not in `[lo, hi]` of the data (the line would be outside the grid).
+ * It is always a line series, also in bar charts: an empty bar series takes one bar position
+ * in each category group and moves the bars.
+ */
+export function zeroLineSeries(
+  meta: Meta,
+  tokens: Tokens,
+  v: Variable,
+  axisIndex: number,
+  [lo, hi]: [number, number],
+) {
+  if (!hasZeroLine(meta, v) || !(lo <= 0 && hi >= 0)) return null;
+  return {
+    type: 'line',
+    id: `zero-${axisIndex}`,
+    name: '',
+    xAxisIndex: axisIndex,
+    yAxisIndex: axisIndex,
+    data: [],
+    silent: true,
+    tooltip: { show: false },
+    markLine: {
+      silent: true,
+      animation: false,
+      symbol: ['none', 'none'],
+      label: { show: false },
+      lineStyle: { color: tokens.axis, type: 'solid', width: 1, opacity: 0.8 },
+      emphasis: { disabled: true },
+      data: [{ yAxis: 0 }],
+    },
+  };
+}
+
+/** Statistic of a step for panel titles: "30-min values", "daily mean", "weekly mean" or "monthly mean". */
+export const STAT_TEXT: Record<Aggregation, string> = {
+  raw: '30-min values',
+  day: 'daily mean',
+  week: 'weekly mean',
+  month: 'monthly mean',
+};
+
+/** Panel title: full label and the statistic, without the unit (the unit is in the y axis name). */
+export function panelTitle(v: Variable, stat: string): string {
+  return `${VARIABLE_LABELS[v]} — ${stat}`;
+}
+
+/** Tooltip value with the display unit, for example "2.31 µmol CO₂ m⁻² s⁻¹" (HTML). */
+export function valueWithUnit(value: number, unit: string): string {
+  return `<b>${formatValue(value)}</b>${unit ? `&nbsp;${esc(unit)}` : ''}`;
 }
 
 export function formatValue(v: number): string {
@@ -133,13 +419,18 @@ export function tooltipBase(tokens: Tokens, trigger: 'axis' | 'item') {
   };
 }
 
+/**
+ * Value axis with an axis line and outside ticks. Give the axis name in `extra`,
+ * for example `yAxisName(tokens, axisName(meta, v, panelH), labelWidth)`.
+ */
 export function valueAxis(tokens: Tokens, gridIndex: number, extra: Record<string, unknown> = {}) {
   return {
     type: 'value',
     gridIndex,
     scale: true,
     splitNumber: 3,
-    axisLine: { show: false },
+    axisLine: { show: true, lineStyle: { color: tokens.axis } },
+    axisTick: { show: true, inside: false, lineStyle: { color: tokens.axis } },
     axisLabel: { color: tokens.textMuted, hideOverlap: true },
     splitLine: { lineStyle: { color: tokens.grid, width: 1 } },
     ...extra,
@@ -270,13 +561,17 @@ export function extent(groups: Group[], v: Variable): [number, number] {
   return lo <= hi ? [lo, hi] : [0, 1];
 }
 
+/** Nice step near `raw`: 1, 2 or 5 times a power of 10, not smaller than `raw`. */
+export function niceStep(raw: number): number {
+  const pow = 10 ** Math.floor(Math.log10(raw));
+  const f = raw / pow;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * pow;
+}
+
 /** Axis range rounded outwards to a nice step (1, 2 or 5 times a power of 10), about 4 steps. */
 export function niceRange([lo, hi]: [number, number]): { min: number; max: number; interval: number } {
   const span = hi - lo || Math.abs(hi) || 1;
-  const raw = span / 4;
-  const pow = 10 ** Math.floor(Math.log10(raw));
-  const f = raw / pow;
-  const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * pow;
+  const step = niceStep(span / 4);
   // Round to remove float noise such as 0.30000000000000004.
   const round = (v: number) => Number(v.toPrecision(12));
   return { min: round(Math.floor(lo / step) * step), max: round(Math.ceil(hi / step) * step), interval: round(step) };
@@ -304,14 +599,17 @@ export function yearsText(params: ViewParams): string {
 /** Layout in px for diagrams with stacked panels (one panel per variable). */
 export const STACK = { top: 24, bottom: 36, gap: 34, left: 56, right: 16 };
 
-/** Grid and title positions for `n` stacked panels in a chart of the given height. */
-export function stackLayout(n: number, height: number, layout = STACK) {
+/**
+ * Grid and title positions for `n` stacked panels in a chart of the given height.
+ * `left` overrides `layout.left`, for example the value from `gridLeftFor()`.
+ */
+export function stackLayout(n: number, height: number, layout = STACK, left = layout.left) {
   const k = Math.max(n, 1);
   const panelH = Math.max(40, (height - layout.top - layout.bottom - layout.gap * k) / k);
   const tops = Array.from({ length: n }, (_, i) => layout.top + layout.gap * (i + 1) + panelH * i);
   return {
-    grid: tops.map((top) => ({ top, height: panelH, left: layout.left, right: layout.right })),
-    title: tops.map((top) => ({ top: top - 24, left: layout.left - 8 })),
+    grid: tops.map((top) => ({ top, height: panelH, left, right: layout.right, ...FIXED_GRID })),
+    title: tops.map((top) => ({ top: top - 24, left: left - 8 })),
   };
 }
 

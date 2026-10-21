@@ -7,6 +7,7 @@ import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import type { Meta } from '../db';
 import type { Variable, ViewParams } from '../state';
+import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
@@ -24,11 +25,25 @@ import {
   eventsInRange,
   eventsKeyText,
   eventTooltipLines,
+  axisName,
+  dayOfYearAxisName,
+  displayUnit,
+  gridLeftFor,
   joinSubtitle,
+  nameLines,
+  panelTitle,
+  signNote,
+  STAT_TEXT,
+  tickLabelWidth,
+  valueWithUnit,
+  X_NAME_SPACE,
+  xAxisName,
+  yAxisName,
+  zeroLineSeries,
+  extent,
   refYearMarks,
   setLabelRows,
   type EventMark,
-  formatValue,
   hasValues,
   readGroups,
   refDateSql,
@@ -38,12 +53,8 @@ import {
   stackHeight,
   stackLayout,
   STACK,
-  titleStyle,
-  titleText,
   tooltipBase,
-  unitOf,
   valueAxis,
-  varLabel,
   yearOpacity,
   yearStep,
   type Group,
@@ -94,7 +105,7 @@ export function prepareYears(table: Table | null, params: ViewParams, meta: Meta
   if (table.numRows === 0) data.note = 'No data for these sites and years.';
   if (params.aggregation === 'raw') data.subtitle = 'Raw data is shown as daily means.';
   if (step === 'week') data.subtitle = WEEK_SPLIT_TEXT;
-  if (params.events) data.subtitle = joinSubtitle(data.subtitle, eventsKeyText(meta, params));
+  data.subtitle = joinSubtitle(data.subtitle, signNote(params.variables), params.events ? eventsKeyText(meta, params) : undefined);
   return data;
 }
 
@@ -115,6 +126,7 @@ export interface SeriesInfo {
   siteId: number;
   site: string;
   year: number;
+  /** Display unit of the value, for example `µmol CO₂ m⁻² s⁻¹`. */
   unit: string;
 }
 
@@ -181,7 +193,7 @@ export function siteYearTooltip(ctx: BuildContext, step: YearStep, info: SeriesI
         .filter((r) => Number.isFinite(r.y))
         .map(({ p, y }) => {
           const s = info[p.seriesIndex];
-          return `${p.marker}${esc(s?.site ?? '')} ${s?.year ?? ''}&nbsp;&nbsp;<b>${formatValue(y)}</b> ${esc(s?.unit ?? '')}`;
+          return `${p.marker}${esc(s?.site ?? '')} ${s?.year ?? ''}&nbsp;&nbsp;${valueWithUnit(y, s?.unit ?? '')}`;
         });
       // Events of the site-years in this tooltip.
       const shown = new Set(list.map((p) => info[p.seriesIndex]).map((s) => (s ? `${s.siteId}|${s.year}` : '')));
@@ -198,22 +210,55 @@ export function siteYearTooltip(ctx: BuildContext, step: YearStep, info: SeriesI
   };
 }
 
+/**
+ * Layout in px for stacked day-of-year panels. The bottom space holds the month labels
+ * and the x axis name. `left` is the smallest left margin; `stackYLayout()` makes it larger for the y axis names.
+ */
+export const YEAR_STACK = { ...STACK, bottom: X_NAME_SPACE + 6 };
+
+/**
+ * Y axis names, tick label widths, the shared left margin and the panel layout for stacked panels.
+ * `nameOf(i, panelH)` gives the y axis name of panel `i`. All panels use the same left margin,
+ * so that the x axes line up.
+ */
+export function stackYLayout(height: number, extents: Array<[number, number]>, nameOf: (i: number, panelH: number) => string) {
+  const n = extents.length;
+  const panelH = stackLayout(n, height, YEAR_STACK).grid[0]?.height ?? 40;
+  const names = extents.map((_, i) => nameOf(i, panelH));
+  const widths = extents.map((e) => tickLabelWidth(e));
+  const left = Math.max(YEAR_STACK.left, ...names.map((nm, i) => gridLeftFor(widths[i] as number, nameLines(nm))));
+  return { layout: stackLayout(n, height, YEAR_STACK, left), names, widths, left };
+}
+
+/** Y layout of the years overlay: one panel per variable, name `axisName()`. */
+function yLayout(data: YearsData, ctx: BuildContext) {
+  const extents = data.variables.map((v) => extent(data.groups, v));
+  return { extents, ...stackYLayout(ctx.height, extents, (i, panelH) => axisName(ctx.meta, data.variables[i] as Variable, panelH)) };
+}
+
+/** Day-of-year x axes of stacked panels. Labels and the axis name on the bottom panel only. */
+export function stackDayAxes(tokens: Tokens, n: number, name: string) {
+  return Array.from({ length: n }, (_, i) => ({
+    ...dayOfYearAxis(tokens, i, i === n - 1),
+    ...(i === n - 1 ? xAxisName(tokens, name) : {}),
+  }));
+}
+
 function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const vars = data.variables;
-  const layout = stackLayout(vars.length, ctx.height);
+  const y = yLayout(data, ctx);
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta);
   const ranks = yearRanks(data.groups);
-  const last = vars.length - 1;
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
-  const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - STACK.left - STACK.right));
+  const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - y.left - STACK.right));
   vars.forEach((v, panel) => {
     data.groups.forEach((g, gi) => {
       if (!hasValues(g, v)) return;
       const [rank, count] = ranks.get(g) ?? [0, 1];
-      info.push({ siteId: g.siteId, site: names.get(g.siteId) ?? String(g.siteId), year: g.year, unit: unitOf(meta, v) });
+      info.push({ siteId: g.siteId, site: names.get(g.siteId) ?? String(g.siteId), year: g.year, unit: displayUnit(meta, v) });
       series.push({
         type: 'line',
         name: names.get(g.siteId) ?? String(g.siteId),
@@ -231,17 +276,20 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
       });
     });
   });
+  // The zero lines come after all data series, so that the tooltip index `info` stays correct.
+  series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, tokens, new Set(data.groups.map((g) => g.siteId)), STACK.left, STACK.right),
+    legend: siteLegend(meta, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
+    // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
-      ...layout.title[i],
-      text: titleText(varLabel(v), unitOf(meta, v)),
-      textStyle: titleStyle(tokens),
+      ...y.layout.title[i],
+      text: panelTitle(v, STAT_TEXT[data.step]),
+      textStyle: { fontSize: 13, fontWeight: 600, color: tokens.text },
     })),
-    grid: layout.grid,
-    xAxis: vars.map((_, i) => dayOfYearAxis(tokens, i, i === last)),
-    yAxis: vars.map((_, i) => valueAxis(tokens, i)),
+    grid: y.layout.grid,
+    xAxis: stackDayAxes(tokens, vars.length, dayOfYearAxisName(meta, ctx.params)),
+    yAxis: vars.map((_, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number))),
     tooltip: siteYearTooltip(ctx, data.step, info, marks.all),
     dataset: data.groups.map((g) => ({
       dimensions: [{ name: 'x', type: 'time' }, ...vars.map((v) => ({ name: v, type: 'float' }))],
@@ -258,8 +306,8 @@ export const years: DiagramDef<YearsData> = {
   prepare: prepareYears,
   build,
   showsEvents: true,
-  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height),
-  height: (params) => stackHeight(params.variables.length, 190),
+  relayout: (data, ctx) => yLayout(data, ctx).layout,
+  height: (params) => stackHeight(params.variables.length, 190, YEAR_STACK),
   describe: (data) =>
     `One panel per variable. The x axis is the day of the year, ${YEAR_STEP_TEXT[data.step]}. ` +
     `Each line is one site and year: ${data.years.length} years (${data.years[0] ?? ''} to ${data.years[data.years.length - 1] ?? ''}). ` +

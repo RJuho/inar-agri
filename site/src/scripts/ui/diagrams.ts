@@ -12,10 +12,11 @@ import {
   TooltipComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
+import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { query, type Meta } from '../db';
 import { diagramDef, type BuildContext, type DiagramDef, type Prepared } from '../diagrams/registry';
-import { composeAlt, parseStats, statsQuery, type SiteStats } from '../alttext';
+import { axesText, composeAlt, parseStats, statsQuery, type SiteStats } from '../alttext';
 import { onSchemeChange, prefersDark, readTokens } from '../theme';
 import type { Diagram, View, ViewParams } from '../state';
 import type { ExportItem } from '../export';
@@ -312,6 +313,13 @@ class DiagramCard {
       } else {
         this.chartEl.hidden = false;
         const altCtx = { params, meta: this.meta, stats };
+        this.lastWidth = this.chartEl.clientWidth;
+        this.chartEl.style.height = `${this.def.height(params, data, this.lastWidth)}px`;
+        this.lastHeight = this.chartEl.clientHeight;
+        const chart = this.ensureChart();
+        chart.resize();
+        const option = this.draw();
+        // Set the alt text after the draw: the axis names come from the option of the chart.
         this.setAlt(composeAlt(
             this.def.label,
             this.def.describe(data, altCtx),
@@ -320,13 +328,8 @@ class DiagramCard {
             stats,
             statsVars,
             this.def.showsEvents === true,
+            axesText(option),
           ),);
-        this.lastWidth = this.chartEl.clientWidth;
-        this.chartEl.style.height = `${this.def.height(params, data, this.lastWidth)}px`;
-        this.lastHeight = this.chartEl.clientHeight;
-        const chart = this.ensureChart();
-        chart.resize();
-        this.draw();
       }
       this.setStatus('ready');
     } catch (err) {
@@ -345,10 +348,15 @@ class DiagramCard {
     this.noteEl.textContent = text ?? '';
   }
 
-  /** Draw the option again with the current data, for example after a colour scheme change. */
-  draw(): void {
-    if (!this.chart || !this.data || !this.params || this.data.note) return;
-    this.chart.setOption(this.def.build(this.data, this.context(this.params)), { notMerge: true });
+  /**
+   * Draw the option again with the current data, for example after a colour scheme change.
+   * Returns the option, or null when there is nothing to draw.
+   */
+  draw(): EChartsCoreOption | null {
+    if (!this.chart || !this.data || !this.params || this.data.note) return null;
+    const option = this.def.build(this.data, this.context(this.params));
+    this.chart.setOption(option, { notMerge: true });
+    return option;
   }
 
   setDark(dark: boolean): void {
