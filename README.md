@@ -50,6 +50,7 @@ The folders `data/` and `db/*.parquet` are not in git. The repository holds all 
 
 - [`docs/data-dictionary.md`](docs/data-dictionary.md): every file, every column, the unit and one example value.
 - [`docs/harmonised-database.md`](docs/harmonised-database.md): the design of the harmonised database and the rules of the build.
+- [`docs/data-overlap.md`](docs/data-overlap.md): the variables that the sites share, and the plant growth data (Maktau NDVI and LAI, harvest records of Qvidja and Haltiala).
 - [`scripts/lib/registry.ts`](scripts/lib/registry.ts): the registry of sites, files and column mappings.
 - [`db/report.md`](db/report.md) (also [`db/report.json`](db/report.json)): the data report of the last build. It gives the row counts, the gaps, the conflicts and the warnings per site and file.
 
