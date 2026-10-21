@@ -139,6 +139,8 @@ necb = -nee_f_gc - c_harvest + c_exo - c_ch4
 
 `c_ch4` is the annual sum of the gap-filled CH4 flux in g C m-2 (Anttila, Särkisuo). `necb_complete` is true only when the year is a full calendar year with a complete NEE_f, and no harvest, input or grazing row is unknown or assumed.
 
+The Calculated page of the website shows `annual.csv` and `necb.csv` as a figure (`site/src/lib/budgetFigure.ts`, SVG made at build time): per site and full year, bars of Reco and C_harvest (positive, carbon leaves the field) and of GPP and C_exo (drawn negative, carbon enters the field), a circle at NEE and a diamond at −NECB (hollow when `necb_complete` is false), with lighter bars for years that are not reliable.
+
 ### Worked example: Qvidja, 2019
 
 Harvests: 2019-06-10, 7 652 kg/ha × 0.406 = 3 107 kg DM/ha; 2019-08-21, 2 707 kg/ha × 0.38 = 1 029 kg DM/ha. `c_harvest = (3 107 + 1 029) × 0.42 / 10 = 173.7 g C m-2`. Organic input: 2019-05-08, molasses fertiliser, 43 g C m-2 (paper value). Annual NEE_f 2019 = −246.7 g C m-2 (uptake). `NECB = 246.7 − 173.7 + 43.0 = +116.0 g C m-2`: the field gained carbon. `necb_complete = true`.
