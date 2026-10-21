@@ -129,7 +129,7 @@ Haltiala uncertainty (rule in `CLAUDE.md`): the script sums each of `NEE_F1` to 
 - Grazing events have no carbon value; the NECB note says "Grazing not quantified".
 - Anttila, Särkisuo and Maktau have no harvest data. For Anttila and Särkisuo the table gives `NECB = −NEE − C_CH4` and `necb_complete = false`. For Maktau it gives no NECB.
 
-Known problems of the sources, kept in the row notes: the Qvidja cut of 2018-06-12 is 615 kg/ha × 0.30 in the xlsx but 1 985 kg DW/ha in Heimsch et al. 2021 (the paper value is used); two Qvidja cuts have a DM fraction of 0.70 and 0.79, which can mean that the amount is already dry; the Haltiala 2025 yield can be a fresh grain weight; the Viikki yields have no unit.
+Known problems of the sources, kept in the row notes: the Qvidja cut of 2018-06-12 is 615 kg/ha × 0.30 in the xlsx but 1 985 kg DW/ha in Heimsch et al. 2021 (the paper value is used); two Qvidja cuts have a DM fraction of 0.70 and 0.79, which can mean that the amount is already dry; the Haltiala 2025 yield can be a fresh grain weight. The Viikki docx gives the yields in kg DW/ha (2022 3 673, 2023 6 773, 2024 2 336, 2025 1 973.7).
 
 NECB per site and local year (`necb.csv`):
 
@@ -182,7 +182,7 @@ Qvidja is 15 to 31 % below the provider's GPP and Reco. The provider used a dayt
 - Anttila, Särkisuo, Haltiala and Viikki have no u* in the files. The providers filtered the measured NEE; the script trusts their quality flag.
 - Särkisuo 2023: air temperature gap of 84 days (May to August). `--temp tsoil` is an option, but the soil temperature has the same gap.
 - NECB is a lower bound in years with an organic input of unknown carbon content (Qvidja 2020 to 2023, Haltiala 2023, Viikki 2023 and 2024). A compost application of 34 500 kg/ha × 0.48 DM can hold about 500 g C m-2, more than the annual NEE.
-- The Viikki yields have no unit; the Haltiala 2025 yield may be fresh weight; two Qvidja DM fractions are suspect. These rows are marked `assumed` or noted.
+- The Viikki C fraction (0.42) is assumed; the Haltiala 2025 yield may be fresh weight; two Qvidja DM fractions are suspect. These rows are marked `assumed` or noted.
 - The provider's E0 of Anttila 2022 (36.7 K) is close to the lower limit of the method. Our 111 K is the mean of windows with a wide range (74 to 364 K). The annual sums are robust to this; the seasonal course of Reco is less certain.
 
 ## 11. How to run and test

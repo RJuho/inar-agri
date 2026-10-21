@@ -45,9 +45,11 @@ No Finnish site has NDVI, LAI, canopy height or a biomass time series.
 
 - **Qvidja** (`Qvidja_management.xlsx`): harvest amount in kg/ha with a DM fraction per cut, 2018 to 2024 (no rows for 2025). Sums of amounts above zero per year: 2018 2 054, 2019 10 359, 2020 6 885, 2021 3 526, 2022 2 639, 2023 1 841, 2024 3 937 kg/ha. Rows with amount 0 are cleaning cuts (`puhdistusniitto`). The file also has grazing (animal, days) and fertilisation. Make sure that `Amount` is fresh mass before you multiply it by the DM fraction.
 - **Haltiala** (`haltiala_smear_management.xlsx`): 37 rows, 2021 to 2025. Harvest values: 2021 7 187 kg DW/ha (3 595 kg C/ha, barley, manual plots), 2022 6 903 kg DW/ha grain (3 452 kg C/ha, oats, straw left), 2025 3 608 kg DW/ha (oats, no C value). 2023: manure 2 × 10 m3/ha, grass failed, no harvest. 2024: sunflower crushed, no harvest. The parcel card PDF (`haltiala_smear_Lohkokortit_2025.pdf`) repeats the 2025 yield (117 260 kg on 32.5 ha). The carbon values are in `scripts/lib/calc/management.ts`.
-- **Viikki**: `EC/Management Information.docx`, not parsed.
+- **Viikki** (`EC/Management Information.docx`): one table row per year, 2022 to 2025: crop, N source and N input (kg N/ha), application dates, harvest dates, tillage dates, yield (kg DW/ha): 2022 3 673 (timothy), 2023 6 773 (barley, clover and grasses), 2024 2 336 (silage), 2025 1 973.7 (faba beans).
 - **Maktau**: text only (stover burning, weeding, ploughing).
 - **Anttila, Särkisuo**: no management file.
+
+The dated events of the Haltiala, Qvidja and Viikki files (and of the 2025 parcel card and Heimsch et al. 2021 for Qvidja 2018 to 2019) are in `db/events.parquet`, from `scripts/lib/events.ts`. See `docs/harmonised-database.md`.
 
 ### Indirect growth indicators
 

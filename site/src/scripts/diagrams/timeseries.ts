@@ -4,11 +4,22 @@ import * as echarts from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
-import { toFloat64 } from '../db';
+import { toFloat64, type Meta } from '../db';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
+import {
+  eventMarkers,
+  eventsInRange,
+  eventsKeyText,
+  eventTooltipLines,
+  setLabelRows,
+  siteColors,
+  siteNames,
+  timeMarks,
+  type EventMark,
+} from './common';
 
 echarts.use([LineChart]);
 
@@ -18,8 +29,12 @@ const DAY = 24 * 60 * MINUTE;
 /** Longest normal step between two rows. A longer step is a gap. */
 const MAX_STEP: Record<Aggregation, number> = { raw: 30 * MINUTE, day: DAY, week: 7 * DAY, month: 31 * DAY };
 
-/** Layout in px. */
+/** Layout in px. The bottom space holds the axis labels and the zoom slider. */
 const LAYOUT = { top: 24, bottom: 64, gap: 34, left: 56, right: 16 };
+/** Zoom slider position in px from the bottom. */
+const SLIDER = { bottom: 8, height: 22 };
+/** Band at the bottom with the slider. The PNG export removes it (with the slider). */
+const SLIDER_BAND = SLIDER.bottom + SLIDER.height + 2;
 
 /**
  * Downsampler for the line series. It keeps, per pixel frame, the value that is
@@ -156,7 +171,7 @@ function sqlFor(params: ViewParams): string | null {
     FROM obs WHERE ${where} GROUP BY ALL ORDER BY site_id, t`;
 }
 
-function prepare(table: Table | null, params: ViewParams): TimeseriesData {
+function prepare(table: Table | null, params: ViewParams, meta: Meta): TimeseriesData {
   const base = { variables: params.variables, aggregation: params.aggregation, sites: [] as SiteSeries[] };
   if (table === null) {
     const note = params.sites.length === 0 ? 'Select one or more sites.' : 'Select one or more variables.';
@@ -172,6 +187,7 @@ function prepare(table: Table | null, params: ViewParams): TimeseriesData {
   );
   const data: TimeseriesData = { ...base, sites, rowCount: n, seriesCount: sites.length * params.variables.length };
   if (n === 0) data.note = 'No data for these sites and years.';
+  if (params.events) data.subtitle = eventsKeyText(meta, params);
   return data;
 }
 
@@ -201,6 +217,15 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
   const axisIdx = vars.map((_, i) => i);
   const last = vars.length - 1;
   const nSites = data.sites.length;
+
+  // Event markers: one set per site, on the series of that site in each panel.
+  // Labels only in the first panel.
+  const events = ctx.params.events ? eventsInRange(meta, ctx.params) : [];
+  const marks = new Map<number, EventMark[]>();
+  for (const s of data.sites) marks.set(s.siteId, timeMarks(events.filter((e) => e.siteId === s.siteId)));
+  const allMarks = [...marks.entries()].flatMap(([siteId, list]) => list.map((mark) => ({ siteId, mark })));
+  if (tMax > tMin) setLabelRows(allMarks.map((m) => m.mark), (ctx.width - LAYOUT.left - LAYOUT.right) / (tMax - tMin));
+  const markColors = siteColors(meta, tokens);
 
   return {
     animation: false,
@@ -256,7 +281,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
       splitLine: { lineStyle: { color: tokens.grid, width: 1 } },
     })),
     axisPointer: { link: [{ xAxisIndex: 'all' }], lineStyle: { color: tokens.axis } },
-    tooltip: tooltip(data, tokens, nSites, unit),
+    tooltip: tooltip(data, tokens, nSites, unit, (from, to) => eventTooltipLines(allMarks, from, to, siteNames(meta), markColors)),
     dataZoom: [
       { type: 'inside', xAxisIndex: axisIdx, start: zoom.start, end: zoom.end, filterMode: 'filter' },
       {
@@ -264,8 +289,8 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
         xAxisIndex: axisIdx,
         start: zoom.start,
         end: zoom.end,
-        bottom: 8,
-        height: 22,
+        bottom: SLIDER.bottom,
+        height: SLIDER.height,
         left: LAYOUT.left,
         right: LAYOUT.right,
         showDataShadow: false,
@@ -295,12 +320,30 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
         sampling: extremeSampler,
         lineStyle: { width: 1 },
         emphasis: { disabled: true },
+        ...eventMarkers(marks.get(s.siteId) ?? [], markColors.get(s.siteId) ?? tokens.text, tokens, panel === 0),
       })),
     ),
   };
 }
 
-function tooltip(data: TimeseriesData, tokens: Tokens, nSites: number, unit: (v: Variable) => string) {
+/** Start and end (exclusive) of the period of a point on the time axis. Raw data: the local day. */
+function periodOf(ms: number, aggregation: Aggregation): [number, number] {
+  if (aggregation === 'week') return [ms, ms + 7 * DAY];
+  if (aggregation === 'month') {
+    const d = new Date(ms);
+    return [ms, Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1)];
+  }
+  const day = Math.floor(ms / DAY) * DAY;
+  return [day, day + DAY];
+}
+
+function tooltip(
+  data: TimeseriesData,
+  tokens: Tokens,
+  nSites: number,
+  unit: (v: Variable) => string,
+  eventLines: (from: number, to: number) => string,
+) {
   return {
     trigger: 'axis',
     confine: true,
@@ -334,17 +377,20 @@ function tooltip(data: TimeseriesData, tokens: Tokens, nSites: number, unit: (v:
         const head = `<span style="color:${tokens.textMuted}">${panelTitle(v, data.aggregation)}, ${echarts.format.encodeHTML(unit(v))}</span>`;
         blocks.push(`${head}<br/>${rows.join('<br/>')}`);
       });
-      return `<b>${timeLabel(first.axisValue, data.aggregation)}</b><br/>${blocks.join('<br/>') || 'No data'}`;
+      const [from, to] = periodOf(first.axisValue, data.aggregation);
+      return `<b>${timeLabel(first.axisValue, data.aggregation)}</b><br/>${blocks.join('<br/>') || 'No data'}${eventLines(from, to)}`;
     },
   };
 }
 
 export const timeseries: DiagramDef<TimeseriesData> = {
+  exportCropBottom: SLIDER_BAND,
   type: 'timeseries',
   label: 'Time series',
   query: sqlFor,
-  prepare: (table, params) => prepare(table, params),
+  prepare,
   build,
+  showsEvents: true,
   relayout: (data, ctx) => panelLayout(data.variables.length, ctx.height),
   describe: (data) =>
     `One panel per variable, one line per site, ${AGGREGATION_LABELS[data.aggregation].toLowerCase()}, time axis in site local time.`,

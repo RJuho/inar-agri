@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-10-21T07:20:44.738Z",
+  "builtAt": "2026-10-21T08:26:10.955Z",
   "duckdb": "v1.5.6",
   "node": "v26.10.0",
   "outputs": [
@@ -22,6 +22,88 @@
       "file": "db/site_variables.parquet",
       "rows": 118,
       "bytes": 5767
+    },
+    {
+      "file": "db/events.parquet",
+      "rows": 83,
+      "bytes": 3978
+    }
+  ],
+  "events": [
+    {
+      "site": "haltiala",
+      "type": "fertilisation",
+      "n": 6
+    },
+    {
+      "site": "haltiala",
+      "type": "harvest",
+      "n": 4
+    },
+    {
+      "site": "haltiala",
+      "type": "other",
+      "n": 1
+    },
+    {
+      "site": "haltiala",
+      "type": "sowing",
+      "n": 6
+    },
+    {
+      "site": "haltiala",
+      "type": "spraying",
+      "n": 4
+    },
+    {
+      "site": "haltiala",
+      "type": "tillage",
+      "n": 11
+    },
+    {
+      "site": "qvidja",
+      "type": "cut",
+      "n": 6
+    },
+    {
+      "site": "qvidja",
+      "type": "fertilisation",
+      "n": 9
+    },
+    {
+      "site": "qvidja",
+      "type": "grazing",
+      "n": 5
+    },
+    {
+      "site": "qvidja",
+      "type": "harvest",
+      "n": 11
+    },
+    {
+      "site": "qvidja",
+      "type": "sowing",
+      "n": 1
+    },
+    {
+      "site": "qvidja",
+      "type": "tillage",
+      "n": 1
+    },
+    {
+      "site": "viikki",
+      "type": "fertilisation",
+      "n": 7
+    },
+    {
+      "site": "viikki",
+      "type": "harvest",
+      "n": 6
+    },
+    {
+      "site": "viikki",
+      "type": "tillage",
+      "n": 5
     }
   ],
   "sites": [

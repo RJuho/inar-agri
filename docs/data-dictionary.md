@@ -298,8 +298,8 @@ EC tower: 60.271671 N, 24.944509 E (WGS84, from `geodata/haltiala_ec_tower_coord
 
 Other Haltiala files:
 
-- `haltiala_smear_management.xlsx`, sheet `Sheet1`. Columns: Year, Date (Excel serial), Action, Value, Units, Description. Example: 2021, 44323, EC system installed. Actions: Spraying, Seeding, Fertilisation, Harvest, Tillage, Sowing, Maintenance.
-- `haltiala_smear_Lohkokortit_2025.pdf`: field parcel cards. Not parsed.
+- `haltiala_smear_management.xlsx`, sheet `Sheet1`. Columns: Year, Date (Excel serial), Action, Value, Units, Description. Example: 2021, 44323, EC system installed. Actions: Spraying, Seeding, Fertilisation, Harvest, Tillage, Sowing, Maintenance. The rows are typed by hand into `scripts/lib/events.ts` (`db/events.parquet`).
+- `haltiala_smear_Lohkokortit_2025.pdf`: field parcel cards of 2025 (in Finnish). Not read by a script. The dates are typed by hand into `scripts/lib/events.ts`. The card gives 2025-06-16 for Jett Mn235 (the xlsx gives 2025-05-16).
 - `geodata/haltiala.shp` (+ `.shx`, `.dbf`, `.prj`, `.cpg`, `.qmd`) and `geodata/haltiala.gpkg`: field geometry. CRS EUREF-FIN / TM35FIN (EPSG:3067).
 - `geodata/haltiala_ec_tower_coords.txt`: `60.271671, 24.944509`.
 
@@ -342,9 +342,9 @@ Location: N 60°17'43.20", E 22°23'30.60" (about 60.2953 N, 22.3918 E), 7 m a.s
 
 Other Qvidja files:
 
-- `Qvidja_management.xlsx`, sheet `Taul1`. Columns: Date (Excel serial), Area of kasvulohko (ha), Management action, Name (Species/product), Amount, Unit, DM fraction, Harvest type, Duration (days), Straws removed (yes/no), Comment. Example: 45822, 4.42, grazing, horse, 4, (empty), (empty), (empty), 5. Actions: grazing, harvest, cultivation, fertilisation.
+- `Qvidja_management.xlsx`, sheet `Taul1`. Columns: Date (Excel serial), Area of kasvulohko (ha), Management action, Name (Species/product), Amount, Unit, DM fraction, Harvest type, Duration (days), Straws removed (yes/no), Comment. Example: 45822, 4.42, grazing, horse, 4, (empty), (empty), (empty), 5. Actions: grazing, harvest, cultivation, fertilisation. The rows are typed by hand into `scripts/lib/events.ts` (`db/events.parquet`).
 - `Qvidja-readme.xlsx`: variable descriptions and site metadata (used above).
-- `Qvidja.pdf`, `Qvidja_C-balance.pdf`: reports. Not parsed.
+- `Qvidja.pdf`, `Qvidja_C-balance.pdf`: reports. Not read by a script. Table 1 of `Qvidja_C-balance.pdf` (Heimsch et al. 2021) gives the 2018 and 2019 events; they are typed by hand into `scripts/lib/events.ts`.
 
 ## 👩🏻‍🔬🎓 Viikki
 
@@ -440,7 +440,7 @@ In 2022 the columns are in the order `rainfall`, `snowfall`; in 2023 `snowfall`,
 
 Units of `Pair`, `Snow Depth`, `rainfall`, `snowfall` and the bulk densities are not in the files; the values given here follow the usual units of the station. The gap-filled NEE of 2025 equals the former `NEE_F_XGB` column divided by 22,7224.
 
-- `EC/Management Information.docx`: management notes. Not parsed.
+- `EC/Management Information.docx`: one table, one row per year 2022 to 2025. Columns: Year, Crop, N source, N input (kg N ha-1), Application date, Harvest dates, Tillage date, Yield (kg DW/ha). Dates are day and month, for example `27 Apr; 25 May`. Example: 2022, Timothy, CAN (mineral fertilizer), 108.0, 10 May, 1 Jul; 27 Aug, 2 Nov, 3673. Not read by a script. The rows are typed by hand into `scripts/lib/events.ts` (events) and `scripts/lib/calc/management.ts` (yields).
 
 ### Soil pit files `data/Viikki/pit1_cleaned_{2023,2024,2025}.csv`
 

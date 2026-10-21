@@ -1,6 +1,6 @@
 # Build report: harmonised core database
 
-Built 2026-10-21T07:20:44.738Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
+Built 2026-10-21T08:26:10.955Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
 
 ## Output files
 
@@ -10,6 +10,29 @@ Built 2026-10-21T07:20:44.738Z with DuckDB v1.5.6 and Node v26.10.0. Generator: 
 | db/sites.parquet | 6 | 3956 |
 | db/variables.parquet | 17 | 1989 |
 | db/site_variables.parquet | 118 | 5767 |
+| db/events.parquet | 83 | 3978 |
+
+## Management events
+
+Rows of events.parquet per site and type. Source: scripts/lib/events.ts.
+
+| Site | Type | Events |
+|---|---|---|
+| haltiala | fertilisation | 6 |
+| haltiala | harvest | 4 |
+| haltiala | other | 1 |
+| haltiala | sowing | 6 |
+| haltiala | spraying | 4 |
+| haltiala | tillage | 11 |
+| qvidja | cut | 6 |
+| qvidja | fertilisation | 9 |
+| qvidja | grazing | 5 |
+| qvidja | harvest | 11 |
+| qvidja | sowing | 1 |
+| qvidja | tillage | 1 |
+| viikki | fertilisation | 7 |
+| viikki | harvest | 6 |
+| viikki | tillage | 5 |
 
 ## Sites
 

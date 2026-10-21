@@ -14,7 +14,7 @@ import { DuckDBInstance } from '@duckdb/node-api';
 
 const SRC_DIR = 'db';
 const OUT_DIR = 'site/public/data';
-const FILES = ['observations', 'sites', 'variables', 'site_variables'].map((name) => `${name}.parquet`);
+const FILES = ['observations', 'sites', 'variables', 'site_variables', 'events'].map((name) => `${name}.parquet`);
 
 const CALC_DIR = 'data/calculated';
 const CALC_FLUXES = `${CALC_DIR}/fluxes_30min.parquet`;

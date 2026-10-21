@@ -13,6 +13,9 @@ import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
   DAY_STEP,
+  eventMarkers,
+  eventsKeyText,
+  joinSubtitle,
   STACK,
   baseOption,
   dayOfYearAxis,
@@ -31,7 +34,7 @@ import {
   yearOpacity,
   type Group,
 } from './common';
-import { siteYearTooltip, yearRanks } from './years';
+import { refYearPx, siteYearTooltip, yearEventMarks, yearRanks, type SeriesInfo } from './years';
 
 echarts.use([LineChart]);
 
@@ -78,7 +81,7 @@ function query(params: ViewParams): string | null {
     FROM d ORDER BY 1, 2, 3`;
 }
 
-function prepare(table: Table | null, params: ViewParams, _meta: Meta): CumulativeData {
+function prepare(table: Table | null, params: ViewParams, meta: Meta): CumulativeData {
   const vars = sumVars(params);
   const base = { variables: vars, groups: [] as Group[] };
   if (table === null) {
@@ -98,7 +101,8 @@ function prepare(table: Table | null, params: ViewParams, _meta: Meta): Cumulati
   else if (vars.some((v) => NEE_VARS.includes(v))) notes.push('Negative NEE = net uptake.');
   if (vars.includes('nee')) notes.push('Measured NEE has gaps, so its sum is not an annual balance.');
   if (params.variables.length > vars.length) notes.push('Only fluxes are summed: NEE, GPP, Reco, CH4. The other variables are not shown.');
-  const data: CumulativeData = { ...base, groups, rowCount: table.numRows, seriesCount, subtitle: notes.join(' ') };
+  const subtitle = joinSubtitle(notes.join(' '), params.events ? eventsKeyText(meta, params) : undefined);
+  const data: CumulativeData = { ...base, groups, rowCount: table.numRows, seriesCount, subtitle };
   if (table.numRows === 0) data.note = 'No data for these sites and years.';
   else if (seriesCount === 0) data.note = `No ${onlyNee ? 'NEE' : 'flux'} values for these sites and years.`;
   return data;
@@ -112,14 +116,15 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
   const names = siteNames(meta);
   const ranks = yearRanks(data.groups);
   const last = vars.length - 1;
-  const info: Array<{ site: string; year: number; unit: string }> = [];
+  const info: SeriesInfo[] = [];
   const series: unknown[] = [];
+  const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - STACK.left - STACK.right));
   vars.forEach((v, panel) => {
     data.groups.forEach((g, gi) => {
       if (!hasValues(g, v)) return;
       const [rank, count] = ranks.get(g) ?? [0, 1];
       const name = names.get(g.siteId) ?? String(g.siteId);
-      info.push({ site: name, year: g.year, unit: unitOfSum(v) });
+      info.push({ siteId: g.siteId, site: name, year: g.year, unit: unitOfSum(v) });
       series.push({
         type: 'line',
         name,
@@ -133,6 +138,7 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
         connectNulls: false,
         lineStyle: { width: 1.75, opacity: yearOpacity(rank, count) },
         emphasis: { focus: 'series', lineStyle: { width: 2.5, opacity: 1 } },
+        ...eventMarkers(marks.byGroup.get(g) ?? [], colors.get(g.siteId) ?? tokens.text, tokens, panel === 0),
       });
     });
   });
@@ -148,7 +154,7 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
         splitLine: { lineStyle: { color: tokens.grid, width: 1 } },
       }),
     ),
-    tooltip: siteYearTooltip(ctx, 'day', info),
+    tooltip: siteYearTooltip(ctx, 'day', info, marks.all),
     dataset: data.groups.map((g) => ({
       dimensions: [{ name: 'x', type: 'time' }, ...vars.map((v) => ({ name: v, type: 'float' }))],
       source: { x: g.x, ...g.values },
@@ -191,6 +197,7 @@ export const cumulative: DiagramDef<CumulativeData> = {
   query,
   prepare,
   build,
+  showsEvents: true,
   relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height),
   height: (params) => stackHeight(Math.max(1, sumVars(params).length), 260),
   statsVariables: sumVars,

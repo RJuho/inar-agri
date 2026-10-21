@@ -393,6 +393,23 @@ select:disabled {
   color: var(--text-secondary);
 }
 
+/* Events: one checkbox below the variable groups, with a hint. */
+.var-events {
+  width: 100%;
+  min-width: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--grid-line);
+}
+
+.var-events .check {
+  align-items: baseline;
+  white-space: normal;
+}
+
+.var-events .check input {
+  flex: none;
+}
+
 /* ---------- Diagram cards ---------- */
 
 .diagrams {

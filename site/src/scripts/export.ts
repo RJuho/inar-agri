@@ -23,6 +23,8 @@ export interface ExportItem {
   /** Chart size in CSS px. 0 when the card shows no chart. */
   width: number;
   height: number;
+  /** Empty band in CSS px at the bottom of the chart image (place of the zoom slider). The export removes it. */
+  cropBottom: number;
   /** PNG data URL of the chart at `scale` pixels per CSS px, or null when no chart. */
   image(scale: number, background: string): string | null;
 }
@@ -78,6 +80,7 @@ export function paramsLine(view: View, meta: Meta, types: string[]): string {
     `Step: ${AGGREGATION_LABELS[p.aggregation]}`,
   ];
   if (types.includes('scatter')) parts.push(`X variable: ${VARIABLE_LABELS[p.xVariable]}`);
+  if (p.events) parts.push('Events: shown');
   return `${parts.join('. ')}.`;
 }
 
@@ -117,12 +120,30 @@ function withText(dataUrl: string, title: string, alt: string): string {
   return bytesToDataUrl(bytes);
 }
 
+/** Chart height in the export: without the empty band at the bottom. */
+const shownHeight = (item: ExportItem) => Math.max(0, item.height - item.cropBottom);
+
+/** Remove `crop` CSS px at the bottom of a chart image made at `scale`. */
+async function cropImage(url: string, crop: number, scale: number): Promise<string> {
+  if (crop <= 0) return url;
+  const img = await loadImage(url);
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = Math.max(1, img.naturalHeight - Math.round(crop * scale));
+  const g = canvas.getContext('2d');
+  if (!g) throw new Error('The browser cannot make a 2D canvas.');
+  g.drawImage(img, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+
 /** PNG of one diagram. The title chunk has the diagram title and the view name. */
-export function diagramPng(item: ExportItem, viewName: string, scale: number): PngResult {
+export async function diagramPng(item: ExportItem, viewName: string, scale: number): Promise<PngResult> {
   if (!item.ready) throw new Error(`Diagram ${item.id} is not ready.`);
-  const url = item.image(cleanScale(scale), readColors().background);
+  const s = cleanScale(scale);
+  const url = item.image(s, readColors().background);
   if (!url) throw new Error(`Diagram ${item.id} has no chart: ${item.note || 'no data'}`);
-  return { dataUrl: withText(url, `${item.title} – ${viewName}`, item.alt), alt: item.alt };
+  const cropped = await cropImage(url, item.cropBottom, s);
+  return { dataUrl: withText(cropped, `${item.title} – ${viewName}`, item.alt), alt: item.alt };
 }
 
 // ---------- Composite image ----------
@@ -225,7 +246,7 @@ export async function compositePng(view: View, meta: Meta, items: ExportItem[], 
     altParts.push(`${item.title}. ${item.alt || item.note}`);
   }
 
-  const partHeight = (p: Part) => (p.kind === 'text' ? blockHeight(p.block) : p.kind === 'image' ? p.item.height : 1);
+  const partHeight = (p: Part) => (p.kind === 'text' ? blockHeight(p.block) : p.kind === 'image' ? shownHeight(p.item) : 1);
   const height = Math.ceil(PAD + parts.reduce((h, p) => h + partHeight(p) + p.gap, 0) + PAD);
 
   // Make the scale smaller when the canvas would be too large for the browser.
@@ -258,7 +279,9 @@ export async function compositePng(view: View, meta: Meta, items: ExportItem[], 
       g.fillRect(PAD, y, contentW, 1);
     } else if (p.kind === 'image') {
       const img = images.get(p.item);
-      if (img) g.drawImage(img, PAD, y, p.item.width, p.item.height);
+      // Draw the chart without the empty band at the bottom.
+      const h = shownHeight(p.item);
+      if (img) g.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight * (h / p.item.height), PAD, y, p.item.width, h);
     } else {
       const b = p.block;
       g.font = b.font;

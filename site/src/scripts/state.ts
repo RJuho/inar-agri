@@ -71,7 +71,12 @@ export interface ViewParams {
   /** First and last year in site local time. null = no limit. */
   yearFrom: number | null;
   yearTo: number | null;
+  /** First and last month (1 to 12). null = January for the first month, December for the last month. */
+  monthFrom: number | null;
+  monthTo: number | null;
   aggregation: Aggregation;
+  /** Show the management events (harvest, sowing, ...) as markers. */
+  events: boolean;
 }
 
 export interface Diagram {
@@ -115,7 +120,10 @@ export function defaultParams(allSites: number[]): ViewParams {
     xVariable: 'ta',
     yearFrom: null,
     yearTo: null,
+    monthFrom: null,
+    monthTo: null,
     aggregation: 'raw',
+    events: false,
   };
 }
 
@@ -156,6 +164,28 @@ function parseYear(x: unknown): number | null | undefined {
   return undefined;
 }
 
+function parseMonth(x: unknown): number | null | undefined {
+  if (x === null) return null;
+  if (typeof x === 'number' && Number.isInteger(x) && x >= 1 && x <= 12) return x;
+  return undefined;
+}
+
+type Range = Pick<ViewParams, 'yearFrom' | 'yearTo' | 'monthFrom' | 'monthTo'>;
+
+/**
+ * Put the start before the end. The (year, month) pairs change places when the start is
+ * after the end. Only when both years are set: else the order depends on the data years.
+ */
+export function orderRange<R extends Range>(r: R): R {
+  const { yearFrom, yearTo, monthFrom, monthTo } = r;
+  if (yearFrom === null || yearTo === null) return r;
+  const from = yearFrom * 12 + (monthFrom ?? 1);
+  const to = yearTo * 12 + (monthTo ?? 12);
+  if (from <= to) return r;
+  if (yearFrom === yearTo) return { ...r, monthFrom: monthTo, monthTo: monthFrom };
+  return { ...r, yearFrom: yearTo, yearTo: yearFrom, monthFrom: monthTo, monthTo: monthFrom };
+}
+
 function isVariable(x: unknown): x is Variable {
   return typeof x === 'string' && (VARIABLES as readonly string[]).includes(x);
 }
@@ -171,13 +201,29 @@ export function parseParams(x: unknown): ViewParams | null {
   const picked = new Set(x.variables.filter(isVariable));
   const variables = VARIABLES.filter((v) => picked.has(v));
   const xVariable = isVariable(x.xVariable) ? x.xVariable : 'ta';
-  let yearFrom = parseYear(x.yearFrom);
-  let yearTo = parseYear(x.yearTo);
+  const yearFrom = parseYear(x.yearFrom);
+  const yearTo = parseYear(x.yearTo);
   if (yearFrom === undefined || yearTo === undefined) return null;
-  if (yearFrom !== null && yearTo !== null && yearFrom > yearTo) [yearFrom, yearTo] = [yearTo, yearFrom];
+  // Views from before the month fields have no month keys: then no month limit.
+  const monthFrom = parseMonth(x.monthFrom ?? null);
+  const monthTo = parseMonth(x.monthTo ?? null);
+  if (monthFrom === undefined || monthTo === undefined) return null;
+  const range = orderRange({ yearFrom, yearTo, monthFrom, monthTo });
   const aggregation = (AGGREGATIONS as readonly unknown[]).includes(x.aggregation) ? (x.aggregation as Aggregation) : null;
   if (aggregation === null) return null;
-  return { sites, variables, xVariable, yearFrom, yearTo, aggregation };
+  const events = x.events === true;
+  // Fixed key order: sameView() compares the JSON text.
+  return {
+    sites,
+    variables,
+    xVariable,
+    yearFrom: range.yearFrom,
+    yearTo: range.yearTo,
+    monthFrom: range.monthFrom,
+    monthTo: range.monthTo,
+    aggregation,
+    events,
+  };
 }
 
 /** Check one view. Diagrams of unknown types are removed. */

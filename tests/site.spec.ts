@@ -864,3 +864,228 @@ test.describe('calculated page', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 });
+
+// ---------- Month range, events option and PNG without the zoom slider ----------
+
+/** A raw timeseries view of Haltiala (site 3) for the given period. */
+function periodView(id: string, params: Record<string, unknown>) {
+  return {
+    id,
+    name: `Period ${id}`,
+    params: { sites: [3], variables: ['ta'], xVariable: 'ta', yearFrom: 2022, yearTo: 2022, aggregation: 'raw', ...params },
+    diagrams: [{ id: 't1', type: 'timeseries' }],
+  };
+}
+
+/** First and last time (ISO text, site local time) in the time series datasets of the first card. */
+async function timeRange(page: Page): Promise<{ min: string; max: string; n: number }> {
+  return page.locator('.diagram-chart').first().evaluate((el) => {
+    const c = (el as unknown as { __chart: { getOption(): { dataset: Array<{ source: { t: ArrayLike<number> } }> } } }).__chart;
+    let min = Infinity;
+    let max = -Infinity;
+    let n = 0;
+    for (const d of c.getOption().dataset) {
+      for (const t of Array.from(d.source.t)) {
+        min = Math.min(min, t);
+        max = Math.max(max, t);
+        n++;
+      }
+    }
+    return { min: new Date(min).toISOString(), max: new Date(max).toISOString(), n };
+  });
+}
+
+interface ViewHook {
+  __inar: { view(): { params: Record<string, unknown> } };
+}
+
+const viewParams = (page: Page) => page.evaluate(() => (globalThis as unknown as ViewHook).__inar.view().params);
+
+test.describe('month range and events', () => {
+  let errors: string[];
+
+  test.beforeEach(async ({ page }) => {
+    errors = trackErrors(page);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+  });
+
+  test('month selects limit the rows to the period', async ({ page }) => {
+    await page.goto('/' + viewHash(periodView('p1', { monthFrom: 4, monthTo: 6 })));
+    await waitReady(page);
+    await expect(page.locator('select[name="monthFrom"]')).toHaveValue('4');
+    await expect(page.locator('select[name="monthTo"]')).toHaveValue('6');
+    await expect(page.locator('select[name="monthFrom"] option')).toHaveCount(13);
+    const r = await timeRange(page);
+    expect(r.min >= '2022-04-01T00:00:00.000Z').toBe(true);
+    expect(r.max < '2022-07-01T00:00:00.000Z').toBe(true);
+    // 30-min rows of April to June: 91 days.
+    expect(r.n).toBeLessThanOrEqual(91 * 48);
+    expect(r.n).toBeGreaterThan(80 * 48);
+    await expect(page.locator('.diagram').first()).toHaveAttribute('data-rows', String(r.n));
+    expect(await page.locator('.diagram figcaption').first().textContent()).toContain('Apr to Jun 2022');
+
+    // Change the form: from month "All" gives January to June.
+    await page.locator('select[name="monthFrom"]').selectOption('');
+    await expect(page.locator('.diagram').first()).not.toHaveAttribute('data-rows', String(r.n), { timeout: READY_TIMEOUT });
+    await waitReady(page);
+    const r2 = await timeRange(page);
+    expect(r2.min < '2022-01-02T00:00:00.000Z').toBe(true);
+    expect(r2.max < '2022-07-01T00:00:00.000Z').toBe(true);
+    expect((await viewParams(page)).monthFrom).toBeNull();
+  });
+
+  test('a period with the start after the end is put in order', async ({ page }) => {
+    await page.goto('/' + viewHash(periodView('p2', { yearFrom: 2023, yearTo: 2022, monthFrom: 2, monthTo: 11 })));
+    await waitReady(page);
+    const p = await viewParams(page);
+    expect([p.yearFrom, p.monthFrom, p.yearTo, p.monthTo]).toEqual([2022, 11, 2023, 2]);
+    const r = await timeRange(page);
+    expect(r.min >= '2022-11-01T00:00:00.000Z').toBe(true);
+    expect(r.max < '2023-03-01T00:00:00.000Z').toBe(true);
+  });
+
+  test('a view without the new keys loads with the defaults', async ({ page }) => {
+    const old = periodView('p3', {});
+    await page.goto('/' + viewHash(old));
+    await waitReady(page);
+    await expect(page.getByRole('tab', { selected: true })).toHaveText('Period p3');
+    const p = await viewParams(page);
+    expect(p.monthFrom).toBeNull();
+    expect(p.monthTo).toBeNull();
+    expect(p.events).toBe(false);
+    await expect(page.locator('select[name="monthFrom"]')).toHaveValue('');
+    await expect(page.locator('input[name="events"]')).not.toBeChecked();
+  });
+
+  test('the events checkbox changes the view parameters', async ({ page }) => {
+    await page.goto('/' + viewHash(periodView('p4', {})));
+    await waitReady(page);
+    const box = page.getByRole('checkbox', { name: /^Events/ });
+    await expect(box).toBeVisible();
+    await box.check();
+    await expect.poll(async () => (await viewParams(page)).events).toBe(true);
+    await waitReady(page);
+    await box.uncheck();
+    await expect.poll(async () => (await viewParams(page)).events).toBe(false);
+
+    // A view with events: true keeps it.
+    await page.goto('/' + viewHash(periodView('p5', { events: true })));
+    await waitReady(page);
+    await expect(page.locator('input[name="events"]')).toBeChecked();
+  });
+
+  test('data file name has the months only when they are set', async ({ page }) => {
+    test.setTimeout(180_000);
+    await page.goto('/' + viewHash(periodView('p6', { yearTo: 2023, monthFrom: 3, monthTo: 10 })));
+    await waitReady(page);
+    await page.locator('[data-action="data"]').click();
+    const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 120_000 }), page.locator('[data-export="one-csv"]').click()]);
+    expect(dl.suggestedFilename()).toBe('inar-agri_period-p6_2022-03-2023-10_raw.csv');
+  });
+
+  test('timeseries PNG has no zoom slider band', async ({ page }) => {
+    await page.goto('/' + viewHash(periodView('p7', {})));
+    await waitReady(page);
+    const chart = page.locator('.diagram-chart').first();
+    const h = await chart.evaluate((el) => el.clientHeight);
+    const w = await chart.evaluate((el) => el.clientWidth);
+    // The slider stays on the page.
+    const sliders = await chart.evaluate(
+      (el) =>
+        (el as unknown as { __chart: { getOption(): { dataZoom: Array<{ type: string }> } } }).__chart
+          .getOption()
+          .dataZoom.filter((d) => d.type === 'slider').length,
+    );
+    expect(sliders).toBe(1);
+    const { png } = await exportPng(page, 0, 2);
+    expect(pngWidth(png)).toBe(2 * w);
+    expect(pngHeight(png)).toBeLessThan(2 * h);
+    expect(pngHeight(png)).toBeGreaterThan(2 * (h - 40));
+  });
+});
+
+/** A Qvidja (site 4) view of 2022 with the given diagram types and events on or off. */
+function eventsView(id: string, sites: number[], events: boolean, types: string[] = ['timeseries', 'cumulative']) {
+  return {
+    id,
+    name: `Events ${id}`,
+    params: { sites, variables: ['nee_f', 'ta'], xVariable: 'ta', yearFrom: 2022, yearTo: 2022, aggregation: 'day', events },
+    diagrams: types.map((type, i) => ({ id: `e${i}`, type })),
+  };
+}
+
+/** x values (epoch ms) of the markLine data of all series of diagram `index`. */
+async function markLineXs(page: Page, index: number): Promise<number[]> {
+  return page
+    .locator('.diagram-chart')
+    .nth(index)
+    .evaluate((el) => {
+      type S = { markLine?: { data?: Array<{ xAxis: number }> } };
+      const c = (el as unknown as { __chart: { getOption(): { series: S[] } } }).__chart;
+      return c.getOption().series.flatMap((s) => (s.markLine?.data ?? []).map((d) => d.xAxis));
+    });
+}
+
+const altOf = async (page: Page, index: number) => (await page.locator('.diagram-alt p').nth(index).textContent()) ?? '';
+
+test.describe('events', () => {
+  let errors: string[];
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    errors = trackErrors(page);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+
+  test('events on: timeseries and cumulative have markers of Qvidja 2022', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev1', [4], true)));
+    await waitReady(page);
+    // Timeseries: real time axis. Qvidja harvest on 2022-06-21.
+    const ts = await markLineXs(page, 0);
+    expect(ts).toContain(Date.UTC(2022, 5, 21));
+    // Cumulative: day of the year on the reference year 2000.
+    const cum = await markLineXs(page, 1);
+    expect(cum).toContain(Date.UTC(2000, 5, 21));
+    // The markers do not change the series count.
+    await expect(page.locator('.diagram').nth(0)).toHaveAttribute('data-series', '2');
+    await expect(page.locator('.diagram').nth(1)).toHaveAttribute('data-series', '1');
+    for (const i of [0, 1]) {
+      const alt = await altOf(page, i);
+      expect(alt).toContain('Management events at Qvidja');
+      expect(alt).toContain('harvest 2022-06-21');
+      expect(alt).toContain('grazing 2022-06-01 to 2022-06-15');
+    }
+    await expect(page.locator('.diagram-sub').first()).toContainText('Event markers');
+  });
+
+  test('events on for Anttila only: alt text says no events', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev2', [1], true)));
+    await waitReady(page);
+    expect(await markLineXs(page, 0)).toEqual([]);
+    expect(await altOf(page, 0)).toContain('No management events for the selected sites in this period.');
+  });
+
+  test('events on: types without markers still get the alt text sentence', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev3', [4], true, ['monthly'])));
+    await waitReady(page);
+    expect(await markLineXs(page, 0)).toEqual([]);
+    expect(await altOf(page, 0)).toContain('harvest 2022-06-21');
+  });
+
+  test('events off: no markers and no events in the alt text', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev4', [4], false, ['timeseries', 'cumulative', 'years', 'yearPanels'])));
+    await waitReady(page);
+    for (const i of [0, 1, 2, 3]) {
+      expect(await markLineXs(page, i)).toEqual([]);
+      expect(await altOf(page, i)).not.toContain('Management events');
+    }
+  });
+});

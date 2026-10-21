@@ -118,10 +118,16 @@ function copyOptions(format: DataFormat, view: View, meta: Meta): string {
   return `FORMAT parquet, COMPRESSION zstd, KV_METADATA ${kvMetadata(view, meta)}`;
 }
 
-/** File name without extension: inar-agri_<view>_<from>-<to>_<step>. */
+/**
+ * File name without extension: inar-agri_<view>_<from>-<to>_<step>. A month limit adds
+ * the month to its year, for example 2022-03-2023-10.
+ */
 export function baseName(view: View, meta: Meta): string {
   const p = view.params;
-  return `inar-agri_${slug(view.name)}_${p.yearFrom ?? meta.yearMin}-${p.yearTo ?? meta.yearMax}_${p.aggregation}`;
+  const month = (m: number | null) => (m === null ? '' : `-${String(m).padStart(2, '0')}`);
+  const from = `${p.yearFrom ?? meta.yearMin}${month(p.monthFrom)}`;
+  const to = `${p.yearTo ?? meta.yearMax}${month(p.monthTo)}`;
+  return `inar-agri_${slug(view.name)}_${from}-${to}_${p.aggregation}`;
 }
 
 async function rowCount(select: string): Promise<number> {

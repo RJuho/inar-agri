@@ -24,6 +24,7 @@ Six eddy-covariance sites deliver data in six layouts. The layouts differ in del
 | `db/sites.parquet` | 6 | Geolocation index: `site_id`, `code`, `fluxnet_id`, `name`, `country`, `lat`, `lon`, `elevation_m`, `utc_offset_min`, `timestep_min`, `ecosystem`, `description`, `comment`, `data_start`, `data_end`. |
 | `db/variables.parquet` | 8 | One row per output column: data type, unit, description. |
 | `db/site_variables.parquet` | about 65 | Provenance per site and column: source file, source columns, SQL expression, factor, zero rule, sensor depth, rank, aggregation, note. |
+| `db/events.parquet` | about 80 | Field management events per site (harvest, cut, grazing, fertilisation, sowing, tillage, spraying, other). Hand-typed in `scripts/lib/events.ts`. |
 | `db/report.md`, `db/report.json` | - | Build report. |
 
 The Parquet files are not in git (`db/*.parquet` is in `.gitignore`). The reports are in git.
@@ -44,6 +45,29 @@ The Parquet files are not in git (`db/*.parquet` is in `.gitignore`). The report
 The timestamp is a naive TIMESTAMP in UTC, not TIMESTAMPTZ. In the browser, TIMESTAMPTZ functions use the time zone of the viewer and would shift the data.
 
 The grid is complete. Between the first and the last period of a site, every 30-minute period has a row. Periods without data have NULL in all value columns. The report gives the number of inserted rows per site.
+
+### `events.parquet`
+
+One row per field management event. Sorted by `site_id`, `date`.
+
+| Column | Type | Meaning |
+|---|---|---|
+| `site_id` | UTINYINT | Key to `sites.parquet`. |
+| `site_code` | VARCHAR | Site code, for example `qvidja`. |
+| `date` | DATE | First day of the event, local calendar day. |
+| `date_end` | DATE | Last day of a multi-day event (grazing, harvest over some days, harrowing). NULL for a one-day event. |
+| `type` | VARCHAR | `harvest`, `cut`, `grazing`, `fertilisation`, `sowing`, `tillage`, `spraying` or `other`. |
+| `detail` | VARCHAR | Short English text: crop or product, amount and unit as in the source. |
+| `source` | VARCHAR | Source file in `data/`. Two files are separated by `; `. |
+
+The rows come from a hand-typed table, `scripts/lib/events.ts`, because the repository has no xlsx, docx or pdf reader. Sources:
+
+- Haltiala: `haltiala_smear_management.xlsx` (2021 to 2025). The parcel card `haltiala_smear_Lohkokortit_2025.pdf` corrects one date: Jett Mn235 was applied on 2025-06-16 in a tank mix with the herbicide, not on 2025-05-16.
+- Qvidja: `Qvidja_management.xlsx` (2018 to 2025) and Table 1 of `Qvidja_C-balance.pdf` (Heimsch et al. 2021) for the 2018 and 2019 events that are not in the xlsx. If a harvest date differs by 1 or 2 days between the two, the xlsx date is used.
+- Viikki: `EC/Management Information.docx` (2022 to 2025). The yield of the year is in the detail of the last harvest of the year.
+- Maktau: no dated events (only seasonal practice). Anttila and Särkisuo: no management data.
+
+Type rules: seeding and oversowing are `sowing`; herbicide, glyphosate and a micronutrient tank mix are `spraying`; harrowing, disc work, subsoiling, cultivation and crushing of the crop are `tillage` (as in the source files); a cleaning cut or a cut left on the field is `cut`; the EC installation is `other`.
 
 ## Sites
 
@@ -93,6 +117,7 @@ Each rule runs in SQL. The report gives its counts.
 - `RegistrySchema`: the registry at start. Unique ids and codes, valid offsets, files that exist, a factor that is finite and not zero, an aggregate rule for every file with a step below 30 minutes.
 - `headerSchema(expected)`: the header of each file must hold every column the mapping uses. A changed file layout stops the build with the list of missing columns.
 - `ObservationRowSchema`: every output row, streamed from DuckDB in chunks. Site id 1-255, timestamp on a 30-minute boundary, finite values in physical ranges (NEE ±100, TA -60 to 60, soil temperature -40 to 60, SWC 0 to 1, QC flag 0 or 1). A range violation is a warning in the report. Any other issue stops the build.
+- `EventRowSchema`: every row of `scripts/lib/events.ts`. Known site code and type, ISO dates in 2014 to 2030, `date_end` after `date`, the source file exists. The build also stops on two equal rows.
 - `ReportSchema`: the report object before it is written.
 
 ## Report
@@ -100,6 +125,7 @@ Each rule runs in SQL. The report gives its counts.
 `db/report.md` has:
 
 - Output files with row counts and bytes.
+- Management events: count per site and type.
 - Per site: rows, inserted grid rows, first and last period (UTC). Per column: valid count, min, max, mean, conflicts, range warnings. Per year: valid count, min and max per column.
 - Per source file: physical lines, header lines, rows read, lines skipped by the CSV parser, rejected rows, duplicate stamps, rows after aggregation. Per source column: valid values, sentinels, zeros set to NULL, factor.
 - Validation summary.
@@ -142,5 +168,4 @@ Known range warnings: Qvidja `vpd` below 0 in 2 018 rows (gap-filled values), Ma
 ## Later extensions
 
 - More variables as nullable columns: pressure, precipitation, LE, H, N2O flux.
-- Management tables from the Haltiala and Qvidja xlsx files (the carbon values are in `scripts/lib/calc/management.ts`).
 - The Maktau 1-hour meteo file as a separate table.

@@ -60,6 +60,10 @@ export interface DiagramDef<D extends Prepared = Prepared> {
   relayout?(data: D, ctx: BuildContext): EChartsCoreOption;
   /** True when the layout changes with the chart width. The card then draws again after a width change. */
   widthDependent?: boolean;
+  /** True when the type draws management event markers (when `params.events` is on). Optional. */
+  showsEvents?: boolean;
+  /** Empty band in px at the bottom of the chart, without the slider, to remove from the PNG export. Optional. */
+  exportCropBottom?: number;
   /** Chart height in px. `data` is null before the first query result. */
   height(params: ViewParams, data: D | null, width: number): number;
   /** Variables for the statistics of the alt text. Default: the variables of the view. */

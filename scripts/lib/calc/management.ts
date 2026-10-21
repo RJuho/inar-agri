@@ -113,27 +113,27 @@ export const MANAGEMENT_CARBON: ManagementRow[] = [
   // ---- Viikki
   {
     site: 'viikki', date: '2022-08-27', action: 'harvest', product: 'timothy, two cuts (1 July, 27 August)', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: 3673,
-    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield 3673 with no unit in the docx. Assumed kg DM/ha for the year. C fraction 0.42 assumed as for Qvidja.',
+    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield of the year 3673 kg DW/ha (docx). C fraction 0.42 assumed as for Qvidja.',
   },
   {
     site: 'viikki', date: '2023-08-24', action: 'harvest', product: 'barley, clover and grasses, two cuts (17 and 24 August)', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: 6773,
-    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield 6773 with no unit in the docx. Assumed kg DM/ha for the year. C fraction 0.42 assumed.',
+    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield of the year 6773 kg DW/ha (docx). C fraction 0.42 assumed.',
   },
   {
     site: 'viikki', date: '2023-04-27', action: 'fertilisation', product: 'dry manure (18.4 kg N/ha) + mineral N', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: null,
     c_fraction: null, c_fraction_source: 'none', c_g_m2: null, source: VI_DOCX, note: 'Only the N input is given.',
   },
   {
-    site: 'viikki', date: '2024-07-31', action: 'harvest', product: 'silage, one cut', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: null,
-    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield not given.',
+    site: 'viikki', date: '2024-07-31', action: 'harvest', product: 'silage, one cut', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: 2336,
+    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield 2336 kg DW/ha (docx). C fraction 0.42 assumed.',
   },
   {
     site: 'viikki', date: '2024-05-22', action: 'fertilisation', product: 'liquid manure (57.5 kg N/ha) + dry manure (22.5 kg N/ha, 9 Oct) + mineral N', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: null,
     c_fraction: null, c_fraction_source: 'none', c_g_m2: null, source: VI_DOCX, note: 'Only the N input is given.',
   },
   {
-    site: 'viikki', date: '2025-09-10', action: 'harvest', product: 'faba beans', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: null,
-    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield not given.',
+    site: 'viikki', date: '2025-09-10', action: 'harvest', product: 'faba beans', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: 1973.7,
+    c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield 1973.7 kg DW/ha (docx). C fraction 0.42 assumed.',
   },
 ];
 

@@ -8,6 +8,7 @@ import type { EChartsCoreOption } from 'echarts/core';
 import type { BuildContext, DiagramDef } from './registry';
 import {
   baseOption,
+  eventMarkers,
   dayOfYearAxis,
   extent,
   hasValues,
@@ -22,7 +23,15 @@ import {
   valueAxis,
   varLabel,
 } from './common';
-import { prepareYears, siteYearTooltip, yearsQuery, type YearsData } from './years';
+import {
+  prepareYears,
+  refYearPx,
+  siteYearTooltip,
+  yearEventMarks,
+  yearsQuery,
+  type SeriesInfo,
+  type YearsData,
+} from './years';
 
 echarts.use([LineChart]);
 
@@ -74,7 +83,9 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const xAxis: unknown[] = [];
   const yAxis: unknown[] = [];
   const series: unknown[] = [];
-  const info: Array<{ site: string; year: number; unit: string }> = [];
+  const info: SeriesInfo[] = [];
+  // Label rows per year: the groups of one year share the x axis of a panel.
+  const marks = yearEventMarks(ctx, data.groups, refYearPx(panelW), (g) => g.year);
 
   data.variables.forEach((v, vi) => {
     const blockTop = L.legend + vi * (L.head + rows * ROW_H);
@@ -98,7 +109,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
       yAxis.push(valueAxis(tokens, gi, { scale: false, ...y, axisLabel: { show: c === 0, color: tokens.textMuted } }));
       data.groups.forEach((g, di) => {
         if (g.year !== year || !hasValues(g, v)) return;
-        info.push({ site: names.get(g.siteId) ?? String(g.siteId), year, unit });
+        info.push({ siteId: g.siteId, site: names.get(g.siteId) ?? String(g.siteId), year, unit });
         series.push({
           type: 'line',
           name: names.get(g.siteId) ?? String(g.siteId),
@@ -112,6 +123,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
           connectNulls: false,
           lineStyle: { width: 1.25 },
           emphasis: { disabled: true },
+          ...eventMarkers(marks.byGroup.get(g) ?? [], colors.get(g.siteId) ?? tokens.text, tokens, vi === 0),
         });
       });
     });
@@ -124,7 +136,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
     grid,
     xAxis,
     yAxis,
-    tooltip: siteYearTooltip(ctx, data.step, info),
+    tooltip: siteYearTooltip(ctx, data.step, info, marks.all),
     dataset: data.groups.map((g) => ({
       dimensions: [{ name: 'x', type: 'time' }, ...data.variables.map((v) => ({ name: v, type: 'float' }))],
       source: { x: g.x, ...g.values },
@@ -137,8 +149,9 @@ export const yearPanels: DiagramDef<YearsData> = {
   type: 'yearPanels',
   label: 'Years side by side',
   query: yearsQuery,
-  prepare: (table, params) => prepareYears(table, params),
+  prepare: prepareYears,
   build,
+  showsEvents: true,
   widthDependent: true,
   height: (params, data, width) => totalHeight(params.variables.length, data?.years.length ?? 1, width),
   describe: (data) =>

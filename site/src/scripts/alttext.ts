@@ -6,7 +6,16 @@ import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from './db';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from './state';
 import { col, whereClause } from './diagrams/sql';
-import { formatValue, unitOf, yearsText } from './diagrams/common';
+import {
+  eventDateText,
+  eventLabel,
+  eventsInRange,
+  eventSymbol,
+  formatValue,
+  shortDetail,
+  unitOf,
+  yearsText,
+} from './diagrams/common';
 
 /** Statistics of one variable at one site, from all 30-minute values in the view range. */
 export interface SiteStats {
@@ -132,7 +141,32 @@ export function statsText(stats: SiteStats[], variables: Variable[], meta: Meta)
   return sentences.join(' ');
 }
 
-/** Alt text: type sentence, sites and years, then statistics. */
+/**
+ * Sentences about the management events of the selected sites in the period, one per site.
+ * `markers` = the diagram draws the events as marker lines.
+ */
+export function eventsText(params: ViewParams, meta: Meta, markers: boolean): string {
+  const events = eventsInRange(meta, params);
+  if (events.length === 0) return 'No management events for the selected sites in this period.';
+  const out: string[] = [];
+  if (markers) {
+    const types = [...new Set(events.map((e) => e.type))];
+    out.push(
+      `Dashed vertical lines in the site colour mark the management events, labelled ${listText(types.map((t) => `${eventSymbol(t)} (${eventLabel(t).toLowerCase()})`))}.`,
+    );
+  }
+  for (const site of meta.sites) {
+    const list = events.filter((e) => e.siteId === site.siteId);
+    if (list.length === 0) continue;
+    const parts = list.map((e) => `${eventLabel(e.type).toLowerCase()} ${eventDateText(e)} (${shortDetail(e.detail)})`);
+    out.push(`Management events at ${site.name} (${list.length}): ${parts.join('; ')}.`);
+  }
+  const without = meta.sites.filter((s) => params.sites.includes(s.siteId) && !events.some((e) => e.siteId === s.siteId));
+  if (without.length > 0) out.push(`No management events for ${listText(without.map((s) => s.name))} in this period.`);
+  return out.join(' ');
+}
+
+/** Alt text: type sentence, sites and years, then statistics, then the events when `params.events` is on. */
 export function composeAlt(
   label: string,
   describe: string,
@@ -140,8 +174,10 @@ export function composeAlt(
   meta: Meta,
   stats: SiteStats[],
   variables: Variable[],
+  markers = false,
 ): string {
   const head = `${label}: ${listText(variables.map((v) => VARIABLE_LABELS[v]))} at ${siteListText(params, meta)}, ${yearsText(params)}.`;
   const body = stats.length > 0 ? ` ${statsText(stats, variables, meta)}` : '';
-  return `${head} ${describe}${body}`.trim();
+  const events = params.events ? ` ${eventsText(params, meta, markers)}` : '';
+  return `${head} ${describe}${body}${events}`.trim();
 }

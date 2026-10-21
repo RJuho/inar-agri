@@ -4,6 +4,7 @@
 import { existsSync } from 'node:fs';
 import { DuckDBTimestampValue } from '@duckdb/node-api';
 import * as v from 'valibot';
+import { EVENT_TYPES } from './events.ts';
 import { ALL_COLUMNS } from './registry.ts';
 
 const nonEmpty = v.pipe(v.string(), v.nonEmpty());
@@ -119,11 +120,27 @@ const ColumnStatSchema = v.object({
   mean: v.nullable(v.number()),
 });
 
+/** One management event (scripts/lib/events.ts). */
+export const EventRowSchema = v.pipe(
+  v.strictObject({
+    site: v.picklist(SITE_CODES),
+    date: v.pipe(v.string(), v.isoDate()),
+    date_end: v.optional(v.pipe(v.string(), v.isoDate())),
+    type: v.picklist(EVENT_TYPES),
+    detail: v.pipe(nonEmpty, v.maxLength(240)),
+    source: nonEmpty,
+  }),
+  v.check((r) => r.date >= '2014-01-01' && r.date <= '2030-12-31', 'date must be in 2014 to 2030'),
+  v.check((r) => r.date_end === undefined || r.date_end > r.date, 'date_end must be after date'),
+  v.check((r) => r.source.split('; ').every((s) => existsSync(s.replace(/ \(.*\)$/, ''))), 'source file must exist'),
+);
+
 export const ReportSchema = v.object({
   builtAt: v.pipe(v.string(), v.isoTimestamp()),
   duckdb: nonEmpty,
   node: nonEmpty,
   outputs: v.array(v.object({ file: nonEmpty, rows: count, bytes: count })),
+  events: v.array(v.object({ site: nonEmpty, type: v.picklist(EVENT_TYPES), n: count })),
   sites: v.array(
     v.object({
       siteId: count,

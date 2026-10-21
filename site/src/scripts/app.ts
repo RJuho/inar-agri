@@ -1,6 +1,7 @@
 // Page start: load the data, read the views from Web storage and the URL hash,
 // and connect the add-diagram list, the tabs, the parameter form and the diagrams.
 import { loadMeta } from './db';
+import { setYearBounds } from './diagrams/sql';
 import { DIAGRAM_DEFS, DIAGRAM_TYPES } from './diagrams/registry';
 import {
   activeView,
@@ -55,6 +56,7 @@ export async function start(): Promise<void> {
     chartEl.dataset.status = 'error';
     return;
   }
+  setYearBounds(meta.yearMin, meta.yearMax);
   const loadSec = ((performance.now() - t0) / 1000).toFixed(1);
   const baseStatus =
     `${fmt(meta.rowCount)} rows, ${meta.sites.length} sites, ${meta.yearMin} to ${meta.yearMax}. ` + `Loaded in ${loadSec} s.`;

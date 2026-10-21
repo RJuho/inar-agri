@@ -11,9 +11,11 @@ import { createReadStream } from 'node:fs';
 import { mkdir, stat, writeFile } from 'node:fs/promises';
 import { DuckDBInstance, type DuckDBConnection } from '@duckdb/node-api';
 import * as v from 'valibot';
+import { EVENTS } from './lib/events.ts';
 import { ALL_COLUMNS, REGISTRY, VARIABLES, type CoreColumn } from './lib/registry.ts';
 import { fail, fmt, ident, lit, log, num, numOrNull, one, rows, str, table } from './lib/duck.ts';
 import {
+  EventRowSchema,
   OBSERVATION_COLUMNS,
   ObservationRowSchema,
   RegistrySchema,
@@ -255,6 +257,12 @@ function renderMarkdown(report: Report): string {
   parts.push('');
   parts.push(table(['File', 'Rows', 'Bytes'], report.outputs.map((o) => [o.file, o.rows, o.bytes])));
   parts.push('');
+  parts.push('## Management events');
+  parts.push('');
+  parts.push('Rows of events.parquet per site and type. Source: scripts/lib/events.ts.');
+  parts.push('');
+  parts.push(table(['Site', 'Type', 'Events'], report.events.map((e) => [e.site, e.type, e.n])));
+  parts.push('');
   parts.push('## Sites');
   parts.push('');
   parts.push(
@@ -414,6 +422,23 @@ async function main(): Promise<void> {
     FROM (VALUES ${siteVariableRows.join(',\n')})
     t(site_id, site_code, column_name, source_id, source_path, source_columns, expression, factor, zero_is_null, depth_cm, rank, aggregation, note)`);
 
+  // Management events (hand-typed table, checked here)
+  const eventIssues = EVENTS.flatMap((e) => {
+    const p = v.safeParse(EventRowSchema, e);
+    return p.success ? [] : [`${e.site} ${e.date} ${e.type}: ${p.issues.map((i) => i.message).join('; ')}`];
+  });
+  if (eventIssues.length > 0) fail(`event rows are not valid:\n${eventIssues.join('\n')}`);
+  const siteIdOf = new Map(registry.sites.map((s) => [s.code, s.siteId]));
+  await conn.run(`
+    CREATE TABLE events AS
+    SELECT site_id::UTINYINT AS site_id, site_code, date::DATE AS date, date_end::DATE AS date_end, type, detail, source
+    FROM (VALUES
+      ${EVENTS.map((e) => `(${[siteIdOf.get(e.site)!, e.site, e.date, e.date_end ?? null, e.type, e.detail, e.source].map(lit).join(', ')})`).join(',\n')}
+    ) t(site_id, site_code, date, date_end, type, detail, source)
+    ORDER BY site_id, date, type, detail`);
+  const dupEvents = await rows(conn, `SELECT site_code, date::VARCHAR AS d, type, count(*) AS n FROM events GROUP BY ALL HAVING count(*) > 1 AND count(DISTINCT detail) < count(*)`);
+  if (dupEvents.length > 0) fail(`duplicate event rows: ${dupEvents.map((r) => `${str(r.site_code)} ${str(r.d)} ${str(r.type)}`).join(', ')}`);
+
   // 4. Validate every output row
   log('Validating rows');
   const validation = await validateRows(conn);
@@ -426,14 +451,14 @@ async function main(): Promise<void> {
   const builtAt = new Date().toISOString();
   const meta = `KV_METADATA {built_at: ${lit(builtAt)}, generator: 'scripts/build-db.ts', design: 'docs/harmonised-database.md'}`;
   await conn.run(`COPY (SELECT * FROM obs ORDER BY site_id, ts_start) TO ${lit(OBS_FILE)} (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 100000, ${meta})`);
-  for (const t of ['sites', 'variables', 'site_variables']) {
+  for (const t of ['sites', 'variables', 'site_variables', 'events']) {
     await conn.run(`COPY (SELECT * FROM ${t}) TO ${lit(`${OUT_DIR}/${t}.parquet`)} (FORMAT parquet, COMPRESSION zstd, ${meta})`);
   }
 
   // 6. Statistics
   log('Computing statistics');
   const outputs: Report['outputs'] = [];
-  for (const t of ['observations', 'sites', 'variables', 'site_variables']) {
+  for (const t of ['observations', 'sites', 'variables', 'site_variables', 'events']) {
     const file = `${OUT_DIR}/${t}.parquet`;
     const n = await one(conn, `SELECT count(*) AS n FROM read_parquet(${lit(file)})`);
     outputs.push({ file, rows: num(n.n), bytes: (await stat(file)).size });
@@ -470,6 +495,11 @@ async function main(): Promise<void> {
     duckdb: version,
     node: process.version,
     outputs,
+    events: (await rows(conn, `SELECT site_code, type, count(*) AS n FROM events GROUP BY ALL ORDER BY min(site_id), type`)).map((r) => ({
+      site: str(r.site_code),
+      type: str(r.type),
+      n: num(r.n),
+    })),
     sites,
     sources: sourceReports,
     validation: { rowsChecked: validation.rowsChecked, errors: validation.errors, warningsByColumn },

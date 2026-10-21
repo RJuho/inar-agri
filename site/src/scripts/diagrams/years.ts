@@ -5,10 +5,14 @@ import * as echarts from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
+import type { Meta } from '../db';
 import type { Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
+  DAY,
+  REF_END,
+  REF_START,
   YEAR_MAX_STEP,
   YEAR_STEP_TEXT,
   baseOption,
@@ -16,6 +20,14 @@ import {
   dayOfYearAxis,
   emptyNote,
   esc,
+  eventMarkers,
+  eventsInRange,
+  eventsKeyText,
+  eventTooltipLines,
+  joinSubtitle,
+  refYearMarks,
+  setLabelRows,
+  type EventMark,
   formatValue,
   hasValues,
   readGroups,
@@ -70,7 +82,7 @@ export function yearsQuery(params: ViewParams): string | null {
     FROM obs WHERE ${where} GROUP BY 1, 2, 3 ORDER BY 1, 2, 3`;
 }
 
-export function prepareYears(table: Table | null, params: ViewParams): YearsData {
+export function prepareYears(table: Table | null, params: ViewParams, meta: Meta): YearsData {
   const step = yearStep(params.aggregation);
   const base = { variables: params.variables, step, groups: [] as Group[], years: [] as number[] };
   if (table === null) return { ...base, rowCount: 0, seriesCount: 0, note: emptyNote(params) };
@@ -82,6 +94,7 @@ export function prepareYears(table: Table | null, params: ViewParams): YearsData
   if (table.numRows === 0) data.note = 'No data for these sites and years.';
   if (params.aggregation === 'raw') data.subtitle = 'Raw data is shown as daily means.';
   if (step === 'week') data.subtitle = WEEK_SPLIT_TEXT;
+  if (params.events) data.subtitle = joinSubtitle(data.subtitle, eventsKeyText(meta, params));
   return data;
 }
 
@@ -97,8 +110,59 @@ export function yearRanks(groups: Group[]): Map<Group, [number, number]> {
   return out;
 }
 
-/** Tooltip for site-year lines. `meta` of each series index gives the site and year. */
-export function siteYearTooltip(ctx: BuildContext, step: YearStep, info: Array<{ site: string; year: number; unit: string }>) {
+/** Site and year of one series, for the tooltip. Index = series index. */
+export interface SeriesInfo {
+  siteId: number;
+  site: string;
+  year: number;
+  unit: string;
+}
+
+/** Event marks of one site and year on the reference-year axis. */
+export interface YearMark {
+  siteId: number;
+  year: number;
+  mark: EventMark;
+}
+
+/**
+ * Event marks per site-year group, when `params.events` is on. `px` = px per ms of one
+ * x axis. `rowsBy` gives the key of the groups that share an x axis (for the label rows).
+ */
+export function yearEventMarks(ctx: BuildContext, groups: Group[], px: number, rowsBy: (g: Group) => number = () => 0) {
+  const byGroup = new Map<Group, EventMark[]>();
+  const all: YearMark[] = [];
+  if (!ctx.params.events) return { byGroup, all };
+  const events = eventsInRange(ctx.meta, ctx.params);
+  const shared = new Map<number, EventMark[]>();
+  for (const g of groups) {
+    const marks = refYearMarks(events, g.siteId, g.year);
+    byGroup.set(g, marks);
+    for (const mark of marks) all.push({ siteId: g.siteId, year: g.year, mark });
+    const key = rowsBy(g);
+    shared.set(key, [...(shared.get(key) ?? []), ...marks]);
+  }
+  for (const list of shared.values()) setLabelRows(list, px);
+  return { byGroup, all };
+}
+
+/** px per ms of a reference-year axis of the given width. */
+export const refYearPx = (width: number) => Math.max(width, 1) / (REF_END - REF_START);
+
+/** Start and end (exclusive) of the period of a point on the reference-year axis. */
+function refPeriod(ms: number, step: YearStep): [number, number] {
+  if (step === 'month') {
+    const d = new Date(ms);
+    return [Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1), Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1)];
+  }
+  if (step === 'week') return [ms, ms + 7 * DAY];
+  return [ms, ms + DAY];
+}
+
+/** Tooltip for site-year lines. `info` of each series index gives the site and year. */
+export function siteYearTooltip(ctx: BuildContext, step: YearStep, info: SeriesInfo[], marks: YearMark[] = []) {
+  const colors = siteColors(ctx.meta, ctx.tokens);
+  const names = siteNames(ctx.meta);
   return {
     ...tooltipBase(ctx.tokens, 'axis'),
     axisPointer: { type: 'line', lineStyle: { color: ctx.tokens.axis } },
@@ -119,7 +183,17 @@ export function siteYearTooltip(ctx: BuildContext, step: YearStep, info: Array<{
           const s = info[p.seriesIndex];
           return `${p.marker}${esc(s?.site ?? '')} ${s?.year ?? ''}&nbsp;&nbsp;<b>${formatValue(y)}</b> ${esc(s?.unit ?? '')}`;
         });
-      return `<b>${dayLabel(first.axisValue, step)}</b><br/>${rows.join('<br/>') || 'No data'}`;
+      // Events of the site-years in this tooltip.
+      const shown = new Set(list.map((p) => info[p.seriesIndex]).map((s) => (s ? `${s.siteId}|${s.year}` : '')));
+      const [from, to] = refPeriod(first.axisValue, step);
+      const events = eventTooltipLines(
+        marks.filter((m) => shown.has(`${m.siteId}|${m.year}`)),
+        from,
+        to,
+        names,
+        colors,
+      );
+      return `<b>${dayLabel(first.axisValue, step)}</b><br/>${rows.join('<br/>') || 'No data'}${events}`;
     },
   };
 }
@@ -132,13 +206,14 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const names = siteNames(meta);
   const ranks = yearRanks(data.groups);
   const last = vars.length - 1;
-  const info: Array<{ site: string; year: number; unit: string }> = [];
+  const info: SeriesInfo[] = [];
   const series: unknown[] = [];
+  const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - STACK.left - STACK.right));
   vars.forEach((v, panel) => {
     data.groups.forEach((g, gi) => {
       if (!hasValues(g, v)) return;
       const [rank, count] = ranks.get(g) ?? [0, 1];
-      info.push({ site: names.get(g.siteId) ?? String(g.siteId), year: g.year, unit: unitOf(meta, v) });
+      info.push({ siteId: g.siteId, site: names.get(g.siteId) ?? String(g.siteId), year: g.year, unit: unitOf(meta, v) });
       series.push({
         type: 'line',
         name: names.get(g.siteId) ?? String(g.siteId),
@@ -152,6 +227,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
         connectNulls: false,
         lineStyle: { width: 1.5, opacity: yearOpacity(rank, count) },
         emphasis: { focus: 'series', lineStyle: { width: 2.5, opacity: 1 } },
+        ...eventMarkers(marks.byGroup.get(g) ?? [], colors.get(g.siteId) ?? tokens.text, tokens, panel === 0),
       });
     });
   });
@@ -166,7 +242,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
     grid: layout.grid,
     xAxis: vars.map((_, i) => dayOfYearAxis(tokens, i, i === last)),
     yAxis: vars.map((_, i) => valueAxis(tokens, i)),
-    tooltip: siteYearTooltip(ctx, data.step, info),
+    tooltip: siteYearTooltip(ctx, data.step, info, marks.all),
     dataset: data.groups.map((g) => ({
       dimensions: [{ name: 'x', type: 'time' }, ...vars.map((v) => ({ name: v, type: 'float' }))],
       source: { x: g.x, ...g.values },
@@ -179,8 +255,9 @@ export const years: DiagramDef<YearsData> = {
   type: 'years',
   label: 'Years overlay',
   query: yearsQuery,
-  prepare: (table, params) => prepareYears(table, params),
+  prepare: prepareYears,
   build,
+  showsEvents: true,
   relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height),
   height: (params) => stackHeight(params.variables.length, 190),
   describe: (data) =>

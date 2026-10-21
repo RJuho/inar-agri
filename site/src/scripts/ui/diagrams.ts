@@ -234,8 +234,12 @@ class DiagramCard {
       ready: this.status !== 'loading',
       width: hasChart ? this.chartEl.clientWidth : 0,
       height: hasChart ? this.chartEl.clientHeight : 0,
+      cropBottom: hasChart ? Math.min(this.def.exportCropBottom ?? 0, Math.max(0, this.chartEl.clientHeight - 1)) : 0,
+      // The image has no zoom slider: it is a control, not data.
       image: (scale, background) =>
-        hasChart && chart ? chart.getDataURL({ type: 'png', pixelRatio: scale, backgroundColor: background }) : null,
+        hasChart && chart
+          ? chart.getDataURL({ type: 'png', pixelRatio: scale, backgroundColor: background, excludeComponents: ['dataZoom'] })
+          : null,
     };
   }
 
@@ -308,7 +312,15 @@ class DiagramCard {
       } else {
         this.chartEl.hidden = false;
         const altCtx = { params, meta: this.meta, stats };
-        this.setAlt(composeAlt(this.def.label, this.def.describe(data, altCtx), params, this.meta, stats, statsVars));
+        this.setAlt(composeAlt(
+            this.def.label,
+            this.def.describe(data, altCtx),
+            params,
+            this.meta,
+            stats,
+            statsVars,
+            this.def.showsEvents === true,
+          ),);
         this.lastWidth = this.chartEl.clientWidth;
         this.chartEl.style.height = `${this.def.height(params, data, this.lastWidth)}px`;
         this.lastHeight = this.chartEl.clientHeight;

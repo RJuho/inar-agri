@@ -1,13 +1,15 @@
-// Parameter form of the active view: sites, variables, years, aggregation and x variable.
+// Parameter form of the active view: sites, variables, events, period, aggregation and x variable.
 // All diagrams of the view use these parameters.
 import type { Meta } from '../db';
 import { siteEmoji } from '../sites';
+import { MONTH_NAMES } from '../diagrams/common';
 import {
   AGGREGATION_LABELS,
   AGGREGATIONS,
   VARIABLE_GROUPS,
   VARIABLE_LABELS,
   VARIABLE_SITES,
+  orderRange,
   type Aggregation,
   type Variable,
   type ViewParams,
@@ -113,14 +115,21 @@ export class ParamsForm {
     const varGroups = el('div', 'var-groups');
     vars.append(el('legend', undefined, 'Variables'), varGroups);
     for (const group of VARIABLE_GROUPS) varGroups.append(this.variableGroup(group.label, group.variables, params.variables));
+    const events = el('div', 'var-events');
+    events.append(checkbox('events', 'on', 'Events', params.events, '', 'Management events (harvest, sowing, ...) as markers'));
+    vars.append(events);
 
     const years: Array<[string, string]> = [['', 'All']];
     for (let y = meta.yearMin; y <= meta.yearMax; y++) years.push([String(y), String(y)]);
+    const months: Options = [['', 'All'], ...MONTH_NAMES.map((m, i): [string, string] => [String(i + 1), m])];
+    const monthValue = (m: number | null) => (m === null ? '' : String(m));
     const other = el('fieldset', 'group');
     other.append(
       el('legend', undefined, 'Range and step'),
       select('yearFrom', 'From year', years, params.yearFrom === null ? '' : String(params.yearFrom)),
+      select('monthFrom', 'From month', months, monthValue(params.monthFrom)),
       select('yearTo', 'To year', years, params.yearTo === null ? '' : String(params.yearTo)),
+      select('monthTo', 'To month', months, monthValue(params.monthTo)),
       select(
         'aggregation',
         'Step',
@@ -183,20 +192,21 @@ export class ParamsForm {
   /** Read the form values. The state module checks them again. */
   private read(): ViewParams {
     const fd = new FormData(this.form);
-    const year = (name: string) => {
+    const num = (name: string) => {
       const v = String(fd.get(name) ?? '');
       return v === '' ? null : Number(v);
     };
-    let yearFrom = year('yearFrom');
-    let yearTo = year('yearTo');
-    if (yearFrom !== null && yearTo !== null && yearFrom > yearTo) [yearFrom, yearTo] = [yearTo, yearFrom];
+    const range = orderRange({ yearFrom: num('yearFrom'), yearTo: num('yearTo'), monthFrom: num('monthFrom'), monthTo: num('monthTo') });
     return {
       sites: fd.getAll('site').map(Number),
       variables: fd.getAll('variable').map(String) as Variable[],
       xVariable: String(fd.get('xVariable')) as Variable,
-      yearFrom,
-      yearTo,
+      yearFrom: range.yearFrom,
+      yearTo: range.yearTo,
+      monthFrom: range.monthFrom,
+      monthTo: range.monthTo,
       aggregation: String(fd.get('aggregation')) as Aggregation,
+      events: fd.get('events') === 'on',
     };
   }
 }

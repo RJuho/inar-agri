@@ -17,7 +17,13 @@
 import * as duckdb from '@duckdb/duckdb-wasm';
 import type { Table, Vector } from 'apache-arrow';
 
-const PARQUET_FILES = ['observations.parquet', 'sites.parquet', 'variables.parquet', 'fluxes.parquet'] as const;
+const PARQUET_FILES = [
+  'observations.parquet',
+  'sites.parquet',
+  'variables.parquet',
+  'fluxes.parquet',
+  'events.parquet',
+] as const;
 
 /** Units of the columns that come from fluxes.parquet (scripts/calc.ts), not from variables.parquet. */
 const CALC_VARIABLES: VariableInfo[] = [
@@ -39,7 +45,19 @@ export interface VariableInfo {
   description: string;
 }
 
-/** Facts about the data that the UI needs: sites, variable units, year range. */
+/** One field management event from events.parquet. Dates are site local calendar days. */
+export interface SiteEvent {
+  siteId: number;
+  /** First day, yyyy-mm-dd. */
+  date: string;
+  /** Last day of a multi-day event, yyyy-mm-dd. null = one day. */
+  dateEnd: string | null;
+  /** harvest, cut, grazing, fertilisation, sowing, tillage, spraying or other. */
+  type: string;
+  detail: string;
+}
+
+/** Facts about the data that the UI needs: sites, variable units, year range, events. */
 export interface Meta {
   sites: Site[];
   variables: Map<string, VariableInfo>;
@@ -48,6 +66,8 @@ export interface Meta {
   yearMax: number;
   /** Number of rows in observations.parquet. */
   rowCount: number;
+  /** Management events, sorted by site and date. */
+  events: SiteEvent[];
 }
 
 /** Make an absolute URL of a path below the Astro base path. */
@@ -217,6 +237,22 @@ export async function loadMeta(): Promise<Meta> {
   const neeF = variables.get('nee_f');
   if (neeF) variables.set('nee_f', { ...neeF, description: `${neeF.description} Maktau: MDS gap filling of scripts/calc.ts.` });
 
+  const evTable = await query(
+    `SELECT site_id::INTEGER AS site_id, strftime(date, '%Y-%m-%d') AS d, strftime(date_end, '%Y-%m-%d') AS d_end, type, detail
+     FROM 'events.parquet' ORDER BY site_id, date, type`,
+  );
+  const events: SiteEvent[] = [];
+  for (let i = 0; i < evTable.numRows; i++) {
+    const dEnd = stringAt(evTable, 'd_end', i);
+    events.push({
+      siteId: Number(evTable.getChild('site_id')?.get(i)),
+      date: stringAt(evTable, 'd', i),
+      dateEnd: dEnd === '' ? null : dEnd,
+      type: stringAt(evTable, 'type', i),
+      detail: stringAt(evTable, 'detail', i),
+    });
+  }
+
   const range = await query(
     `SELECT year(min(tl))::INTEGER AS y0, year(max(tl))::INTEGER AS y1, count(*)::INTEGER AS n FROM obs`,
   );
@@ -226,6 +262,7 @@ export async function loadMeta(): Promise<Meta> {
     yearMin: Number(range.getChild('y0')?.get(0)),
     yearMax: Number(range.getChild('y1')?.get(0)),
     rowCount: Number(range.getChild('n')?.get(0)),
+    events,
   };
 }
 
