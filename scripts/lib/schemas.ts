@@ -42,6 +42,7 @@ export const SourceSchema = v.pipe(
     delim: v.picklist([',', ';']),
     headerLines: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(2)),
     decimalComma: v.boolean(),
+    encoding: v.optional(v.picklist(['utf-8', 'latin-1'])),
     timestampColumn: nonEmpty,
     timestampFormats: v.pipe(v.array(nonEmpty), v.minLength(1)),
     timestampIsEnd: v.boolean(),

@@ -48,11 +48,11 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 
 ### 👩🏻‍🔬🎓 Viikki
 
-- EC files `data/Viikki/EC/2022.csv` to `2025.csv`: 16 033 to 17 569 rows, 36 to 43 columns, 30-minute step.
-- Semicolon delimiter. Comma decimal mark. Datetime column `Datetime`, format `d.m.yyyy H:MM`, example `1.1.2022 0:00`. Missing value: empty field. The 2023 and 2024 files start on 1 December of the previous year.
-- Column names change by year. 2022 to 2024 key columns: `PAR` (-0,13), `Pair` (100,22), `WS` (1,1), `WD` (329), `P` (0), `Snow Depth` (9), `NEE` (0,006168531), `GFN2O` (0,010908517), `RH` (92,43), `SWin`, `SWout`, `LWin`, `LWout`, `Tair` (-0,95), `WC1..3`, `WFPS1..2`, `WL`, `precip_phase` (no_precip), `snowfall`, `rainfall`.
-- N2O unit changes: µg m-2 s-1 in 2022 and 2023, nmol m-2 s-1 in 2024. The 2022 file also has `N2O_sameunit` and `GF_N2O_sameunit`.
-- 2025 key columns: `PA_FMI` (100,51), `P_FMI`, `SNOWDEPTH_FMI`, `avg(AirT_2.2m_digi (C))` (-2,44), `avg(AirRH_2.2m (%))`, `PPFD (umol/m2s)`, `NEE_F_XGB` (0,966301), `N2O_gapfilled` (0,001741306), `WFPS1`, `WFPS2`, `Rainfall `, `Snowfall`. Note the trailing space in `Rainfall `.
+- EC files `data/Viikki/EC/2022.csv` to `2025.csv` (version of 2026-10-20): 17 521 to 17 569 rows, 30 to 35 columns, 30-minute step, full calendar years. Encoding ISO-8859-1 (Latin-1), CRLF line ends.
+- Semicolon delimiter. Comma decimal mark. Datetime column `Datetime`, format `d.m.yyyy H:MM`, example `1.1.2022 0:00`. Missing value: empty field. Units are in the column names. The degree sign is a literal `?`.
+- Key columns: `NEE (mg CO2 m-2 s-1)` measured, about 20 % of periods (0,023166791), `NEE_gapfilled (mg CO2 m-2 s-1)` (0,006168531; 2024 spells it `NEE _gapfilled`), `N2O (ug m-2 s-1)`, `N2O_gapfilled (ug m-2 s-1)` (0,004809073), `Tair (?C)` (-0,95; two spaces `Tair  (?C)` in 2022 and 2023), `RH(%)` or `RH (%)` (92,43), `PAR (umol/m2s)` or 2025 `PPFD (umol/m2s)`, `WS (m/s)`, `WD (deg)`, `P (mm)` or 2024 `P(mm)`, `Snow Depth` (9), `SWin (W/m2)`, `Swout (W/m2)` or `SWout (W/m2)`, `LWin (W/m2)`, `LWout (W/m2)`, `HF (W/m2)`, `WL (m)` / `WL(m)` / 2025 `Water level (m)`, `rainfall`, `snowfall` (2025 `Rainfall`, `Snowfall`).
+- Soil columns in the EC files (same sensors as pit layers 1 and 2): `RD1 (mV)`, `RD2 (mV)`, `T1 (?C)` (0,4), `T2 (?C)`, `EC1 (µS/cm)`, `EC2 (µS/cm)`, `MP1 (kPa)`, `MP2 (kPa)`, `WFPS1 (%)` (104,716448), `WFPS2 (%)`. 2022 and 2023 also have `Soil Bulk density` (1,3), `Soil Particle Density` (2,65), `Total Porosity` (0,509433962); 2022 has `MP3 (kPa)`. `WFPS1 / 100 × 0,509433962` = pit `WC1`. No `WC` columns.
+- `EC/Management Information.docx`: management notes, not parsed.
 - Soil pit files `data/Viikki/pit1_cleaned_2023.csv` to `2025.csv`: about 105 000 rows each, 35 to 37 columns, comma delimiter, 5-minute step. Timestamp column `TIMESTAMP`, format `yyyy-mm-dd HH:MM:SS`, example `2022-12-31 00:05:00`. Each file starts on 31 December of the previous year.
 - Pit columns, index 1 to 5 = depth 14, 37, 54, 95, 120 cm: `Redox_Avg_n` mV, add +200 mV (471.4), `Temp_T12_Avg_n` C (0.4), `EC_Avg_n` µS/cm (60), `Temp_T21_Avg_n` C, `Matric_potential_Avg_n` kPa (-0.1), `WC1..5` m3/m3 (0.449), `Water_level_Avg` m (1.777), `Temp_ottpls_Avg` C, `shf_plate_Avg` W/m2. Details in `pit1_metadata.txt`.
 - Crops (field Alaniitty 1): 2022 timothy, 2023 barley / mixed grass / red clover, 2024 grassland, 2025 fava bean. Coordinates are not in the data files.
@@ -72,7 +72,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Files are large. Read only the first lines with `head` when you inspect a file.
 - Skip the unit row in Anttila and Särkisuo files. DuckDB applies `skip` before it reads the header. Read the names first, then read the data: `read_csv(path, header=true, all_varchar=true) LIMIT 0` gives the names, then `read_csv(path, skip=2, header=false, names=[...], nullstr='-9999')` gives the data.
 - Set the missing-value string per file: `nullstr='-9999'` (Anttila, Särkisuo, Maktau), `nullstr='NA'` (Haltiala), `nullstr=''` (Qvidja, Viikki).
-- Viikki EC files: `read_csv(path, delim=';', decimal_separator=',', timestampformat='%-d.%-m.%Y %-H:%M')` or parse `Datetime` with `strptime(Datetime, '%d.%m.%Y %H:%M')`.
+- Viikki EC files: `read_csv(path, delim=';', decimal_separator=',', encoding='latin-1', timestampformat='%-d.%-m.%Y %-H:%M')` or parse `Datetime` with `strptime(Datetime, '%d.%m.%Y %H:%M')`. Without `encoding='latin-1'` the read fails on line 1.
 - `YYYYMMDDHHMM` timestamps (Qvidja, Maktau): read as VARCHAR or BIGINT, then `strptime(CAST(col AS VARCHAR), '%Y%m%d%H%M')`.
 - Example: `SELECT * FROM read_csv('data/Haltiala/haltiala.csv', nullstr='NA') LIMIT 5;`
 

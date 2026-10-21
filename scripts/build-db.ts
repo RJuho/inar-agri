@@ -101,8 +101,9 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
   const maps = mappings(src);
 
   // Header check. read_csv reads the names from line 1 and the unit row (if any) is skipped later.
+  const encoding = lit(src.encoding ?? 'utf-8');
   const head = await conn.runAndReadAll(
-    `SELECT * FROM read_csv(${lit(src.path)}, delim=${lit(src.delim)}, header=true, all_varchar=true) LIMIT 0`,
+    `SELECT * FROM read_csv(${lit(src.path)}, delim=${lit(src.delim)}, header=true, all_varchar=true, encoding=${encoding}) LIMIT 0`,
   );
   const names = head.columnNames();
   const needed = [...new Set([src.timestampColumn, ...maps.flatMap(([, m]) => m.sourceColumns)])];
@@ -125,7 +126,7 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
     FROM (
       SELECT ${tsParsed} AS ts_parsed, ${dataCols.map((c) => `${clean(c)} AS ${ident(c)}`).join(', ')}
       FROM read_csv(${lit(src.path)}, delim=${lit(src.delim)}, header=false, skip=${src.headerLines},
-                    names=[${names.map(lit).join(', ')}], all_varchar=true, store_rejects=true)
+                    names=[${names.map(lit).join(', ')}], all_varchar=true, store_rejects=true, encoding=${encoding})
     )`);
 
   let linesSkippedByParser = 0;

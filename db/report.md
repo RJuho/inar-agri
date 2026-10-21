@@ -1,15 +1,15 @@
 # Build report: harmonised core database
 
-Built 2026-10-20T17:27:41.298Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
+Built 2026-10-21T05:57:38.324Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
 
 ## Output files
 
 | File | Rows | Bytes |
 |---|---|---|
-| db/observations.parquet | 537980 | 8114092 |
-| db/sites.parquet | 6 | 3783 |
+| db/observations.parquet | 537980 | 8310738 |
+| db/sites.parquet | 6 | 3956 |
 | db/variables.parquet | 8 | 1476 |
-| db/site_variables.parquet | 59 | 5000 |
+| db/site_variables.parquet | 67 | 5111 |
 
 ## Sites
 
@@ -119,21 +119,21 @@ Valid values, min, max, mean, merge conflicts and physical range warnings per co
 
 | Column | Valid | Valid % | Min | Max | Mean | Conflicts | Range warnings |
 |---|---|---|---|---|---|---|---|
-| nee | 3947 | 5.6 | -32.175 | 12.85 | -0.21011 | 0 | 0 |
-| nee_f | 68064 | 97.1 | -39.215 | 12.85 | 0.074452 | 0 | 0 |
-| nee_qc | 17520 | 25 | 0 | 1 | 0.77471 | 0 | 0 |
-| ta | 67375 | 96.1 | -27 | 29.59 | 7.2873 | 0 | 0 |
-| tsoil | 52384 | 74.7 | -3.9 | 29.313 | 8.1766 | 0 | 0 |
-| swc | 50917 | 72.6 | 0.10134 | 0.53863 | 0.30418 | 0 | 0 |
+| nee | 14949 | 21.3 | -39.215 | 12.85 | -1.0666 | 0 | 0 |
+| nee_f | 69552 | 99.2 | -39.215 | 12.85 | 0.087793 | 0 | 0 |
+| nee_qc | 70128 | 100 | 0 | 1 | 0.78683 | 0 | 0 |
+| ta | 68860 | 98.2 | -27 | 29.59 | 7.1377 | 0 | 0 |
+| tsoil | 63939 | 91.2 | -3.9 | 29.313 | 8.5307 | 0 | 0 |
+| swc | 62472 | 89.1 | 0.10134 | 0.53863 | 0.29494 | 48 | 0 |
 
 Per year: valid count, min and max.
 
 | Year | Rows | nee | nee_f | nee_qc | ta | tsoil | swc |
 |---|---|---|---|---|---|---|---|
-| 2021 | 4 | 0 | 4 · 0.14016 … 0.23728 | 0 | 4 · -1 … -0.91 | 0 | 0 |
-| 2022 | 17520 | 0 | 17520 · -34.238 … 9.9312 | 0 | 17008 · -20.86 … 29.59 | 52 · 0.4 … 0.4 | 52 · 0.44967 … 0.53391 |
-| 2023 | 17520 | 0 | 16944 · -39.215 … 10.157 | 0 | 17089 · -17.1 … 28.45 | 17434 · -3.9 … 28.582 | 17407 · 0.1025 … 0.53456 |
-| 2024 | 17568 | 0 | 16080 · -26.151 … 11.956 | 4 · 1 … 1 | 16074 · -27 … 27.4 | 17566 · -2.6 … 22.868 | 17564 · 0.10134 … 0.52467 |
+| 2021 | 4 | 0 | 4 · 0.14016 … 0.23728 | 4 · 1 … 1 | 4 · -1 … -0.91 | 0 | 0 |
+| 2022 | 17520 | 3425 · -34.238 … 9.9312 | 17520 · -34.238 … 9.9312 | 17520 · 0 … 1 | 17008 · -20.86 … 29.59 | 11607 · -1.276 … 21.1 | 11607 · 0.12526 … 0.53385 |
+| 2023 | 17520 | 3371 · -39.215 … 10.157 | 16944 · -39.215 … 10.157 | 17520 · 0 … 1 | 17089 · -17.1 … 28.45 | 17434 · -3.9 … 28.582 | 17407 · 0.1025 … 0.53456 |
+| 2024 | 17568 | 4206 · -26.151 … 12.227 | 17568 · -26.151 … 11.956 | 17568 · 0 … 1 | 17559 · -27 … 27.4 | 17566 · -2.6 … 22.868 | 17564 · 0.10134 … 0.52467 |
 | 2025 | 17516 | 3947 · -32.175 … 12.85 | 17516 · -32.175 … 12.85 | 17516 · 0 … 1 | 17200 · -17.58 … 28.8 | 17332 · -2.7667 … 29.313 | 15894 · 0.15823 … 0.53863 |
 
 ### Maktau
@@ -182,7 +182,7 @@ Physical lines = header lines + rows read + lines skipped by the parser. Rejecte
 | sarkisuo_biomet_2023 | data/Särkisuo/biomet_final_30min_FI-Sar_2023.csv | 17522 | 2 | 17520 | 0 | 0 | 0 |  |
 | haltiala | data/Haltiala/haltiala.csv | 81601 | 1 | 81600 | 0 | 0 | 0 |  |
 | qvidja | data/Qvidja/Qvidja_2018-2025.csv | 237556 | 1 | 237555 | 0 | 0 | 103447 |  |
-| viikki_ec_2022 | data/Viikki/EC/2022.csv | 16033 | 1 | 16032 | 0 | 0 | 0 |  |
+| viikki_ec_2022 | data/Viikki/EC/2022.csv | 17521 | 1 | 17520 | 0 | 0 | 0 |  |
 | viikki_ec_2023 | data/Viikki/EC/2023.csv | 17521 | 1 | 17520 | 0 | 0 | 0 |  |
 | viikki_ec_2024 | data/Viikki/EC/2024.csv | 17569 | 1 | 17568 | 0 | 0 | 0 |  |
 | viikki_ec_2025 | data/Viikki/EC/2025.csv | 17521 | 1 | 17520 | 0 | 0 | 0 |  |
@@ -232,14 +232,22 @@ Per source column: valid values, sentinel values set to NULL (-9999, NA, inf), e
 | qvidja | ta | 237555 | 0 | 0 |  |
 | qvidja | tsoil | 228159 | 0 | 0 |  |
 | qvidja | swc | 219003 | 0 | 0 |  |
-| viikki_ec_2022 | nee_f | 16032 | 0 | 0 | 22.7223667617219 |
-| viikki_ec_2022 | ta | 15536 | 0 | 0 |  |
-| viikki_ec_2023 | nee_f | 17520 | 0 | 0 | 22.7223667617219 |
-| viikki_ec_2023 | ta | 17100 | 0 | 0 |  |
-| viikki_ec_2024 | nee_f | 16992 | 0 | 0 | 22.7223667617219 |
-| viikki_ec_2024 | ta | 17535 | 0 | 0 |  |
-| viikki_ec_2025 | nee | 3947 | 0 | 0 |  |
-| viikki_ec_2025 | nee_f | 17520 | 0 | 0 |  |
+| viikki_ec_2022 | nee | 3425 | 0 | 0 | 22.7223667617219 |
+| viikki_ec_2022 | nee_f | 17520 | 0 | 0 | 22.7223667617219 |
+| viikki_ec_2022 | nee_qc | 17520 | 0 | 0 |  |
+| viikki_ec_2022 | ta | 17008 | 0 | 0 |  |
+| viikki_ec_2022 | tsoil | 11603 | 0 | 0 |  |
+| viikki_ec_2022 | swc | 11603 | 0 | 0 | 0.00509433962 |
+| viikki_ec_2023 | nee | 3371 | 0 | 0 | 22.7223667617219 |
+| viikki_ec_2023 | nee_f | 16944 | 0 | 0 | 22.7223667617219 |
+| viikki_ec_2023 | nee_qc | 17520 | 0 | 0 |  |
+| viikki_ec_2023 | ta | 17089 | 0 | 0 |  |
+| viikki_ec_2024 | nee | 4206 | 0 | 0 | 22.7223667617219 |
+| viikki_ec_2024 | nee_f | 17568 | 0 | 0 | 22.7223667617219 |
+| viikki_ec_2024 | nee_qc | 17568 | 0 | 0 |  |
+| viikki_ec_2024 | ta | 17559 | 0 | 0 |  |
+| viikki_ec_2025 | nee | 3947 | 0 | 0 | 22.7223667617219 |
+| viikki_ec_2025 | nee_f | 17520 | 0 | 0 | 22.7223667617219 |
 | viikki_ec_2025 | nee_qc | 17520 | 0 | 0 |  |
 | viikki_ec_2025 | ta | 17204 | 0 | 0 |  |
 | viikki_pit_2023 | tsoil | 104631 | 0 | 0 |  |

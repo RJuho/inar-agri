@@ -49,6 +49,8 @@ export type Source = {
   /** Lines before the first data line: 1 = header only, 2 = header and unit row. */
   headerLines: number;
   decimalComma: boolean;
+  /** Text encoding of the file. Default utf-8. */
+  encoding?: 'utf-8' | 'latin-1';
   timestampColumn: string;
   /** strptime formats, tried in this order. */
   timestampFormats: string[];
@@ -65,8 +67,10 @@ export type Source = {
 
 export type Registry = { sites: Site[]; sources: Source[] };
 
-/** 1 mg CO2 = 1000 / 44.0095 µmol CO2. */
+/** 1 mg CO2 = 1000 / 44.0095 µmol CO2. The Viikki EC files give NEE in mg CO2 m-2 s-1 (header). */
 export const MG_CO2_TO_UMOL = 1000 / 44.0095;
+/** Viikki WFPS (%) to m3 m-3: porosity 0.509433962 (= 1 - 1.3 / 2.65, columns of the 2022 and 2023 files) / 100. */
+export const VIIKKI_WFPS_TO_SWC = 0.509433962 / 100;
 
 const ISO_SECONDS = '%Y-%m-%d %H:%M:%S';
 const ISO_MINUTES = '%Y-%m-%d %H:%M';
@@ -102,7 +106,7 @@ export const SITES: Site[] = [
     siteId: 5, code: 'viikki', fluxnetId: null, name: 'Viikki', country: 'FI',
     lat: null, lon: null, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'CRO',
     description: 'Grassland in rotation, field Alaniitty 1. 2022 timothy, 2023 barley / mixed grass / red clover, 2024 grassland, 2025 fava bean. Data 2022-2025.',
-    comment: 'Coordinates are not in the source files. NEE 2022-2024 unit assumed mg CO2 m-2 s-1 and converted.',
+    comment: 'Coordinates are not in the source files. NEE unit mg CO2 m-2 s-1 per the file headers, converted to µmol. Soil 2022 from the EC file, 2023-2025 from the soil pit.',
   },
   {
     siteId: 6, code: 'maktau', fluxnetId: 'KE-Mkt', name: 'Maktau', country: 'KE',
@@ -142,30 +146,36 @@ function anttilaLike(site: SiteCode, code: string, dir: string, year: number): S
 }
 
 function viikkiEc(year: number): Source {
-  const base = {
-    id: `viikki_ec_${year}`, site: 'viikki' as const, path: `data/Viikki/EC/${year}.csv`,
-    delim: ';' as const, headerLines: 1, decimalComma: true,
-    timestampColumn: 'Datetime', timestampFormats: [FINNISH, ISO_SECONDS], timestampIsEnd: false, stepMin: 30, rank: 1,
-  };
-  if (year === 2025) {
-    return {
-      ...base,
-      columns: {
-        nee: { sourceColumns: ['NEE'], expr: 'num("NEE")' },
-        nee_f: { sourceColumns: ['NEE_F_XGB'], expr: 'num("NEE_F_XGB")' },
-        nee_qc: { sourceColumns: ['NEE'], expr: 'CASE WHEN num("NEE") IS NOT NULL THEN 0 ELSE 1 END', note: '0 where a measured NEE exists.' },
-        ta: { sourceColumns: ['avg(AirT_2.2m_digi (C))'], expr: 'num("avg(AirT_2.2m_digi (C))")' },
-      },
-    };
-  }
+  // Column names change by year. The degree sign is a literal "?" in the files.
+  const nee = 'NEE (mg CO2 m-2 s-1)';
+  const neeF = year === 2024 ? 'NEE _gapfilled (mg CO2 m-2 s-1)' : 'NEE_gapfilled (mg CO2 m-2 s-1)';
+  const tair = year <= 2023 ? 'Tair  (?C)' : 'Tair (?C)';
+  const soil2022: Partial<Record<CoreColumn, ColumnMap>> =
+    year === 2022
+      ? {
+          tsoil: {
+            sourceColumns: ['T1 (?C)'], expr: 'num("T1 (?C)")', depthCm: 14,
+            note: 'Only 2022, where no pit file exists. Same sensor as pit Temp_T12_Avg_1 (30-min mean, checked for 2023 and 2024). Values from 2022-04-12.',
+          },
+          swc: {
+            sourceColumns: ['WFPS1 (%)'], expr: `num("WFPS1 (%)") * ${VIIKKI_WFPS_TO_SWC}`, factor: VIIKKI_WFPS_TO_SWC, depthCm: 14,
+            note: 'Only 2022, where no pit file exists. WFPS1 = WC1 / porosity * 100 in the file. The factor gives back pit WC1 (exact for 2023 and 2024). Values from 2022-04-12.',
+          },
+        }
+      : {};
   return {
-    ...base,
+    id: `viikki_ec_${year}`, site: 'viikki', path: `data/Viikki/EC/${year}.csv`,
+    delim: ';', headerLines: 1, decimalComma: true, encoding: 'latin-1',
+    timestampColumn: 'Datetime', timestampFormats: [FINNISH], timestampIsEnd: false, stepMin: 30, rank: 1,
     columns: {
+      nee: { sourceColumns: [nee], expr: `num("${nee}") * ${MG_CO2_TO_UMOL}`, factor: MG_CO2_TO_UMOL, note: 'Measured NEE. Unit mg CO2 m-2 s-1 in the header.' },
       nee_f: {
-        sourceColumns: ['NEE'], expr: `num("NEE") * ${MG_CO2_TO_UMOL}`, factor: MG_CO2_TO_UMOL,
-        note: 'Unit of the source is not documented. Assumed mg CO2 m-2 s-1 (values are about 1/22 of the 2025 µmol scale). Measured NEE is not identified in this file.',
+        sourceColumns: [neeF], expr: `num("${neeF}") * ${MG_CO2_TO_UMOL}`, factor: MG_CO2_TO_UMOL,
+        note: 'Gap-filled NEE. Unit mg CO2 m-2 s-1 in the header. In 2024 (1750 periods) and 2025 (228) the gap-filled value differs from the measured value.',
       },
-      ta: { sourceColumns: ['Tair'], expr: 'num("Tair")' },
+      nee_qc: { sourceColumns: [nee], expr: `CASE WHEN num("${nee}") IS NOT NULL THEN 0 ELSE 1 END`, note: '0 where a measured NEE exists.' },
+      ta: { sourceColumns: [tair], expr: `num("${tair}")` },
+      ...soil2022,
     },
   };
 }

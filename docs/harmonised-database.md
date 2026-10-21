@@ -11,7 +11,7 @@ Six eddy-covariance sites deliver data in six layouts. The layouts differ in del
 ## Principles
 
 - `data/` is read-only. The build reads the files and does not change them.
-- No loss of numeric accuracy. All measurements are DOUBLE. Each source value is a decimal text with at most 17 significant digits, so DOUBLE holds it exactly. The build applies only two arithmetic operations, and both are listed in `site_variables.parquet`: a unit factor (Viikki NEE 2022-2024) and a 30-minute mean (Viikki soil pit).
+- No loss of numeric accuracy. All measurements are DOUBLE. Each source value is a decimal text with at most 17 significant digits, so DOUBLE holds it exactly. The build applies only three arithmetic operations, and all are listed in `site_variables.parquet`: a unit factor for Viikki NEE (mg CO2 to µmol), a unit factor for Viikki WFPS 2022 (% to m3 m-3), and a 30-minute mean (Viikki soil pit).
 - Scope: the strict intersection. A column exists only when all six sites have the variable. The result is NEE, air temperature, soil temperature and soil water content.
 - Every rule is explicit in the registry or in this document, and every rule reports its counts in the build report.
 - DuckDB does all reading, cleaning, merging and writing in SQL. Valibot validates the registry, the file headers, every output row and the report.
@@ -23,7 +23,7 @@ Six eddy-covariance sites deliver data in six layouts. The layouts differ in del
 | `db/observations.parquet` | about 538 000 | One row per site and 30-minute period. Sorted by `site_id`, `ts_start`. ZSTD, row groups of 100 000 rows. |
 | `db/sites.parquet` | 6 | Geolocation index: `site_id`, `code`, `fluxnet_id`, `name`, `country`, `lat`, `lon`, `elevation_m`, `utc_offset_min`, `timestep_min`, `ecosystem`, `description`, `comment`, `data_start`, `data_end`. |
 | `db/variables.parquet` | 8 | One row per output column: data type, unit, description. |
-| `db/site_variables.parquet` | about 60 | Provenance per site and column: source file, source columns, SQL expression, factor, zero rule, sensor depth, rank, aggregation, note. |
+| `db/site_variables.parquet` | about 65 | Provenance per site and column: source file, source columns, SQL expression, factor, zero rule, sensor depth, rank, aggregation, note. |
 | `db/report.md`, `db/report.json` | - | Build report. |
 
 The Parquet files are not in git (`db/*.parquet` is in `.gitignore`). The reports are in git.
@@ -65,27 +65,26 @@ The Finnish files use UTC+2 all year (no daylight saving time). All sources stam
 | Anttila, Särkisuo | `co2_flux_final_gf_ensemble` where `co2_flux_final_gap` = 0 | `co2_flux_final_gf_ensemble` | `co2_flux_final_gap` | `TA_1_1_1` | `TS_1_1_1` (not known) | `SWC_1_1_1` (not known) |
 | Haltiala | `NEE` | `NEE_F` | 0 where `NEE` has a value, else 1 | `TA_F` | `TS_010_F` (10) | `SWC_010_F` (10) |
 | Qvidja | `NEE` where `NEE_QC` = 0 | `NEE` | `NEE_QC` | `TA_F` | `TS_1` (5) | `SM` (10) |
-| Viikki 2022-2024 (EC file) | NULL | `NEE` × 22.7224 | NULL | `Tair` | pit `Temp_T12_Avg_1`, 30-min mean (14) | pit `WC1`, 30-min mean (14) |
-| Viikki 2025 (EC file) | `NEE` | `NEE_F_XGB` | 0 where `NEE` has a value, else 1 | `avg(AirT_2.2m_digi (C))` | pit, as above | pit, as above |
+| Viikki (EC file) | `NEE (mg CO2 m-2 s-1)` × 22.7224 | `NEE_gapfilled (mg CO2 m-2 s-1)` × 22.7224 | 0 where `NEE` has a value, else 1 | `Tair (?C)` | 2022: EC `T1 (?C)` (14). 2023-2025: pit `Temp_T12_Avg_1`, 30-min mean (14) | 2022: EC `WFPS1 (%)` × 0.00509433962 (14). 2023-2025: pit `WC1`, 30-min mean (14) |
 | Maktau | `FC` (continuous file) | NULL | NULL | `TA_1_1_1` | `TS_1_1_1` (10) | `SWC_1_1_1` (10) |
 
 Notes:
 
 - Anttila and Särkisuo: the flux file and the biomet file of the same year share one time grid. The build joins them on the period.
-- Viikki NEE 2022-2024: the unit is not documented. The values are about 1/22 of the 2025 values in µmol m-2 s-1. The build assumes mg CO2 m-2 s-1 and multiplies by 1000 / 44.0095 = 22.7224. This is an assumption. Change `MG_CO2_TO_UMOL` in the registry when the unit is confirmed. The measured NEE is not identified in these files (`NEE_G` has values in about 20 % of the rows and its meaning is not known), so `nee` and `nee_qc` are NULL.
-- Viikki soil: the EC files have soil columns only in 2023-2024 and the 2025 file has none. The soil pit (5-minute step, 2023-2025) is the one consistent source. The build uses layer 1 (14 cm) for all years. 2022 has no soil data.
+- Viikki EC files (version of 2026-10-20): the headers give the NEE unit, mg CO2 m-2 s-1, for all four years. The build multiplies by 1000 / 44.0095 = 22.7224 (`MG_CO2_TO_UMOL`). The measured NEE is in `NEE (mg CO2 m-2 s-1)` (about 20 % of the periods) and the gap-filled NEE in `NEE_gapfilled (mg CO2 m-2 s-1)` (2024: `NEE _gapfilled`, with a space). In 2024 (1 750 periods) and 2025 (228) the gap-filled value differs from the measured value. The files are Latin-1; the degree sign is a literal `?` (`Tair (?C)`, two spaces in 2022 and 2023). The source has `encoding: 'latin-1'`.
+- Viikki soil: the soil pit (5-minute step, 2023-2025) gives layer 1 (14 cm). No pit file exists for 2022. The 2022 EC file holds the same sensor: `T1 (?C)` is the 30-minute mean of pit `Temp_T12_Avg_1` (checked for 2023 and 2024, mean absolute difference 0.02 °C), and `WFPS1 (%)` × 0.509433962 / 100 is pit `WC1` exactly (porosity 0.509433962 = 1 − 1.3 / 2.65, columns `Soil Bulk density` and `Soil Particle Density`). The build uses these two columns for 2022 only, from 2022-04-12. On 2022-12-31 both sources exist and the report counts 48 `swc` conflicts from rounding; the pit value (rank 10) loses against the EC file (rank 1) in these 48 periods.
 - Maktau: the continuous file (EC and biomet, 2018-2024) and the 30-minute meteo file (2014-2025) both hold TA, TS and SWC. The continuous file has rank 1 and the meteo file rank 2. Where both have a value, the continuous value is used. The two files disagree in about 490 periods for TA (median difference 0.54 °C). The report lists these conflicts. The 1-hour meteo file has a different time step and is not used.
 
 ## Rules
 
 Each rule runs in SQL. The report gives its counts.
 
-1. **Read as text, cast as number.** Every file is read with `all_varchar=true`. The text is trimmed. Empty text is NULL. In the Viikki EC files the decimal comma becomes a point. The macro `num(x)` casts to DOUBLE and returns NULL for the sentinels `-9999` (in any textual form such as `-9999.0000`), `NA`, `inf` and `nan`. The report counts the sentinels per source column.
-2. **Timestamps.** Each source has a list of `strptime` formats, tried in order. Viikki EC files use `d.m.yyyy H:MM` and, from 2024-01-01, `yyyy-mm-dd HH:MM:SS`. Qvidja and Maktau use `YYYYMMDDHHMM`. A row whose stamp does not parse or is not on a 30-minute boundary is rejected and counted. `ts_start` = local stamp minus the UTC offset of the site.
+1. **Read as text, cast as number.** Every file is read with `all_varchar=true` and the encoding of the source (`utf-8`, or `latin-1` for the Viikki EC files). The text is trimmed. Empty text is NULL. In the Viikki EC files the decimal comma becomes a point. The macro `num(x)` casts to DOUBLE and returns NULL for the sentinels `-9999` (in any textual form such as `-9999.0000`), `NA`, `inf` and `nan`. The report counts the sentinels per source column.
+2. **Timestamps.** Each source has a list of `strptime` formats, tried in order. Viikki EC files use `d.m.yyyy H:MM`. Qvidja and Maktau use `YYYYMMDDHHMM`. A row whose stamp does not parse or is not on a 30-minute boundary is rejected and counted. `ts_start` = local stamp minus the UTC offset of the site.
 3. **Deterministic merge.** All sources of a site are stacked. For each period and column the first non-NULL value wins, in the order of source rank and then file row. The report counts, per site and column, the periods where two sources give different non-NULL values (conflicts). Exact duplicate rows (Qvidja 2018-2023 has every row twice) give no conflict.
 4. **Maktau zero fill.** In both Maktau files, an exact 0 in `TA_1_1_1`, `TS_1_1_1` or `SWC_1_1_1` is a logger fill value and becomes NULL. The site is tropical lowland, so 0 °C and 0.000 m3 m-3 do not occur. The report counts the zeros per source column.
 5. **Viikki pit to 30 minutes.** The pit stamps the end of each 5-minute period. The build subtracts one microsecond and takes the 30-minute bucket, so the stamps 00:05 to 00:30 fall into the period that starts at 00:00. Duplicate 5-minute stamps are reduced to one row first. The period value is the mean of at least 3 of the 6 values, rounded to 10 decimals to remove binary summation noise. Otherwise it is NULL.
-6. **Unit factor.** Only Viikki NEE 2022-2024 has a factor. The factor is a field in the registry and appears in `site_variables.parquet` and in the report.
+6. **Unit factor.** Viikki NEE (all years, mg CO2 to µmol) and Viikki WFPS 2022 (% to m3 m-3) have a factor. The factor is a field in the registry and appears in `site_variables.parquet` and in the report.
 7. **Grid completion.** Missing periods between the first and the last period of a site get a row with NULL values.
 8. **Write.** `COPY ... TO 'db/observations.parquet' (FORMAT parquet, COMPRESSION zstd, ROW_GROUP_SIZE 100000, KV_METADATA {...})`, ordered by `site_id`, `ts_start`. The key-value metadata holds the build time and the generator name.
 
@@ -110,7 +109,7 @@ Physical lines = header lines + rows read + lines skipped by the parser.
 ## How to add a dataset
 
 1. Add the site to `SITES` in `scripts/lib/registry.ts` with a new `siteId`, the UTC offset and the coordinates.
-2. Add one `Source` per file. Give the delimiter, the number of header lines, the decimal mark, the timestamp column and formats, the time step, whether the stamp marks the period end, and the rank.
+2. Add one `Source` per file. Give the delimiter, the number of header lines, the decimal mark, the encoding (if not UTF-8), the timestamp column and formats, the time step, whether the stamp marks the period end, and the rank.
 3. Map each core column with a SQL expression over the cleaned text columns, with `num("col")` for numbers. Add `factor`, `zeroIsNull`, `depthCm` and `note` where they apply.
 4. Run `npm run typecheck` and `npm run build:db`. Read the report: rejected rows, sentinels, conflicts and range warnings show problems in the mapping.
 
@@ -120,8 +119,6 @@ To add an output column, add it to `CORE_COLUMNS` and `VARIABLES` in the registr
 
 - Coordinates of Anttila, Särkisuo and Viikki (Alaniitty 1). The sites table has NULL.
 - Depth of `TS_1_1_1` and `SWC_1_1_1` at Anttila and Särkisuo.
-- Unit of Viikki NEE 2022-2024, and the meaning of `NEE_G`.
-- Units of Viikki N2O (2022-2023 µg m-2 s-1 per the header, 2024 nmol m-2 s-1, 2025 not documented). Not used yet.
 - Maktau soil temperature in the meteo file has values near 1 °C in 2016-2017 and 2024. These pass the range check but look like sensor faults.
 
 ## Later extensions

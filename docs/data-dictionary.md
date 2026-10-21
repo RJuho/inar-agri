@@ -352,104 +352,93 @@ Field Alaniitty 1. Crops: 2022 timothy, 2023 barley / mixed grass / red clover, 
 
 ### EC files `data/Viikki/EC/{2022,2023,2024,2025}.csv`
 
-Semicolon delimiter. Comma decimal mark (`0,13`). Datetime format `d.m.yyyy H:MM`. Missing value: empty field. Half-hour step. Units are not in the files. The 2022 header states the N2O unit: µg m-2 s-1 in 2022 and 2023, nmol m-2 s-1 in 2024. Column names change by year. The 2025 file uses new names.
+Version of 2026-10-20. Semicolon delimiter. Comma decimal mark (`0,13`). Datetime format `d.m.yyyy H:MM`. Missing value: empty field. Half-hour step, full calendar years. Encoding ISO-8859-1 (Latin-1): read with `encoding='latin-1'`. CRLF line ends. Units are in the column names. The degree sign is a literal `?` (`Tair (?C)`). Column names change a little by year (spaces, `PAR` / `PPFD`, `WL` / `Water level`). The soil columns `RD`, `T`, `EC`, `MP` and `WFPS` come from the same sensors as layers 1 and 2 of the soil pit; `WFPS1 / 100 × 0,509433962` = pit `WC1`.
 
-| File | Rows | Columns | First datetime |
+| File | Rows | Columns | First datetime | Last datetime |
+|---|---|---|---|---|
+| `data/Viikki/EC/2022.csv` | 17521 | 35 | 1.1.2022 0:00 | 31.12.2022 23:30 |
+| `data/Viikki/EC/2023.csv` | 17521 | 34 | 1.1.2023 0:00 | 31.12.2023 23:30 |
+| `data/Viikki/EC/2024.csv` | 17569 | 30 | 1.1.2024 0:00 | 31.12.2024 23:30 |
+| `data/Viikki/EC/2025.csv` | 17521 | 30 | 1.1.2025 0:00 | 31.12.2025 23:30 |
+
+#### 2022 and 2023 (same layout; `n/a` = column not in that file)
+
+| Column | Unit | Example 2022 | Example 2023 |
 |---|---|---|---|
-| `data/Viikki/EC/2022.csv` | 16033 | 43 | 1.1.2022 0:00 |
-| `data/Viikki/EC/2023.csv` | 17521 | 39 | 1.12.2022 0:00 |
-| `data/Viikki/EC/2024.csv` | 17569 | 40 | 1.12.2023 0:00 |
-| `data/Viikki/EC/2025.csv` | 17521 | 36 | 1.1.2025 0:00 |
+| `Datetime` | local time UTC+2 | 1.1.2022 0:00 | 1.1.2023 0:00 |
+| `PAR (umol/m2s)` | µmol m-2 s-1 | -0,13 | -0,17 |
+| `Pair` | kPa | 100,22 | 99,39 |
+| `WS (m/s)` | m s-1 | 1,1 | 4,7 |
+| `WD (deg)` | degrees | 329 | 242 |
+| `P (mm)` | mm | 0 | 0 |
+| `Snow Depth` | cm | 9 | 9 |
+| `NEE (mg CO2 m-2 s-1)` | mg CO2 m-2 s-1, measured | (empty) | (empty) |
+| `NEE_gapfilled (mg CO2 m-2 s-1)` | mg CO2 m-2 s-1 | 0,006168531 | 0,023166791 |
+| `N2O (ug m-2 s-1)` | µg m-2 s-1, measured | (empty) | 0,010170237 |
+| `N2O_gapfilled (ug m-2 s-1)` | µg m-2 s-1 | 0,004809073 | 0,010170237 |
+| `RH(%)` | % | 92,43 | 89,54 |
+| `SWin (W/m2)` | W m-2 | -4,87 | -9,34 |
+| `Swout (W/m2)` | W m-2 | -3,47 | -6,17 |
+| `LWin (W/m2)` | W m-2 | -25,51 | -97,06 |
+| `LWout  (W/m2)` (two spaces) | W m-2 | -15,21 | -24,92 |
+| `Tair  (?C)` (two spaces) | °C | -0,95 | 4,47 |
+| `RD1 (mV)` | mV | (empty) | 603,4 |
+| `RD2 (mV)` | mV | (empty) | 687,3166667 |
+| `T1 (?C)` | °C, 14 cm | (empty) | 0,4 |
+| `T2 (?C)` | °C, 37 cm | (empty) | 1,5 |
+| `EC1 (µS/cm)` | µS cm-1 | (empty) | 111,65 |
+| `EC2 (µS/cm)` | µS cm-1 | (empty) | 505,5166667 |
+| `MP1 (kPa)` | kPa | (empty) | -0,1 |
+| `MP2 (kPa)` | kPa | (empty) | -0,1 |
+| `MP3 (kPa)` | kPa | (empty) | n/a |
+| `Soil Bulk density` | g cm-3 | 1,3 | 1,3 |
+| `Soil Particle Density` | g cm-3 | 2,65 | 2,65 |
+| `Total Porosity` | - | 0,509433962 | 0,509433962 |
+| `WFPS1 (%)` | % | (empty) | 104,716448 |
+| `WFPS2 (%)` | % | (empty) | 83,98008019 |
+| `HF (W/m2)` | W m-2 | (empty) | (empty) |
+| `WL (m)` | m | (empty) | -0,1225 |
+| `rainfall` | mm | 0 | 0 |
+| `snowfall` | mm | 0 | 0 |
 
-#### 2022, 2023 and 2024 (union of columns; `n/a` = column not in that file)
+In 2022 the columns are in the order `rainfall`, `snowfall`; in 2023 `snowfall`, `rainfall`. The soil columns of 2022 start on 12.4.2022.
 
-| Column | Example 2022 | Example 2023 | Example 2024 |
-|---|---|---|---|
-| `Datetime` | 1.1.2022 0:00 | 1.12.2022 0:00 | 1.12.2023 0:00 |
-| `PAR` | -0,13 | -0,17 | 0,18 |
-| `Pair` | 100,22 | 103,83 | 100,29 |
-| `WS` | 1,1 | 0,7 | 3 |
-| `WD` | 329 | 81 | 13 |
-| `P` | 0 | 0 | 0,1 |
-| `Snow Depth` | 9 | 3,7 | 13,7 |
-| `NEE_G` | (empty) | (empty) | (empty) |
-| `NEE` | 0,006168531 | 0,055628598 | 0,043402441 |
-| `N2O (ug m-2 s-1 for 22 and 23 but nmol m-2 s-1 for 2024)` | (empty) | n/a | n/a |
-| `N2O_sameunit` | (empty) | n/a | n/a |
-| `N2O` | (empty) | (empty) | (empty) |
-| `GF_N2O (ug m-2 s-1 for 22 and 23 but nmol m-2 s-1 for 2024)` | 0,010908517 | n/a | n/a |
-| `GF_N2O_sameunit` | 0,010908517 | n/a | n/a |
-| `GFN2O` | 0,010908517 | 0,004926705 | 0,014049959 |
-| `RH` | 92,43 | 98,35 | 93,13 |
-| `SWin` | -4,87 | -4,82 | -8,01 |
-| `SWout` | -3,47 | -2,92 | -8,46 |
-| `LWin` | -25,51 | -18,24 | -18,3 |
-| `LWout` | -15,21 | -13,28 | -14,92 |
-| `Tair` | -0,95 | 0,33 | -4,65 |
-| `RD1` | (empty) | 694,9 | 760,6666667 |
-| `RD2` | (empty) | 696,32 | 671,2833333 |
-| `T1` | (empty) | 0,9 | 0,1 |
-| `T2` | (empty) | 2,9 | 2 |
-| `EC1` | (empty) | 47 | 30,68333333 |
-| `EC2` | (empty) | 344,24 | 378 |
-| `MP1` | (empty) | -0,2 | -20,39666667 |
-| `MP2` | (empty) | -0,1 | -0,1 |
-| `MP3` | (empty) | -0,1 | 0 |
-| `WC1` | (empty) | 0,30215638 | 0,2225593 |
-| `WC2` | (empty) | 0,31612078 | 0,3592294 |
-| `WC3` | (empty) | 0,28136494 | 0,4262068 |
-| `Soil Bulk density` | 1,3 | 1,3 | 1,3 |
-| `Soil Particle Density` | 2,65 | 2,65 | 2,65 |
-| `Total Porosity` | 0,509433962 | 0,509433962 | 0,509433962 |
-| `WFPS1` | (empty) | 59,3121783 | 43,6875663 |
-| `WFPS2` | (empty) | 62,0533383 | 70,51540074 |
-| `HF` | (empty) | (empty) | -3,0557455 |
-| `WL` | (empty) | -1,4554 | -0,556 |
-| `precip_phase` | no_precip | no_precip | snow |
-| `snowfall` | 0 | 0 | 0,1 |
-| `rainfall` | 0 | 0 | 0 |
-| `N2O FLUX` | n/a | n/a | (empty) |
+#### 2024 and 2025 (same layout; names differ as shown)
 
-#### 2025
+| Column 2024 | Column 2025 | Unit | Example 2024 | Example 2025 |
+|---|---|---|---|---|
+| `Datetime` | `Datetime` | local time UTC+2 | 1.1.2024 0:00 | 1.1.2025 0:00 |
+| `PAR (umol/m2s)` | `PPFD (umol/m2s)` | µmol m-2 s-1 | -0,11 | -0,05 |
+| `WS (m/s)` | `WS (m/s)` | m s-1 | 2 | 1,2 |
+| `WD (deg)` | `WD (deg)` | degrees | 359 | 143 |
+| `P(mm)` | `P (mm)` | mm | 0 | 0 |
+| `Snow Depth` | `Snow Depth` | cm | 30 | 2 |
+| `NEE (mg CO2 m-2 s-1)` | `NEE (mg CO2 m-2 s-1)` | mg CO2 m-2 s-1, measured | (empty) | (empty) |
+| `NEE _gapfilled (mg CO2 m-2 s-1)` | `NEE_gapfilled (mg CO2 m-2 s-1)` | mg CO2 m-2 s-1 | -0,003480355 | 0,042526907 |
+| `N2O (ug m-2 s-1)` | `N2O (ug m-2 s-1)` | µg m-2 s-1, measured | (empty) | (empty) |
+| `N2O_gapfilled (ug m-2 s-1)` | `N2O_gapfilled (ug m-2 s-1)` | µg m-2 s-1 | 0,038725614 | 0,001741306 |
+| `RH (%)` | `RH (%)` | % | 85 | 81,2 |
+| `SWin (W/m2)` | `SWin (W/m2)` | W m-2 | -8,02 | -5,61 |
+| `SWout (W/m2)` | `SWout (W/m2)` | W m-2 | -5,39 | -3,23 |
+| `LWin (W/m2)` | `LWin (W/m2)` | W m-2 | -76,87 | -38,98 |
+| `LWout (W/m2)` | `LWout (W/m2)` | W m-2 | -22,53 | -10,7 |
+| `Tair (?C)` | `Tair (?C)` | °C | -16,7 | -2,44 |
+| `RD1 (mV)` | `RD1 (mV)` | mV | 767,9 | -132,7 |
+| `RD2 (mV)` | `RD2 (mV)` | mV | 728 | 464,7 |
+| `T1 (?C)` | `T1 (?C)` | °C, 14 cm | 0,1 | 1,3 |
+| `T2 (?C)` | `T2 (?C)` | °C, 37 cm | 1,1 | 2,7 |
+| `EC1  (µS/cm)` (two spaces) | `EC1 (µS/cm)` | µS cm-1 | 29,2 | 390,5 |
+| `EC2  (µS/cm)` (two spaces) | `EC2 (µS/cm)` | µS cm-1 | 442,4 | 435,4 |
+| `MP1 (kPa)` | `MP1 (kPa)` | kPa | 0 | 0 |
+| `MP2 (kPa)` | `MP2 (kPa)` | kPa | -0,1 | -0,1 |
+| `WFPS1 (%)` | `WFPS1 (%)` | % | 55,39841096 | 97,95491996 |
+| `WFPS2 (%)` | `WFPS2 (%)` | % | 76,33782763 | 76,87083096 |
+| `HF(W/m2)` | `HF (W/m2)` | W m-2 | (empty) | (empty) |
+| `WL(m)` | `Water level (m)` | m | -0,4 | -0,1 |
+| `snowfall` | `Snowfall` | mm | 0 | 0 |
+| `rainfall` | `Rainfall` | mm | 0 | 0 |
 
-| Column | Example 2025 |
-|---|---|
-| `Datetime` | 1.1.2025 0:00 |
-| `PA_FMI` | 100,51 |
-| `WS` | 1,2 |
-| `WD` | 143 |
-| `P_FMI` | 0 |
-| `SNOWDEPTH_FMI` | 2 |
-| `avg(AirRH_2.2m (%))` | 0 |
-| `avg(AirT_2.2m_digi (C))` | -2,44 |
-| `avg(SW_upper (W/m2))` | -5,61 |
-| `avg(SW_lower (W/m2))` | -3,23 |
-| `avg(LW_upper (W/m2))` | -38,98 |
-| `avg(LW_lower (W/m2))` | -10,7 |
-| `avg(NetRadT (C))` | -0,28 |
-| `PPFD (umol/m2s)` | -0,05 |
-| `Pres (hPa)` | 1004,5 |
-| `RD1` | -132,7 |
-| `RD2` | 464,7 |
-| `CCVWC1` | 3079,7 |
-| `T1` | 1,3 |
-| `EC1` | 390,5 |
-| `CCVWC2` | 2802,8 |
-| `T2` | 2,7 |
-| `EC2` | 435,4 |
-| `MP1` | 0 |
-| `MP2` | -0,1 |
-| `Water_level_Avg` | -0,1 |
-| `Temp_ottpls_Avg` | 7,3 |
-| `shf_plate_Avg` | (empty) |
-| `NEE` | (empty) |
-| `NEE_F_XGB` | 0,966301 |
-| `FN2O` | (empty) |
-| `N2O_gapfilled` | 0,001741306 |
-| `WFPS1` | 97,95491996 |
-| `WFPS2` | 76,87083096 |
-| `Rainfall ` | 0 |
-| `Snowfall` | 0 |
+Units of `Pair`, `Snow Depth`, `rainfall`, `snowfall` and the bulk densities are not in the files; the values given here follow the usual units of the station. The gap-filled NEE of 2025 equals the former `NEE_F_XGB` column divided by 22,7224.
 
 - `EC/Management Information.docx`: management notes. Not parsed.
 

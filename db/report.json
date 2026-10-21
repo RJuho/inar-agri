@@ -1,17 +1,17 @@
 {
-  "builtAt": "2026-10-20T17:27:41.298Z",
+  "builtAt": "2026-10-21T05:57:38.324Z",
   "duckdb": "v1.5.6",
   "node": "v26.10.0",
   "outputs": [
     {
       "file": "db/observations.parquet",
       "rows": 537980,
-      "bytes": 8114092
+      "bytes": 8310738
     },
     {
       "file": "db/sites.parquet",
       "rows": 6,
-      "bytes": 3783
+      "bytes": 3956
     },
     {
       "file": "db/variables.parquet",
@@ -20,8 +20,8 @@
     },
     {
       "file": "db/site_variables.parquet",
-      "rows": 59,
-      "bytes": 5000
+      "rows": 67,
+      "bytes": 5111
     }
   ],
   "sites": [
@@ -1077,51 +1077,51 @@
       "tsLastUtc": "2025-12-31 21:30:00",
       "columns": {
         "nee": {
-          "n_valid": 3947,
-          "min": -32.174597,
-          "max": 12.849674,
-          "mean": -0.21011146744362766,
+          "n_valid": 14949,
+          "min": -39.21497181290403,
+          "max": 12.849819993410513,
+          "mean": -1.066628177231517,
           "conflicts": 0,
           "rangeWarnings": 0
         },
         "nee_f": {
-          "n_valid": 68064,
+          "n_valid": 69552,
           "min": -39.21497181290403,
-          "max": 12.849674,
-          "mean": 0.0744524727528291,
+          "max": 12.849819993410513,
+          "mean": 0.08779309963251193,
           "conflicts": 0,
           "rangeWarnings": 0
         },
         "nee_qc": {
-          "n_valid": 17520,
+          "n_valid": 70128,
           "min": 0,
           "max": 1,
-          "mean": 0.7747146118721461,
+          "mean": 0.7868326488706365,
           "conflicts": 0,
           "rangeWarnings": 0
         },
         "ta": {
-          "n_valid": 67375,
+          "n_valid": 68860,
           "min": -27,
           "max": 29.59,
-          "mean": 7.287307458256032,
+          "mean": 7.137743828056941,
           "conflicts": 0,
           "rangeWarnings": 0
         },
         "tsoil": {
-          "n_valid": 52384,
+          "n_valid": 63939,
           "min": -3.9,
           "max": 29.3133333333,
-          "mean": 8.17656584135146,
+          "mean": 8.530722368717937,
           "conflicts": 0,
           "rangeWarnings": 0
         },
         "swc": {
-          "n_valid": 50917,
+          "n_valid": 62472,
           "min": 0.10134055,
           "max": 0.53863315,
-          "mean": 0.3041794973605111,
-          "conflicts": 0,
+          "mean": 0.2949430842706258,
+          "conflicts": 48,
           "rangeWarnings": 0
         }
       },
@@ -1143,10 +1143,10 @@
               "mean": 0.18010599984094344
             },
             "nee_qc": {
-              "n_valid": 0,
-              "min": null,
-              "max": null,
-              "mean": null
+              "n_valid": 4,
+              "min": 1,
+              "max": 1,
+              "mean": 1
             },
             "ta": {
               "n_valid": 4,
@@ -1173,10 +1173,10 @@
           "rows": 17520,
           "columns": {
             "nee": {
-              "n_valid": 0,
-              "min": null,
-              "max": null,
-              "mean": null
+              "n_valid": 3425,
+              "min": -34.237983571728826,
+              "max": 9.931157727308877,
+              "mean": -2.2423868885309566
             },
             "nee_f": {
               "n_valid": 17520,
@@ -1185,10 +1185,10 @@
               "mean": -0.19616825012770656
             },
             "nee_qc": {
-              "n_valid": 0,
-              "min": null,
-              "max": null,
-              "mean": null
+              "n_valid": 17520,
+              "min": 0,
+              "max": 1,
+              "mean": 0.8045091324200914
             },
             "ta": {
               "n_valid": 17008,
@@ -1197,16 +1197,16 @@
               "mean": 6.7891321730950205
             },
             "tsoil": {
-              "n_valid": 52,
-              "min": 0.4,
-              "max": 0.4,
-              "mean": 0.3999999999999998
+              "n_valid": 11607,
+              "min": -1.276,
+              "max": 21.1,
+              "mean": 10.092653786517067
             },
             "swc": {
-              "n_valid": 52,
-              "min": 0.44967475,
-              "max": 0.5339137,
-              "mean": 0.5031775980769232
+              "n_valid": 11607,
+              "min": 0.12526104995957812,
+              "max": 0.5338490497420573,
+              "mean": 0.25535815702155634
             }
           }
         },
@@ -1215,10 +1215,10 @@
           "rows": 17520,
           "columns": {
             "nee": {
-              "n_valid": 0,
-              "min": null,
-              "max": null,
-              "mean": null
+              "n_valid": 3371,
+              "min": -39.21497181290403,
+              "max": 10.156502391529102,
+              "mean": -1.1501409914297078
             },
             "nee_f": {
               "n_valid": 16944,
@@ -1227,10 +1227,10 @@
               "mean": 0.45243116011033435
             },
             "nee_qc": {
-              "n_valid": 0,
-              "min": null,
-              "max": null,
-              "mean": null
+              "n_valid": 17520,
+              "min": 0,
+              "max": 1,
+              "mean": 0.8075913242009133
             },
             "ta": {
               "n_valid": 17089,
@@ -1257,28 +1257,28 @@
           "rows": 17568,
           "columns": {
             "nee": {
-              "n_valid": 0,
-              "min": null,
-              "max": null,
-              "mean": null
+              "n_valid": 4206,
+              "min": -26.150851111691797,
+              "max": 12.227415921562391,
+              "mean": -0.8460306377999273
             },
             "nee_f": {
-              "n_valid": 16080,
+              "n_valid": 17568,
               "min": -26.15085211147593,
               "max": 11.955657823878935,
-              "mean": -0.005721554678048767
+              "mean": 0.05388430077638122
             },
             "nee_qc": {
-              "n_valid": 4,
-              "min": 1,
+              "n_valid": 17568,
+              "min": 0,
               "max": 1,
-              "mean": 1
+              "mean": 0.7605874316939891
             },
             "ta": {
-              "n_valid": 16074,
+              "n_valid": 17559,
               "min": -27,
               "max": 27.4,
-              "mean": 7.850938783128012
+              "mean": 7.216737285722393
             },
             "tsoil": {
               "n_valid": 17566,
@@ -1300,15 +1300,15 @@
           "columns": {
             "nee": {
               "n_valid": 3947,
-              "min": -32.174597,
-              "max": 12.849674,
-              "mean": -0.21011146744362766
+              "min": -32.17496254217839,
+              "max": 12.849819993410513,
+              "mean": -0.21011385445134675
             },
             "nee_f": {
               "n_valid": 17516,
-              "min": -32.1746,
-              "max": 12.849674,
-              "mean": 0.053076584037451115
+              "min": -32.1749655415308,
+              "max": 12.849819993410513,
+              "mean": 0.05307718719624662
             },
             "nee_qc": {
               "n_valid": 17516,
@@ -2265,25 +2265,49 @@
       "id": "viikki_ec_2022",
       "site": "viikki",
       "path": "data/Viikki/EC/2022.csv",
-      "physicalLines": 16033,
+      "physicalLines": 17521,
       "headerLines": 1,
-      "rowsRead": 16032,
+      "rowsRead": 17520,
       "rowsRejected": 0,
       "linesSkippedByParser": 0,
       "duplicateStamps": 0,
       "rowsAfterAggregation": null,
       "columns": {
-        "nee_f": {
-          "n_valid": 16032,
+        "nee": {
+          "n_valid": 3425,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": 22.7223667617219
         },
-        "ta": {
-          "n_valid": 15536,
+        "nee_f": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 22.7223667617219
+        },
+        "nee_qc": {
+          "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
+        },
+        "ta": {
+          "n_valid": 17008,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "tsoil": {
+          "n_valid": 11603,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
+        "swc": {
+          "n_valid": 11603,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 0.00509433962
         }
       }
     },
@@ -2299,14 +2323,26 @@
       "duplicateStamps": 0,
       "rowsAfterAggregation": null,
       "columns": {
-        "nee_f": {
-          "n_valid": 17520,
+        "nee": {
+          "n_valid": 3371,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": 22.7223667617219
         },
+        "nee_f": {
+          "n_valid": 16944,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 22.7223667617219
+        },
+        "nee_qc": {
+          "n_valid": 17520,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
         "ta": {
-          "n_valid": 17100,
+          "n_valid": 17089,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
@@ -2325,14 +2361,26 @@
       "duplicateStamps": 0,
       "rowsAfterAggregation": null,
       "columns": {
-        "nee_f": {
-          "n_valid": 16992,
+        "nee": {
+          "n_valid": 4206,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": 22.7223667617219
         },
+        "nee_f": {
+          "n_valid": 17568,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": 22.7223667617219
+        },
+        "nee_qc": {
+          "n_valid": 17568,
+          "n_sentinel": 0,
+          "n_zero_nulled": 0,
+          "factor": null
+        },
         "ta": {
-          "n_valid": 17535,
+          "n_valid": 17559,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
           "factor": null
@@ -2355,13 +2403,13 @@
           "n_valid": 3947,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
-          "factor": null
+          "factor": 22.7223667617219
         },
         "nee_f": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
-          "factor": null
+          "factor": 22.7223667617219
         },
         "nee_qc": {
           "n_valid": 17520,
