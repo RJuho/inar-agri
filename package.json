@@ -7,6 +7,7 @@
   "scripts": {
     "build:db": "node scripts/build-db.ts",
     "calc": "node scripts/calc.ts",
+    "scan:anomalies": "node scripts/scan-anomalies.ts",
     "test:unit": "node --test 'scripts/lib/calc/*.test.ts' 'site/src/scripts/diagrams/*.test.ts' 'site/src/scripts/*.test.ts'",
     "typecheck": "tsc --noEmit && tsc --noEmit -p site/tsconfig.json",
     "site:sync": "node scripts/sync-site-data.ts && node scripts/sync-site-duckdb.ts",
