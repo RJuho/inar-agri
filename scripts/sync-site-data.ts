@@ -70,8 +70,11 @@ if (out !== null && out >= src) {
   const conn = await db.connect();
   await conn.run(`
     COPY (
+      -- nee_f_calc: the gap-filled NEE that observations.parquet does not have. Maktau has no
+      -- gap-filled NEE in the source, thus all its rows (measured and MDS) go in; the other sites
+      -- give only the MDS rows (Viikki 2023). db.ts fills nee_f with it where the source is NULL.
       SELECT site_id, ts_start, gpp::FLOAT AS gpp, reco::FLOAT AS reco, reco_fqc, gpp_fqc,
-             CASE WHEN nee_fill = 'mds' THEN nee_f::FLOAT END AS nee_f_calc
+             CASE WHEN nee_fill = 'mds' OR site_code = 'maktau' THEN nee_f::FLOAT END AS nee_f_calc
       FROM read_parquet('${CALC_FLUXES}') ORDER BY site_id, ts_start
     ) TO '${OUT_FLUXES}' (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL 19, ROW_GROUP_SIZE 100000)`);
   conn.closeSync();
