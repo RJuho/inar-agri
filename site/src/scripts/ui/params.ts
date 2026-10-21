@@ -3,6 +3,7 @@
 import type { Meta } from '../db';
 import { siteEmoji } from '../sites';
 import { MONTH_NAMES } from '../diagrams/common';
+import { GLOSSARY, citeShort } from '../glossary';
 import {
   AGGREGATION_LABELS,
   AGGREGATIONS,
@@ -18,11 +19,49 @@ import {
 /** Wait time after the last change before the diagrams are drawn again. */
 const DEBOUNCE_MS = 300;
 
+/** Base path of the site, with a slash at the end (same as db.ts). */
+const BASE = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
   if (text !== undefined) e.textContent = text;
   return e;
+}
+
+/**
+ * One variable: the checkbox label, an info button and the summary text (hidden at start).
+ * The button is not in the label, thus a click on it does not change the checkbox.
+ * A button has no "change" event and FormData ignores it, thus the form does not see the click.
+ */
+function variableItem(v: Variable, label: HTMLLabelElement): HTMLDivElement {
+  const item = el('div', 'var-item');
+  const id = `var-info-${v}`;
+  const entry = GLOSSARY[v];
+
+  const btn = el('button', 'var-info-btn', 'ⓘ');
+  btn.type = 'button';
+  btn.setAttribute('aria-expanded', 'false');
+  btn.setAttribute('aria-controls', id);
+  btn.setAttribute('aria-label', `About ${VARIABLE_LABELS[v]}`);
+
+  const info = el('p', 'var-info');
+  info.id = id;
+  info.hidden = true;
+  info.append(document.createTextNode(entry.summary));
+  const cite = citeShort(entry.sources);
+  if (cite) info.append(' ', el('span', 'var-cite', cite));
+  const more = el('a', 'var-more', 'All terms');
+  more.href = `${BASE}variables/#var-${v}`;
+  info.append(' ', more);
+
+  btn.addEventListener('click', () => {
+    info.hidden = !info.hidden;
+    btn.setAttribute('aria-expanded', String(!info.hidden));
+  });
+
+  item.append(label, btn, info);
+  return item;
 }
 
 function checkbox(name: string, value: string, label: string, checked: boolean, emoji = '', hint = ''): HTMLLabelElement {
@@ -179,7 +218,7 @@ export class ParamsForm {
         const title = `${info.description ?? ''}${unit}`.trim();
         if (title) item.title = title;
       }
-      list.append(item);
+      list.append(variableItem(v, item));
     }
     box.append(tools, list);
     return box;

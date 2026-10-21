@@ -301,7 +301,52 @@
   }
 }
 
-/* ---------- Footer (both pages) ---------- */
+/* ---------- Variables page ---------- */
+
+.glossary {
+  max-width: 72ch;
+  margin: 0 0 12px;
+}
+
+.glossary dt {
+  margin-top: 16px;
+  font-weight: 650;
+  scroll-margin-top: 16px;
+}
+
+.glossary dt:target {
+  color: var(--series-1);
+}
+
+.glossary dd {
+  margin: 4px 0 0;
+  color: var(--text-primary);
+}
+
+.glossary-label {
+  margin-left: 6px;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.references li {
+  overflow-wrap: anywhere;
+}
+
+.references li:target {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
+.references .ref-note {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* ---------- Footer (all pages) ---------- */
 .site-footer {
   max-width: 1200px;
   margin: 0 auto 24px;

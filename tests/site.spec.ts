@@ -124,6 +124,30 @@ test.describe('first page', () => {
   test('full-page screenshot', async ({ page }) => {
     await page.screenshot({ path: 'test-results/site-full-page.png', fullPage: true });
   });
+
+  test('variable info toggle shows the summary', async ({ page }) => {
+    // One info button per variable (15 variables in state.ts).
+    await expect(page.locator('.var-info-btn')).toHaveCount(15);
+    const box = page.locator('input[name="variable"][value="nee"]');
+    const checked = await box.isChecked();
+    const btn = page.locator('button.var-info-btn[aria-controls="var-info-nee"]');
+    const info = page.locator('#var-info-nee');
+
+    await btn.click();
+    await expect(btn).toHaveAttribute('aria-expanded', 'true');
+    await expect(info).toBeVisible();
+    // Start of GLOSSARY.nee.summary in site/src/scripts/glossary.ts.
+    await expect(info).toContainText('The net CO₂ flux between the field');
+    await expect(info).toContainText('Heimsch et al. 2021');
+    await expect(info.locator('a.var-more')).toHaveAttribute('href', /variables\/#var-nee$/);
+    // The button does not change the checkbox.
+    expect(await box.isChecked()).toBe(checked);
+
+    await btn.click();
+    await expect(btn).toHaveAttribute('aria-expanded', 'false');
+    await expect(info).toBeHidden();
+    expect(await box.isChecked()).toBe(checked);
+  });
 });
 
 /** Wait until all diagrams of the active view are drawn. */
@@ -1154,6 +1178,52 @@ test.describe('calculated page', () => {
     await page.reload();
     const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
     expect(overflow).toBeLessThanOrEqual(0);
+  });
+});
+
+test.describe('variables page', () => {
+  let errors: string[];
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    errors = trackErrors(page);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+    await page.goto('/variables/');
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+
+  test('lists the 15 variables and has no script', async ({ page }) => {
+    await expect(page.locator('h1')).toContainText('Variables');
+    await expect(page.locator('.glossary dt')).toHaveCount(15);
+    await expect(page.locator('#var-nee')).toHaveCount(1);
+    await expect(page.locator('#var-swc')).toHaveCount(1);
+    await expect(page.locator('script')).toHaveCount(0);
+  });
+
+  test('has the reference list with DOI links', async ({ page }) => {
+    const refs = page.locator('section:has(> #references) ol.references li');
+    await expect(refs).toHaveCount(6);
+    for (const li of await refs.all()) {
+      expect(await li.locator('a[href^="https://doi.org/10."]').count()).toBeGreaterThan(0);
+    }
+    await expect(page.locator('#ref-gao2026')).toHaveCount(1);
+  });
+
+  test('each citation link goes to a reference on the page', async ({ page }) => {
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) {
+      await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    }
+  });
+
+  test('the page navigation marks the Variables page', async ({ page }) => {
+    const nav = page.getByRole('navigation', { name: 'Pages' });
+    await expect(nav.getByRole('link', { name: 'Variables' })).toHaveAttribute('aria-current', 'page');
   });
 });
 

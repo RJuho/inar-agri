@@ -1,0 +1,106 @@
+---
+// Text page "Variables": short summaries of the variables of the data page, with sources.
+// The texts come from scripts/glossary.ts. The page has no client script.
+import Base from '../layouts/Base.astro';
+import { CITED_REFS, GLOSSARY, REF_IDS, REFERENCES, type RefId } from '../scripts/glossary';
+import { VARIABLE_GROUPS, VARIABLE_LABELS } from '../scripts/state';
+
+/** Why an article of the collection is not cited in the summaries. */
+const NOT_CITED: Partial<Record<RefId, string>> = {
+  gao2026: 'Uses NEE with the opposite sign (positive = uptake). Not cited for NEE.',
+  sirola2024: 'Soil and flux data of Viikki analysed with PCA. No definitions of these variables.',
+  vettikkat2026: 'Ammonia flux by eddy covariance. No definitions of these variables.',
+};
+const otherRefs = REF_IDS.filter((id) => !CITED_REFS.includes(id));
+---
+
+<Base
+  title="Variables – INAR agri"
+  description="Short summaries of the 15 variables on the INAR agri data page, with the articles that explain them."
+>
+  <main class="prose">
+    <header>
+      <h1>Variables</h1>
+      <p class="lead">
+        This page gives short summaries of the 15 variables on the <a href={import.meta.env.BASE_URL}>data page</a>.
+        A source in brackets is the article in the collection that explains the term.
+      </p>
+    </header>
+
+    <p>
+      Fluxes use the micrometeorological sign: a flux to the air is positive and a flux into the field is negative.
+      Thus NEE &lt; 0 is uptake by the field. Note: <a href="#ref-gao2026">Gao et al. 2026</a> uses the opposite sign
+      for NEE (positive = uptake).
+    </p>
+
+    {
+      VARIABLE_GROUPS.map((g) => (
+        <section aria-label={g.label}>
+          <h2>{g.label}</h2>
+          <dl class="glossary">
+            {g.variables.map((v) => {
+              const e = GLOSSARY[v];
+              return (
+                <>
+                  <dt id={`var-${v}`}>
+                    {e.term} <span class="glossary-label">{VARIABLE_LABELS[v]}</span>
+                  </dt>
+                  <dd>
+                    {e.summary}
+                    {e.sources.length > 0 && (
+                      <>
+                        {' ('}
+                        {e.sources.map((id, i) => (
+                          <>
+                            {i > 0 && '; '}
+                            <a href={`#ref-${id}`}>{REFERENCES[id].short}</a>
+                          </>
+                        ))}
+                        {')'}
+                      </>
+                    )}
+                  </dd>
+                </>
+              );
+            })}
+          </dl>
+        </section>
+      ))
+    }
+
+    <section aria-labelledby="references">
+      <h2 id="references">References</h2>
+      <ol class="references">
+        {
+          CITED_REFS.map((id) => {
+            const r = REFERENCES[id];
+            return (
+              <li id={`ref-${id}`}>
+                {r.authors} ({r.year}): <em>{r.title}</em>. {r.journal}.{' '}
+                <a href={`https://doi.org/${r.doi}`}>doi:{r.doi}</a>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="other-articles">
+      <h2 id="other-articles">Other articles in the collection</h2>
+      <ol class="references">
+        {
+          otherRefs.map((id) => {
+            const r = REFERENCES[id];
+            return (
+              <li id={`ref-${id}`}>
+                {r.authors} ({r.year}): <em>{r.title}</em>. {r.journal}.{' '}
+                <a href={`https://doi.org/${r.doi}`}>doi:{r.doi}</a>
+                <span class="ref-note">{NOT_CITED[id]}</span>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+  </main>
+</Base>
