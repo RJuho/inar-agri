@@ -1,0 +1,803 @@
+---
+// Text page "Calculated data": methods and results of scripts/calc.ts (docs/calculated.md).
+// All formulas and tables are made at build time. The page has no client script.
+import 'katex/dist/katex.min.css';
+import Base from '../layouts/Base.astro';
+import { readCsv, readJson, type Row } from '../lib/csv';
+import { tex } from '../lib/tex';
+
+// ---------- Data ----------
+
+interface Report {
+  builtAt: string;
+  options: { temp: string; ustar: string; gppNight: string };
+  constants: {
+    lloydTaylor: { tref: number; t0: number };
+    hhToGc: number;
+    night: { swIn: number; ppfd: number };
+    e0: {
+      winDays: number;
+      stepDays: number;
+      minData: number;
+      minTempRange: number;
+      limits: Record<'ta' | 'tsoil', { min: number; max: number }>;
+      trimPercent: number;
+      nBest: number;
+    };
+    rref: { winDays: number; stepDays: number; minData: number; maxCentreDistanceDays: number };
+    taFill: { maxLinearRows: number; mdcDays: number[]; hourTolRows: number };
+    maktau: {
+      ssitcMax: number;
+      plausibility: number;
+      ustarFixed: number;
+      mpt: { tempClasses: number; ustarClasses: number; plateauFraction: number; lookAhead: number; maxCorr: number };
+    };
+    mds: { tolSwIn: number; tolTa: number; tolVpd: number; minCount: number };
+    reliable: { minFracMeasured: number; maxGapDays: number };
+  };
+  maktau: {
+    filter: { total: number; noFlag: number; badFlag: number; implausible: number; lowUstar: number; kept: number };
+  };
+  warnings: string[];
+}
+
+const report = readJson<Report>('report.json');
+const c = report.constants;
+const annual = readCsv('annual.csv');
+const necb = readCsv('necb.csv');
+const params = readCsv('partition_params.csv');
+const valPart = readCsv('validation_partition.csv');
+const valQvidja = readCsv('validation_qvidja.csv');
+const valHaltiala = readCsv('validation_haltiala.csv');
+const mgmt = readCsv('management_carbon.csv');
+
+const SITE_NAMES: Record<string, string> = {
+  anttila: 'Anttila',
+  sarkisuo: 'Särkisuo',
+  haltiala: 'Haltiala',
+  qvidja: 'Qvidja',
+  viikki: 'Viikki',
+  maktau: 'Maktau',
+};
+const SITE_ORDER = Object.keys(SITE_NAMES);
+const siteName = (code: string | null): string => (code ? (SITE_NAMES[code] ?? code) : '–');
+const bySiteYear = (siteKey: string) => (a: Row, b: Row) =>
+  SITE_ORDER.indexOf(a[siteKey] ?? '') - SITE_ORDER.indexOf(b[siteKey] ?? '') ||
+  Number(a.year ?? 0) - Number(b.year ?? 0);
+
+// ---------- Number format ----------
+
+const DASH = '–';
+/** Number with a fixed count of decimals, thin-space thousands, true minus sign. Null gives a dash. */
+function num(v: string | number | null | undefined, decimals = 0): string {
+  if (v === null || v === undefined || v === '') return DASH;
+  const x = typeof v === 'number' ? v : Number(v);
+  if (!Number.isFinite(x)) return DASH;
+  const s = x.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const out = s.replace(/,/g, ' ');
+  return out === '-0' ? '0' : out.replace(/^-/, '−');
+}
+const pct = (v: string | null, decimals = 0) => (v === null ? DASH : `${num(Number(v) * 100, decimals)} %`);
+const yesNo = (v: string | null) => (v === null ? DASH : v === 'true' ? 'yes' : 'no');
+const builtAt = report.builtAt.replace('T', ' ').replace(/:\d\d(\.\d+)?Z$/, ' UTC');
+
+// ---------- Derived constants ----------
+
+const lt = c.lloydTaylor;
+const e0Win = 2 * c.e0.winDays + 1;
+const rrefWin = 2 * c.rref.winDays + 1;
+const linearHours = c.taFill.maxLinearRows / 2;
+const hourTol = c.taFill.hourTolRows / 2;
+const e0Lim = c.e0.limits;
+const ustar = c.maktau.ustarFixed;
+
+/** Rows per site where the script computed VPD with the Magnus formula (from the report warnings). */
+const magnusRows: Record<string, number> = {};
+for (const w of report.warnings) {
+  const m = /^(\w+): VPD computed from ta and rh \(Magnus\) in (\d+) rows/.exec(w);
+  if (m?.[1] && m[2]) magnusRows[m[1]] = Number(m[2]);
+}
+
+// ---------- Formulas (TeX, rendered at build time) ----------
+
+const C = (name: string) => `C_{\\mathrm{${name}}}`;
+const hu = [
+  `\\mathrm{NECB} = \\mathrm{NEE} + ${C('exo')} - ${C('harvest')} - ${C('D')} - ${C('fire')} - ${C('volatile')} - C_{\\mathrm{CH_4}} - ${C('erosion')}`,
+  `\\mathrm{NECB} = \\mathrm{NEE} - ${C('harvest')}`,
+  `\\mathrm{NEE} = \\mathrm{NPP} - R_{\\mathrm{h}}`,
+  `\\mathrm{NECB} = \\mathrm{NPP} - R_{\\mathrm{h}} - ${C('harvest')}`,
+  `${C('input')} = \\mathrm{NPP} - ${C('harvest')}`,
+  `\\mathrm{NECB} = ${C('input')} - R_{\\mathrm{h}}`,
+  `\\mathrm{RCB} = \\mathrm{NECB} - \\mathrm{SCB}`,
+].map((s) => tex(s, true));
+
+const f = {
+  necbOurs: tex(`\\mathrm{NECB} = -\\mathrm{NEE} - ${C('harvest')} + ${C('exo')} - C_{\\mathrm{CH_4}}`, true),
+  magnus: tex(
+    '\\mathrm{VPD} = 6.1078\\,\\exp\\!\\left(\\frac{17.27\\,T}{T + 237.3}\\right)\\left(1 - \\frac{\\mathrm{RH}}{100}\\right)\\ \\mathrm{hPa}',
+    true,
+  ),
+  lloyd: tex(
+    'R_{\\mathrm{eco}}(T) = R_{\\mathrm{ref}}\\,\\exp\\!\\left(E_0\\left(\\frac{1}{T_{\\mathrm{ref}}-T_0}-\\frac{1}{T-T_0}\\right)\\right)',
+    true,
+  ),
+  ltConst: tex(
+    `T_{\\mathrm{ref}} = ${lt.tref}\\ {}^{\\circ}\\mathrm{C},\\qquad T_0 = ${lt.t0}\\ {}^{\\circ}\\mathrm{C}`,
+    true,
+  ),
+  g: tex('g(T) = \\frac{1}{T_{\\mathrm{ref}}-T_0}-\\frac{1}{T-T_0}', true),
+  e0Valid: tex(
+    `E_0 - \\mathrm{SE} > ${e0Lim.ta.min}\\ \\mathrm{K} \\quad\\text{and}\\quad E_0 + \\mathrm{SE} < ${e0Lim.ta.max}\\ \\mathrm{K}`,
+    true,
+  ),
+  rref: tex(
+    'R_{\\mathrm{ref}} = \\frac{\\sum_i \\mathrm{NEE}_i\\, f_i}{\\sum_i f_i^2},\\quad f_i = \\exp\\big(E_0\\, g(T_i)\\big)',
+    true,
+  ),
+  gpp: tex('\\mathrm{GPP} = R_{\\mathrm{eco}} - \\mathrm{NEE}_f', true),
+  recoRow: tex('R_{\\mathrm{eco}}(t) = R_{\\mathrm{ref}}(t)\\,\\exp\\big(E_0\\, g(T(t))\\big)', true),
+  conv: tex(
+    `1\\ \\mu\\mathrm{mol\\,m^{-2}\\,s^{-1}} \\times 1800\\ \\mathrm{s} \\times 12.011\\times10^{-6}\\ \\mathrm{g\\,\\mu mol^{-1}} = ${num(c.hhToGc, 5)}\\ \\mathrm{g\\,C\\,m^{-2}}`,
+    true,
+  ),
+  sumAnnual: tex(
+    `\\mathrm{NEE}_{\\mathrm{year}} = ${num(c.hhToGc, 5)} \\sum_{i \\in \\mathrm{year}} \\mathrm{NEE}_{f,i}`,
+    true,
+  ),
+  sigma: tex(
+    '\\sigma_{10} = \\sqrt{\\frac{1}{9}\\sum_{k=1}^{10}\\left(S_k - \\bar{S}\\right)^2},\\quad S_k = \\sum_{i \\in \\mathrm{year}} \\mathrm{NEE\\_F}k_i',
+    true,
+  ),
+  ci: tex('\\mathrm{CI}_{95} = 1.96\\,\\sigma_{10}', true),
+  dry: tex('m_{\\mathrm{dry}} = m_{\\mathrm{fresh}} \\times f_{\\mathrm{DM}}', true),
+  cMass: tex('C = \\frac{m_{\\mathrm{dry}}\\,[\\mathrm{kg\\,ha^{-1}}] \\times f_{C}}{10}\\ \\mathrm{g\\,C\\,m^{-2}}', true),
+  // Inline symbols.
+  e0: tex('E_0'),
+  rrefSym: tex('R_{\\mathrm{ref}}'),
+  ustar: tex('u_*'),
+  ustarLim: tex(`u_* \\ge ${ustar}\\ \\mathrm{m\\,s^{-1}}`),
+  fcLim: tex(`|\\mathrm{FC}| < ${c.maktau.plausibility}\\ \\mu\\mathrm{mol\\,m^{-2}\\,s^{-1}}`),
+  identity: tex('\\mathrm{NEE}_f = R_{\\mathrm{eco}} - \\mathrm{GPP}'),
+};
+
+// ---------- Tables ----------
+
+const paramRows = [...params].sort(bySiteYear('site_code'));
+const annualRows = [...annual].sort(bySiteYear('site_code'));
+const necbRows = [...necb].sort(bySiteYear('site_code'));
+const mgmtRows = [...mgmt].sort((a, b) => bySiteYear('site')(a, b) || (a.date ?? '').localeCompare(b.date ?? ''));
+const valPartRows = [...valPart].sort(bySiteYear('site_code'));
+
+const inputs = [
+  { site: 'anttila', night: 'sw_in', vpd: 'Magnus', ustar: 'no', neeF: 'provider', src: 'yes (night-time method)' },
+  { site: 'sarkisuo', night: 'ppfd (most rows of 2022), sw_in', vpd: 'Magnus', ustar: 'no', neeF: 'provider', src: 'yes (night-time method)' },
+  { site: 'haltiala', night: 'ppfd', vpd: 'file', ustar: 'no', neeF: 'provider (10 XGBoost models)', src: 'no' },
+  { site: 'qvidja', night: 'sw_in', vpd: 'file', ustar: 'yes', neeF: 'provider', src: 'yes (daytime method)' },
+  { site: 'viikki', night: 'sw_in', vpd: 'Magnus', ustar: 'no', neeF: 'provider, MDS in 576 rows', src: 'no' },
+  { site: 'maktau', night: 'sw_in', vpd: 'file, else Magnus', ustar: 'yes', neeF: 'MDS (this calculation)', src: 'no' },
+];
+const tempLabel = report.options.temp === 'tsoil' ? 'soil temperature' : 'air temperature';
+
+const mds = c.mds;
+const mdsSteps = [
+  ['Look-up table, 3 drivers', '±7 days, then ±14 days', '1'],
+  ['Look-up table, sw_in only', '±7 days', '1'],
+  ['Mean diurnal course (same time ±1 h)', 'same day, ±1 day', '1'],
+  ['Mean diurnal course', '±2 days', '2'],
+  ['Look-up table, 3 drivers', '±21, ±28 days', '2'],
+  ['Look-up table, 3 drivers', '±35 … ±70 days', '3'],
+  ['Look-up table, sw_in only', '±14, ±21, ±28 days', '2'],
+  ['Look-up table, sw_in only', '±35 … ±70 days', '3'],
+  ['Mean diurnal course', '±7 … ±210 days', '3'],
+];
+const mf = report.maktau.filter;
+
+const toc = [
+  ['purpose', 'Purpose and source article'],
+  ['signs', 'Sign conventions'],
+  ['equations', 'Equations'],
+  ['inputs', 'Inputs and variables'],
+  ['partitioning', 'Night-time partitioning'],
+  ['maktau', 'Maktau: filter and gap filling'],
+  ['sums', 'Sums and units'],
+  ['results', 'Results'],
+  ['management', 'Management carbon'],
+  ['validation', 'Validation'],
+  ['limits', 'Limits and open questions'],
+  ['reproduce', 'How to reproduce'],
+] as const;
+---
+
+<Base
+  title="Calculated data – INAR agri"
+  description="How we calculate GPP, Reco, gap-filled NEE, annual carbon sums and NECB for six INAR agricultural sites, after Hu et al. 2024."
+>
+  <main class="prose">
+    <header>
+      <h1>Calculated data</h1>
+      <p class="lead">
+        This page tells how we calculate gross primary production (GPP), ecosystem respiration (Reco), gap-filled NEE
+        for Maktau, annual carbon sums and the net ecosystem carbon balance (NECB). It also shows the results and the
+        checks. The data page shows the half-hourly values.
+      </p>
+    </header>
+
+    <nav class="toc" aria-labelledby="toc-title">
+      <h2 id="toc-title">Contents</h2>
+      <ol>
+        {toc.map(([id, label]) => <li><a href={`#${id}`}>{label}</a></li>)}
+      </ol>
+    </nav>
+
+    <section aria-labelledby="purpose">
+      <h2 id="purpose">1. Purpose and source article</h2>
+      <p>
+        The method follows the Methods section of Hu, T., Malone, S. L., Rumpel, C. and Chabbi, A. (2024): <em>Maximizing soil organic carbon stocks through optimal ploughing and renewal strategies in (Ley) grassland.</em> Communications Earth &amp; Environment 5, 38, <a href="https://doi.org/10.1038/s43247-024-01202-3">doi:10.1038/s43247-024-01202-3</a>.
+      </p>
+      <p>
+        The article is a model study of one grassland site in France. It gives a carbon balance (Eq. 1 to 7) and the
+        flux methods: a <Fragment set:html={f.ustar} /> threshold of {ustar} m s<sup>−1</sup>, a plausibility
+        limit of ±{c.maktau.plausibility} µmol m<sup>−2</sup> s<sup>−1</sup> and gap filling after Reichstein et al. 2005.
+      </p>
+      <p>We calculate these products from our eddy-covariance data:</p>
+      <ul>
+        <li>GPP and Reco with the night-time method of Reichstein et al. 2005, for all six sites.</li>
+        <li>Gap-filled NEE for Maktau (quality filter, <Fragment set:html={f.ustar} /> filter, MDS gap filling).</li>
+        <li>Daily, monthly and annual sums of NEE, GPP and Reco in g C m<sup>−2</sup>.</li>
+        <li>The NECB per site and year, with a carbon table of harvests and organic inputs.</li>
+      </ul>
+      <p>
+        We cannot calculate NPP, heterotrophic respiration (R<sub>h</sub>), C<sub>input</sub>, SCB and RCB (Eq. 3 to 7).
+        These need a soil model or repeated soil carbon samples. No site measures leached carbon, fire, volatile losses or
+        erosion.
+      </p>
+    </section>
+
+    <section aria-labelledby="signs">
+      <h2 id="signs">2. Sign conventions</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col">Quantity</th><th scope="col">In the source files</th><th scope="col">In the calculated data</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">NEE</th><td class="wrap">Positive = emission (all sites)</td><td class="wrap">Positive = emission</td></tr>
+            <tr>
+              <th scope="row">GPP</th>
+              <td class="wrap">Anttila, Särkisuo: GPP ≥ 0. Qvidja: GPP ≤ 0 (uptake is negative)</td>
+              <td class="wrap">GPP ≥ 0 = uptake. We change the sign of the Qvidja source GPP.</td>
+            </tr>
+            <tr><th scope="row">Reco</th><td class="wrap">Positive</td><td class="wrap">Positive</td></tr>
+            <tr>
+              <th scope="row">NEE, GPP, Reco</th>
+              <td class="wrap">Anttila, Särkisuo: NEE = Reco − GPP. Qvidja: the relation does not hold (daytime method).</td>
+              <td class="wrap"><Fragment set:html={f.identity} /> in every row</td>
+            </tr>
+            <tr>
+              <th scope="row">NECB, Hu et al. 2024</th>
+              <td class="wrap">NEE positive = uptake. NECB positive = carbon gain.</td>
+              <td class="wrap">NECB positive = the field gains carbon</td>
+            </tr>
+            <tr>
+              <th scope="row">NECB, Heimsch et al. 2024 (Qvidja)</th>
+              <td class="wrap">NEE positive = emission. NECB positive = carbon loss.</td>
+              <td class="wrap">The validation table changes the sign of the paper values</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="equations">
+      <h2 id="equations">3. Equations</h2>
+      <p>Hu et al. 2024 give these equations. The numbers are the numbers of the article.</p>
+      <ol class="formula-list">
+        {hu.map((html, i) => <li><span class="eq-no">Eq. {i + 1}</span><Fragment set:html={html} /></li>)}
+      </ol>
+      <p>
+        C<sub>exo</sub> is the carbon in manure and organic fertiliser. C<sub>harvest</sub> is the carbon that leaves the
+        field in grain, straw or cut grass. C<sub>CH<sub>4</sub></sub> is the carbon lost as methane. The article keeps
+        only Eq. 2.
+      </p>
+      <p>
+        Our NEE is positive for an emission. Thus Eq. 1, without the terms that no site measures, becomes (g C m<sup>−2</sup> yr<sup>−1</sup>, positive = gain):
+      </p>
+      <Fragment set:html={f.necbOurs} />
+    </section>
+
+    <section aria-labelledby="inputs">
+      <h2 id="inputs">4. Inputs and variables</h2>
+      <p>
+        The calculation reads the harmonised database. Days and years are local calendar days and years (Finnish sites
+        UTC+2, Maktau UTC+3). The temperature for the respiration model is the {tempLabel} at all sites.
+      </p>
+      <ul>
+        <li>
+          Night: incoming shortwave radiation sw_in &lt; {c.night.swIn} W m<sup>−2</sup>. Where sw_in is missing, PPFD
+          &lt; {c.night.ppfd} µmol m<sup>−2</sup> s<sup>−1</sup>.
+        </li>
+        <li>VPD: the value of the source file. Where the file has no VPD, we use the Magnus formula:</li>
+      </ul>
+      <Fragment set:html={f.magnus} />
+      <div class="table-wrap">
+        <table>
+          <caption>Inputs per site. “Provider” = the gap-filled NEE of the data provider.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col">Night flag</th>
+              <th scope="col">Temperature</th>
+              <th scope="col">VPD</th>
+              <th scope="col" class="num">Magnus rows</th>
+              <th scope="col"><Fragment set:html={f.ustar} /></th>
+              <th scope="col">Gap-filled NEE</th>
+              <th scope="col">Source GPP and Reco</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              inputs.map((r) => (
+                <tr>
+                  <th scope="row">{siteName(r.site)}</th>
+                  <td>{r.night}</td>
+                  <td>{tempLabel}</td>
+                  <td>{r.vpd}</td>
+                  <td class="num">{num(magnusRows[r.site] ?? 0)}</td>
+                  <td>{r.ustar}</td>
+                  <td>{r.neeF}</td>
+                  <td>{r.src}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="partitioning">
+      <h2 id="partitioning">5. Night-time partitioning</h2>
+      <p>At night, there is no photosynthesis. Thus the measured night NEE is the respiration. The respiration follows Lloyd and Taylor (1994):</p>
+      <Fragment set:html={f.lloyd} />
+      <Fragment set:html={f.ltConst} />
+      <p>
+        <Fragment set:html={f.e0} /> (K) is the temperature sensitivity. <Fragment set:html={f.rrefSym} /> (µmol m<sup>−2</sup> s<sup>−1</sup>) is the respiration at {lt.tref} °C. We write the exponent with:
+      </p>
+      <Fragment set:html={f.g} />
+      <p>The steps per site and local calendar year:</p>
+      <ol>
+        <li>
+          <strong>Night sample.</strong> Rows with the night flag, a measured NEE and a temperature. At Qvidja and Maktau,
+          rows with <Fragment set:html={f.ustar} /> &lt; {ustar} m s<sup>−1</sup> are not used. Negative night fluxes stay in
+          the sample.
+        </li>
+        <li>
+          <strong><Fragment set:html={f.e0} /> from short windows.</strong> Windows of {e0Win} days (±{c.e0.winDays} days),
+          one every {c.e0.stepDays} days. A window needs more than {c.e0.minData} values and a temperature range of at least
+          {' '}{c.e0.minTempRange} K. A least-squares fit gives <Fragment set:html={f.rrefSym} /> and <Fragment set:html={f.e0} />. Then the fit removes the residuals outside the {c.e0.trimPercent} to
+          {' '}{100 - c.e0.trimPercent} % band and fits again. A window is valid when:
+          <Fragment set:html={f.e0Valid} />
+          (with the soil temperature, the upper limit is {e0Lim.tsoil.max} K). The annual <Fragment set:html={f.e0} /> is the
+          mean of the {c.e0.nBest} valid windows with the smallest standard error (SE). Fallbacks, in this order: fewer
+          than {c.e0.nBest} valid windows → mean of the valid windows; no valid window → one fit on all nights of the year;
+          no fit → the value of the nearest year of the same site; else no Reco and GPP for the year.
+        </li>
+        <li>
+          <strong><Fragment set:html={f.rrefSym} /> from short windows.</strong> Windows of {rrefWin} days, one every
+          {' '}{c.rref.stepDays} days, with <Fragment set:html={f.e0} /> fixed. A window needs more than {c.rref.minData} values. The closed-form least-squares value is:
+          <Fragment set:html={f.rref} />
+          A negative value is not used. Between the window centres, the value is linear. Rows more than
+          {' '}{c.rref.maxCentreDistanceDays} days from a usable window get a low quality flag.
+        </li>
+        <li>
+          <strong>Temperature for every row.</strong> Linear interpolation fills gaps up to {linearHours} hours. The mean
+          diurnal course (same time ±{hourTol} h, over ±{c.taFill.mdcDays.join(', ±')} days) fills longer gaps.
+        </li>
+        <li>
+          <strong>Reco and GPP for every row.</strong>
+          <Fragment set:html={f.recoRow} />
+          <Fragment set:html={f.gpp} />
+          We do not set GPP to zero at night. Thus <Fragment set:html={f.identity} /> holds in every row.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="maktau">
+      <h2 id="maktau">6. Maktau: filter, <Fragment set:html={f.ustar} /> and gap filling</h2>
+      <p>Maktau has a measured CO<sub>2</sub> flux (FC), a quality flag and <Fragment set:html={f.ustar} />, but no gap-filled NEE. The calculation:</p>
+      <ol>
+        <li>Keeps rows with a quality flag of {c.maktau.ssitcMax} or less. Rows without a flag are not used.</li>
+        <li>Keeps <Fragment set:html={f.fcLim} />.</li>
+        <li>
+          Keeps <Fragment set:html={f.ustarLim} /> (the threshold of the article). The moving point test of Papale et al.
+          2006 also runs, but its results change too much between years ({c.maktau.mpt.tempClasses} temperature classes,
+          {' '}{c.maktau.mpt.ustarClasses} <Fragment set:html={f.ustar} /> classes). We do not apply it.
+        </li>
+        <li>
+          Fills the gaps with marginal distribution sampling (MDS, Reichstein et al. 2005). Similar conditions:
+          sw_in ±{mds.tolSwIn} W m<sup>−2</sup>, air temperature ±{mds.tolTa} °C, VPD ±{mds.tolVpd} hPa, at least
+          {' '}{mds.minCount} values.
+        </li>
+      </ol>
+      <p>
+        Result: {num(mf.kept)} of {num(mf.total)} flux rows stay. {num(mf.noFlag)} rows have no flag, {num(mf.badFlag)} rows have a bad flag and {num(mf.lowUstar)} rows have a low <Fragment set:html={f.ustar} />.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>MDS steps, in this order. Quality flag 1 = good, 3 = model only.</caption>
+          <thead>
+            <tr><th scope="col">Step</th><th scope="col">Window</th><th scope="col" class="num">Quality flag</th></tr>
+          </thead>
+          <tbody>
+            {mdsSteps.map(([step, win, q]) => <tr><td>{step}</td><td>{win}</td><td class="num">{q}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        A row without VPD skips the 3-driver steps. The MDS value of a long gap is a model, not a measurement. The annual
+        table marks those years as not reliable.
+      </p>
+    </section>
+
+    <section aria-labelledby="sums">
+      <h2 id="sums">7. Sums and units</h2>
+      <p>One 30-minute value of 1 µmol CO<sub>2</sub> m<sup>−2</sup> s<sup>−1</sup> is this mass of carbon:</p>
+      <Fragment set:html={f.conv} />
+      <Fragment set:html={f.sumAnnual} />
+      <p>
+        The sums use the local day, month and calendar year. When one row of a period has no value, the sum of the period
+        is empty. An annual sum is reliable when the measured fraction is at least
+        {' '}{num(c.reliable.minFracMeasured * 100)} % and the longest gap is {c.reliable.maxGapDays} days or less.
+      </p>
+      <h3 id="haltiala-uncertainty">Haltiala uncertainty</h3>
+      <p>
+        Haltiala has ten gap-filling models (NEE_F1 to NEE_F10). We sum each model per year (<em>S<sub>k</sub></em>). Then we
+        calculate the standard deviation of the ten sums:
+      </p>
+      <Fragment set:html={f.sigma} />
+      <Fragment set:html={f.ci} />
+      <div class="table-wrap">
+        <table>
+          <caption>Haltiala annual NEE and its uncertainty (g C m<sup>−2</sup>)</caption>
+          <thead>
+            <tr>
+              <th scope="col">Year</th>
+              <th scope="col" class="num">NEE</th>
+              <th scope="col" class="num">Mean of 10 models</th>
+              <th scope="col" class="num">σ<sub>10</sub></th>
+              <th scope="col" class="num">CI<sub>95</sub></th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              valHaltiala.map((r) => (
+                <tr>
+                  <th scope="row">{r.year}</th>
+                  <td class="num">{num(r.nee_f_gc)}</td>
+                  <td class="num">{num(r.mean10)}</td>
+                  <td class="num">{num(r.sd10, 1)}</td>
+                  <td class="num">±{num(r.ci95, 1)}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="results">
+      <h2 id="results">8. Results</h2>
+      <h3 id="results-e0">Temperature sensitivity per site and year</h3>
+      <div class="table-wrap">
+        <table>
+          <caption><Fragment set:html={f.e0} /> (K) ± SE. “Neighbour” = value of the nearest year.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col" class="num">Year</th>
+              <th scope="col" class="num">Night values</th>
+              <th scope="col" class="num"><Fragment set:html={f.e0} /> (K)</th>
+              <th scope="col">Method</th>
+              <th scope="col" class="num">Valid / tried windows</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              paramRows.map((r) => (
+                <tr>
+                  <th scope="row">{siteName(r.site_code)}</th>
+                  <td class="num">{r.year}</td>
+                  <td class="num">{num(r.n_night)}</td>
+                  <td class="num">{r.e0 === null ? DASH : `${num(r.e0, 1)} ± ${num(r.e0_se, 1)}`}</td>
+                  <td>{r.e0_method}</td>
+                  <td class="num">{r.e0_windows_valid} / {r.e0_windows_tried}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="results-annual">Annual sums</h3>
+      <div class="table-wrap">
+        <table>
+          <caption>Annual sums in g C m<sup>−2</sup>. Negative NEE = uptake. “–” = no complete sum.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col" class="num">Year</th>
+              <th scope="col" class="num">NEE</th>
+              <th scope="col" class="num">GPP</th>
+              <th scope="col" class="num">Reco</th>
+              <th scope="col" class="num">Measured</th>
+              <th scope="col">Reliable</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              annualRows.map((r) => (
+                <tr>
+                  <th scope="row">{siteName(r.site_code)}</th>
+                  <td class="num">{r.year}</td>
+                  <td class="num">{num(r.nee_f_gc)}</td>
+                  <td class="num">{num(r.gpp_gc)}</td>
+                  <td class="num">{num(r.reco_gc)}</td>
+                  <td class="num">{pct(r.frac_measured)}</td>
+                  <td>{yesNo(r.reliable)}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="results-necb">Net ecosystem carbon balance</h3>
+      <div class="table-wrap">
+        <table>
+          <caption>NECB in g C m<sup>−2</sup>. Positive NECB = the field gains carbon.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col" class="num">Year</th>
+              <th scope="col" class="num">NEE</th>
+              <th scope="col" class="num">C<sub>harvest</sub></th>
+              <th scope="col" class="num">C<sub>exo</sub></th>
+              <th scope="col" class="num">C<sub>CH4</sub></th>
+              <th scope="col" class="num">NECB</th>
+              <th scope="col">Complete</th>
+              <th scope="col">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              necbRows.map((r) => (
+                <tr>
+                  <th scope="row">{siteName(r.site_code)}</th>
+                  <td class="num">{r.year}</td>
+                  <td class="num">{num(r.nee_f_gc)}</td>
+                  <td class="num">{num(r.c_harvest)}</td>
+                  <td class="num">{num(r.c_exo)}</td>
+                  <td class="num">{num(r.c_ch4)}</td>
+                  <td class="num">{num(r.necb)}</td>
+                  <td>{yesNo(r.necb_complete)}</td>
+                  <td class="wrap">{r.note ?? ''}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="management">
+      <h2 id="management">9. Management carbon</h2>
+      <p>
+        The carbon table lists harvests and organic inputs from the management files of the sites and from the two Qvidja
+        papers (Heimsch et al. 2021 and 2024). Rules:
+      </p>
+      <ul>
+        <li>Dry mass from the fresh mass and the dry-matter fraction, or the dry mass of the file:</li>
+      </ul>
+      <Fragment set:html={f.dry} />
+      <Fragment set:html={f.cMass} />
+      <ul>
+        <li>Carbon fraction: Qvidja 0.42 (both Qvidja papers), Haltiala 0.50 (management file), Viikki 0.42 (assumed).</li>
+        <li>
+          An organic input without a carbon content gets no carbon value. Then the NECB is a lower bound. The Qvidja
+          molasses fertiliser of 2018 and 2019 uses the value of Heimsch et al. 2021.
+        </li>
+        <li>Grazing gets no carbon value.</li>
+        <li>Anttila, Särkisuo and Maktau have no harvest data. For Maktau we give no NECB.</li>
+      </ul>
+      <div class="table-wrap">
+        <table>
+          <caption>Management events. Dry mass in kg ha<sup>−1</sup>, carbon in g C m<sup>−2</sup>. “–” = unknown.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col">Date</th>
+              <th scope="col">Action</th>
+              <th scope="col">Product</th>
+              <th scope="col" class="num">Dry mass</th>
+              <th scope="col" class="num">C fraction</th>
+              <th scope="col">Source</th>
+              <th scope="col" class="num">g C m<sup>−2</sup></th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              mgmtRows.map((r) => (
+                <tr>
+                  <th scope="row">{siteName(r.site)}</th>
+                  <td class="num">{r.date}</td>
+                  <td>{r.action}</td>
+                  <td class="wrap">{r.product}</td>
+                  <td class="num">{num(r.dry_mass_kg_ha)}</td>
+                  <td class="num">{num(r.c_fraction, 2)}</td>
+                  <td>{r.c_fraction_source ?? DASH}</td>
+                  <td class="num">{num(r.c_g_m2)}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="validation">
+      <h2 id="validation">10. Validation</h2>
+      <p>
+        At Anttila, our annual GPP and Reco are within 1.2 % of the night-time partitioning of the data provider. The
+        half-hourly <Fragment set:html={f.rrefSym} /> agrees well (r = 0.97 to 0.98), but <Fragment set:html={f.e0} /> is different. <Fragment set:html={f.e0} /> and <Fragment set:html={f.rrefSym} /> compensate each other in the annual
+        sums. Särkisuo 2022 is 5 % below the provider.
+      </p>
+      <p>
+        At Qvidja, our GPP and Reco are 15 to 31 % below the provider. The provider used a daytime method. Its night Reco
+        is about 55 % above the measured night NEE. Our method follows the measured night flux. We report this
+        difference and do not correct it.
+      </p>
+      <p>
+        Our Qvidja NEE sums are more negative than Heimsch et al. 2024, because the current file has a later processing
+        version. The paper includes the carbon of grazing, thus the NECB values are not directly comparable.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Our partitioning against the data provider. Sums in g C m<sup>−2</sup>, RMSE and bias in µmol m<sup>−2</sup> s<sup>−1</sup>.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col" class="num">Year</th>
+              <th scope="col" class="num">GPP ours</th>
+              <th scope="col" class="num">GPP provider</th>
+              <th scope="col" class="num">Diff.</th>
+              <th scope="col" class="num">Reco ours</th>
+              <th scope="col" class="num">Reco provider</th>
+              <th scope="col" class="num">Diff.</th>
+              <th scope="col" class="num">RMSE Reco</th>
+              <th scope="col" class="num">Bias Reco</th>
+              <th scope="col" class="num"><Fragment set:html={f.e0} /> ours</th>
+              <th scope="col" class="num"><Fragment set:html={f.e0} /> provider</th>
+              <th scope="col" class="num">r(<Fragment set:html={f.rrefSym} />)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              valPartRows.map((r) => (
+                <tr>
+                  <th scope="row">{siteName(r.site_code)}</th>
+                  <td class="num">{r.year}</td>
+                  <td class="num">{num(r.gpp_gc)}</td>
+                  <td class="num">{num(r.gpp_src_gc)}</td>
+                  <td class="num">{r.gpp_gc === null ? DASH : `${num(r.gpp_diff_pct, 1)} %`}</td>
+                  <td class="num">{num(r.reco_gc)}</td>
+                  <td class="num">{num(r.reco_src_gc)}</td>
+                  <td class="num">{r.reco_gc === null ? DASH : `${num(r.reco_diff_pct, 1)} %`}</td>
+                  <td class="num">{num(r.rmse_reco, 2)}</td>
+                  <td class="num">{num(r.bias_reco, 2)}</td>
+                  <td class="num">{num(r.e0, 1)}</td>
+                  <td class="num">{num(r.e0_src, 1)}</td>
+                  <td class="num">{num(r.corr_rref, 2)}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>
+            Qvidja against Heimsch et al. 2024, Table 1 (years from 4 May). g C m<sup>−2</sup>. The sign of the paper NECB
+            is changed (positive = gain).
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Period</th>
+              <th scope="col" class="num">NEE ours</th>
+              <th scope="col" class="num">NEE paper</th>
+              <th scope="col" class="num">GPP ours</th>
+              <th scope="col" class="num">GPP file</th>
+              <th scope="col" class="num">GPP paper</th>
+              <th scope="col" class="num">Reco ours</th>
+              <th scope="col" class="num">Reco file</th>
+              <th scope="col" class="num">Reco paper</th>
+              <th scope="col" class="num">C<sub>harvest</sub> ours</th>
+              <th scope="col" class="num">C<sub>harvest</sub> paper</th>
+              <th scope="col" class="num">C<sub>exo</sub> ours</th>
+              <th scope="col" class="num">C<sub>exo</sub> paper</th>
+              <th scope="col" class="num">NECB ours</th>
+              <th scope="col" class="num">NECB paper</th>
+              <th scope="col">Class</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              valQvidja.map((r) => (
+                <tr>
+                  <th scope="row">{(r.period ?? '').replace(/(\d{4})-\d\d-\d\d to (\d{4})-\d\d-\d\d/, '$1–$2')}</th>
+                  <td class="num">{num(r.nee_f_gc)}</td>
+                  <td class="num">{num(r.nee_paper)}</td>
+                  <td class="num">{num(r.gpp_gc)}</td>
+                  <td class="num">{num(r.gpp_src_gc)}</td>
+                  <td class="num">{num(r.gpp_paper)}</td>
+                  <td class="num">{num(r.reco_gc)}</td>
+                  <td class="num">{num(r.reco_src_gc)}</td>
+                  <td class="num">{num(r.reco_paper)}</td>
+                  <td class="num">{num(r.c_harvest)}</td>
+                  <td class="num">{num(r.output_paper)}</td>
+                  <td class="num">{num(r.c_exo)}</td>
+                  <td class="num">{num(r.input_paper)}</td>
+                  <td class="num">{num(r.necb)}</td>
+                  <td class="num">{num(r.necb_paper)}</td>
+                  <td>{r.class}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Haltiala: the annual NEE is equal to the mean of the ten model sums within 0.15 g C m<sup>−2</sup> (table in
+        section 7).
+      </p>
+    </section>
+
+    <section aria-labelledby="limits">
+      <h2 id="limits">11. Limits and open questions</h2>
+      <ul>
+        <li>
+          Viikki measures NEE in about 20 % of the periods. It has few valid <Fragment set:html={f.e0} /> windows, and the <Fragment set:html={f.rrefSym} /> interpolation spans long winter gaps.
+        </li>
+        <li>
+          Maktau: only 2019 is almost complete. 2018 and 2023 use <Fragment set:html={f.e0} /> of a neighbour year. 2023 has
+          no Reco, because the few measured night fluxes are negative.
+        </li>
+        <li>
+          Anttila, Särkisuo, Haltiala and Viikki have no <Fragment set:html={f.ustar} /> in the files. We use the quality
+          flag of the provider.
+        </li>
+        <li>Särkisuo 2023 has an 84-day gap in the air temperature. Thus it has no annual GPP and Reco.</li>
+        <li>
+          The NECB is a lower bound in years with an organic input of unknown carbon content. One compost application can
+          hold about 500 g C m<sup>−2</sup>, more than the annual NEE.
+        </li>
+        <li>
+          The Viikki yields have no unit. The Haltiala 2025 yield can be a fresh mass. Two Qvidja dry-matter fractions are
+          not certain.
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="reproduce">
+      <h2 id="reproduce">12. How to reproduce</h2>
+      <p>Run these commands in the repository. The full method description is in <code>docs/calculated.md</code>.</p>
+      <pre><code>npm run build:db     # db/*.parquet from the source files
+npm run calc         # data/calculated/* (GPP, Reco, sums, NECB, validation)
+npm run site:build   # copies the tables to the site and builds this page</code></pre>
+      <p>
+        The parameters are in <code>scripts/lib/calc/constants.ts</code>. This run used the options <code>--ustar {report.options.ustar}</code>, <code>--temp {report.options.temp}</code> and
+        <code>--gpp-night {report.options.gppNight}</code>.
+      </p>
+    </section>
+
+    <p class="page-foot">Numbers from the calculation of {builtAt}.</p>
+  </main>
+</Base>

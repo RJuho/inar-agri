@@ -12,3 +12,4 @@ playwright-report/
 .wrangler/
 screenshots/
 site/public/duckdb/
+site/src/data/

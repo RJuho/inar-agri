@@ -5,8 +5,9 @@ import { siteEmoji } from '../sites';
 import {
   AGGREGATION_LABELS,
   AGGREGATIONS,
+  VARIABLE_GROUPS,
   VARIABLE_LABELS,
-  VARIABLES,
+  VARIABLE_SITES,
   type Aggregation,
   type Variable,
   type ViewParams,
@@ -22,7 +23,7 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
   return e;
 }
 
-function checkbox(name: string, value: string, label: string, checked: boolean, emoji = ''): HTMLLabelElement {
+function checkbox(name: string, value: string, label: string, checked: boolean, emoji = '', hint = ''): HTMLLabelElement {
   const wrap = el('label', 'check');
   const input = el('input');
   input.type = 'checkbox';
@@ -36,18 +37,47 @@ function checkbox(name: string, value: string, label: string, checked: boolean, 
     icon.setAttribute('aria-hidden', 'true');
     wrap.append(icon);
   }
-  wrap.append(document.createTextNode(label));
+  if (hint) {
+    // The hint comes after the label text, thus the accessible name starts with the label.
+    // One span for both, thus they wrap as one text.
+    const text = el('span', 'check-text', label);
+    text.append(el('small', 'var-sites', ` · ${hint}`));
+    wrap.append(text);
+  } else {
+    wrap.append(document.createTextNode(label));
+  }
   return wrap;
 }
 
-function select(name: string, label: string, options: Array<[string, string]>, value: string): HTMLLabelElement {
+type Options = Array<[string, string]>;
+
+function options(parent: HTMLSelectElement | HTMLOptGroupElement, items: Options): void {
+  for (const [v, text] of items) {
+    const o = el('option', undefined, text);
+    o.value = v;
+    parent.append(o);
+  }
+}
+
+/** A select field. Items with a label and options go into an <optgroup>. */
+function select(
+  name: string,
+  label: string,
+  items: Options | Array<{ label: string; options: Options }>,
+  value: string,
+): HTMLLabelElement {
   const wrap = el('label', 'field');
   const s = el('select');
   s.name = name;
-  for (const [v, text] of options) {
-    const o = el('option', undefined, text);
-    o.value = v;
-    s.append(o);
+  for (const item of items) {
+    if (Array.isArray(item)) {
+      options(s, [item]);
+    } else {
+      const g = el('optgroup');
+      g.label = item.label;
+      options(g, item.options);
+      s.append(g);
+    }
   }
   s.value = value;
   wrap.append(el('span', 'field-label', label), s);
@@ -79,9 +109,10 @@ export class ParamsForm {
     sites.append(el('legend', undefined, 'Sites'));
     for (const s of meta.sites) sites.append(checkbox('site', String(s.siteId), s.name, params.sites.includes(s.siteId), siteEmoji(s.code)));
 
-    const vars = el('fieldset', 'group');
-    vars.append(el('legend', undefined, 'Variables'));
-    for (const v of VARIABLES) vars.append(checkbox('variable', v, VARIABLE_LABELS[v], params.variables.includes(v)));
+    const vars = el('fieldset', 'group vars');
+    const varGroups = el('div', 'var-groups');
+    vars.append(el('legend', undefined, 'Variables'), varGroups);
+    for (const group of VARIABLE_GROUPS) varGroups.append(this.variableGroup(group.label, group.variables, params.variables));
 
     const years: Array<[string, string]> = [['', 'All']];
     for (let y = meta.yearMin; y <= meta.yearMax; y++) years.push([String(y), String(y)]);
@@ -99,12 +130,49 @@ export class ParamsForm {
       select(
         'xVariable',
         'X variable (scatter)',
-        VARIABLES.map((v) => [v, VARIABLE_LABELS[v]]),
+        VARIABLE_GROUPS.map((g) => ({ label: g.label, options: g.variables.map((v): [string, string] => [v, VARIABLE_LABELS[v]]) })),
         params.xVariable,
       ),
     );
 
     this.form.replaceChildren(sites, vars, other);
+  }
+
+  /** One group of variable checkboxes, with "All" and "None" buttons. */
+  private variableGroup(label: string, variables: readonly Variable[], selected: readonly Variable[]): HTMLFieldSetElement {
+    const box = el('fieldset', 'var-group');
+    box.append(el('legend', undefined, label));
+
+    const tools = el('div', 'var-group-tools');
+    const list = el('div', 'var-list');
+    const button = (text: string, aria: string, checked: boolean) => {
+      const b = el('button', 'var-group-btn', text);
+      b.type = 'button';
+      b.setAttribute('aria-label', aria);
+      b.addEventListener('click', () => {
+        for (const input of list.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')) input.checked = checked;
+        // Same path as a click on a checkbox: the form listens for "change".
+        list.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      return b;
+    };
+    tools.append(
+      button('All', `Select all ${label} variables`, true),
+      button('None', `Clear all ${label} variables`, false),
+    );
+
+    for (const v of variables) {
+      const item = checkbox('variable', v, VARIABLE_LABELS[v], selected.includes(v), '', VARIABLE_SITES[v]);
+      const info = this.meta.variables.get(v);
+      if (info) {
+        const unit = info.unit ? ` Unit: ${info.unit}.` : '';
+        const title = `${info.description ?? ''}${unit}`.trim();
+        if (title) item.title = title;
+      }
+      list.append(item);
+    }
+    box.append(tools, list);
+    return box;
   }
 
   private schedule(): void {

@@ -5,7 +5,7 @@
 // alt text as iTXt chunks (keywords Title and Description).
 import type { Meta } from './db';
 import { addTextChunks, bytesToDataUrl, dataUrlToBytes } from './png';
-import { AGGREGATION_LABELS, VARIABLE_LABELS, type View } from './state';
+import { AGGREGATION_LABELS, VARIABLE_LABELS, type View, type ViewParams } from './state';
 import { unitOf, yearsText } from './diagrams/common';
 import { listText } from './alttext';
 
@@ -81,11 +81,20 @@ export function paramsLine(view: View, meta: Meta, types: string[]): string {
   return `${parts.join('. ')}.`;
 }
 
+/**
+ * Data files of the view. GPP and Reco (calculated) come from fluxes.parquet,
+ * the other variables from observations.parquet.
+ */
+export function sourceFiles(params: ViewParams): string {
+  const calc = params.variables.some((v) => v === 'gpp' || v === 'reco');
+  return calc ? 'observations.parquet and fluxes.parquet' : 'observations.parquet';
+}
+
 /** Source line: data set, page address and the time of the export (UTC). */
-export function sourceLine(): string {
+export function sourceLine(params: ViewParams): string {
   const url = window.location.origin + window.location.pathname;
   const time = new Date().toISOString().slice(0, 16).replace('T', ' ');
-  return `Source: INAR agri harmonised database (observations.parquet), ${url}. Time axes show site local time. Made ${time} UTC.`;
+  return `Source: INAR agri harmonised database (${sourceFiles(params)}), ${url}. Time axes show site local time. Made ${time} UTC.`;
 }
 
 /** File name part from the view name: lower case, a to z, 0 to 9 and "-". */
@@ -195,7 +204,7 @@ export async function compositePng(view: View, meta: Meta, items: ExportItem[], 
     meta,
     items.map((i) => i.type),
   );
-  const source = sourceLine();
+  const source = sourceLine(view.params);
   const parts: Part[] = [
     { kind: 'text', block: block(ctx, view.name, contentW, 22, colors.text, 650), gap: 4 },
     { kind: 'text', block: block(ctx, params, contentW, 14, colors.text), gap: 4 },

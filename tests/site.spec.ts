@@ -350,13 +350,13 @@ test.describe('diagram types', () => {
     await expect(page.locator('.diagram-sub')).toContainText('daily means');
   });
 
-  test('cumulative without NEE shows a note, not an error', async ({ page }) => {
+  test('cumulative without a flux shows a note, not an error', async ({ page }) => {
     await page.goto('/' + viewHash(typeView('cumulative', ['ta', 'swc'])));
     await waitReady(page);
     const card = page.locator('.diagram');
     await expect(card).toHaveAttribute('data-status', 'ready');
     await expect(card).toHaveAttribute('data-series', '0');
-    await expect(card.locator('.diagram-note')).toContainText('needs the variable');
+    await expect(card.locator('.diagram-note')).toContainText('need one or more flux variables');
   });
 
   test('scatter with only the x variable shows a note', async ({ page }) => {
@@ -717,5 +717,150 @@ test.describe('data export', () => {
       for (const e of entries) total += format === 'csv' ? parseCsv(e.data).rows.length : (await readParquet(e.data, e.name)).n;
       expect(total).toBe(shown);
     }
+  });
+});
+
+// ---------- New variables, the weekly step and the Calculated page ----------
+
+/** A timeseries view of the given sites, variables and step. */
+function stepView(id: string, sites: number[], variables: string[], aggregation: string) {
+  return {
+    id,
+    name: `Step ${aggregation}`,
+    params: { sites, variables, xVariable: 'ta', yearFrom: 2022, yearTo: 2023, aggregation },
+    diagrams: [{ id: 't1', type: 'timeseries' }],
+  };
+}
+
+test.describe('new variables and weekly step', () => {
+  test.describe.configure({ timeout: 300_000 });
+  let errors: string[];
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    errors = trackErrors(page);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+
+  test('the variable checkboxes come in three groups', async ({ page }) => {
+    await page.goto('/');
+    await waitReady(page);
+    for (const legend of ['Fluxes', 'Meteorology', 'Soil']) {
+      await expect(page.locator('#params legend', { hasText: legend })).toBeVisible();
+    }
+    for (const v of ['gpp', 'reco', 'ch4', 'sw_in', 'ustar']) {
+      await expect(page.locator(`input[name="variable"][value="${v}"]`)).toHaveCount(1);
+    }
+    await expect(page.locator('select option[value="week"]')).toHaveCount(1);
+  });
+
+  test('weekly rows lie between daily and monthly rows', async ({ page }) => {
+    const rows: Record<string, number> = {};
+    for (const step of ['day', 'week', 'month']) {
+      await page.goto('/' + viewHash(stepView(`w-${step}`, [3], ['nee_f'], step)));
+      await waitReady(page);
+      rows[step] = Number(await page.locator('.diagram[data-type="timeseries"]').getAttribute('data-rows'));
+    }
+    // Haltiala 2022-2023: 730 days, about 105 weeks, 24 months.
+    expect(rows.day).toBe(730);
+    expect(rows.month).toBe(24);
+    expect(rows.week).toBeGreaterThanOrEqual(104);
+    expect(rows.week).toBeLessThanOrEqual(106);
+  });
+
+  test('weekly data export starts on Mondays and has the step in the file name', async ({ page }) => {
+    await page.goto('/' + viewHash(stepView('w-export', [3], ['nee_f', 'gpp'], 'week')));
+    await waitReady(page);
+    const csv = await downloadData(page, 'one-csv');
+    expect(csv.name).toBe('inar-agri_step-week_2022-2023_week.csv');
+    const table = parseCsv(csv.bytes);
+    expect(table.header).toEqual(['site_code', 'site_name', 'ts_start_utc', 'ts_local', 'nee_f', 'gpp']);
+    expect(table.rows.length).toBeGreaterThan(100);
+    for (const r of table.rows) expect(new Date(`${r[3] as string}Z`).getUTCDay()).toBe(1);
+  });
+
+  test('calculated GPP, Reco and the CH4 flux draw series with units', async ({ page }) => {
+    await page.goto('/' + viewHash(stepView('w-new', [1, 2], ['gpp', 'reco', 'ch4'], 'day')));
+    await waitReady(page);
+    const card = page.locator('.diagram[data-type="timeseries"]');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    expect(Number(await card.getAttribute('data-series'))).toBe(6);
+    expect(Number(await card.getAttribute('data-rows'))).toBeGreaterThan(1000);
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('GPP, calculated');
+    expect(alt).toContain('CH4 flux');
+  });
+
+  test('Maktau has a gap-filled NEE from the calculation', async ({ page }) => {
+    await page.goto('/' + viewHash(stepView('w-maktau', [6], ['nee_f'], 'month')));
+    await waitReady(page);
+    const csv = await downloadData(page, 'one-csv');
+    const table = parseCsv(csv.bytes);
+    expect(table.rows.length).toBe(24);
+    expect(table.rows.filter((r) => r[4] !== '').length).toBe(24);
+  });
+
+  test('cumulative sums GPP and Reco', async ({ page }) => {
+    await page.goto('/' + viewHash({ ...stepView('w-cum', [3], ['gpp', 'reco'], 'day'), diagrams: [{ id: 'c1', type: 'cumulative' }] }));
+    await waitReady(page);
+    const card = page.locator('.diagram[data-type="cumulative"]');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    expect(Number(await card.getAttribute('data-series'))).toBeGreaterThan(0);
+  });
+});
+
+test.describe('calculated page', () => {
+  let errors: string[];
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    errors = trackErrors(page);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+    await page.goto('/calculated/');
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+
+  test('renders the formulas with KaTeX and MathML', async ({ page }) => {
+    await expect(page.locator('h1')).toContainText('Calculated');
+    expect(await page.locator('.katex').count()).toBeGreaterThan(10);
+    expect(await page.locator('math').count()).toBeGreaterThan(10);
+    await expect(page.locator('.katex-error')).toHaveCount(0);
+    await expect(page.locator('script')).toHaveCount(0);
+  });
+
+  test('has the result tables', async ({ page }) => {
+    const tables = page.locator('table');
+    expect(await tables.count()).toBeGreaterThanOrEqual(5);
+    for (const name of SITE_NAMES) await expect(page.locator('table', { hasText: name }).first()).toBeVisible();
+  });
+
+  test('the footer links to the source code', async ({ page }) => {
+    await expect(page.locator('footer a[href="https://github.com/RJuho/inar-agri"]')).toBeVisible();
+  });
+
+  test('page navigation goes both ways', async ({ page }) => {
+    const nav = page.getByRole('navigation', { name: 'Pages' });
+    await expect(nav.getByRole('link', { name: 'Calculated' })).toHaveAttribute('aria-current', 'page');
+    await nav.getByRole('link', { name: 'Data' }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await waitReady(page);
+    await page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Calculated' }).click();
+    await expect(page).toHaveURL(/\/calculated\/?$/);
+  });
+
+  test('no horizontal page scroll at phone width', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
+    expect(overflow).toBeLessThanOrEqual(0);
   });
 });

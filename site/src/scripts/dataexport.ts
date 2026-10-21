@@ -3,8 +3,8 @@
 // saves them through a Blob link. All work is in the browser; there are no server calls.
 //
 // The rows are the same as in the time series diagram: same sites, variables, years
-// (site local time) and step. Step "day" and "month" give the mean per local day or
-// local month, as in the diagram.
+// (site local time) and step. Step "day", "week" and "month" give the mean per local
+// day, local ISO week (start Monday 00:00) or local month, as in the diagram.
 //
 // Columns, in this order:
 //   site_code     text   Site code from sites.parquet, for example "qvidja".
@@ -19,9 +19,9 @@
 // metadata (keys "unit:<column>"). The CSV file has a header row only, no units row.
 import { copyToBuffer, query, type Meta } from './db';
 import { col, whereClause } from './diagrams/sql';
-import { AGGREGATION_LABELS, VARIABLE_LABELS, type View, type ViewParams } from './state';
+import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type View, type ViewParams } from './state';
 import { yearsText } from './diagrams/common';
-import { slug } from './export';
+import { slug, sourceFiles } from './export';
 import { zipStore } from './zip';
 
 export type DataScope = 'one' | 'sites';
@@ -41,6 +41,13 @@ const MIME: Record<DataFormat | 'zip', string> = {
   parquet: 'application/vnd.apache.parquet',
   csv: 'text/csv;charset=utf-8',
   zip: 'application/zip',
+};
+
+/** Description text of the mean for each step. */
+const MEAN_TEXT: Record<Exclude<Aggregation, 'raw'>, string> = {
+  day: 'Mean per local day.',
+  week: 'Mean per local ISO week (start Monday 00:00 local time).',
+  month: 'Mean per local month.',
 };
 
 /** SQL string literal. */
@@ -66,7 +73,8 @@ export function exportSql(params: ViewParams, siteId?: number): string | null {
       FROM obs o JOIN ${sitesTable} s USING (site_id)
       WHERE ${where.replace(/\b(site_id|tl)\b/g, 'o.$1')} ORDER BY o.site_id, o.tl`;
   }
-  const unit = params.aggregation === 'day' ? 'day' : 'month';
+  // Step 'week' = ISO week, start Monday 00:00 site local time.
+  const unit = params.aggregation;
   return `SELECT ${siteCols}, a.t - to_minutes(s.utc_offset_min::INT) AS ts_start_utc, a.t AS ts_local, ${vars.map((v) => `a.${v}`).join(', ')}
     FROM (SELECT site_id, date_trunc('${unit}', tl)::TIMESTAMP AS t, ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
           FROM obs WHERE ${where} GROUP BY ALL) a
@@ -87,7 +95,7 @@ function kvMetadata(view: View, meta: Meta): string {
   const p = view.params;
   const unit = (c: string) => meta.variables.get(c)?.unit ?? '';
   const kv: Record<string, string> = {
-    source: 'INAR agri harmonised database (observations.parquet)',
+    source: `INAR agri harmonised database (${sourceFiles(p)})`,
     view: view.name,
     params: JSON.stringify(p),
     step: AGGREGATION_LABELS[p.aggregation],
@@ -98,7 +106,7 @@ function kvMetadata(view: View, meta: Meta): string {
   for (const c of valueColumns(p)) {
     kv[`unit:${c}`] = unit(c);
     const label = (VARIABLE_LABELS as Record<string, string>)[c];
-    kv[`description:${c}`] = (label ? `${label}. ` : '') + (meta.variables.get(c)?.description ?? '') + (p.aggregation === 'raw' ? '' : ` Mean per local ${p.aggregation}.`);
+    kv[`description:${c}`] = (label ? `${label}. ` : '') + (meta.variables.get(c)?.description ?? '') + (p.aggregation === 'raw' ? '' : ` ${MEAN_TEXT[p.aggregation]}`);
   }
   return `{${Object.entries(kv)
     .map(([k, v]) => `${lit(k)}: ${lit(v)}`)

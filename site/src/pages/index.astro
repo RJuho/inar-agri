@@ -1,52 +1,51 @@
 ---
 // First page: views (tabs) with diagrams of the harmonised database.
 // The browser loads the Parquet files with DuckDB-WASM and draws them with ECharts.
-import '../styles/global.css';
+import Base from '../layouts/Base.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
-    <title>INAR agri data</title>
-  </head>
-  <body>
-    <main>
-      <header>
-        <h1>INAR agricultural flux sites</h1>
-        <p class="lead">
-          Data in the harmonised database: net ecosystem exchange (NEE), air temperature, soil temperature and soil
-          water content at six sites, 30-minute periods. The time axis shows site local time. Each view (tab) has its
-          own data parameters and diagrams. The views stay in this browser.
-        </p>
-        <p id="status" class="status" role="status" aria-live="polite">Loading data…</p>
-      </header>
-      <div class="toolbar">
-        <label class="field">
-          <span class="field-label">Add diagram</span>
-          <select id="add-diagram" aria-label="Add diagram">
-            <option value="">Pick a type…</option>
-          </select>
-        </label>
-      </div>
-      <nav id="tabs" class="tabs" aria-label="Views"></nav>
-      <div id="params"></div>
-      <div id="chart" class="diagrams" data-status="loading" aria-label="Diagrams"></div>
-    </main>
+<Base
+  title="INAR agri data"
+  description="Flux and weather data of six INAR agricultural sites in the browser. Make views and diagrams, and download the data."
+>
+  <main>
+    <header>
+      <h1>INAR agricultural flux sites</h1>
+      <p class="lead">
+        Data in the harmonised database at six sites, 30-minute periods. The default view shows net ecosystem
+        exchange (NEE), air temperature, soil temperature and soil water content. You can select more variables, for
+        example GPP, Reco, radiation, humidity and CH4. The <a href={`${base}calculated/`}>Calculated page</a> tells
+        how we calculate GPP and Reco. The time axis shows site local time. Each view (tab) has its own data
+        parameters and diagrams. The views stay in this browser.
+      </p>
+      <p id="status" class="status" role="status" aria-live="polite">Loading data…</p>
+    </header>
+    <div class="toolbar">
+      <label class="field">
+        <span class="field-label">Add diagram</span>
+        <select id="add-diagram" aria-label="Add diagram">
+          <option value="">Pick a type…</option>
+        </select>
+      </label>
+    </div>
+    <nav id="tabs" class="tabs" aria-label="Views"></nav>
+    <div id="params"></div>
+    <div id="chart" class="diagrams" data-status="loading" aria-label="Diagrams"></div>
+  </main>
 
-    <script>
-      import { start } from '../scripts/app';
+  <script>
+    import { start } from '../scripts/app';
 
-      start().catch((err: unknown) => {
-        console.error(err);
-        const statusEl = document.getElementById('status');
-        if (statusEl) {
-          statusEl.textContent = `Cannot show the data: ${err instanceof Error ? err.message : String(err)}`;
-          statusEl.classList.add('error');
-        }
-        document.getElementById('chart')?.setAttribute('data-status', 'error');
-      });
-    </script>
-  </body>
-</html>
+    start().catch((err: unknown) => {
+      console.error(err);
+      const statusEl = document.getElementById('status');
+      if (statusEl) {
+        statusEl.textContent = `Cannot show the data: ${err instanceof Error ? err.message : String(err)}`;
+        statusEl.classList.add('error');
+      }
+      document.getElementById('chart')?.setAttribute('data-status', 'error');
+    });
+  </script>
+</Base>

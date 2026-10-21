@@ -9,8 +9,8 @@ import type { Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
-  DAY,
-  DAY_STEP,
+  YEAR_MAX_STEP,
+  YEAR_STEP_TEXT,
   baseOption,
   dayLabel,
   dayOfYearAxis,
@@ -35,27 +35,36 @@ import {
   yearOpacity,
   yearStep,
   type Group,
+  type YearStep,
 } from './common';
 
 echarts.use([LineChart]);
 
 export interface YearsData extends Prepared {
   variables: Variable[];
-  step: 'day' | 'month';
+  step: YearStep;
   groups: Group[];
   /** Years in the data, sorted. */
   years: number[];
 }
 
 /**
- * SQL for the year diagrams: one row per site, year and day (or month).
+ * SQL for the year diagrams: one row per site, year and day (or week, or month).
  * x = the same day in the reference year, in epoch ms.
+ * Week: the ISO week (start Monday 00:00 local). A week over 1 January is split in two
+ * parts, one per year. The part in the new year starts on 1 January.
  */
 export function yearsQuery(params: ViewParams): string | null {
   const where = whereClause(params);
   if (where === null || params.variables.length === 0) return null;
   const vars = params.variables.map(col);
-  const x = yearStep(params.aggregation) === 'month' ? refDateSql('tl', '15') : refDateSql('tl');
+  const step = yearStep(params.aggregation);
+  const x =
+    step === 'month'
+      ? refDateSql('tl', '15')
+      : step === 'week'
+        ? refDateSql(`greatest(date_trunc('week', tl), date_trunc('year', tl))`)
+        : refDateSql('tl');
   return `SELECT site_id::DOUBLE AS site_id, year(tl)::DOUBLE AS yr, ${x} AS x,
       ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
     FROM obs WHERE ${where} GROUP BY 1, 2, 3 ORDER BY 1, 2, 3`;
@@ -65,15 +74,19 @@ export function prepareYears(table: Table | null, params: ViewParams): YearsData
   const step = yearStep(params.aggregation);
   const base = { variables: params.variables, step, groups: [] as Group[], years: [] as number[] };
   if (table === null) return { ...base, rowCount: 0, seriesCount: 0, note: emptyNote(params) };
-  const groups = readGroups(table, params.variables, true, step === 'month' ? 32 * DAY : DAY_STEP);
+  const groups = readGroups(table, params.variables, true, YEAR_MAX_STEP[step]);
   const years = [...new Set(groups.map((g) => g.year))].sort((a, b) => a - b);
   let seriesCount = 0;
   for (const v of params.variables) for (const g of groups) if (hasValues(g, v)) seriesCount++;
   const data: YearsData = { ...base, groups, years, rowCount: table.numRows, seriesCount };
   if (table.numRows === 0) data.note = 'No data for these sites and years.';
   if (params.aggregation === 'raw') data.subtitle = 'Raw data is shown as daily means.';
+  if (step === 'week') data.subtitle = WEEK_SPLIT_TEXT;
   return data;
 }
+
+/** Subtitle for weekly means on a day-of-year axis. */
+export const WEEK_SPLIT_TEXT = 'Weekly means (ISO weeks, start Monday). A week over 1 January is split: each part is in its own year.';
 
 /** Year rank of each group within its site, for the line opacity. */
 export function yearRanks(groups: Group[]): Map<Group, [number, number]> {
@@ -85,7 +98,7 @@ export function yearRanks(groups: Group[]): Map<Group, [number, number]> {
 }
 
 /** Tooltip for site-year lines. `meta` of each series index gives the site and year. */
-export function siteYearTooltip(ctx: BuildContext, step: 'day' | 'month', info: Array<{ site: string; year: number; unit: string }>) {
+export function siteYearTooltip(ctx: BuildContext, step: YearStep, info: Array<{ site: string; year: number; unit: string }>) {
   return {
     ...tooltipBase(ctx.tokens, 'axis'),
     axisPointer: { type: 'line', lineStyle: { color: ctx.tokens.axis } },
@@ -171,7 +184,8 @@ export const years: DiagramDef<YearsData> = {
   relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height),
   height: (params) => stackHeight(params.variables.length, 190),
   describe: (data) =>
-    `One panel per variable. The x axis is the day of the year, ${data.step === 'month' ? 'monthly means' : 'daily means'}. ` +
+    `One panel per variable. The x axis is the day of the year, ${YEAR_STEP_TEXT[data.step]}. ` +
     `Each line is one site and year: ${data.years.length} years (${data.years[0] ?? ''} to ${data.years[data.years.length - 1] ?? ''}). ` +
-    `The colour shows the site, and lighter lines are earlier years.`,
+    `The colour shows the site, and lighter lines are earlier years.` +
+    (data.step === 'week' ? ' A week over 1 January is split: each part is in its own year.' : ''),
 };

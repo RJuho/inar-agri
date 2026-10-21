@@ -1,0 +1,271 @@
+/* Page navigation (all pages) and the text page "Calculated data".
+   Colours come only from the tokens in global.css, so dark mode works. */
+
+/* ---------- Page navigation ---------- */
+
+.page-nav {
+  border-bottom: 1px solid var(--grid-line);
+  background: var(--surface-raised);
+}
+
+.page-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  list-style: none;
+}
+
+.page-nav a {
+  display: inline-block;
+  padding: 10px 0 8px;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 550;
+  text-decoration: none;
+}
+
+.page-nav a:hover {
+  color: var(--text-primary);
+}
+
+.page-nav a[aria-current='page'] {
+  border-bottom-color: var(--series-1);
+  color: var(--text-primary);
+}
+
+.page-nav a:focus-visible,
+.prose a:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
+.lead a,
+.prose a {
+  color: var(--series-1);
+}
+
+/* ---------- Text page ---------- */
+
+.prose {
+  min-width: 0;
+}
+
+/* Readable line length for text. Tables and formulas can use the full width. */
+.prose p,
+.prose ul,
+.prose ol,
+.prose h2,
+.prose h3,
+.prose pre {
+  max-width: 72ch;
+}
+
+.prose h2 {
+  margin: 40px 0 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--grid-line);
+  font-size: 1.25rem;
+  font-weight: 650;
+}
+
+.prose h3 {
+  margin: 24px 0 6px;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0 0 12px;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.4em;
+}
+
+.prose li + li {
+  margin-top: 4px;
+}
+
+.prose code {
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--grid-line);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+.prose pre {
+  margin: 0 0 12px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--grid-line);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  overflow-wrap: normal;
+}
+
+.prose .note,
+.page-foot {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.page-foot {
+  margin-top: 40px;
+  padding-top: 12px;
+  border-top: 1px solid var(--grid-line);
+}
+
+/* Section headings jump below the top edge, not under it. */
+.prose [id] {
+  scroll-margin-top: 16px;
+}
+
+/* ---------- Table of contents ---------- */
+
+.toc {
+  max-width: 72ch;
+  margin: 16px 0 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--grid-line);
+  border-radius: 6px;
+  background: var(--surface-raised);
+}
+
+.toc h2 {
+  margin: 0 0 6px;
+  padding: 0;
+  border: 0;
+  font-size: 1rem;
+}
+
+.toc ol {
+  margin: 0;
+  padding-left: 1.6em;
+}
+
+.toc li + li {
+  margin-top: 2px;
+}
+
+/* ---------- Tables ---------- */
+
+.table-wrap {
+  max-width: 100%;
+  margin: 0 0 16px;
+  overflow-x: auto;
+}
+
+.table-wrap table {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-wrap caption {
+  padding: 0 0 6px;
+  color: var(--text-secondary);
+  text-align: left;
+  caption-side: top;
+}
+
+.table-wrap th,
+.table-wrap td {
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--grid-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table-wrap thead th {
+  border-bottom: 2px solid var(--axis-line);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table-wrap td.num,
+.table-wrap th.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table-wrap td.wrap {
+  min-width: 16ch;
+  max-width: 40ch;
+}
+
+.table-wrap tbody tr:hover {
+  background: var(--surface-raised);
+}
+
+/* ---------- Formulas ---------- */
+
+.katex {
+  font-size: 1.1em;
+}
+
+.katex-display {
+  margin: 12px 0;
+  padding: 2px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.formula-list {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.formula-list li {
+  display: grid;
+  grid-template-columns: 3.5em minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+}
+
+.formula-list .eq-no {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.formula-list .katex-display {
+  margin: 4px 0;
+  text-align: left;
+}
+
+.formula-list .katex-display > .katex {
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .table-wrap th,
+  .table-wrap td {
+    padding: 4px 6px;
+  }
+}
+
+/* ---------- Footer (both pages) ---------- */
+.site-footer {
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  padding: 16px 16px 0;
+  box-sizing: border-box;
+  border-top: 1px solid var(--grid-line);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+.site-footer a { color: inherit; }

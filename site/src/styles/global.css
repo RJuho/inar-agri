@@ -320,6 +320,79 @@ select:disabled {
   accent-color: var(--series-1);
 }
 
+/* Variables: one fieldset per group (Fluxes, Meteorology, Soil).
+   Groups stand side by side on wide screens and wrap on narrow screens. */
+.group.vars {
+  flex: 1 1 100%;
+}
+
+.var-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  width: 100%;
+  min-width: 0;
+}
+
+.var-group {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* The legend floats, thus the All and None buttons stay on the same line. */
+.var-group legend {
+  float: left;
+  padding: 0;
+  margin: 0 8px 4px 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--text-primary);
+}
+
+.var-group-tools {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.var-group-btn {
+  min-height: 28px;
+  padding: 2px 8px;
+  font-size: 0.8125rem;
+}
+
+.var-list {
+  clear: both;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Long labels with a site hint can wrap: no horizontal scroll on phones. */
+.var-list .check {
+  align-items: baseline;
+  white-space: normal;
+}
+
+.var-list .check input {
+  flex: none;
+}
+
+.check-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.var-sites {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
 /* ---------- Diagram cards ---------- */
 
 .diagrams {

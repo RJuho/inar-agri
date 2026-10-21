@@ -6,7 +6,7 @@ import { ScatterChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
-import type { Variable, ViewParams } from '../state';
+import type { Aggregation, Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
 import {
@@ -36,6 +36,14 @@ interface ScatterData extends Prepared {
   ys: Variable[];
   sites: Array<{ siteId: number; x: Float64Array; values: Partial<Record<Variable, Float64Array>> }>;
 }
+
+/** Text for the points of each step. */
+const STEP_TEXT: Record<Aggregation, string> = {
+  raw: '30-minute values',
+  day: 'daily means',
+  week: 'weekly means',
+  month: 'monthly means',
+};
 
 const yVars = (params: ViewParams) => params.variables.filter((v) => v !== params.xVariable);
 
@@ -82,7 +90,7 @@ function prepare(table: Table | null, params: ViewParams, _meta: Meta): ScatterD
   }
   let seriesCount = 0;
   for (const v of ys) for (const s of sites) if (s.values[v]?.some(Number.isFinite)) seriesCount++;
-  const step = params.aggregation === 'raw' ? '30-minute values' : params.aggregation === 'day' ? 'daily means' : 'monthly means';
+  const step = STEP_TEXT[params.aggregation];
   const data: ScatterData = {
     ...base,
     sites,

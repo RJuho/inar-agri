@@ -16,7 +16,7 @@ const MINUTE = 60 * 1000;
 const DAY = 24 * 60 * MINUTE;
 
 /** Longest normal step between two rows. A longer step is a gap. */
-const MAX_STEP: Record<Aggregation, number> = { raw: 30 * MINUTE, day: DAY, month: 31 * DAY };
+const MAX_STEP: Record<Aggregation, number> = { raw: 30 * MINUTE, day: DAY, week: 7 * DAY, month: 31 * DAY };
 
 /** Layout in px. */
 const LAYOUT = { top: 24, bottom: 64, gap: 34, left: 56, right: 16 };
@@ -69,6 +69,7 @@ function panelLayout(n: number, height: number) {
 function timeLabel(ms: number, aggregation: Aggregation): string {
   const iso = new Date(ms).toISOString();
   if (aggregation === 'month') return iso.slice(0, 7);
+  if (aggregation === 'week') return `Week of ${iso.slice(0, 10)}`;
   if (aggregation === 'day') return iso.slice(0, 10);
   return `${iso.slice(0, 16).replace('T', ' ')} local time`;
 }
@@ -148,7 +149,8 @@ function sqlFor(params: ViewParams): string | null {
     return `SELECT site_id::DOUBLE AS site_id, epoch_ms(tl)::DOUBLE AS t, ${vars.join(', ')}
       FROM obs WHERE ${where} ORDER BY site_id, tl`;
   }
-  const unit = params.aggregation === 'day' ? 'day' : 'month';
+  // Step 'week' = ISO week, start Monday 00:00 site local time.
+  const unit = params.aggregation;
   return `SELECT site_id::DOUBLE AS site_id, epoch_ms(date_trunc('${unit}', tl))::DOUBLE AS t,
       ${vars.map((v) => `avg(${v}) AS ${v}`).join(', ')}
     FROM obs WHERE ${where} GROUP BY ALL ORDER BY site_id, t`;

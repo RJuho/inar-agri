@@ -27,10 +27,26 @@ export function refDateSql(expr: string, day = `day(${expr})`): string {
   return `epoch_ms(make_date(${REF_YEAR}, month(${expr}), ${day})::TIMESTAMP)::DOUBLE`;
 }
 
+/** Step of the day-of-year diagrams. */
+export type YearStep = 'day' | 'week' | 'month';
+
 /** Day-of-year step for the years diagrams. Raw data is shown as daily means. */
-export function yearStep(a: Aggregation): 'day' | 'month' {
-  return a === 'month' ? 'month' : 'day';
+export function yearStep(a: Aggregation): YearStep {
+  return a === 'raw' ? 'day' : a;
 }
+
+/**
+ * Longest normal step between two weekly points on a reference-year axis. A week is 7 days.
+ * In a year that is not a leap year, a week over the end of February is 8 days on the
+ * reference-year axis.
+ */
+export const WEEK_STEP = 8 * DAY;
+
+/** Longest normal step between two points on a reference-year axis. */
+export const YEAR_MAX_STEP: Record<YearStep, number> = { day: DAY_STEP, week: WEEK_STEP, month: 32 * DAY };
+
+/** Text for a year step, for example "weekly means". */
+export const YEAR_STEP_TEXT: Record<YearStep, string> = { day: 'daily means', week: 'weekly means', month: 'monthly means' };
 
 /** Site colour: the slot is the position of the site in sites.parquet. It is the same in all diagrams. */
 export function siteColors(meta: Meta, tokens: Tokens): Map<number, string> {
@@ -149,11 +165,12 @@ export function dayOfYearAxis(tokens: Tokens, gridIndex: number, showLabels: boo
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export const MONTH_NAMES = MONTHS;
 
-/** Label of a reference-year time: "14 Mar", or "Mar" for monthly data. */
-export function dayLabel(ms: number, step: 'day' | 'month'): string {
+/** Label of a reference-year time: "14 Mar", "Week of 14 Mar", or "Mar" for monthly data. */
+export function dayLabel(ms: number, step: YearStep): string {
   const d = new Date(ms);
   const m = MONTHS[d.getUTCMonth()] as string;
-  return step === 'month' ? m : `${d.getUTCDate()} ${m}`;
+  if (step === 'month') return m;
+  return step === 'week' ? `Week of ${d.getUTCDate()} ${m}` : `${d.getUTCDate()} ${m}`;
 }
 
 /** Text for the step setting, for example "daily means". */

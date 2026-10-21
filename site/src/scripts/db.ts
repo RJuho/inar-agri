@@ -1,6 +1,6 @@
 // DuckDB-WASM access for the website.
 // The page fetches the Parquet files from public/data/, registers them in an
-// in-browser DuckDB and reads them with SQL. The files are small (about 8 MB),
+// in-browser DuckDB and reads them with SQL. The files are about 25 MB together,
 // so we register full buffers. This works on all static hosts and does not
 // need HTTP range requests.
 //
@@ -17,7 +17,13 @@
 import * as duckdb from '@duckdb/duckdb-wasm';
 import type { Table, Vector } from 'apache-arrow';
 
-const PARQUET_FILES = ['observations.parquet', 'sites.parquet', 'variables.parquet'] as const;
+const PARQUET_FILES = ['observations.parquet', 'sites.parquet', 'variables.parquet', 'fluxes.parquet'] as const;
+
+/** Units of the columns that come from fluxes.parquet (scripts/calc.ts), not from variables.parquet. */
+const CALC_VARIABLES: VariableInfo[] = [
+  { name: 'gpp', unit: 'µmol CO2 m-2 s-1', description: 'Gross primary production, night-time partitioning (scripts/calc.ts). GPP >= 0 = uptake.' },
+  { name: 'reco', unit: 'µmol CO2 m-2 s-1', description: 'Ecosystem respiration, night-time partitioning (scripts/calc.ts).' },
+];
 
 export interface Site {
   siteId: number;
@@ -114,7 +120,8 @@ let dbPromise: Promise<duckdb.AsyncDuckDB> | null = null;
 
 /**
  * Start DuckDB one time and load the data.
- * Table `obs` has all columns of observations.parquet plus `tl`:
+ * Table `obs` has all columns of observations.parquet, `gpp` and `reco` from
+ * fluxes.parquet (Maktau `nee_f` too), plus `tl`:
  * the start of the period in site local time (ts_start + utc_offset_min).
  * The database stays open for later queries.
  */
@@ -126,8 +133,11 @@ function getDB(): Promise<duckdb.AsyncDuckDB> {
     try {
       await conn.query(
         `CREATE TABLE obs AS
-         SELECT o.*, o.ts_start + to_minutes(s.utc_offset_min::INT) AS tl
-         FROM 'observations.parquet' o JOIN 'sites.parquet' s USING (site_id)`,
+         SELECT o.* REPLACE (coalesce(o.nee_f, f.nee_f_calc::DOUBLE) AS nee_f),
+                f.gpp::DOUBLE AS gpp, f.reco::DOUBLE AS reco,
+                o.ts_start + to_minutes(s.utc_offset_min::INT) AS tl
+         FROM 'observations.parquet' o JOIN 'sites.parquet' s USING (site_id)
+         LEFT JOIN 'fluxes.parquet' f USING (site_id, ts_start)`,
       );
     } finally {
       await conn.close();
@@ -203,6 +213,9 @@ export async function loadMeta(): Promise<Meta> {
     const name = stringAt(varTable, 'column_name', i);
     variables.set(name, { name, unit: stringAt(varTable, 'unit', i), description: stringAt(varTable, 'description', i) });
   }
+  for (const v of CALC_VARIABLES) variables.set(v.name, v);
+  const neeF = variables.get('nee_f');
+  if (neeF) variables.set('nee_f', { ...neeF, description: `${neeF.description} Maktau: MDS gap filling of scripts/calc.ts.` });
 
   const range = await query(
     `SELECT year(min(tl))::INTEGER AS y0, year(max(tl))::INTEGER AS y1, count(*)::INTEGER AS n FROM obs`,

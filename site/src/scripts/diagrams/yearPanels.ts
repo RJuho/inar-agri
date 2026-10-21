@@ -11,6 +11,7 @@ import {
   dayOfYearAxis,
   extent,
   hasValues,
+  YEAR_STEP_TEXT,
   niceRange,
   siteColors,
   siteLegend,
@@ -143,5 +144,6 @@ export const yearPanels: DiagramDef<YearsData> = {
   describe: (data) =>
     `Small multiples: one panel per year (${data.years[0] ?? ''} to ${data.years[data.years.length - 1] ?? ''}), side by side, ` +
     `one row of panels per variable. Each panel starts on 1 January and has one line per site, ` +
-    `${data.step === 'month' ? 'monthly means' : 'daily means'}. All panels of a variable have the same y axis.`,
+    `${YEAR_STEP_TEXT[data.step]}. All panels of a variable have the same y axis.` +
+    (data.step === 'week' ? ' A week over 1 January is split: each part is in its own year.' : ''),
 };

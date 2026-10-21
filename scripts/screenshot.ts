@@ -25,8 +25,10 @@ Usage: npm run screenshot -- [options]
 Options:
   --url <url>          Page address. Default: ${DEFAULT_URL}
   --view <json|file>   View to show: JSON text or a JSON file. Missing keys get default values:
-                       name "Screenshot", the default parameters (all sites, five variables,
-                       all years, raw), one timeseries diagram. Example:
+                       name "Screenshot", the default parameters (all sites, the five variables
+                       nee, nee_f, ta, tsoil, swc, all years, raw), one timeseries diagram.
+                       Variable names: nee, nee_f, gpp, reco, gpp_src, reco_src, ch4, ta, sw_in,
+                       ppfd, rh, vpd, ustar, tsoil, swc. Steps: raw, day, week, month. Example:
                        '{"params":{"sites":[4],"variables":["nee_f","ta"],"yearFrom":2022,"yearTo":2023,"aggregation":"day"},"diagrams":[{"id":"a","type":"monthly"},{"id":"b","type":"cumulative"}]}'
   --diagram <target>   "all" (default): one image with all diagrams, a header and the alt texts.
                        A number: the diagram at this position (0 = first). Other text: a diagram id.

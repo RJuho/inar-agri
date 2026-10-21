@@ -1,6 +1,6 @@
 # Calculated flux products (`data/calculated/`)
 
-This document describes `scripts/calc.ts`: what it calculates, which formulas and parameters it uses, which assumptions it makes, and how to check the result. Run it with `npm run calc`. The output folder `data/calculated/` is not in git; the script makes it from `db/*.parquet` in about 7 seconds. The run writes `data/calculated/report.md` with all counts, fit diagnostics and validation tables.
+The website page `/calculated/` shows a summary of this document with the formulas and the result tables. This document describes `scripts/calc.ts`: what it calculates, which formulas and parameters it uses, which assumptions it makes, and how to check the result. Run it with `npm run calc`. The output folder `data/calculated/` is not in git; the script makes it from `db/*.parquet` in about 7 seconds. The run writes `data/calculated/report.md` with all counts, fit diagnostics and validation tables.
 
 ## 1. Source article and scope
 

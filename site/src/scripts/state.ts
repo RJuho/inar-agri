@@ -2,25 +2,62 @@
 // The state is kept in localStorage. A view can also come from the URL hash.
 // This file has no DOM code and no chart code.
 
-/** Variables that the user can select. Only these names go into SQL. */
-export const VARIABLES = ['nee', 'nee_f', 'ta', 'tsoil', 'swc'] as const;
+/** Variables that the user can select. Only these names go into SQL. Order = panel order. */
+export const VARIABLES = [
+  'nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4',
+  'ta', 'sw_in', 'ppfd', 'rh', 'vpd', 'ustar',
+  'tsoil', 'swc',
+] as const;
 export type Variable = (typeof VARIABLES)[number];
+
+/** Checkbox groups of the parameter form. */
+export const VARIABLE_GROUPS: readonly { label: string; variables: readonly Variable[] }[] = [
+  { label: 'Fluxes', variables: ['nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4'] },
+  { label: 'Meteorology', variables: ['ta', 'sw_in', 'ppfd', 'rh', 'vpd', 'ustar'] },
+  { label: 'Soil', variables: ['tsoil', 'swc'] },
+];
+
+/** Variables of the default view. */
+export const DEFAULT_VARIABLES: readonly Variable[] = ['nee', 'nee_f', 'ta', 'tsoil', 'swc'];
 
 /** Short labels. Units come from variables.parquet. */
 export const VARIABLE_LABELS: Record<Variable, string> = {
   nee: 'NEE, measured',
   nee_f: 'NEE, gap-filled',
+  gpp: 'GPP, calculated',
+  reco: 'Reco, calculated',
+  gpp_src: 'GPP, data provider',
+  reco_src: 'Reco, data provider',
+  ch4: 'CH4 flux',
   ta: 'Air temperature',
+  sw_in: 'Shortwave radiation',
+  ppfd: 'PPFD',
+  rh: 'Relative humidity',
+  vpd: 'Vapour pressure deficit',
+  ustar: 'Friction velocity u*',
   tsoil: 'Soil temperature',
   swc: 'Soil water content',
 };
 
-export const AGGREGATIONS = ['raw', 'day', 'month'] as const;
+/** Sites that have the variable, for variables that only some sites have. Shown as a hint. */
+export const VARIABLE_SITES: Partial<Record<Variable, string>> = {
+  gpp_src: 'Anttila, Särkisuo, Qvidja',
+  reco_src: 'Anttila, Särkisuo, Qvidja',
+  ch4: 'Anttila, Särkisuo',
+  sw_in: 'not Haltiala',
+  ppfd: 'not Qvidja, Maktau',
+  rh: 'not Haltiala',
+  vpd: 'Haltiala, Qvidja, Maktau',
+  ustar: 'Qvidja, Maktau',
+};
+
+export const AGGREGATIONS = ['raw', 'day', 'week', 'month'] as const;
 export type Aggregation = (typeof AGGREGATIONS)[number];
 
 export const AGGREGATION_LABELS: Record<Aggregation, string> = {
   raw: '30 min (raw)',
   day: 'Daily mean',
+  week: 'Weekly mean',
   month: 'Monthly mean',
 };
 
@@ -70,11 +107,11 @@ export function newId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-/** Default parameters: all sites, all variables, all years, raw data. */
+/** Default parameters: all sites, the default variables, all years, raw data. */
 export function defaultParams(allSites: number[]): ViewParams {
   return {
     sites: [...allSites],
-    variables: [...VARIABLES],
+    variables: [...DEFAULT_VARIABLES],
     xVariable: 'ta',
     yearFrom: null,
     yearTo: null,
