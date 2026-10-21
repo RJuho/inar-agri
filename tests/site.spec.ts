@@ -290,7 +290,7 @@ test.describe('views and diagrams', () => {
   });
 });
 
-const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative'] as const;
+const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint'] as const;
 const SITE_NAMES = ['Anttila', 'Särkisuo', 'Haltiala', 'Qvidja', 'Viikki', 'Maktau'];
 
 /** A view with one diagram of `type`. */
@@ -370,6 +370,16 @@ test.describe('diagram types', () => {
       const all = [...axes.y, ...axes.x].join(' | ').replace(/\s*\n\s*/g, ' ');
       if (type === 'cumulative') {
         expect(all).toContain('g C m⁻²');
+      } else if (type === 'fingerprint') {
+        // The y axis is the time of day. The unit is on the colour scale label of each variable block.
+        expect(all).toContain('Time of day');
+        const titles = await card.locator('.diagram-chart').evaluate((el) => {
+          const chart = (el as unknown as { __chart: { getOption(): { title?: Array<{ text?: string }> } } }).__chart;
+          return (chart.getOption().title ?? []).map((t) => t.text ?? '').join(' | ');
+        });
+        expect(titles).toContain('µmol CO₂ m⁻² s⁻¹');
+        expect(titles).not.toContain('m-2');
+        expect(titles).toContain('m³ m⁻³');
       } else {
         expect(all).toContain('µmol CO₂ m⁻² s⁻¹');
         expect(all).not.toContain('m-2');
@@ -394,6 +404,50 @@ test.describe('diagram types', () => {
     await expect(card).toHaveAttribute('data-status', 'ready');
     await expect(card).toHaveAttribute('data-series', '0');
     await expect(card.locator('.diagram-note')).toContainText('need one or more flux variables');
+  });
+
+  test('fingerprint bins the days to at most 400 columns and has one colour scale per variable', async ({ page }) => {
+    const view = { ...typeView('fingerprint', ['nee_f', 'ta']), params: { ...typeView('fingerprint').params, sites: [4], variables: ['nee_f', 'ta'], yearFrom: 2022, yearTo: 2023 } };
+    await page.goto('/' + viewHash(view));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    // One panel per variable and site: 2 variables × 1 site.
+    await expect(card).toHaveAttribute('data-series', '2');
+    // 730 days in 2022 and 2023: 2 days per column, 365 columns, 48 half hours.
+    expect(Number(await card.getAttribute('data-rows'))).toBe(365 * 48);
+    const info = await card.locator('.diagram-chart').evaluate((el) => {
+      type Option = { xAxis?: Array<{ data?: string[] }>; visualMap?: Array<{ min?: number; max?: number }>; series?: Array<{ data?: unknown[] }> };
+      const chart = (el as unknown as { __chart: { getOption(): Option } }).__chart;
+      const o = chart.getOption();
+      return {
+        columns: o.xAxis?.[0]?.data?.length ?? 0,
+        first: o.xAxis?.[0]?.data?.[0] ?? '',
+        scales: (o.visualMap ?? []).map((v) => [v.min, v.max]),
+        cells: (o.series ?? []).map((s) => s.data?.length ?? 0),
+      };
+    });
+    expect(info.columns).toBe(365);
+    expect(info.first).toBe('2022-01-01');
+    expect(info.scales.length).toBe(2);
+    // NEE: a diverging scale, symmetric around 0. Air temperature: a sequential scale.
+    expect(info.scales[0]?.[0]).toBeCloseTo(-(info.scales[0]?.[1] as number), 6);
+    expect(info.scales[1]?.[0] as number).toBeLessThan(0);
+    expect(info.scales[1]?.[1] as number).toBeGreaterThan(20);
+    for (const n of info.cells) expect(n).toBeLessThanOrEqual(365 * 48);
+    await expect(page.locator('.diagram-sub')).toContainText('mean of 2 days');
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('2 panels');
+    expect(alt).toContain('Each column is the mean of 2 days');
+  });
+
+  test('fingerprint with more than 24 panels shows a note, not an error', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('fingerprint', ['nee', 'nee_f', 'ta', 'tsoil', 'swc'])));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    await expect(card).toHaveAttribute('data-series', '0');
+    await expect(card.locator('.diagram-note')).toContainText('Too many panels: 30');
   });
 
   test('scatter with only the x variable shows a note', async ({ page }) => {
