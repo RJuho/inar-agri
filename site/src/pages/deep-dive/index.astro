@@ -1,0 +1,55 @@
+---
+// List page of the Deep Dives: all MDX pages in this folder, newest first.
+// Each frontmatter is checked with Valibot (lib/deepDive.ts); a bad frontmatter stops the build.
+import '../../styles/deep-dive.css';
+import Base from '../../layouts/Base.astro';
+import AiNotice from '../../components/AiNotice.astro';
+import { baseUrl, parseFrontmatter, SITE_NAMES } from '../../lib/deepDive';
+
+const modules = import.meta.glob<{ frontmatter: unknown }>('./*.mdx', { eager: true });
+const base = baseUrl();
+const dives = Object.entries(modules)
+  .map(([path, mod]) => {
+    const slug = path.replace(/^\.\//, '').replace(/\.mdx$/, '');
+    return { slug, fm: parseFrontmatter(mod.frontmatter, slug) };
+  })
+  .sort((a, b) => b.fm.date.localeCompare(a.fm.date) || a.fm.title.localeCompare(b.fm.title));
+---
+
+<Base
+  title="Deep Dives – INAR agri"
+  description="Short articles that answer one question each from the INAR agricultural eddy-covariance data."
+>
+  <main class="prose deep-dive">
+    <header>
+      <h1>Deep Dives</h1>
+      <AiNotice subject="the questions, the analysis scripts, the articles and their summaries" />
+      <p class="lead">
+        Each Deep Dive answers one question with the data of this project. A script calculates all numbers; the
+        article shows them with the method, the limits and the references. A dive is a draft until another model
+        calculates the numbers again and a review checks the language and the references.
+      </p>
+    </header>
+
+    <ul class="dd-list">
+      {
+        dives.map(({ slug, fm }) => (
+          <li class="dd-card" data-slug={slug}>
+            <h2>
+              <a href={`${base}deep-dive/${slug}/`}>{fm.title}</a>
+            </h2>
+            <p class="dd-card-question">{fm.question}</p>
+            <p class="dd-card-answer">
+              <strong>Short answer:</strong> {fm.shortAnswer}
+            </p>
+            <p class="dd-card-meta">
+              <span class={`dd-status dd-status-${fm.status}`}>{fm.status === 'checked' ? 'Checked' : 'Draft'}</span>
+              <span>{fm.sites.map((s) => SITE_NAMES[s]).join(', ')}</span>
+              <time datetime={fm.date}>{fm.date}</time>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Base>

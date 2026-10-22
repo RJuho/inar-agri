@@ -1,0 +1,31 @@
+---
+// One number of a Deep Dive, from the result JSON (site/src/deep-dives/<slug>.json).
+// `k` is the dotted path, for example "sites.qvidja.nee.mean". A missing key stops the build.
+// Do not type numbers in the text of a dive: use this component. Rules: CLAUDE.md, "Deep Dive".
+import { diveNumber, fmtNum, slugFromUrl } from '../../lib/deepDive';
+
+interface Props {
+  /** Dotted path in the JSON. */
+  k: string;
+  /** Number of decimals. */
+  digits?: number;
+  /** Unit after the number (with a no-break space). */
+  unit?: string;
+  /** Show + before a positive value. */
+  sign?: boolean;
+  /** Show the absolute value (for text such as "decreased by"). */
+  abs?: boolean;
+  /** Multiply by 100 (fraction to percent). The unit is then "%" when no unit is given. */
+  percent?: boolean;
+  /** Slug of the dive. Default: from the page URL. */
+  dive?: string;
+}
+
+const { k, digits = 2, unit, sign = false, abs = false, percent = false, dive } = Astro.props;
+const slug = dive ?? slugFromUrl(Astro.url);
+const raw = diveNumber(slug, k);
+const text = fmtNum(percent ? raw * 100 : raw, digits, { sign, abs });
+const u = unit ?? (percent ? '%' : undefined);
+---
+
+<span class="dd-num" data-k={k}>{text}{u && <Fragment set:html={`&nbsp;${u}`} />}</span>

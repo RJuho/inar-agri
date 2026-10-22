@@ -1,0 +1,33 @@
+---
+// Build-time figure of a Deep Dive: SVG (role="img" with an aria-label = alt text), caption and a
+// link to the data page with the same sites, variables and period. The SVG comes from
+// site/src/lib/deepDiveChart.ts (renderSvg). The caption is the slot.
+import { baseUrl, dataPageHref, type DataLink } from '../../lib/deepDive';
+
+interface Props {
+  id: string;
+  /** Figure number and title, for example "Figure 1. Mean daily fluxes around the events". */
+  title: string;
+  svg: string;
+  /** The alt text of the SVG; the page shows it below the caption too. */
+  alt: string;
+  /** View of the data page for the link. */
+  view?: DataLink;
+}
+const { id, title, svg, alt, view } = Astro.props;
+if (!/role="img"/.test(svg) || !/aria-label="[^"]+"/.test(svg)) throw new Error(`Deep Dive figure ${id}: the SVG needs role="img" and an aria-label`);
+const href = view ? dataPageHref(baseUrl(), view) : null;
+---
+
+<figure class="dd-figure" id={id}>
+  <div class="dd-figure-wrap"><Fragment set:html={svg} /></div>
+  <figcaption>
+    <p class="dd-figure-title"><strong>{title}</strong></p>
+    <slot />
+    <details class="dd-alt">
+      <summary>Text description of the figure</summary>
+      <p>{alt}</p>
+    </details>
+    {href && <p class="dd-figure-link"><a href={href}>Open in the data page</a> ({view!.name})</p>}
+  </figcaption>
+</figure>

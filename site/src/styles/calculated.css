@@ -31,7 +31,8 @@
   color: var(--text-primary);
 }
 
-.page-nav a[aria-current='page'] {
+.page-nav a[aria-current='page'],
+.page-nav a[aria-current='true'] {
   border-bottom-color: var(--series-1);
   color: var(--text-primary);
 }

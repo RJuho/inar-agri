@@ -1,0 +1,198 @@
+/* Deep Dive pages (list page and articles). The shared text styles (.prose, tables, references)
+   are in calculated.css. Colours come only from the tokens in global.css, so dark mode works. */
+
+.dd-kicker {
+  margin: 16px 0 0;
+  font-size: 0.875rem;
+}
+
+.dd-kicker a {
+  color: var(--link);
+}
+
+/* ---------- Facts box below the AI notice ---------- */
+
+.dd-facts {
+  display: grid;
+  gap: 4px;
+  max-width: 72ch;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--grid-line);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  font-size: 0.875rem;
+}
+
+.dd-facts > div {
+  display: grid;
+  grid-template-columns: 9em minmax(0, 1fr);
+  gap: 8px;
+}
+
+.dd-facts dt {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.dd-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.dd-facts ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.dd-facts a {
+  color: var(--link);
+}
+
+@media (max-width: 480px) {
+  .dd-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+/* Status badge: text and border, not colour only. */
+.dd-status {
+  display: inline-block;
+  padding: 0 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.dd-status-draft {
+  border-style: dashed;
+}
+
+.dd-status-draft::before {
+  content: '\25CB\00a0'; /* open circle */
+}
+
+.dd-status-checked::before {
+  content: '\2713\00a0'; /* check mark */
+}
+
+.dd-status-note {
+  margin-left: 8px;
+  color: var(--text-secondary);
+}
+
+.dd-question {
+  font-size: 1.1rem;
+  font-weight: 550;
+}
+
+.dd-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- List page ---------- */
+
+.prose .dd-list {
+  max-width: 72ch;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prose .dd-list li + li {
+  margin-top: 12px;
+}
+
+.dd-card {
+  padding: 12px 16px;
+  border: 1px solid var(--grid-line);
+  border-radius: 6px;
+  background: var(--surface-raised);
+}
+
+.prose .dd-card h2 {
+  margin: 0 0 6px;
+  padding: 0;
+  border: 0;
+  font-size: 1.125rem;
+}
+
+.dd-card h2 a {
+  color: var(--link);
+}
+
+.prose .dd-card p {
+  margin: 0 0 6px;
+}
+
+.dd-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ---------- Figures (SVG made at build time, site/src/lib/deepDiveChart.ts) ---------- */
+
+.dd-figure {
+  margin: 16px 0 20px;
+}
+
+/* The SVG scales with the page. On a narrow screen it keeps 720 px and scrolls, like the tables. */
+.dd-figure-wrap {
+  max-width: 1100px;
+  overflow-x: auto;
+}
+
+.dd-chart {
+  display: block;
+  min-width: 720px;
+  height: auto;
+}
+
+/* ECharts writes fixed colours into the SVG. The page tokens replace the text colour and the
+   sentinel colour #7a7974 (NEE, the mean markers and the black site colour), so the figure reads
+   in dark mode. */
+.dd-chart text {
+  fill: var(--text-primary);
+}
+
+.dd-chart [fill='#7a7974'] {
+  fill: var(--text-primary);
+}
+
+.dd-chart [stroke='#7a7974'] {
+  stroke: var(--text-primary);
+}
+
+.dd-figure figcaption {
+  max-width: 72ch;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.prose .dd-figure figcaption p {
+  margin: 6px 0 0;
+}
+
+.dd-figure-title {
+  color: var(--text-primary);
+}
+
+.dd-alt {
+  margin-top: 6px;
+}
+
+.dd-alt summary {
+  cursor: pointer;
+  color: var(--link);
+}
+
+.dd-figure-link a {
+  color: var(--link);
+}

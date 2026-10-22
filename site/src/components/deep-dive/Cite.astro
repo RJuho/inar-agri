@@ -1,0 +1,15 @@
+---
+// Short citation link to the reference list of a Deep Dive, for example "(Heimsch et al. 2021)".
+// The id must be in the frontmatter `references`; the layout checks each link.
+import { resolveReference, type DiveRefId } from '../../lib/deepDive';
+
+interface Props {
+  ids: DiveRefId[];
+  /** Text after the citation, for example a page: "p. 5". */
+  note?: string;
+}
+const { ids, note } = Astro.props;
+const refs = ids.map(resolveReference);
+---
+
+<span class="dd-cite">({refs.map((r, i) => <>{i > 0 && '; '}<a href={`#ref-${r.id}`}>{r.short}</a></>)}{note && `, ${note}`})</span>

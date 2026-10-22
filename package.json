@@ -8,7 +8,7 @@
     "build:db": "node scripts/build-db.ts",
     "calc": "node scripts/calc.ts",
     "scan:anomalies": "node scripts/scan-anomalies.ts",
-    "test:unit": "node --test 'scripts/lib/*.test.ts' 'scripts/lib/calc/*.test.ts' 'site/src/scripts/diagrams/*.test.ts' 'site/src/scripts/*.test.ts'",
+    "test:unit": "node --test 'scripts/lib/*.test.ts' 'scripts/lib/calc/*.test.ts' 'scripts/lib/deep-dive/*.test.ts' 'site/src/scripts/diagrams/*.test.ts' 'site/src/scripts/*.test.ts'",
     "typecheck": "tsc --noEmit && tsc --noEmit -p site/tsconfig.json",
     "site:sync": "node scripts/sync-site-data.ts && node scripts/sync-site-duckdb.ts",
     "site:dev": "npm run site:sync && astro dev --root site --host",
@@ -18,7 +18,8 @@
     "screenshot": "node scripts/screenshot.ts",
     "cf:preview": "npm run site:build && wrangler dev",
     "deploy": "npm run site:build && wrangler deploy",
-    "wrangler": "wrangler"
+    "wrangler": "wrangler",
+    "deep-dives": "node scripts/deep-dives.ts"
   },
   "devDependencies": {
     "@duckdb/node-api": "1.5.6-r.1",
@@ -29,6 +30,7 @@
     "wrangler": "4.151.3"
   },
   "dependencies": {
+    "@astrojs/mdx": "8.1.0",
     "@duckdb/duckdb-wasm": "1.32.0",
     "astro": "7.4.1",
     "echarts": "^6.1.0",

@@ -1,0 +1,32 @@
+---
+// Reference list of a Deep Dive: full citation, DOI link and the path of the local copy in the repository.
+import { resolveReference, type DiveRefId } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+
+interface Props {
+  ids: DiveRefId[];
+}
+const refs = Astro.props.ids.map(resolveReference);
+/** Files in data/ are not in git; docs/ files have a link to the repository. */
+const repoLink = (file: string) => (file.startsWith('docs/') ? `${REPO_URL}/blob/main/${file}` : null);
+---
+
+<ol class="references">
+  {
+    refs.map((r) => (
+      <li id={`ref-${r.id}`}>
+        {r.text}
+        {r.doi && (
+          <>
+            {' '}
+            <a href={`https://doi.org/${r.doi}`} rel="noopener">doi:{r.doi}</a>
+          </>
+        )}
+        <span class="ref-note">
+          Local copy:{' '}
+          {repoLink(r.file) ? <a href={repoLink(r.file)!} rel="noopener"><code>{r.file}</code></a> : <code>{r.file}</code>}
+        </span>
+      </li>
+    ))
+  }
+</ol>

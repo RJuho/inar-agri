@@ -1,6 +1,7 @@
 // Astro configuration for the data website.
 // Run Astro with `--root site`. See package.json scripts.
 import { defineConfig } from 'astro/config';
+import mdx from '@astrojs/mdx';
 import { execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 
@@ -29,7 +30,8 @@ const versionFile = {
 
 export default defineConfig({
   output: 'static',
-  integrations: [versionFile],
+  // MDX: the Deep Dive articles (site/src/pages/deep-dive/*.mdx).
+  integrations: [mdx(), versionFile],
   vite: {
     define: {
       __BUILD_TIME__: JSON.stringify(BUILD.time),

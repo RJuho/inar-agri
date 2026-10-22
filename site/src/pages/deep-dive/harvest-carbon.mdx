@@ -1,0 +1,340 @@
+---
+layout: ../../layouts/DeepDive.astro
+title: Harvest and cutting vs carbon balance
+question: Is a harvest or a cut associated with a change of NEE, GPP and Reco in the days and weeks after it?
+shortAnswer: At Qvidja the net CO₂ uptake is lower for weeks after a harvest. Viikki shows the same direction, but with too few events. At the cereal field Haltiala, NEE does not change.
+sites: [haltiala, qvidja, viikki]
+variables: [nee_f, gpp, reco]
+period: { from: 2018, to: 2025 }
+date: '2026-10-22'
+status: checked
+models:
+  - model: Claude Opus 5.5
+    role: question, analysis script, text, figures and the fixes of the review
+  - model: Claude Sonnet
+    role: independent recompute of the numbers (own SQL, without the script)
+  - model: Claude Haiku
+    role: language (STE) and reference review
+script: scripts/deep-dives/harvest-carbon.ts
+references: [heimsch2021, heimsch2024, shurpali2025, vira2025, hu2024, qvidja-management, viikki-management, haltiala-management, calculated-doc, anomaly-report]
+checks:
+  - kind: recompute
+    by: Claude Sonnet
+    date: '2026-10-22'
+    result: pass
+    note: All counts and statistics of the JSON reproduced from the article text alone, without the scripts. Seven clarifications of the method were added to "Data and method" by Opus.
+  - kind: review
+    by: Claude Haiku
+    date: '2026-10-22'
+    result: pass
+    note: Pass with fixes (STE sentences, causal and vague words, citation pages, Heimsch cutting heights and dates, Vira and Hu claims, yield p-values, finding status). Opus applied the fixes.
+---
+
+import raw from '../../deep-dives/harvest-carbon.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { changeFigure, compositeFigure, episodeRows, excludedEpisodes, harvestData, yieldFigure } from '../../lib/deepDives/harvestCarbon';
+
+export const d = harvestData(raw);
+export const fig1 = compositeFigure(d);
+export const fig2 = changeFigure(d);
+export const fig3 = yieldFigure(d);
+export const rows = episodeRows(d);
+export const excluded = excludedEpisodes(d);
+export const base = baseUrl();
+export const U = 'g C m⁻² d⁻¹';
+export const UM = 'µmol m⁻² s⁻¹';
+
+## Short answer
+
+The change is the mean daily NEE in the <Num k="method.afterDays" digits={0} /> days after a harvest or cut minus the
+mean in the <Num k="method.beforeDays" digits={0} /> days before. A higher NEE means less net uptake of CO₂.
+
+For all <Num k="all.n" digits={0} /> used episodes at three sites, the mean change of NEE was
+<Num k="all.nee.mean" sign unit={U} /> (<Num k="method.ciLevelPct" digits={0} /> % interval
+<Num k="all.nee.ciLo" sign /> to <Num k="all.nee.ciHi" sign />). NEE increased in
+<Num k="all.nee.nPositive" digits={0} /> of the <Num k="all.nee.n" digits={0} /> episodes. At the same time, GPP
+decreased (<Num k="all.gpp.mean" sign unit={U} />, interval <Num k="all.gpp.ciLo" sign /> to <Num k="all.gpp.ciHi" sign />).
+The change of Reco was <Num k="all.reco.mean" sign unit={U} />, and its interval (<Num k="all.reco.ciLo" sign /> to
+<Num k="all.reco.ciHi" sign />) includes zero.
+
+- **Qvidja** (silage grassland): NEE <Num k="sites.qvidja.nee.mean" sign unit={U} /> (n = <Num k="sites.qvidja.n" digits={0} />,
+  interval <Num k="sites.qvidja.nee.ciLo" sign /> to <Num k="sites.qvidja.nee.ciHi" sign />). In days
+  <Num k="method.lateFrom" digits={0} /> to <Num k="method.lateTo" digits={0} /> after the event, the change was
+  <Num k="sites.qvidja.late.nee.mean" sign unit={U} /> (n = <Num k="sites.qvidja.late.nee.n" digits={0} />, interval
+  <Num k="sites.qvidja.late.nee.ciLo" sign /> to <Num k="sites.qvidja.late.nee.ciHi" sign />).
+- **Viikki** (grass and crop rotation): NEE <Num k="sites.viikki.nee.mean" sign unit={U} /> (n = <Num k="sites.viikki.n" digits={0} />,
+  interval <Num k="sites.viikki.nee.ciLo" sign /> to <Num k="sites.viikki.nee.ciHi" sign />). The mean is positive.
+  <Num k="sites.viikki.n" digits={0} /> episodes are too few for a conclusion.
+- **Haltiala** (cereal field, grain harvests at the end of the season): NEE <Num k="sites.haltiala.nee.mean" sign unit={U} />
+  (n = <Num k="sites.haltiala.n" digits={0} />, interval <Num k="sites.haltiala.nee.ciLo" sign /> to
+  <Num k="sites.haltiala.nee.ciHi" sign />). The interval includes zero.
+
+The data show no significant relation between the yield of a harvest and the change of NEE.
+
+## Data and method
+
+**Events.** We used the harvest and cut events of the management files
+<Cite ids={['qvidja-management', 'viikki-management', 'haltiala-management']} />. The build stores them in
+`db/events.parquet`. There are <Num k="counts.harvests" digits={0} /> harvests and <Num k="counts.cuts" digits={0} /> cuts.
+A harvest removes the biomass. At Qvidja, a cut is a cleaning cut, and the grass stays on the field
+<Cite ids={['qvidja-management']} />.
+
+**Episodes.** We sorted the events of each site by date. An event joins the current episode when it starts not more
+than <Num k="method.mergeDays" digits={0} /> days after the end of that episode. The end of an episode is the last
+day of its events. Where the file gives an end date (`date_end`), we used it. For example, the Haltiala harvest of
+2022-08-15 ends on 2022-08-24. This gives <Num k="counts.episodes" digits={0} /> episodes from
+<Num k="counts.events" digits={0} /> events. The yield of an episode is the sum of the yields of its events. In this
+data, not more than one event per episode has a yield.
+
+**Fluxes.** We used the daily sums of gap-filled NEE, GPP and Reco in g C m⁻² d⁻¹ from
+`data/calculated/daily.parquet` <Cite ids={['calculated-doc']} />. A day is the local calendar day (`date_local`).
+NEE > 0 is a net release of CO₂ to the air. GPP ≥ 0 is the uptake by photosynthesis. The data providers made the
+gap-filled NEE. This project made GPP and Reco with the night-time partitioning. In this method, Reco is a temperature
+model fitted to night NEE. GPP is Reco − NEE.
+
+**Windows.** For each episode we calculated the mean daily flux in these windows:
+
+- *before*: the <Num k="method.beforeDays" digits={0} /> days before the first day of the episode,
+- *after*: the <Num k="method.afterDays" digits={0} /> days after the last day of the episode (main result),
+- *early*: days one to <Num k="method.earlyDays" digits={0} /> after the last day,
+- *late*: days <Num k="method.lateFrom" digits={0} /> to <Num k="method.lateTo" digits={0} /> after the last day.
+
+The days of the episode are not in a window. The change of an episode is the mean of a window after the episode
+minus the mean of the *before* window.
+
+**Rules.** An episode is used when it passes all three rules:
+
+- **Rule 1.** No other harvest or cut episode of the site starts in the *before* window or in the *after* window.
+- **Rule 2.** Each of the two windows has at least <Num k="method.minDays" digits={0} /> days with all three fluxes.
+- **Rule 3.** In each of the two windows, the mean measured fraction of NEE is at least
+  <Num k="method.minFracPct" digits={0} /> %. The measured fraction is the mean of `frac_measured` of the days with
+  all three fluxes.
+
+The late window has the same day rule as rule 2. It also must not contain the start of another episode. Else the
+late value of the episode is empty.
+
+We added rule 3 for this reason: the gap-filling models use data from the days before and after the event. When most
+half hours are gap-filled, the filled values can hide the change. <Num k="counts.excluded" digits={0} /> episodes
+did not pass rule 3. All episodes passed rules 1 and 2. <Num k="counts.used" digits={0} /> episodes are used.
+These episodes are not used:
+
+<ul>{excluded.map((t) => <li>{t}</li>)}</ul>
+
+**Statistics.** We calculated these values per site and for all sites:
+
+- the mean change and the standard deviation (SD),
+- the number of episodes (n),
+- a <Num k="method.ciLevelPct" digits={0} /> % percentile bootstrap interval of the mean
+  (<Num k="method.bootstrapResamples" digits={0} /> resamples, fixed seed).
+
+For the sites with few episodes (Viikki, Haltiala), a bootstrap interval is not reliable. Use the single values in the table.
+
+**Check without gap filling.** We also used the *measured* half-hourly NEE in µmol m⁻² s⁻¹. A day is the local date
+of `tl` in `data/calculated/fluxes_30min.parquet`. We used the night flag of the partitioning (low radiation) to make
+two groups: day and night. Half hours without a night flag (<Num k="counts.nightNullPct" digits={1} unit="%" /> of the measured half hours) are not in
+the day group or in the night group. For each window we calculated the mean measured NEE of each group. A window needs at least
+<Num k="method.minMeasuredDay" digits={0} /> measured day-time half hours or <Num k="method.minMeasuredNight" digits={0} />
+measured night-time half hours. Day and night have a different number of hours. This check gives the direction of
+the change, not a daily sum.
+
+**Yield.** We used the dry-matter yield of the episode in t DW ha⁻¹. Qvidja and Haltiala give a yield per harvest.
+Viikki gives one yield per year on the last harvest of the year. We used the Viikki value only when the year has one
+episode. We calculated the Pearson correlation r, its two-sided p-value (t-test, n − 2 degrees of freedom) and the
+least-squares slope. The slope has the same p-value as r.
+
+## Results
+
+<Figure
+  id="figure-1"
+  title="Figure 1. Mean daily NEE, GPP and Reco around a harvest or cut"
+  svg={fig1.svg}
+  alt={fig1.alt}
+  view={{ name: 'Harvest and cut: daily fluxes', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    Mean of the used episodes per site. Day 0 is the first day of the episode (dashed vertical line). The bands show
+    ±1 SD of the episodes for NEE and GPP. NEE &gt; 0 is a net release of CO₂. The link to the data page shows the
+    daily values of all years with the event markers.
+  </p>
+</Figure>
+
+At Qvidja the mean NEE was <Num k="sites.qvidja.before.nee" unit={U} /> before the event and
+<Num k="sites.qvidja.after.nee" unit={U} /> after it. At Viikki it was <Num k="sites.viikki.before.nee" unit={U} />
+before and <Num k="sites.viikki.after.nee" unit={U} /> after. GPP decreased at the same time. At Qvidja the change of
+GPP was <Num k="sites.qvidja.gpp.mean" sign unit={U} /> (interval <Num k="sites.qvidja.gpp.ciLo" sign /> to
+<Num k="sites.qvidja.gpp.ciHi" sign />). At Viikki it was <Num k="sites.viikki.gpp.mean" sign unit={U} /> (n = <Num k="sites.viikki.n" digits={0} />,
+interval <Num k="sites.viikki.gpp.ciLo" sign /> to <Num k="sites.viikki.gpp.ciHi" sign />). The interval of the change
+of Reco includes zero at both sites.
+
+At Haltiala the change of NEE was <Num k="sites.haltiala.nee.mean" sign unit={U} />. GPP
+(<Num k="sites.haltiala.gpp.mean" sign unit={U} />) and Reco (<Num k="sites.haltiala.reco.mean" sign unit={U} />)
+both decreased by a similar quantity. The air was colder after the harvest than before: the change of the mean air
+temperature was <Num k="sites.haltiala.ta.mean" sign digits={1} unit="°C" /> (n = <Num k="sites.haltiala.ta.n" digits={0} />,
+interval <Num k="sites.haltiala.ta.ciLo" sign digits={1} /> to <Num k="sites.haltiala.ta.ciHi" sign digits={1} />). In
+Figure 1, GPP at Haltiala is already low before the harvest. These are observations. This analysis does not show
+their cause.
+
+<Figure
+  id="figure-2"
+  title="Figure 2. Change of the mean daily flux per episode"
+  svg={fig2.svg}
+  alt={fig2.alt}
+  view={{ name: 'Harvest and cut: cumulative NEE', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['cumulative'] }}
+>
+  <p>
+    Each symbol is one used episode. The change is the mean of the {d.method.afterDays}-day window after the episode
+    minus the mean of the {d.method.beforeDays}-day window before it. Filled symbols: the episode has a harvest. Open
+    symbols: the episode has cuts only. The diamond and the vertical line show the site mean and its bootstrap
+    interval. For n = {d.sites.viikki.n} the interval is not reliable.
+  </p>
+</Figure>
+
+<div class="table-wrap">
+
+| Group | n | NEE change | {d.method.ciLevelPct} % interval | GPP change | Reco change |
+|---|--:|--:|--:|--:|--:|
+| All used episodes | <Num k="all.n" digits={0} /> | <Num k="all.nee.mean" sign /> | <Num k="all.nee.ciLo" sign /> to <Num k="all.nee.ciHi" sign /> | <Num k="all.gpp.mean" sign /> | <Num k="all.reco.mean" sign /> |
+| Qvidja | <Num k="sites.qvidja.n" digits={0} /> | <Num k="sites.qvidja.nee.mean" sign /> | <Num k="sites.qvidja.nee.ciLo" sign /> to <Num k="sites.qvidja.nee.ciHi" sign /> | <Num k="sites.qvidja.gpp.mean" sign /> | <Num k="sites.qvidja.reco.mean" sign /> |
+| Viikki | <Num k="sites.viikki.n" digits={0} /> | <Num k="sites.viikki.nee.mean" sign /> | <Num k="sites.viikki.nee.ciLo" sign /> to <Num k="sites.viikki.nee.ciHi" sign /> | <Num k="sites.viikki.gpp.mean" sign /> | <Num k="sites.viikki.reco.mean" sign /> |
+| Haltiala | <Num k="sites.haltiala.n" digits={0} /> | <Num k="sites.haltiala.nee.mean" sign /> | <Num k="sites.haltiala.nee.ciLo" sign /> to <Num k="sites.haltiala.nee.ciHi" sign /> | <Num k="sites.haltiala.gpp.mean" sign /> | <Num k="sites.haltiala.reco.mean" sign /> |
+| Episodes with a harvest | <Num k="kinds.harvest.n" digits={0} /> | <Num k="kinds.harvest.nee.mean" sign /> | <Num k="kinds.harvest.nee.ciLo" sign /> to <Num k="kinds.harvest.nee.ciHi" sign /> | <Num k="kinds.harvest.gpp.mean" sign /> | <Num k="kinds.harvest.reco.mean" sign /> |
+| Cuts only (Qvidja) | <Num k="kinds.cutOnly.n" digits={0} /> | <Num k="kinds.cutOnly.nee.mean" sign /> | <Num k="kinds.cutOnly.nee.ciLo" sign /> to <Num k="kinds.cutOnly.nee.ciHi" sign /> | <Num k="kinds.cutOnly.gpp.mean" sign /> | <Num k="kinds.cutOnly.reco.mean" sign /> |
+
+</div>
+
+All changes are in g C m⁻² d⁻¹ (mean of the episodes).
+
+**Harvest and cut.** For the episodes with a harvest, the change of NEE was
+<Num k="kinds.harvest.nee.mean" sign unit={U} /> (n = <Num k="kinds.harvest.n" digits={0} />, interval
+<Num k="kinds.harvest.nee.ciLo" sign /> to <Num k="kinds.harvest.nee.ciHi" sign />). For the episodes with cuts only,
+it was <Num k="kinds.cutOnly.nee.mean" sign unit={U} /> (n = <Num k="kinds.cutOnly.n" digits={0} />, range
+<Num k="kinds.cutOnly.nee.min" sign /> to <Num k="kinds.cutOnly.nee.max" sign />). The cut-only group is too small to
+compare the two groups.
+
+**Duration.** At Qvidja the change in the early window was <Num k="sites.qvidja.early.nee.mean" sign unit={U} />
+(n = <Num k="sites.qvidja.early.nee.n" digits={0} />, interval <Num k="sites.qvidja.early.nee.ciLo" sign /> to
+<Num k="sites.qvidja.early.nee.ciHi" sign />). In the late window it was <Num k="sites.qvidja.late.nee.mean" sign unit={U} />
+(n = <Num k="sites.qvidja.late.nee.n" digits={0} />, interval <Num k="sites.qvidja.late.nee.ciLo" sign /> to
+<Num k="sites.qvidja.late.nee.ciHi" sign />). The lower net uptake continued until day
+<Num k="method.lateTo" digits={0} /> after the event. In Figure 1, the mean GPP at Qvidja stays below the level before
+the event until the end of the figure.
+
+**Check without gap filling.** The measured day-time NEE also increased after the event. It increased in
+<Num k="all.measuredDay.nPositive" digits={0} /> of <Num k="all.measuredDay.n" digits={0} /> episodes. The mean change
+was <Num k="all.measuredDay.mean" sign unit={UM} /> (interval <Num k="all.measuredDay.ciLo" sign /> to
+<Num k="all.measuredDay.ciHi" sign />). The mean change of the measured night-time NEE was
+<Num k="all.measuredNight.mean" sign unit={UM} /> (n = <Num k="all.measuredNight.n" digits={0} />, interval
+<Num k="all.measuredNight.ciLo" sign /> to <Num k="all.measuredNight.ciHi" sign />). This interval includes zero. These
+results agree with the partitioned result: the day-time uptake decreased, and the data show no change of the
+night-time release.
+
+**All episodes.** We also calculated the result with the <Num k="counts.excluded" digits={0} /> episodes that did not
+pass rule 3 (n = <Num k="sensitivity.all.n" digits={0} />). The mean change of NEE is then
+<Num k="sensitivity.all.nee.mean" sign unit={U} /> (interval <Num k="sensitivity.all.nee.ciLo" sign /> to
+<Num k="sensitivity.all.nee.ciHi" sign />). Rule 3 does not change the main result.
+
+<Figure
+  id="figure-3"
+  title="Figure 3. Change of NEE against the yield of the episode"
+  svg={fig3.svg}
+  alt={fig3.alt}
+  view={{ name: 'Harvest and cut: NEE at Qvidja, Viikki and Haltiala', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['nee_f'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    Used episodes with a yield. Dashed line: least-squares fit for Qvidja. The Haltiala yields are grain yields. The
+    Qvidja yields are silage. The Viikki yields are the yields of the year.
+  </p>
+</Figure>
+
+**Yield.** At Qvidja the Pearson r between the yield and the change of NEE was <Num k="yield.sites.qvidja.r" />
+(n = <Num k="yield.sites.qvidja.n" digits={0} />, p = <Num k="yield.sites.qvidja.p" />). The slope was
+<Num k="yield.sites.qvidja.slope" sign /> g C m⁻² d⁻¹ per t DW ha⁻¹ (same p-value). At Haltiala, r was
+<Num k="yield.sites.haltiala.r" /> (n = <Num k="yield.sites.haltiala.n" digits={0} />, p = <Num k="yield.sites.haltiala.p" />).
+Viikki has <Num k="yield.sites.viikki.n" digits={0} /> episodes with a yield. These correlations are not significant at
+p &lt; <Num k="method.alpha" />. We did not combine the sites. Grain, silage and whole-year yields are different quantities.
+
+**Comparison with the articles.** Heimsch et al. compared five-day means of NEE before and after each harvest at
+Qvidja. The harvest of June 2018 changed the mean CO₂ flux from a net sink to a small source
+<Cite ids={['heimsch2021']} note="p. 3473" />. This harvest used a cutting height of 6 cm. The other harvests of
+2018 and 2019 used 15 cm <Cite ids={['heimsch2021']} note="PDF p. 3" />. After the harvests with 15 cm, the mean sink
+rate decreased to near zero <Cite ids={['heimsch2021']} note="p. 3473" />.
+
+Shurpali et al. measured three grassland fields in Finland. After each harvest, the fields changed to a short net
+release of CO₂ <Cite ids={['shurpali2025']} note="PDF p. 4" />. The fields were sources until the regrowth and the
+increasing GPP were larger than the respiration <Cite ids={['shurpali2025']} note="PDF p. 11" />. Our result agrees with these two articles.
+
+At Qvidja, Heimsch et al. report that the highest yield (June 2021) did not give a high annual GPP. In their data,
+the leaf area did not recover after that harvest <Cite ids={['heimsch2024']} note="PDF p. 6" />. Vira et al. compared NPP from the yields with NPP from GPP. For
+the grasslands, the two estimates were not significantly correlated <Cite ids={['vira2025']} note="PDF p. 14, PDF p. 16" />.
+
+The carbon in the harvest is a separate export term of the net ecosystem carbon balance (NECB). Hu et al. use this
+term in a model framework (DailyDayCent) <Cite ids={['hu2024']} note="p. 8" />. A model study of Qvidja found that the
+management events tended to change the NECB more through the import and export of carbon than through a change of NEE
+<Cite ids={['heimsch2024']} note="PDF p. 9" />. This dive does not include the export term. It shows only the change
+of the CO₂ exchange.
+
+<div class="table-wrap">
+<table>
+<caption>All episodes. Measured % = mean measured fraction of NEE before / after. Changes in g C m⁻² d⁻¹, air temperature in °C, measured day-time NEE in µmol m⁻² s⁻¹. Yield in t DW ha⁻¹; "year" = yield of the year of a site with more than one episode in that year (not used).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Dates</th><th scope="col">Kind</th><th scope="col">Crop</th><th scope="col" class="num">Yield</th><th scope="col" class="num">Measured %</th><th scope="col" class="num">ΔNEE</th><th scope="col" class="num">ΔGPP</th><th scope="col" class="num">ΔReco</th><th scope="col" class="num">ΔTair</th><th scope="col" class="num">ΔNEE day, measured</th><th scope="col">Use</th><th scope="col">Other events in the windows</th></tr>
+</thead>
+<tbody>
+{rows.map((r) => (<tr id={`episode-${r.id}`}><td>{r.site}</td><td>{r.dates}</td><td>{r.kind}</td><td>{r.crop}</td><td class="num">{r.yieldT}</td><td class="num">{r.frac}</td><td class="num">{r.dNee}</td><td class="num">{r.dGpp}</td><td class="num">{r.dReco}</td><td class="num">{r.dTa}</td><td class="num">{r.dDay}</td><td>{r.used}</td><td class="wrap">{r.others}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+## Limits and uncertainty
+
+- **Small n.** Viikki and Haltiala have only <Num k="sites.viikki.n" digits={0} /> and
+  <Num k="sites.haltiala.n" digits={0} /> used episodes. Their bootstrap intervals are not reliable. Use the single
+  values in the table. At Qvidja the SD of the change of NEE is <Num k="sites.qvidja.nee.sd" unit={U} />
+  (n = <Num k="sites.qvidja.n" digits={0} />).
+- **Season.** The windows also contain the normal change of the season. In August and September, GPP also decreases
+  without a harvest. We have no control field without a harvest. The change is *associated with* the event. This analysis
+  does not show that the event causes all of the change. The Haltiala harvests were at the end of the season.
+- **Other management.** <Num k="counts.withOtherEvents" digits={0} /> used episodes have other events in the windows.
+  In <Num k="counts.withFertilisation" digits={0} /> of them, a fertilisation follows the harvest (see the table). We
+  did not remove these episodes.
+- **Gap filling.** In the used windows, the mean measured fraction of NEE is <Num k="counts.fracMeasuredMeanPct" digits={0} /> %
+  (lowest <Num k="counts.fracMeasuredMinPct" digits={0} /> %). The other half hours are gap-filled. The gap-filling
+  models do not use the harvest date. They can make the change smaller. GPP and Reco are model values. The
+  reference respiration Rref of the Reco model comes from windows of <Num k="method.rrefWindowDays" digits={0} /> days,
+  every <Num k="method.rrefStepDays" digits={0} /> days <Cite ids={['calculated-doc']} />.
+- **Time stamps.** The raw time stamps of Viikki are UTC, but the build reads them as local time (UTC+2). The
+  Viikki values are 2 hours early (<a href={`${base}data-report/#finding-VII-01`}>finding VII-01</a>, waits for
+  provider). We tested this. We made the Viikki daily sums again from the 30-min data with the local time moved by
+  <Num k="utcShift.hours" digits={0} /> hours. The largest difference in a change of NEE, GPP or Reco of an episode was
+  <Num k="utcShift.maxAbsChange" unit={U} />. With the moved time, the mean change of NEE at Viikki is
+  <Num k="utcShift.nee.mean" sign unit={U} /> (without: <Num k="sites.viikki.nee.mean" sign />).
+- **Viikki gap filling.** The gap-filled NEE of Viikki in 2024 differs from the measured NEE in some periods
+  (<a href={`${base}data-report/#finding-VII-05`}>finding VII-05</a>) <Cite ids={['anomaly-report']} />.
+- **Qvidja annual NEE.** The annual NEE of Qvidja in our data is more negative than in Heimsch et al. 2024
+  (<a href={`${base}data-report/#finding-QVI-11`}>finding QVI-11</a>). We did not test the effect of this difference
+  on the change around an event.
+- **Event dates.** We used the dates of the management files. Heimsch et al. 2021 give some dates that are one or two
+  days different: 23 September 2018 (file: 2018-09-25), 11 June 2019 (file: 2019-06-10) and 20 August 2019 (file:
+  2019-08-21) <Cite ids={['heimsch2021']} note="PDF p. 3" />. A harvest can take more than one day. We used the first
+  and the last day where the file gives them.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `site/src/deep-dives/harvest-carbon.json`. The script
+[`scripts/deep-dives/harvest-carbon.ts`](https://github.com/RJuho/inar-agri/blob/main/scripts/deep-dives/harvest-carbon.ts)
+writes this file. It reads only `db/events.parquet`, `db/sites.parquet`, `data/calculated/daily.parquet` and
+`data/calculated/fluxes_30min.parquet`.
+
+```sh
+npm run build:db && npm run calc      # make the inputs
+npm run deep-dives -- harvest-carbon  # write the JSON again
+npm run deep-dives -- --check         # compare a fresh run with the committed JSON
+```

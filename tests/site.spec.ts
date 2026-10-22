@@ -1574,8 +1574,83 @@ test.describe('events page', () => {
   });
 });
 
+// ---------- Deep Dives ----------
+
+test.describe('deep dive pages', () => {
+  let errors: string[];
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    errors = trackErrors(page);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+
+  test('the list page lists the harvest dive and the link opens it', async ({ page }) => {
+    await page.goto('/deep-dive/');
+    await expect(page.locator('h1')).toHaveText('Deep Dives');
+    const nav = page.getByRole('navigation', { name: 'Pages' });
+    await expect(nav.getByRole('link', { name: 'Deep Dives' })).toHaveAttribute('aria-current', 'page');
+    const card = page.locator('.dd-card[data-slug="harvest-carbon"]');
+    await expect(card).toHaveCount(1);
+    await expect(card.locator('.dd-card-question')).toContainText('harvest');
+    await expect(card.locator('.dd-status')).toHaveText(/Draft|Checked/);
+    await expectOnlyUpdateScript(page);
+    await card.getByRole('link', { name: 'Harvest and cutting vs carbon balance' }).click();
+    await expect(page).toHaveURL(/\/deep-dive\/harvest-carbon\/?$/);
+    await expect(page.locator('h1')).toHaveText('Harvest and cutting vs carbon balance');
+  });
+
+  test('the harvest dive has the fixed sections, figures with alt text and numbers from the JSON', async ({ page }) => {
+    await page.goto('/deep-dive/harvest-carbon/');
+    await expect(page.locator('h1')).toHaveText('Harvest and cutting vs carbon balance');
+    expect(await page.locator('h1 + .ai-notice[role="note"]').count()).toBe(1);
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    const figures = page.locator('figure.dd-figure svg[role="img"]');
+    expect(await figures.count()).toBeGreaterThanOrEqual(1);
+    for (const svg of await figures.all()) expect((await svg.getAttribute('aria-label'))?.length ?? 0).toBeGreaterThan(40);
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(20);
+    // Each citation link goes to an entry of the reference list.
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    // The nav marks the Deep Dives section on a dive page.
+    await expect(page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Deep Dives' })).toHaveAttribute('aria-current', 'true');
+    await expectOnlyUpdateScript(page);
+  });
+
+  test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
+    await page.goto('/deep-dive/harvest-carbon/');
+    const link = page.locator('#figure-1 .dd-figure-link a');
+    const href = (await link.getAttribute('href')) ?? '';
+    expect(href).toMatch(/^\/#view=/);
+    const view = JSON.parse(Buffer.from(href.replace(/^\/#view=/, ''), 'base64url').toString('utf8')) as { params: { sites: number[]; variables: string[] } };
+    expect(view.params.sites).toEqual([3, 4, 5]);
+    expect(view.params.variables).toEqual(['nee_f', 'gpp', 'reco']);
+    await link.click();
+    await waitReady(page);
+    const params = await viewParams(page);
+    expect(params.sites).toEqual([3, 4, 5]);
+    expect(params.aggregation).toBe('day');
+  });
+
+  test('no horizontal page scroll at phone width', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/']) {
+      await page.goto(path);
+      const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
+      expect(overflow, path).toBeLessThanOrEqual(0);
+    }
+  });
+});
+
 test.describe('AI notice', () => {
-  for (const path of ['/calculated/', '/variables/', '/events/', '/data-report/']) {
+  for (const path of ['/calculated/', '/variables/', '/events/', '/data-report/', '/deep-dive/', '/deep-dive/harvest-carbon/']) {
     test(`${path} shows the AI notice below the h1`, async ({ page, baseURL }) => {
       const foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
       await page.goto(path);

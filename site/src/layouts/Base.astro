@@ -18,7 +18,10 @@ const pages = [
   { href: `${base}variables/`, label: 'Variables' },
   { href: `${base}events/`, label: 'Events' },
   { href: `${base}data-report/`, label: 'Data Report' },
+  { href: `${base}deep-dive/`, label: 'Deep Dives' },
 ];
+/** aria-current of a page link: 'page' on its own page, 'true' on a sub-page (for example one Deep Dive). */
+const current = (href: string) => (path === href ? 'page' : href !== base && path.startsWith(href) ? 'true' : undefined);
 ---
 
 <html lang="en">
@@ -35,7 +38,7 @@ const pages = [
         {
           pages.map((p) => (
             <li>
-              <a href={p.href} aria-current={path === p.href ? 'page' : undefined}>
+              <a href={p.href} aria-current={current(p.href)}>
                 {p.label}
               </a>
             </li>
