@@ -129,6 +129,23 @@ export function periodLabel(period: PeriodId, year: number): string {
   return period === 'DJF' ? `${p.name} ${year - 1}/${String(year).slice(-2)}` : `${p.name} ${year}`;
 }
 
+/**
+ * Key of the period year of an ISO date for the per-period figure: "2022-MAM". Unlike periodOf(), the
+ * winter is keyed by the DECEMBER year: December 2022 and January and February 2023 give "2022-DJF".
+ */
+export function periodKey(iso: string): string {
+  const year = Number(iso.slice(0, 4));
+  const month = Number(iso.slice(5, 7));
+  if (!(month >= 1 && month <= 12)) throw new Error(`bad date: ${iso}`);
+  const p = PERIODS.find((x) => (x.months as readonly number[]).includes(month))!;
+  return `${month <= 2 ? year - 1 : year}-${p.id}`;
+}
+
+/** Label of a period year with the winter keyed by the December year: "spring 2022", "winter 2022/23". */
+export function periodLabelDec(period: PeriodId, year: number): string {
+  return period === 'DJF' ? periodLabel('DJF', year + 1) : periodLabel(period, year);
+}
+
 // ---------- Percentile rank ----------
 
 /**

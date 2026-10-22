@@ -1646,13 +1646,13 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
-  test('the natural events dive has the fixed sections, three figures, the tables and numbers from the JSON', async ({ page }) => {
+  test('the natural events dive has the fixed sections, four figures, the tables and numbers from the JSON', async ({ page }) => {
     await page.goto('/deep-dive/natural-events/');
     await expect(page.locator('h1')).toHaveText('Natural events and disturbances');
     const h2 = await page.locator('main h2').allInnerTexts();
     expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
     const figures = page.locator('figure.dd-figure svg[role="img"]');
-    expect(await figures.count()).toBe(3);
+    expect(await figures.count()).toBe(4);
     for (const svg of await figures.all()) expect((await svg.getAttribute('aria-label'))?.length ?? 0).toBeGreaterThan(40);
     expect(await page.locator('.dd-num').count()).toBeGreaterThan(60);
     // The class table, the period table and the episode table.

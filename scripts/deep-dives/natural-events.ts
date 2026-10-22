@@ -21,6 +21,8 @@
 // 6. Per class and site: NEE of the used event days against the NEE of the other used days of the
 //    same calendar months. Pooled period years (MAM, JJA, SON, DJF). Anscombe statistics of daily
 //    NEE against daily mean ta and against the swc percentile rank.
+// 7. Anscombe statistics of daily NEE against daily mean ta per period year, all sites together
+//    (taPeriods). Here the winter is keyed by the December year (periodKey()).
 
 import type { DuckDBConnection } from '@duckdb/node-api';
 import { num, numOrNull, rows, str } from '../lib/duck.ts';
@@ -31,7 +33,10 @@ import {
   detectClasses,
   eventDayMask,
   PERIODS,
+  periodKey,
+  periodLabelDec,
   poolByPeriod,
+  type PeriodId,
   type ClassEpisode,
   type ClassId,
   type DayRow,
@@ -314,7 +319,50 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
     return out;
   };
   const anscombe: Record<Pair, Record<string, PairStats>> = { ta: await pairStats('ta_mean'), swc: await pairStats('swc_pct') };
-  const points: Record<string, { n: number; x: (number | null)[]; s: (number | null)[]; y: number[]; f: number[] }> = {};
+  // Per period year, all sites together. The winter is keyed by the December year (periodKey()).
+  const keyExpr = `(CASE WHEN month(d) <= 2 THEN year(d) - 1 ELSE year(d) END)::VARCHAR || '-' ||
+    CASE WHEN month(d) IN (3, 4, 5) THEN 'MAM' WHEN month(d) IN (6, 7, 8) THEN 'JJA' WHEN month(d) IN (9, 10, 11) THEN 'SON' ELSE 'DJF' END`;
+  const tpRows = await rows(
+    conn,
+    `SELECT ${keyExpr} AS k,
+            count(*)::DOUBLE AS n, count(DISTINCT site_code)::DOUBLE AS ns,
+            avg(ta_mean)::DOUBLE AS mx, avg(nee)::DOUBLE AS my,
+            var_samp(ta_mean)::DOUBLE AS vx, var_samp(nee)::DOUBLE AS vy,
+            corr(nee, ta_mean)::DOUBLE AS r, regr_slope(nee, ta_mean)::DOUBLE AS b,
+            regr_intercept(nee, ta_mean)::DOUBLE AS a, regr_r2(nee, ta_mean)::DOUBLE AS r2
+     FROM ne_pairs WHERE ta_mean IS NOT NULL GROUP BY k`,
+  );
+  const tpByKey = new Map(tpRows.map((r) => [str(r.k), r]));
+  const keyYears = tpRows.map((r) => Number(str(r.k).slice(0, 4)));
+  const periodOrder = PERIODS.map((p) => p.id) as PeriodId[];
+  const taPeriods: { key: string; period: PeriodId; year: number; label: string; n: number; sitesWithData: number; stats: PairStats }[] = [];
+  for (let yr = Math.min(...keyYears); yr <= Math.max(...keyYears); yr++)
+    for (const period of periodOrder) {
+      const key = `${yr}-${period}`;
+      const r = tpByKey.get(key);
+      const n = r ? num(r.n) : 0;
+      taPeriods.push({
+        key,
+        period,
+        year: yr,
+        label: periodLabelDec(period, yr),
+        n,
+        sitesWithData: r ? num(r.ns) : 0,
+        stats: {
+          n,
+          meanX: r ? numOrNull(r.mx) : null,
+          meanY: r ? numOrNull(r.my) : null,
+          varX: r ? numOrNull(r.vx) : null,
+          varY: r ? numOrNull(r.vy) : null,
+          r: r ? numOrNull(r.r) : null,
+          slope: r ? numOrNull(r.b) : null,
+          intercept: r ? numOrNull(r.a) : null,
+          r2: r ? numOrNull(r.r2) : null,
+        },
+      });
+    }
+  const periodKeys = taPeriods.map((t) => t.key);
+  const points: Record<string, { n: number; x: (number | null)[]; s: (number | null)[]; y: number[]; f: number[]; p: number[] }> = {};
   for (const site of SITES) {
     const nAll = num((await rows(conn, `SELECT count(*) AS n FROM ne_pairs WHERE site_code = '${site}'`))[0]!.n);
     if (nAll === 0) continue;
@@ -330,6 +378,11 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       s: p.map((r) => numOrNull(r.s)),
       y: p.map((r) => num(r.y)),
       f: p.map((r) => classMask(classesOf(site, dayNumber(str(r.d))))),
+      p: p.map((r) => {
+        const i = periodKeys.indexOf(periodKey(str(r.d)));
+        if (i < 0) throw new Error(`no period key for ${site} ${str(r.d)}`);
+        return i;
+      }),
     };
   }
 
@@ -354,6 +407,7 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       classes: [...CLASSES],
       minDays: MIN_DAYS,
       pointsPerSite: POINTS_PER_SITE,
+      periodKey: 'The per-period figure (anscombe.taPeriods) keys the winter (DJF) by the December year.',
       utcShiftHours: 2,
       utcShiftHalfHours: 4,
       units: { nee: 'g C m-2 d-1', ta: '°C', precip: 'mm d-1', swc: 'm3 m-3', swcPct: '%', tsoil: '°C' },
@@ -364,7 +418,7 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
     rainSeasons: seasonsOut,
     classes: classesOut,
     periods: { years: periodYears },
-    anscombe: { ...anscombe, points },
+    anscombe: { ...anscombe, points, periodKeys, taPeriods },
     literature: {},
     totals: {
       usedDays: SITES.reduce((a, s) => a + bySite.get(s)!.filter((d) => d.used).length, 0),

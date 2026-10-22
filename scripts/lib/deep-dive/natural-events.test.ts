@@ -7,7 +7,9 @@ import {
   episodesFromFlags,
   eventDayMask,
   percentileRank,
+  periodKey,
   periodLabel,
+  periodLabelDec,
   periodOf,
   poolByPeriod,
   rainSeasons,
@@ -87,6 +89,23 @@ test('periodLabel names the winter with both years', () => {
   assert.equal(periodLabel('SON', 2019), 'autumn 2019');
   assert.equal(periodLabel('DJF', 2023), 'winter 2022/23');
   assert.equal(periodLabel('DJF', 2000), 'winter 1999/00');
+});
+
+test('periodKey keys the winter by the December year', () => {
+  assert.equal(periodKey('2022-12-01'), '2022-DJF');
+  assert.equal(periodKey('2023-01-15'), '2022-DJF');
+  assert.equal(periodKey('2023-02-28'), '2022-DJF');
+  assert.equal(periodKey('2023-03-01'), '2023-MAM');
+  assert.equal(periodKey('2023-07-01'), '2023-JJA');
+  assert.equal(periodKey('2023-11-30'), '2023-SON');
+  assert.throws(() => periodKey('2023-00-01'));
+});
+
+test('periodLabelDec names the winter from the December year', () => {
+  assert.equal(periodLabelDec('MAM', 2022), 'spring 2022');
+  assert.equal(periodLabelDec('SON', 2022), 'autumn 2022');
+  assert.equal(periodLabelDec('DJF', 2022), 'winter 2022/23');
+  assert.equal(periodLabelDec('DJF', 1999), 'winter 1999/00');
 });
 
 test('percentileRank follows DuckDB percent_rank (0 and 100 at the ends, ties share the rank)', () => {

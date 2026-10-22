@@ -24,7 +24,7 @@ checks:
     by: claude-sonnet-5-5
     date: '2026-10-22'
     result: pass
-    note: Event-day counts per class and site, class NEE means with n, the Figure 1 and 2 statistics, the four Maktau failed seasons and four period-years were recomputed from db/ and daily.parquet with own SQL and agree with the article. Three clarifications of the method text (the 2019 to 2024 limit for the Maktau classes, the reference months, the failed-rains median) were added after the check.
+    note: Event-day counts per class and site, class NEE means with n, the Figure 1 and 2 statistics, the four Maktau failed seasons and four period-years were recomputed from db/ and daily.parquet with own SQL and agree with the article. Three clarifications of the method text (the 2019 to 2024 limit for the Maktau classes, the reference months, the failed-rains median) were added after the check. The pooled period-year n, r and slope of Figure 4 were recomputed for six period-years and agree to rounding.
   - kind: review
     by: claude-haiku-5-5
     date: '2026-10-22'
@@ -38,12 +38,13 @@ import Cite from '../../components/deep-dive/Cite.astro';
 import Figure from '../../components/deep-dive/Figure.astro';
 import References from '../../components/deep-dive/References.astro';
 import { baseUrl } from '../../lib/deepDive';
-import { classRows, eventRows, failedSeasons, monthDays, naturalEventsData, periodFigure, periodRows, swcFigure, taFigure, untestedSeasons } from '../../lib/deepDives/naturalEvents';
+import { classRows, eventRows, failedSeasons, monthDays, naturalEventsData, periodFigure, periodRows, swcFigure, taFigure, taPeriodFigure, untestedSeasons } from '../../lib/deepDives/naturalEvents';
 
 export const d = naturalEventsData(raw);
 export const fig1 = taFigure(d);
 export const fig2 = swcFigure(d);
 export const fig3 = periodFigure(d);
+export const fig4 = taPeriodFigure(d);
 export const classes = classRows(d);
 export const periods = periodRows(d);
 export const events = eventRows(d);
@@ -311,6 +312,31 @@ zero-curtain days were 2022/23 (<Num k="periods.years.22.eventDays.zeroCurtain" 
 (<Num k="periods.years.26.eventDays.zeroCurtain" digits={0} />); winter 2023/24 also had the most cold-spell days
 (<Num k="periods.years.26.eventDays.coldSpell" digits={0} />). The set of sites changes from year to year. Thus a mean over all sites compares different fields. The per-site means in
 the table are a better comparison.
+
+The figure below shows the relation of the first scatter figure per period-year, with all sites in one panel. In summer 2021 the warmer days
+had lower NEE (r = <Num k="anscombe.taPeriods.13.stats.r" />, n = <Num k="anscombe.taPeriods.13.n" digits={0} /> site days,
+<Num k="anscombe.taPeriods.13.sitesWithData" digits={0} /> sites, slope <Num k="anscombe.taPeriods.13.stats.slope" digits={3} /> g C m⁻² d⁻¹ per °C).
+In winter 2022/23 r was <Num k="anscombe.taPeriods.19.stats.r" /> (n = <Num k="anscombe.taPeriods.19.n" digits={0} />,
+<Num k="anscombe.taPeriods.19.sitesWithData" digits={0} /> sites). But the variance of the air temperature in this panel is large
+(<Num k="anscombe.taPeriods.19.stats.varX" digits={1} unit="°C²" />), because the panel has the warm days of Maktau and the cold days of
+the Finnish sites. Thus this r is more likely associated with the difference between the sites than with the response of one
+field. Equal statistics can hide different patterns (the Anscombe quartet), thus look at the points and not only at the box.
+
+<Figure
+  id="figure-4"
+  title="Figure 4. Daily NEE against the daily mean air temperature per period-year, all sites in one panel"
+  svg={fig4.svg}
+  alt={fig4.alt}
+  view={{ name: 'Natural events: NEE and air temperature', sites: ALL, variables: ['nee_f', 'ta'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['anscombe'] }}
+>
+  <p>
+    All sites in one panel; one row per year and the columns spring, summer, autumn and winter. The winter of a row is
+    December of that year to February of the next year, for example "winter 2022/23" in the row 2022. The period table
+    and Figure 3 give the same winter the year of its January (2023). The box gives the statistics of all used days of
+    the period-year with NEE and air temperature; the points are the sample of up to {d.method.pointsPerSite} days per
+    site. Hollow triangles: days with frost, heat or a cold spell. Dashed line: least-squares line.
+  </p>
+</Figure>
 
 <div class="table-wrap">
 <table>

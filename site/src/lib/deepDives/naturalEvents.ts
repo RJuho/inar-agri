@@ -3,7 +3,7 @@
 // (scripts/deep-dives/natural-events.ts). Valibot checks the parts that the figures use.
 import * as v from 'valibot';
 import { fmtNum, SITE_NAMES, type SiteCode } from '../deepDive';
-import { AXIS, FONT, gridHeight, INK, minus, niceRange, panelGrid, renderSvg, SERIES, siteColor, siteSymbol, SURFACE } from '../deepDiveChart';
+import { AXIS, FONT, gridHeight, INK, minus, niceRange, panelGrid, renderSvg, SERIES, siteColor, siteSymbol, SURFACE, type PanelBox } from '../deepDiveChart';
 
 const N = v.nullable(v.number());
 const SITE = v.picklist(['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau']);
@@ -59,7 +59,9 @@ const DataSchema = v.looseObject({
   anscombe: v.looseObject({
     ta: v.record(v.string(), PairStats),
     swc: v.record(v.string(), PairStats),
-    points: v.record(v.string(), v.object({ n: v.number(), x: v.array(N), s: v.array(N), y: v.array(N), f: v.array(v.number()) })),
+    points: v.record(v.string(), v.object({ n: v.number(), x: v.array(N), s: v.array(N), y: v.array(N), f: v.array(v.number()), p: v.array(v.number()) })),
+    periodKeys: v.array(v.string()),
+    taPeriods: v.array(v.object({ key: v.string(), period: PERIOD, year: v.number(), label: v.string(), n: v.number(), sitesWithData: v.number(), stats: PairStats })),
   }),
 });
 export type NaturalEventsData = v.InferOutput<typeof DataSchema>;
@@ -131,16 +133,124 @@ function statsLines(st: Pair): string[] {
   ];
 }
 
-// ---------- Figures 1 and 2: Anscombe panels ----------
+// ---------- Figures 1, 2 and 4: Anscombe panels (shared helpers) ----------
+
+type Points = NaturalEventsData['anscombe']['points'][string];
+type XY = [number, number];
+/** Points of one site in one panel: plain points and points of event days (class bit in `mask`). */
+interface PanelGroup {
+  site: SiteCode;
+  plain: XY[];
+  marked: XY[];
+}
+const OLS = 'Least-squares line';
+
+/** Split the drawn points of one site into plain and marked points; `keep(i)` selects the points of the panel. */
+function splitPoints(p: Points, xv: (number | null)[], mask: number, keep: (i: number) => boolean = () => true): { plain: XY[]; marked: XY[] } {
+  const plain: XY[] = [];
+  const marked: XY[] = [];
+  p.y.forEach((yy, i) => {
+    const xx = xv[i];
+    if (yy === null || xx === null || xx === undefined || !keep(i)) return;
+    ((p.f[i] ?? 0) & mask ? marked : plain).push([xx, yy]);
+  });
+  return { plain, marked };
+}
+
+/** Text of the least-squares line, for example "y = −0.05 x + 0.31". */
+function lineText(st: Pair): string {
+  return `y = ${statValue(st.slope)} x ${(st.intercept ?? 0) < 0 ? '−' : '+'} ${statValue(st.intercept === null ? null : Math.abs(st.intercept))}`;
+}
+
+/**
+ * Series of one panel: one point series per site, one series of hollow triangles for the marked
+ * points of all sites, the dashed least-squares line over the x range of the points, and the zero line.
+ */
+function panelSeries(d: NaturalEventsData, gi: number, groups: PanelGroup[], st: Pair | undefined, eventName: string): Record<string, unknown>[] {
+  const base = { xAxisIndex: gi, yAxisIndex: gi, silent: true, emphasis: { disabled: true } };
+  const out: Record<string, unknown>[] = [];
+  for (const g of groups) {
+    const slot = d.sites[g.site]!.slot;
+    out.push({ ...base, type: 'scatter', name: SITE_NAMES[g.site], symbol: siteSymbol(slot), symbolSize: 4, data: g.plain, itemStyle: { color: siteColor(slot), opacity: 0.5 }, z: 2 });
+  }
+  out.push({ ...base, type: 'scatter', name: eventName, symbol: 'triangle', symbolSize: 7, data: groups.flatMap((g) => g.marked), itemStyle: { color: 'transparent', borderColor: INK, borderWidth: 1 }, z: 3 });
+  const all = groups.flatMap((g) => [...g.plain, ...g.marked]).map((q) => q[0]);
+  if (st && st.n >= 2 && st.slope !== null && st.intercept !== null && all.length) {
+    const a = Math.min(...all);
+    const b = Math.max(...all);
+    out.push({ ...base, type: 'line', name: OLS, symbol: 'none', data: [[a, st.intercept + st.slope * a], [b, st.intercept + st.slope * b]], lineStyle: { color: INK, width: 1.5, type: [6, 4] }, itemStyle: { color: INK }, z: 4 });
+  }
+  out.push({ ...base, type: 'line', data: [], markLine: zeroLine });
+  return out;
+}
+
+/**
+ * Statistics box at the top left of a panel, or at the bottom left when `chartHeight` is given
+ * (Figure 4: there the bottom left, cold days with a large uptake, has almost no points).
+ */
+function statsBox(g: PanelBox, text: string, font = { size: 11, lineHeight: 14 }, chartHeight?: number): Record<string, unknown> {
+  return {
+    type: 'text',
+    silent: true,
+    z: 100,
+    left: g.left + 6,
+    ...(chartHeight === undefined ? { top: g.top + 6 } : { bottom: chartHeight - g.top - g.height + 6 }),
+    style: { text, fontSize: font.size, lineHeight: font.lineHeight, fontFamily: FONT, fill: INK, backgroundColor: SURFACE, borderColor: AXIS, borderWidth: 1, padding: [3, 5], borderRadius: 2 },
+  };
+}
+
+/** Legend of the sites, the event triangle and the least-squares line. */
+function scatterLegend(d: NaturalEventsData, sites: SiteCode[], eventName: string, left: number): Record<string, unknown> {
+  return {
+    top: 4,
+    left,
+    itemGap: 24,
+    textStyle: { fontSize: 12, color: INK },
+    data: [
+      ...sites.map((s) => ({ name: SITE_NAMES[s], icon: siteSymbol(d.sites[s]!.slot), itemStyle: { color: siteColor(d.sites[s]!.slot) } })),
+      { name: eventName, icon: 'triangle', itemStyle: { color: 'transparent', borderColor: INK, borderWidth: 1.2 } },
+      { name: OLS, icon: 'path://M0,4h7v2H0z M10,4h7v2h-7z M20,4h7v2h-7z', itemStyle: { color: INK } },
+    ],
+  };
+}
+
+type Range = { min: number; max: number; interval: number };
+
+/** Value axes of a panel grid with shared ranges; axis names at the last row (x) and the first column (y). */
+function scatterAxes(grids: PanelBox[], cols: number, x: Range, y: Range, xName: string): { xAxis: unknown[]; yAxis: unknown[] } {
+  const lastRow = Math.floor((grids.length - 1) / cols);
+  const common = { type: 'value', axisLine: { onZero: false, lineStyle: { color: AXIS } }, axisLabel: { ...axisLabel, formatter: (t: number) => minus(t) }, splitLine, nameLocation: 'middle', nameTextStyle: { fontSize: 12, color: INK } };
+  return {
+    xAxis: grids.map((_, i) => ({ ...common, gridIndex: i, min: x.min, max: x.max, interval: x.interval, name: Math.floor(i / cols) === lastRow ? xName : '', nameGap: 28 })),
+    yAxis: grids.map((_, i) => ({ ...common, gridIndex: i, min: y.min, max: y.max, interval: y.interval, name: i % cols === 0 ? `NEE (${UNIT_DAY})` : '', nameGap: 40 })),
+  };
+}
+
+/** Shared x and y range over all drawn points of the sites. */
+function pointRanges(d: NaturalEventsData, sites: SiteCode[], xOf: (p: Points) => (number | null)[], xFixed?: Range): { x: Range; y: Range } {
+  const xs: number[] = [];
+  const ys: number[] = [];
+  for (const s of sites) {
+    const p = d.anscombe.points[s]!;
+    const xv = xOf(p);
+    p.y.forEach((y, i) => {
+      if (y !== null && xv[i] !== null && xv[i] !== undefined) {
+        xs.push(xv[i]!);
+        ys.push(y);
+      }
+    });
+  }
+  return { x: xFixed ?? niceRange(xs, 6), y: niceRange(ys, 5) };
+}
 
 interface ScatterSpec {
   key: 'ta' | 'swc';
   /** Point array of the x value. */
-  xOf: (p: NaturalEventsData['anscombe']['points'][string]) => (number | null)[];
+  xOf: (p: Points) => (number | null)[];
   mask: number;
   eventName: string;
   xName: string;
-  xFixed?: { min: number; max: number; interval: number };
+  xFixed?: Range;
   /** First sentences of the alt text. */
   intro: string;
 }
@@ -154,109 +264,20 @@ function scatterFigure(d: NaturalEventsData, spec: ScatterSpec): FigureOut {
   const panelH = 240;
   const grids = panelGrid(sites.length, cols, width, margin, gap, panelH);
   const height = gridHeight(sites.length, cols, margin, gap.y, panelH);
-  const xs: number[] = [];
-  const ys: number[] = [];
-  for (const s of sites) {
-    const p = d.anscombe.points[s]!;
-    const xv = spec.xOf(p);
-    p.y.forEach((y, i) => {
-      if (y !== null && xv[i] !== null && xv[i] !== undefined) {
-        xs.push(xv[i]!);
-        ys.push(y);
-      }
-    });
-  }
-  const x = spec.xFixed ?? niceRange(xs, 6);
-  const y = niceRange(ys, 5);
+  const { x, y } = pointRanges(d, sites, spec.xOf, spec.xFixed);
   const series: Record<string, unknown>[] = [];
   const graphic: Record<string, unknown>[] = [];
-  const OLS = 'Least-squares line';
   sites.forEach((s, gi) => {
-    const slot = d.sites[s]!.slot;
-    const p = d.anscombe.points[s]!;
-    const xv = spec.xOf(p);
-    const plain: [number, number][] = [];
-    const marked: [number, number][] = [];
-    p.y.forEach((yy, i) => {
-      const xx = xv[i];
-      if (yy === null || xx === null || xx === undefined) return;
-      ((p.f[i] ?? 0) & spec.mask ? marked : plain).push([xx, yy]);
-    });
-    const base = { xAxisIndex: gi, yAxisIndex: gi, silent: true, emphasis: { disabled: true } };
-    series.push({ ...base, type: 'scatter', name: SITE_NAMES[s], symbol: siteSymbol(slot), symbolSize: 4, data: plain, itemStyle: { color: siteColor(slot), opacity: 0.5 }, z: 2 });
-    series.push({ ...base, type: 'scatter', name: spec.eventName, symbol: 'triangle', symbolSize: 7, data: marked, itemStyle: { color: 'transparent', borderColor: INK, borderWidth: 1 }, z: 3 });
     const st = d.anscombe[spec.key][s]!;
-    const all = [...plain, ...marked].map((q) => q[0]);
-    if (st.n >= 2 && st.slope !== null && st.intercept !== null && all.length) {
-      const a = Math.min(...all);
-      const b = Math.max(...all);
-      series.push({ ...base, type: 'line', name: OLS, symbol: 'none', data: [[a, st.intercept + st.slope * a], [b, st.intercept + st.slope * b]], lineStyle: { color: INK, width: 1.5, type: [6, 4] }, itemStyle: { color: INK }, z: 4 });
-    }
-    series.push({ ...base, type: 'line', data: [], markLine: zeroLine });
-    const g = grids[gi]!;
-    graphic.push({
-      type: 'text',
-      silent: true,
-      z: 100,
-      left: g.left + 6,
-      top: g.top + 6,
-      style: {
-        text: st.n >= 2 ? statsLines(st).join('\n') : 'Fewer than 2 days',
-        fontSize: 11,
-        lineHeight: 14,
-        fontFamily: FONT,
-        fill: INK,
-        backgroundColor: SURFACE,
-        borderColor: AXIS,
-        borderWidth: 1,
-        padding: [3, 5],
-        borderRadius: 2,
-      },
-    });
+    const group = { site: s, ...splitPoints(d.anscombe.points[s]!, spec.xOf(d.anscombe.points[s]!), spec.mask) };
+    series.push(...panelSeries(d, gi, [group], st, spec.eventName));
+    graphic.push(statsBox(grids[gi]!, st.n >= 2 ? statsLines(st).join('\n') : 'Fewer than 2 days'));
   });
-  const lastRow = Math.floor((sites.length - 1) / cols);
   const option = {
-    legend: {
-      top: 4,
-      left: margin.left,
-      itemGap: 24,
-      textStyle: { fontSize: 12, color: INK },
-      data: [
-        ...sites.map((s) => ({ name: SITE_NAMES[s], icon: siteSymbol(d.sites[s]!.slot), itemStyle: { color: siteColor(d.sites[s]!.slot) } })),
-        { name: spec.eventName, icon: 'triangle', itemStyle: { color: 'transparent', borderColor: INK, borderWidth: 1.2 } },
-        { name: OLS, icon: 'path://M0,4h7v2H0z M10,4h7v2h-7z M20,4h7v2h-7z', itemStyle: { color: INK } },
-      ],
-    },
+    legend: scatterLegend(d, sites, spec.eventName, margin.left),
     title: sites.map((s, i) => panelTitle(SITE_NAMES[s], grids[i]!.left, grids[i]!.top - 22)),
     grid: grids.map((g) => ({ left: g.left, top: g.top, width: g.width, height: g.height, containLabel: false })),
-    xAxis: grids.map((_, i) => ({
-      type: 'value',
-      gridIndex: i,
-      min: x.min,
-      max: x.max,
-      interval: x.interval,
-      axisLine: { onZero: false, lineStyle: { color: AXIS } },
-      axisLabel: { ...axisLabel, formatter: (t: number) => minus(t) },
-      splitLine,
-      name: Math.floor(i / cols) === lastRow ? spec.xName : '',
-      nameLocation: 'middle',
-      nameGap: 28,
-      nameTextStyle: { fontSize: 12, color: INK },
-    })),
-    yAxis: grids.map((_, i) => ({
-      type: 'value',
-      gridIndex: i,
-      min: y.min,
-      max: y.max,
-      interval: y.interval,
-      axisLine: { onZero: false, lineStyle: { color: AXIS } },
-      axisLabel: { ...axisLabel, formatter: (t: number) => minus(t) },
-      splitLine,
-      name: i % cols === 0 ? `NEE (${UNIT_DAY})` : '',
-      nameLocation: 'middle',
-      nameGap: 40,
-      nameTextStyle: { fontSize: 12, color: INK },
-    })),
+    ...scatterAxes(grids, cols, x, y, spec.xName),
     graphic,
     series,
   };
@@ -265,11 +286,14 @@ function scatterFigure(d: NaturalEventsData, spec: ScatterSpec): FigureOut {
     const p = d.anscombe.points[s]!;
     const xv = spec.xOf(p);
     const nMarked = p.f.filter((f, i) => f & spec.mask && xv[i] !== null && p.y[i] !== null).length;
-    return `${SITE_NAMES[s]}: n = ${st.n} days, r = ${statValue(st.r)}, line y = ${statValue(st.slope)} x ${(st.intercept ?? 0) < 0 ? '−' : '+'} ${statValue(st.intercept === null ? null : Math.abs(st.intercept))}, ${nMarked} marked event days of ${xv.filter((q, i) => q !== null && p.y[i] !== null).length} drawn points`;
+    return `${SITE_NAMES[s]}: n = ${st.n} days, r = ${statValue(st.r)}, line ${lineText(st)}, ${nMarked} marked event days of ${xv.filter((q, i) => q !== null && p.y[i] !== null).length} drawn points`;
   });
   const alt = `${spec.intro} ${parts.join('. ')}.`;
   return { svg: renderSvg(option as never, width, height, alt), alt };
 }
+
+const TA_EVENT = 'Frost, heat or cold-spell day';
+const TA_X_NAME = 'Daily mean air temperature (°C)';
 
 /** Figure 1: daily NEE against the daily mean air temperature, one panel per site; frost, heat and cold-spell days marked. */
 export function taFigure(d: NaturalEventsData): FigureOut {
@@ -277,8 +301,8 @@ export function taFigure(d: NaturalEventsData): FigureOut {
     key: 'ta',
     xOf: (p) => p.x,
     mask: TEMP_MASK,
-    eventName: 'Frost, heat or cold-spell day',
-    xName: 'Daily mean air temperature (°C)',
+    eventName: TA_EVENT,
+    xName: TA_X_NAME,
     intro: `Scatter chart in six panels, one per site: daily NEE (${UNIT_DAY}) against the daily mean air temperature (°C). Each panel has a box with n, the means, the variances, Pearson r, R² and the least-squares line of all used days; the points are a sample of up to ${d.method.pointsPerSite} days per site. Hollow triangles mark frost, heat and cold-spell days.`,
   });
 }
@@ -294,6 +318,62 @@ export function swcFigure(d: NaturalEventsData): FigureOut {
     xFixed: { min: 0, max: 100, interval: 20 },
     intro: `Scatter chart in six panels, one per site: daily NEE (${UNIT_DAY}) against the percentile rank of the daily soil water content in the site (0 to 100 %). Each panel has a box with n, the means, the variances, Pearson r, R² and the least-squares line of all used days; the points are a sample of up to ${d.method.pointsPerSite} days per site. Hollow triangles mark days of heavy rain, dry spell or failed rains, soil drought and soil wet.`,
   });
+}
+
+/**
+ * Figure 4: daily NEE against the daily mean air temperature per period year, all sites in one panel.
+ * One row per year, columns spring, summer, autumn, winter (December of the row year to February of
+ * the next year). The box gives the statistics of all used days of the period year (anscombe.taPeriods);
+ * the points are the per-site sample, put in the panel of their period year (points.<site>.p).
+ */
+export function taPeriodFigure(d: NaturalEventsData): FigureOut {
+  const sites = SITES.filter((s) => d.anscombe.points[s]);
+  const cells = d.anscombe.taPeriods;
+  const keys = d.anscombe.periodKeys;
+  if (cells.length !== keys.length || cells.some((c, i) => c.key !== keys[i])) throw new Error('natural-events: taPeriods and periodKeys do not agree');
+  if (cells.some((c, i) => c.period !== PERIODS[i % 4])) throw new Error('natural-events: taPeriods are not in the order MAM, JJA, SON, DJF per year');
+  const width = 1100;
+  const cols = 4;
+  const margin = { left: 64, right: 16, top: 78, bottom: 52 };
+  const gap = { x: 44, y: 56 };
+  const panelH = 200;
+  const grids = panelGrid(cells.length, cols, width, margin, gap, panelH);
+  const height = gridHeight(cells.length, cols, margin, gap.y, panelH);
+  const { x, y } = pointRanges(d, sites, (p) => p.x);
+  const series: Record<string, unknown>[] = [];
+  const graphic: Record<string, unknown>[] = [];
+  const small = { size: 10, lineHeight: 12.5 };
+  cells.forEach((c, gi) => {
+    const g = grids[gi]!;
+    const groups = sites.map((s) => {
+      const p = d.anscombe.points[s]!;
+      return { site: s, ...splitPoints(p, p.x, TEMP_MASK, (i) => p.p[i] === gi) };
+    });
+    series.push(...panelSeries(d, gi, groups, c.stats, TA_EVENT));
+    if (c.n === 0) {
+      graphic.push({ type: 'text', silent: true, z: 100, left: g.left + g.width / 2, top: g.top + g.height / 2, style: { text: 'no data', fontSize: 12, fontFamily: FONT, fill: INK, align: 'center', verticalAlign: 'middle' } });
+    } else {
+      graphic.push(statsBox(g, c.n >= 2 ? statsLines(c.stats).join('\n') : 'Fewer than 2 days', small, height));
+    }
+  });
+  const option = {
+    legend: scatterLegend(d, sites, TA_EVENT, margin.left),
+    title: cells.map((c, i) => panelTitle(c.label, grids[i]!.left, grids[i]!.top - 22)),
+    grid: grids.map((g) => ({ left: g.left, top: g.top, width: g.width, height: g.height, containLabel: false })),
+    ...scatterAxes(grids, cols, x, y, TA_X_NAME),
+    graphic,
+    series,
+  };
+  const withData = cells.filter((c) => c.n > 0);
+  const empty = cells.filter((c) => c.n === 0).map((c) => c.label);
+  const parts = withData.map(
+    (c) =>
+      `${c.label}: n = ${fmtNum(c.n, 0)} days, ${c.sitesWithData} ${c.sitesWithData === 1 ? 'site' : 'sites'}, r = ${c.stats.r === null ? '–' : fmtNum(c.stats.r, 2)}, slope ${c.stats.slope === null ? '–' : fmtNum(c.stats.slope, 3)} ${UNIT_DAY} per °C`,
+  );
+  const years = [...new Set(cells.map((c) => c.year))];
+  const emptyText = empty.length ? `These period years have no data: ${empty.join(', ')}.` : 'All period years have data.';
+  const alt = `Scatter chart in ${cells.length} panels, one row per year from ${years[0]} to ${years[years.length - 1]} and four columns (spring, summer, autumn, winter): daily NEE (${UNIT_DAY}) against the daily mean air temperature (°C), all sites in one panel. The winter of a row is December of that year to February of the next year. Each panel has a box at the bottom left with n, the means, the variances, Pearson r, R² and the least-squares line of all used days of the period year; the points are the sample of up to ${d.method.pointsPerSite} days per site. Hollow triangles mark frost, heat and cold-spell days. ${parts.join('. ')}. ${emptyText}`;
+  return { svg: renderSvg(option as never, width, height, alt), alt };
 }
 
 // ---------- Figure 3: event days per period and year ----------
