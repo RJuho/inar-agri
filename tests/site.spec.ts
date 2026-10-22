@@ -295,6 +295,33 @@ test.describe('views and diagrams', () => {
     await expect(page.locator('select[name="aggregation"]')).toHaveValue('day');
   });
 
+  test('a parameter change makes the form busy until the diagrams are ready', async ({ page }) => {
+    await page.goto('/');
+    await waitReady(page);
+    const box = page.locator('input[name="site"]').first();
+    await box.focus();
+    await box.uncheck();
+    // Busy: the controls, the tabs and "Add diagram" are disabled; aria-busy and the status text are set.
+    await expect(page.locator('form.params')).toHaveAttribute('aria-busy', 'true');
+    await expect(box).toBeDisabled();
+    await expect(page.locator('select[name="aggregation"]')).toBeDisabled();
+    await expect(page.locator('[data-action="new"]')).toBeDisabled();
+    await expect(page.locator('#add-diagram')).toBeDisabled();
+    await expect(page.locator('#chart')).toHaveAttribute('aria-busy', 'true');
+    await expect(page.locator('.params-status')).toHaveText('Updating diagrams…');
+    await expect(page.locator('.params-status')).toHaveAttribute('role', 'status');
+    // Ready: all enabled again, and the focus is back on the changed checkbox.
+    await waitReady(page);
+    await expect(page.locator('form.params')).not.toHaveAttribute('aria-busy', /.*/);
+    await expect(page.locator('#chart')).not.toHaveAttribute('aria-busy', /.*/);
+    await expect(box).toBeEnabled();
+    await expect(page.locator('[data-action="new"]')).toBeEnabled();
+    await expect(page.locator('#add-diagram')).toBeEnabled();
+    await expect(page.locator('.params-status')).toHaveText('');
+    await expect(box).toBeFocused();
+    await expect(page.locator('#chart')).toHaveAttribute('data-series', '25');
+  });
+
   test('bad localStorage value gives the default view and a backup', async ({ page }) => {
     await page.addInitScript(() => {
       if (!sessionStorage.getItem('seeded')) {

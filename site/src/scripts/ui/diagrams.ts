@@ -419,6 +419,8 @@ export class DiagramList {
   private paramsKey = '';
   private readonly hint: HTMLParagraphElement;
   private readonly stopScheme: () => void;
+  /** Callbacks of whenSettled(). */
+  private settled: Array<() => void> = [];
 
   constructor(
     private readonly container: HTMLElement,
@@ -508,6 +510,20 @@ export class DiagramList {
     return [...this.cards.values()].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
   }
 
+  /** True while one or more cards run their query or draw. */
+  loading(): boolean {
+    return [...this.cards.values()].some((c) => c.status === 'loading');
+  }
+
+  /**
+   * Call `cb` when no card is loading: at once when no card loads now, else when the last card
+   * is ready, has a note or has an error.
+   */
+  whenSettled(cb: () => void): void {
+    if (!this.loading()) cb();
+    else this.settled.push(cb);
+  }
+
   /** Write the sums of all cards to the container attributes. */
   private report(): void {
     const cards = [...this.cards.values()];
@@ -520,6 +536,9 @@ export class DiagramList {
     el.dataset.status = status;
     el.dataset.rows = String(cards.reduce((n, c) => n + c.rowCount, 0));
     el.dataset.series = String(cards.reduce((n, c) => n + c.seriesCount, 0));
+    if (this.settled.length > 0 && !this.loading()) {
+      for (const cb of this.settled.splice(0)) cb();
+    }
   }
 
   dispose(): void {

@@ -128,6 +128,11 @@ function select(
 export class ParamsForm {
   private timer: ReturnType<typeof setTimeout> | undefined;
   private readonly form: HTMLFormElement;
+  /** Live region for "Updating diagrams…". */
+  private readonly statusEl: HTMLParagraphElement;
+  /** The control of the last change. The focus goes back to it after the busy state. */
+  private lastControl: HTMLElement | null = null;
+  private busy = false;
 
   constructor(
     host: HTMLElement,
@@ -137,8 +142,45 @@ export class ParamsForm {
     this.form = el('form', 'params');
     this.form.setAttribute('aria-label', 'Data parameters');
     this.form.addEventListener('submit', (e) => e.preventDefault());
-    this.form.addEventListener('change', () => this.schedule());
-    host.replaceChildren(this.form);
+    this.form.addEventListener('change', (e) => {
+      // The All / None buttons send "change" from the list. Then the focused button is the control.
+      const t = e.target;
+      this.lastControl =
+        t instanceof HTMLInputElement || t instanceof HTMLSelectElement
+          ? t
+          : document.activeElement instanceof HTMLElement && this.form.contains(document.activeElement)
+            ? document.activeElement
+            : null;
+      this.schedule();
+    });
+    this.statusEl = el('p', 'params-status');
+    this.statusEl.setAttribute('role', 'status');
+    this.statusEl.setAttribute('aria-live', 'polite');
+    host.replaceChildren(this.form, this.statusEl);
+  }
+
+  /**
+   * Busy state while the diagrams load after a parameter change: the controls are disabled,
+   * the form has aria-busy and the live region says "Updating diagrams…". At the end, the focus
+   * goes back to the changed control, if the focus is not on an other element.
+   */
+  setBusy(busy: boolean): void {
+    if (busy === this.busy) return;
+    this.busy = busy;
+    this.applyBusy();
+    this.statusEl.textContent = busy ? 'Updating diagrams…' : '';
+    if (!busy) {
+      const active = document.activeElement;
+      const lost = active === null || active === document.body || this.form.contains(active);
+      if (lost && this.lastControl?.isConnected) this.lastControl.focus();
+    }
+  }
+
+  private applyBusy(): void {
+    for (const fs of this.form.querySelectorAll<HTMLFieldSetElement>(':scope > fieldset')) fs.disabled = this.busy;
+    if (this.busy) this.form.setAttribute('aria-busy', 'true');
+    else this.form.removeAttribute('aria-busy');
+    this.form.classList.toggle('busy', this.busy);
   }
 
   /** Show the parameters of a view. A pending change of the previous view is dropped. */
@@ -188,6 +230,7 @@ export class ParamsForm {
     );
 
     this.form.replaceChildren(sites, vars, other);
+    this.applyBusy();
   }
 
   /** One group of variable checkboxes, with "All" and "None" buttons. */

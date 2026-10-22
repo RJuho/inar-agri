@@ -156,11 +156,27 @@ export async function start(): Promise<void> {
     downloadData: (scope, format) => saveData(scope, format),
   });
 
+  /**
+   * Busy state after a parameter change, until all diagrams are ready, have a note or have an error.
+   * The form, the tabs and "Add diagram" are disabled, so that updates do not overlap.
+   */
+  let busy = false;
+  const setBusy = (on: boolean) => {
+    busy = on;
+    form.setBusy(on);
+    tabs.setBusy(on);
+    addEl.disabled = on || !canAddDiagram(activeView(store));
+    if (on) chartEl.setAttribute('aria-busy', 'true');
+    else chartEl.removeAttribute('aria-busy');
+  };
+
   const form = new ParamsForm(byId('params'), meta, (params) => {
     const clean = parseParams(params);
     if (!clean) return;
     activeView(store).params = clean;
     commit();
+    setBusy(true);
+    diagrams.whenSettled(() => setBusy(false));
   });
 
   /** Show a message in the status line. After `ms` (0 = never), show the normal text again. */
@@ -259,7 +275,7 @@ export async function start(): Promise<void> {
       shownId = view.id;
     }
     diagrams.sync(view);
-    addEl.disabled = !canAddDiagram(view);
+    addEl.disabled = busy || !canAddDiagram(view);
     chartEl.setAttribute('aria-label', `Diagrams of view ${view.name}`);
   }
 

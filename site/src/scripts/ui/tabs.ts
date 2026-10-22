@@ -33,6 +33,8 @@ export class Tabs {
   private store: Store | null = null;
   /** The menu stays the same element across renders, so that its state (open, busy) stays. */
   private readonly dataMenu: DataMenu;
+  /** True while the diagrams load after a parameter change: all buttons are disabled. */
+  private busy = false;
 
   constructor(
     private readonly el: HTMLElement,
@@ -84,8 +86,14 @@ export class Tabs {
     link.dataset.action = 'link';
     all.dataset.action = 'png-all';
     const params = activeView(store).params;
-    this.dataMenu.setEnabled(params.sites.length > 0 && params.variables.length > 0);
+    this.dataMenu.setEnabled(!this.busy && params.sites.length > 0 && params.variables.length > 0);
     tools.append(add, copy, rename, del, link, all, this.dataMenu.el);
+    if (this.busy) {
+      for (const b of [...list.querySelectorAll('button'), add, copy, rename, del, link, all]) b.disabled = true;
+      this.el.setAttribute('aria-busy', 'true');
+    } else {
+      this.el.removeAttribute('aria-busy');
+    }
 
     this.el.replaceChildren(list, tools);
     if (this.renaming) {
@@ -93,6 +101,13 @@ export class Tabs {
       input?.focus();
       input?.select();
     }
+  }
+
+  /** Turn the busy state on or off and draw the tabs again. */
+  setBusy(busy: boolean): void {
+    if (busy === this.busy) return;
+    this.busy = busy;
+    if (this.store) this.render(this.store);
   }
 
   private startRename(id: string): void {
