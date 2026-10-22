@@ -12,6 +12,8 @@ export const SERIES = ['#0072b2', '#e69f00', '#56b4e9', '#cc79a7', '#000000', '#
  */
 export const INK = '#7a7974';
 export const AXIS = '#8a8984';
+/** Sentinel colour for a box background (for example a statistics box). deep-dive.css maps it to --surface-raised. */
+export const SURFACE = '#fcfcfb';
 export const FONT = 'system-ui, sans-serif';
 
 /** Colours of the carbon fluxes, as in the budget diagram: NEE text colour, GPP blue, Reco orange. */

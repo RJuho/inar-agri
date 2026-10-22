@@ -1,0 +1,413 @@
+---
+layout: ../../layouts/DeepDive.astro
+title: Natural events and disturbances
+question: Which natural events (frost, heat, cold spells, heavy rain, dry spells, failed rains, soil drought, wet soil and frozen soil) occur at the six sites, and how is the daily NEE on these days different from the NEE on other days of the same months?
+shortAnswer: "Dry spells were associated with more net CO₂ uptake and heavy rain with less. Soil drought: less uptake at Qvidja, more uptake at Haltiala and Viikki. Heat: mixed."
+sites: [anttila, sarkisuo, haltiala, qvidja, viikki, maktau]
+variables: [nee_f, ta, swc, tsoil, precip]
+period: { from: 2018, to: 2025 }
+date: '2026-10-22'
+status: checked
+models:
+  - model: claude-fable-5-1
+    role: plan, definitions, orchestration, final corrections
+  - model: claude-opus-5-5
+    role: script, helpers, article, figures
+  - model: claude-sonnet-5-5
+    role: independent recompute
+  - model: claude-haiku-5-5
+    role: language and citation review
+script: scripts/deep-dives/natural-events.ts
+references: [heimsch2021, heimsch2024, shurpali2025, rasanen2026, calculated-doc, anomaly-report]
+checks:
+  - kind: recompute
+    by: claude-sonnet-5-5
+    date: '2026-10-22'
+    result: pass
+    note: Event-day counts per class and site, class NEE means with n, the Figure 1 and 2 statistics, the four Maktau failed seasons and four period-years were recomputed from db/ and daily.parquet with own SQL and agree with the article. Three clarifications of the method text (the 2019 to 2024 limit for the Maktau classes, the reference months, the failed-rains median) were added after the check.
+  - kind: review
+    by: claude-haiku-5-5
+    date: '2026-10-22'
+    result: pass
+    note: Citations checked against the PDFs and the documents, all supported. The first review (partial) found figure-number digits, a too strong drought wording, a claim without a source, missing n, long sentences and a missing Maktau gap caveat. All items and the items of the re-review (unnumbered claims, "NEE < 0", grammar) were corrected.
+---
+
+import raw from '../../deep-dives/natural-events.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { classRows, eventRows, failedSeasons, monthDays, naturalEventsData, periodFigure, periodRows, swcFigure, taFigure, untestedSeasons } from '../../lib/deepDives/naturalEvents';
+
+export const d = naturalEventsData(raw);
+export const fig1 = taFigure(d);
+export const fig2 = swcFigure(d);
+export const fig3 = periodFigure(d);
+export const classes = classRows(d);
+export const periods = periodRows(d);
+export const events = eventRows(d);
+export const failed = failedSeasons(d);
+export const untested = untestedSeasons(d);
+export const base = baseUrl();
+export const OUT = [10, 11, 12, 1, 2, 3, 4];
+export const wetQ = monthDays(d, 'qvidja', 'soilWet', OUT);
+export const dryHalEp = d.events.haltiala.filter((e) => e.class === 'soilDrought').reduce((a, b) => (b.days > a.days ? b : a));
+export const wetH = monthDays(d, 'haltiala', 'soilWet', OUT);
+export const wetV = monthDays(d, 'viikki', 'soilWet', OUT);
+export const wetA = monthDays(d, 'anttila', 'soilWet', OUT);
+export const drySar = monthDays(d, 'sarkisuo', 'soilDrought', [1, 2]);
+export const dryHal = monthDays(d, 'haltiala', 'soilDrought', [6, 7, 8]);
+export const dryVii = monthDays(d, 'viikki', 'soilDrought', [6, 7, 8]);
+export const U = 'g C m⁻² d⁻¹';
+export const ALL = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'];
+
+## Short answer
+
+We found <Num k="totals.episodes" digits={0} /> episodes of natural events at the six sites. For each class and site,
+we compared the daily NEE on the event days with the daily NEE on the other used days of the same calendar months.
+An NEE below zero is a net uptake of CO₂. A positive difference means less uptake or more release on the event days.
+
+- **Dry spells** were associated with more net uptake at the four Finnish sites with rain data, for example Qvidja
+  <Num k="classes.drySpell.qvidja.diff" sign unit={U} /> (n = <Num k="classes.drySpell.qvidja.event.n" digits={0} /> days).
+- **Heavy rain** days were associated with less uptake at all five sites with rain data, but the number of days is
+  small (for example Qvidja n = <Num k="classes.heavyRain.qvidja.event.n" digits={0} />,
+  difference <Num k="classes.heavyRain.qvidja.diff" sign unit={U} />).
+- **Soil drought** gave a mixed result. It was associated with less uptake at Qvidja
+  (<Num k="classes.soilDrought.qvidja.diff" sign unit={U} />, n = <Num k="classes.soilDrought.qvidja.event.n" digits={0} />)
+  and with more uptake at Haltiala
+  (<Num k="classes.soilDrought.haltiala.diff" sign unit={U} />, n = <Num k="classes.soilDrought.haltiala.event.n" digits={0} />)
+  and Viikki (<Num k="classes.soilDrought.viikki.diff" sign unit={U} />, n = <Num k="classes.soilDrought.viikki.event.n" digits={0} />).
+- **Heat** days were associated with more uptake at Haltiala (<Num k="classes.heat.haltiala.diff" sign unit={U} />,
+  n = <Num k="classes.heat.haltiala.event.n" digits={0} />) and Viikki (<Num k="classes.heat.viikki.diff" sign unit={U} />,
+  n = <Num k="classes.heat.viikki.event.n" digits={0} />). They were associated with less uptake at the other four sites
+  (see the class table).
+- **Cold spells** and the **zero curtain** (frozen soil) are winter classes. On these days NEE was a small release.
+  At most sites it was a little smaller than on the other days of the same months, for example cold spells at Qvidja
+  <Num k="classes.coldSpell.qvidja.event.mean" unit={U} /> (SD <Num k="classes.coldSpell.qvidja.event.sd" />,
+  n = <Num k="classes.coldSpell.qvidja.event.n" digits={0} />) against <Num k="classes.coldSpell.qvidja.reference.mean" unit={U} />
+  (SD <Num k="classes.coldSpell.qvidja.reference.sd" />, n = <Num k="classes.coldSpell.qvidja.reference.n" digits={0} />).
+- Daily NEE decreased with the air temperature at the five Finnish sites. Pearson r was from
+  <Num k="anscombe.ta.viikki.r" /> at Viikki (n = <Num k="anscombe.ta.viikki.n" digits={0} /> days) to
+  <Num k="anscombe.ta.qvidja.r" /> at Qvidja (n = <Num k="anscombe.ta.qvidja.n" digits={0} />). At Maktau daily NEE
+  increased a little with it (r = <Num k="anscombe.ta.maktau.r" />, n = <Num k="anscombe.ta.maktau.n" digits={0} />).
+
+## Data and method
+
+**Days.** A local day starts at midnight site local time. This is `ts_start` plus the UTC offset of the site. A daily
+value of a variable needs <Num k="method.minHalfHours" digits={0} /> or more of the <Num k="method.halfHoursPerDay" digits={0} />
+half hours. Before the daily means, we removed half hours with an air temperature below
+<Num k="method.taSpikeLimit" digits={0} unit="°C" />. This removes one logger row at Särkisuo
+(<a href={`${base}data-report/#finding-SAR-03`}>finding SAR-03</a>). The daily NEE is `nee_f_gc` (g C m⁻² d⁻¹) of
+`data/calculated/daily.parquet` <Cite ids={['calculated-doc']} />. At the five Finnish sites it is the gap-filled NEE of
+the data provider. Only where the provider column is empty (some rows of Viikki in 2023), the gap filling (MDS) of this
+project fills it. At Maktau the daily NEE is the MDS gap filling of this project. At Maktau, all classes, the soil
+percentiles and the NEE use only the years <Num k="method.maktauFluxYears.from" digits={0} /> to
+<Num k="method.maktauFluxYears.to" digits={0} />.
+
+**Human disturbances.** We removed the days from <Num k="method.humanWindow.before" digits={0} /> days before to
+<Num k="method.humanWindow.after" digits={0} /> days after each dated management event of `db/events.parquet`
+(harvest, cut, grazing, fertilisation, tillage, sowing, spraying and other). The other days are the *used days*.
+This removed <Num k="sites.qvidja.days.human" digits={0} /> days at Qvidja, <Num k="sites.viikki.days.human" digits={0} />
+at Viikki and <Num k="sites.haltiala.days.human" digits={0} /> at Haltiala. Anttila, Särkisuo and Maktau have no dated
+events, thus all their days are used. The weather classes are detected on all days, because the weather does not
+depend on the management. The removed days are not used in the NEE analysis and in the soil classes. In total there are
+<Num k="totals.usedDays" digits={0} /> used days, <Num k="totals.usedNeeDays" digits={0} /> of them with NEE.
+
+**Classes.** Weather classes use absolute limits. Soil classes use the percentiles of each site.
+
+- *Frost*: daily minimum air temperature below <Num k="method.frost.belowC" digits={0} unit="°C" />, only from May to
+  September, Finnish sites only.
+- *Heat*: daily maximum air temperature above <Num k="method.heat.finlandC" digits={0} unit="°C" /> (Finland) or above
+  <Num k="method.heat.maktauC" digits={0} unit="°C" /> (Maktau). A run of <Num k="method.heat.waveDays" digits={0} /> or
+  more heat days is marked as a heat wave in the episode table.
+- *Cold spell*: daily mean air temperature below <Num k="method.coldSpellC" digits={0} unit="°C" /> (Finland).
+- *Heavy rain*: more than <Num k="method.heavyRainMm" digits={0} unit="mm" /> rain in a day. Haltiala has no rain
+  sensor, thus it has no heavy rain and no dry spells.
+- *Dry spell*: <Num k="method.drySpell.days" digits={0} /> or more days in a row with less than
+  <Num k="method.drySpell.mmPerDay" digits={0} unit="mm" /> rain, from May to September (Finland). A day without a rain
+  value stops the run.
+- *Failed rains* (Maktau): a rain season (March to May or September to November) with a rain sum below the median of
+  the seasonal sums of the years <Num k="method.maktauFluxYears.from" digits={0} /> to
+  <Num k="method.maktauFluxYears.to" digits={0} /> (the season itself included). The mean soil water content of the
+  season must also be below the median of the season means of the same years, the season itself included
+  (quantile <Num k="method.failedRains.swcQuantile" digits={1} />). A season needs
+  <Num k="method.failedRains.minSeasonDays" digits={0} /> or more days with rain data. All days of a failed season
+  are event days.
+- *Soil drought* and *soil wet*: daily mean soil water content below the
+  <Num k="method.soil.p10" percent digits={0} unit="%" /> or above the <Num k="method.soil.p90" percent digits={0} unit="%" />
+  percentile of the used days of the site. Because both tails have the same size, the two classes have the same number
+  of days at a site, except for ties of equal values. At Qvidja, Viikki and Haltiala, we used the soil water only on days
+  with a daily mean soil temperature above <Num k="method.soil.tsoilMinC" digits={1} unit="°C" />, because the sensors
+  read a too low value in frozen soil.
+- *Zero curtain*: daily mean soil temperature within ±<Num k="method.zeroCurtain.bandC" digits={1} unit="°C" /> of zero
+  for <Num k="method.zeroCurtain.days" digits={0} /> or more days in a row (Finland). We use it as an indirect sign of
+  frozen or snow-covered soil, because the database has no snow depth.
+
+Consecutive days of a class make one *episode*. A day can be in more than one class.
+
+**Statistics.** For each class and site with <Num k="method.minDays" digits={0} /> or more used event days with NEE, we
+calculated n, mean and SD of the daily NEE on the event days and on the *reference days*. The reference days are the
+non-event used days in the calendar months that have at least one used event day with NEE at that site. The difference
+is the event mean minus the reference mean. For the Anscombe panels of the two scatter figures we calculated, per site and over all used days with NEE, n, the means, the variances, Pearson r, R² and the
+least-squares line of daily NEE against the daily mean air temperature and against the percentile rank of the daily
+soil water content within the site. The figures draw a sample of up to
+<Num k="method.pointsPerSite" digits={0} /> days per site. The periods are spring (March to May), summer (June to
+August), autumn (September to November) and winter (December to February). A winter has the year of its January.
+For each period and year we added the used days over all sites.
+
+## Results
+
+<Figure
+  id="figure-1"
+  title="Figure 1. Daily NEE against the daily mean air temperature, with frost, heat and cold-spell days marked"
+  svg={fig1.svg}
+  alt={fig1.alt}
+  view={{ name: 'Natural events: NEE and air temperature', sites: ALL, variables: ['nee_f', 'ta'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['anscombe'] }}
+>
+  <p>
+    One panel per site, all periods. The box gives the statistics of all used days with NEE; the points are a sample of
+    up to {d.method.pointsPerSite} days. Hollow triangles: days with frost, heat or a cold spell. Dashed line: least-squares
+    line. An NEE below zero is a net uptake of CO₂.
+  </p>
+</Figure>
+
+At the Finnish sites, daily NEE was lower (more uptake) on warmer days. The correlation is weak to moderate
+(r from <Num k="anscombe.ta.viikki.r" /> at Viikki, n = <Num k="anscombe.ta.viikki.n" digits={0} />, to
+<Num k="anscombe.ta.qvidja.r" /> at Qvidja, n = <Num k="anscombe.ta.qvidja.n" digits={0} />). The uptake also depends on
+the light, the crop and the management. At Maktau the daily mean air temperature has a small range
+(variance <Num k="anscombe.ta.maktau.varX" digits={1} />, n = <Num k="anscombe.ta.maktau.n" digits={0} />) and the
+correlation is weak and positive (r = <Num k="anscombe.ta.maktau.r" />).
+
+**Temperature classes.** On cold-spell days, NEE was a small release at all five Finnish sites, from
+<Num k="classes.coldSpell.viikki.event.mean" unit={U} /> at Viikki (n = <Num k="classes.coldSpell.viikki.event.n" digits={0} />,
+SD <Num k="classes.coldSpell.viikki.event.sd" />) to <Num k="classes.coldSpell.sarkisuo.event.mean" unit={U} /> at Särkisuo
+(n = <Num k="classes.coldSpell.sarkisuo.event.n" digits={0} />, SD <Num k="classes.coldSpell.sarkisuo.event.sd" />). Särkisuo is
+the only site where the release on cold-spell days was larger than on the reference days. Frost days gave different
+directions. At Anttila (<Num k="classes.frost.anttila.diff" sign unit={U} />, n = <Num k="classes.frost.anttila.event.n" digits={0} />)
+and Särkisuo (<Num k="classes.frost.sarkisuo.diff" sign unit={U} />, n = <Num k="classes.frost.sarkisuo.event.n" digits={0} />) the
+uptake was smaller than on the reference days. At Qvidja it was larger (<Num k="classes.frost.qvidja.diff" sign unit={U} />,
+n = <Num k="classes.frost.qvidja.event.n" digits={0} />). Most frost days are in May. Heat days were associated with more uptake at Haltiala (<Num k="classes.heat.haltiala.event.mean" unit={U} />,
+SD <Num k="classes.heat.haltiala.event.sd" />, n = <Num k="classes.heat.haltiala.event.n" digits={0} />, against
+<Num k="classes.heat.haltiala.reference.mean" unit={U} /> on the reference days) and Viikki
+(<Num k="classes.heat.viikki.diff" sign unit={U} />, n = <Num k="classes.heat.viikki.event.n" digits={0} />). They were associated
+with less uptake at Anttila (<Num k="classes.heat.anttila.diff" sign unit={U} />, n = <Num k="classes.heat.anttila.event.n" digits={0} />),
+Särkisuo (<Num k="classes.heat.sarkisuo.diff" sign unit={U} />, n = <Num k="classes.heat.sarkisuo.event.n" digits={0} />), Qvidja
+(<Num k="classes.heat.qvidja.diff" sign unit={U} />, n = <Num k="classes.heat.qvidja.event.n" digits={0} />) and Maktau
+(<Num k="classes.heat.maktau.diff" sign unit={U} />, n = <Num k="classes.heat.maktau.event.n" digits={0} />). The SD of the
+daily NEE is large in summer, thus the differences of single classes have a large uncertainty (see the table).
+
+<div class="table-wrap">
+<table>
+<caption>NEE on event days against reference days (non-event used days in the calendar months with used event days), per class and site, in g C m⁻² d⁻¹ (mean ± SD). Event days = used event days (all event days, before the human-disturbance window, in parentheses when different). Difference = event mean − reference mean; a positive value is less uptake or more release on event days. Classes with fewer than {d.method.minDays} used event days with NEE have no row.</caption>
+<thead>
+<tr><th scope="col">Class</th><th scope="col">Site</th><th scope="col" class="num">Event days</th><th scope="col" class="num">Episodes</th><th scope="col" class="num">n event</th><th scope="col" class="num">Event NEE</th><th scope="col" class="num">n reference</th><th scope="col" class="num">Reference NEE</th><th scope="col" class="num">Difference</th></tr>
+</thead>
+<tbody>
+{classes.map((r) => (<tr id={`class-${r.id}`}><td>{r.cls}</td><td>{r.site}</td><td class="num">{r.days}</td><td class="num">{r.episodes}</td><td class="num">{r.nEvent}</td><td class="num">{r.event}</td><td class="num">{r.nRef}</td><td class="num">{r.reference}</td><td class="num">{r.diff}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<Figure
+  id="figure-2"
+  title="Figure 2. Daily NEE against the site percentile rank of the soil water content, with water-class days marked"
+  svg={fig2.svg}
+  alt={fig2.alt}
+  view={{ name: 'Natural events: NEE, soil water and rain', sites: ALL, variables: ['nee_f', 'swc', 'precip'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    One panel per site, all periods. The x axis is the percentile rank of the daily mean soil water content among the
+    used days of the site, from the driest to the wettest day. The box gives the statistics of all used days with NEE and soil
+    water; the points are a sample of up to {d.method.pointsPerSite} days. Hollow triangles: days with heavy rain, a dry
+    spell or failed rains, soil drought or wet soil. Dashed line: least-squares line.
+  </p>
+</Figure>
+
+**Soil water classes.** At four sites the daily NEE increased with the soil water rank. Pearson r was
+<Num k="anscombe.swc.haltiala.r" /> at Haltiala (n = <Num k="anscombe.swc.haltiala.n" digits={0} />),
+<Num k="anscombe.swc.qvidja.r" /> at Qvidja (n = <Num k="anscombe.swc.qvidja.n" digits={0} />),
+<Num k="anscombe.swc.viikki.r" /> at Viikki (n = <Num k="anscombe.swc.viikki.n" digits={0} />) and
+<Num k="anscombe.swc.anttila.r" /> at Anttila (n = <Num k="anscombe.swc.anttila.n" digits={0} />). Thus the wettest days
+had less uptake. Most soil-wet days are from October to April, outside the main growing season. These are {wetQ.n} of {wetQ.total}
+days at Qvidja, {wetV.n} of {wetV.total} at Viikki, {wetH.n} of {wetH.total} at Haltiala and {wetA.n} of {wetA.total}
+at Anttila. At Särkisuo (r = <Num k="anscombe.swc.sarkisuo.r" />, n = <Num k="anscombe.swc.sarkisuo.n" digits={0} />) and
+Maktau (r = <Num k="anscombe.swc.maktau.r" />, n = <Num k="anscombe.swc.maktau.n" digits={0} />) the relation was weak
+and negative.
+
+The soil drought result is mixed. At Qvidja the NEE on soil drought days was
+<Num k="classes.soilDrought.qvidja.event.mean" unit={U} /> (SD <Num k="classes.soilDrought.qvidja.event.sd" />,
+n = <Num k="classes.soilDrought.qvidja.event.n" digits={0} />), against <Num k="classes.soilDrought.qvidja.reference.mean" unit={U} />
+on the reference days: less uptake. At Särkisuo, a drained peat soil <Cite ids={['shurpali2025']} note="p. 3" />, NEE on soil
+drought days was a net release (<Num k="classes.soilDrought.sarkisuo.event.mean" unit={U} />,
+n = <Num k="classes.soilDrought.sarkisuo.event.n" digits={0} />). But {drySar.n} of these {drySar.total} days are in
+January and February. The soil temperature rule is not applied at Särkisuo and Anttila, and a frozen soil gives a low
+reading. Thus this result is more likely associated with winter than with a summer drought.
+At Haltiala (<Num k="classes.soilDrought.haltiala.diff" sign unit={U} />, n = <Num k="classes.soilDrought.haltiala.event.n" digits={0} />),
+Viikki (<Num k="classes.soilDrought.viikki.diff" sign unit={U} />, n = <Num k="classes.soilDrought.viikki.event.n" digits={0} />)
+and Anttila (<Num k="classes.soilDrought.anttila.diff" sign unit={U} />, n = <Num k="classes.soilDrought.anttila.event.n" digits={0} />)
+the uptake was larger on soil drought days. At Haltiala {dryHal.n} of the {dryHal.total} soil drought days are from June to August. One episode that starts in June {dryHalEp.start.slice(0, 4)} has {dryHalEp.days} of these days.
+At Viikki {dryVii.n} of {dryVii.total} are from June to August, when the crop grows fast. A low soil water content can thus be associated with a high
+uptake and transpiration, and not only with a water stress. At Maktau the difference was small (<Num k="classes.soilDrought.maktau.diff" sign unit={U} />,
+n = <Num k="classes.soilDrought.maktau.event.n" digits={0} />).
+
+The soil water level is different between the sites. The site percentiles were
+<Num k="sites.anttila.swcP10" digits={2} /> to <Num k="sites.anttila.swcP90" digits={2} /> m³ m⁻³ at Anttila (mineral soil).
+At Särkisuo (peat) they were <Num k="sites.sarkisuo.swcP10" digits={2} /> to <Num k="sites.sarkisuo.swcP90" digits={2} /> m³ m⁻³.
+Shurpali et al. also report a higher soil water content in the organic soils than in the mineral soil of Anttila
+<Cite ids={['shurpali2025']} note="p. 4" />. The organic soils are Särkisuo and a third field. At Maktau the percentiles were
+<Num k="sites.maktau.swcP10" digits={3} /> to <Num k="sites.maktau.swcP90" digits={3} /> m³ m⁻³. Räsänen et al. found a
+critical soil moisture for the maize at Maktau. Below it, water limits the evapotranspiration. This value changes from
+year to year, and it is between these two percentiles <Cite ids={['rasanen2026']} note="p. 9" />.
+
+Dry spells were associated with more uptake at the four Finnish sites with rain data: Anttila
+<Num k="classes.drySpell.anttila.diff" sign unit={U} /> (n = <Num k="classes.drySpell.anttila.event.n" digits={0} />), Särkisuo
+<Num k="classes.drySpell.sarkisuo.diff" sign unit={U} /> (n = <Num k="classes.drySpell.sarkisuo.event.n" digits={0} />), Qvidja
+<Num k="classes.drySpell.qvidja.diff" sign unit={U} /> (n = <Num k="classes.drySpell.qvidja.event.n" digits={0} />) and Viikki
+<Num k="classes.drySpell.viikki.diff" sign unit={U} /> (n = <Num k="classes.drySpell.viikki.event.n" digits={0} />). Heavy rain days had less uptake at all five sites with rain data, for example Viikki
+<Num k="classes.heavyRain.viikki.diff" sign unit={U} /> (n = <Num k="classes.heavyRain.viikki.event.n" digits={0} />,
+SD <Num k="classes.heavyRain.viikki.event.sd" />). With so few days, the intervals are wide.
+At Maktau, the failed rain seasons were {failed.join(', ')}. Räsänen et al. describe the long rains (March to May)
+and the short rains (October to December) of the region, with more frequent droughts in recent years
+<Cite ids={['rasanen2026']} note="p. 2" />, and name 2021 and 2022 as dry years <Cite ids={['rasanen2026']} note="p. 9" />.
+The daily NEE in the failed seasons (<Num k="classes.failedRains.maktau.event.mean" unit={U} />,
+SD <Num k="classes.failedRains.maktau.event.sd" />, n = <Num k="classes.failedRains.maktau.event.n" digits={0} />) was
+almost the same as on the reference days (<Num k="classes.failedRains.maktau.reference.mean" unit={U} />,
+SD <Num k="classes.failedRains.maktau.reference.sd" />), but the SD was much smaller: in the failed seasons the daily NEE changed little from day to day.
+
+**Frozen soil.** The zero curtain had the most event days of the winter classes. For example, Qvidja had
+<Num k="counts.qvidja.zeroCurtain.days" digits={0} /> days and Haltiala <Num k="counts.haltiala.zeroCurtain.days" digits={0} />.
+NEE on these days was a small release. At Qvidja it was <Num k="classes.zeroCurtain.qvidja.event.mean" unit={U} />
+(SD <Num k="classes.zeroCurtain.qvidja.event.sd" />, n = <Num k="classes.zeroCurtain.qvidja.event.n" digits={0} />).
+At Qvidja the winter of 2018/19 had <Num k="periods.years.6.bySite.qvidja.eventDays.zeroCurtain" digits={0} /> zero-curtain
+days. The winter of 2019/20 had <Num k="periods.years.10.bySite.qvidja.eventDays.zeroCurtain" digits={0} />. Heimsch et
+al. report permanent snow cover at Qvidja in the first of these winters. In the second winter they report only two short
+snow-cover periods <Cite ids={['heimsch2021']} note="p. 3472" />. This agrees with the indirect sign.
+
+**Periods and years.** The period figure and the table below give the used days per period and year, added over all sites.
+
+<Figure
+  id="figure-3"
+  title="Figure 3. Event days per class, period and year, added over all sites"
+  svg={fig3.svg}
+  alt={fig3.alt}
+  view={{ name: 'Natural events: weather and soil', sites: ALL, variables: ['ta', 'precip', 'swc', 'tsoil'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    Number of used event days of all sites per class. A day with two classes counts in both. Dry spells (Finland) and
+    failed rains (Maktau) share one colour. The number of sites with data changes between the years (see the table).
+  </p>
+</Figure>
+
+Of the four periods, the summers have the most negative NEE in the period table. Summer 2022 (<Num k="periods.years.16.nee.mean" unit={U} />,
+SD <Num k="periods.years.16.nee.sd" />, n = <Num k="periods.years.16.n" digits={0} /> site days, all six sites) had
+<Num k="periods.years.16.eventDays.soilDrought" digits={0} /> soil drought days and
+<Num k="periods.years.16.eventDays.drySpell" digits={0} /> dry-spell days. Summer 2024 (<Num k="periods.years.24.nee.mean" unit={U} />,
+n = <Num k="periods.years.24.n" digits={0} />) had <Num k="periods.years.24.eventDays.soilDrought" digits={0} /> soil drought
+days. Summer 2018 has data from Qvidja only (<Num k="periods.years.1.nee.mean" unit={U} />,
+n = <Num k="periods.years.1.n" digits={0} />). Heimsch et al. describe the growing season of 2018 at Qvidja as severely or extremely dry,
+with an exceptional drought index <Cite ids={['heimsch2024']} note="PDF p. 5" />. The winters with the most
+zero-curtain days were 2022/23 (<Num k="periods.years.22.eventDays.zeroCurtain" digits={0} />) and 2023/24
+(<Num k="periods.years.26.eventDays.zeroCurtain" digits={0} />); winter 2023/24 also had the most cold-spell days
+(<Num k="periods.years.26.eventDays.coldSpell" digits={0} />). The set of sites changes from year to year. Thus a mean over all sites compares different fields. The per-site means in
+the table are a better comparison.
+
+<div class="table-wrap">
+<table>
+<caption>Period-years, all sites added. n = used site days with NEE; NEE in g C m⁻² d⁻¹ (mean ± SD of all site days). Per site = site mean (n). Event days = sum of the used event days of all classes and sites.</caption>
+<thead>
+<tr><th scope="col">Period</th><th scope="col" class="num">Sites</th><th scope="col" class="num">n</th><th scope="col" class="num">NEE</th><th scope="col">Per site</th><th scope="col" class="num">Event days</th></tr>
+</thead>
+<tbody>
+{periods.map((r) => (<tr id={`period-${r.id}`}><td>{r.label}</td><td class="num">{r.sites}</td><td class="num">{r.n}</td><td class="num">{r.nee}</td><td class="wrap">{r.bySite}</td><td class="num">{r.eventDays}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+**Episodes.** The table lists all <Num k="totals.episodes" digits={0} /> episodes. Peak = the most extreme daily value of
+the episode (air temperature, rain, soil water rank, length of the dry spell, mean soil temperature of the zero curtain,
+or the rain sum of a failed season). NEE = mean ± SD of the used days of the episode (n).
+
+<details class="dd-alt">
+<summary>Show all episodes</summary>
+<div class="table-wrap">
+<table>
+<caption>All episodes of natural events. Days = used days of the episode, or "used of all" when the human-disturbance window removed days. NEE in g C m⁻² d⁻¹.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Class</th><th scope="col">Dates</th><th scope="col" class="num">Days</th><th scope="col" class="num">Peak</th><th scope="col" class="num">NEE (n)</th></tr>
+</thead>
+<tbody>
+{events.map((r) => (<tr id={`event-${r.id}`}><td>{r.site}</td><td>{r.cls}</td><td>{r.dates}</td><td class="num">{r.days}</td><td class="num">{r.peak}</td><td class="num">{r.nee}</td></tr>))}
+</tbody>
+</table>
+</div>
+</details>
+
+## Limits and uncertainty
+
+- **Association, not cause.** The event days differ from the reference days in more than one way (light, crop stage,
+  season inside the month). The differences are *associated with* the events. The SD of the daily NEE is often larger
+  than the difference, for example heat at Qvidja: SD <Num k="classes.heat.qvidja.event.sd" /> on
+  <Num k="classes.heat.qvidja.event.n" digits={0} /> event days and <Num k="classes.heat.qvidja.reference.sd" /> on
+  <Num k="classes.heat.qvidja.reference.n" digits={0} /> reference days.
+- **Small n.** Heavy rain at Anttila and Särkisuo (n = <Num k="classes.heavyRain.anttila.event.n" digits={0} /> and
+  <Num k="classes.heavyRain.sarkisuo.event.n" digits={0} />) and frost at Viikki (n = <Num k="classes.frost.viikki.event.n" digits={0} />)
+  have few days. Their results are not reliable.
+- **Human-disturbance window.** The weather classes are detected on all days. The removed days (<Num k="method.humanWindow.before" digits={0} />
+  days before to <Num k="method.humanWindow.after" digits={0} /> days after each event) apply to the NEE and soil
+  analysis only. Anttila, Särkisuo and Maktau have no dated events in the database, thus their NEE can include
+  management effects (for example cuts).
+- **Soil drought in winter.** At Anttila and Särkisuo the soil water is used also in frozen soil, thus part of their
+  soil drought days are winter days with a low sensor reading, not dry soil.
+- **Zero curtain is an indirect sign.** The database has no snow depth and no water table. A flat soil temperature near zero
+  is also found in sensor data (<a href={`${base}data-report/#finding-SAR-04`}>finding SAR-04</a>,
+  <a href={`${base}data-report/#finding-ANT-05`}>ANT-05</a>, <a href={`${base}data-report/#finding-VII-03`}>VII-03</a>,
+  <a href={`${base}data-report/#finding-HAL-04`}>HAL-04</a>). The class is very common (for example
+  <Num k="counts.sarkisuo.zeroCurtain.days" digits={0} /> days at Särkisuo) and is a winter state, not a short event.
+- **Soil water.** We used site percentiles, not absolute values, because the sensors and soils differ. The Qvidja value
+  is a conversion from sensor volts (<a href={`${base}data-report/#finding-QVI-01`}>finding QVI-01</a>) with a sensor
+  upper limit in wet periods (<a href={`${base}data-report/#finding-QVI-02`}>QVI-02</a>) and low values in frozen soil
+  (<a href={`${base}data-report/#finding-QVI-03`}>QVI-03</a>, <a href={`${base}data-report/#finding-QVI-16`}>QVI-16</a>).
+  Haltiala has a coarse resolution with long flat periods
+  (<a href={`${base}data-report/#finding-HAL-01`}>finding HAL-01</a>) and a higher level in 2021
+  (<a href={`${base}data-report/#finding-HAL-03`}>HAL-03</a>), which moves the 2021 days to the wet tail.
+  Heimsch et al. also link winter drops of the soil moisture at Qvidja to soil freezing <Cite ids={['heimsch2021']} note="p. 3472" />.
+- **Rain.** Haltiala has no rain data. The Qvidja rain gauge has a gap from December 2021 to May 2022
+  (<a href={`${base}data-report/#finding-QVI-08`}>finding QVI-08</a>); a missing day stops a dry spell.
+- **Maktau.** The logger stored day-time rows only from July 2023 to January 2024
+  (<a href={`${base}data-report/#finding-MKT-01`}>finding MKT-01</a>), thus these days fail the
+  <Num k="method.minHalfHours" digits={0} />-half-hour rule, and the seasons {untested.join(' and ')} have no failed-rains
+  result. VPD fill values affect the MDS gap filling (<a href={`${base}data-report/#finding-MKT-02`}>MKT-02</a>), and the
+  day-time air temperature of 2024 is higher than in the other years (<a href={`${base}data-report/#finding-MKT-08`}>MKT-08</a>),
+  which can add heat days. The MDS gap filling of Maktau has gaps of several months in two years. The documentation
+  calls the result of these years not reliable <Cite ids={['calculated-doc']} />. Our seasons use full calendar months; the short rains are from October to December
+  <Cite ids={['rasanen2026']} note="p. 2" />, thus September to November covers them only in part.
+- **Time stamps.** The raw time stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as local time,
+  so the values are <Num k="method.utcShiftHours" digits={0} /> hours early
+  (<a href={`${base}data-report/#finding-ANT-01`}>findings ANT-01</a>, <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a>,
+  <a href={`${base}data-report/#finding-VII-01`}>VII-01</a>). On a daily scale this moves
+  <Num k="method.utcShiftHalfHours" digits={0} /> of the <Num k="method.halfHoursPerDay" digits={0} /> half hours of a day to
+  the next day. For daily minimum, maximum and mean values this effect is small.
+- **Sample in the figures.** The points of the two scatter figures are a repeatable random sample of up to
+  <Num k="method.pointsPerSite" digits={0} /> days per site. The statistics in the boxes and the tables use all used days.
+- **Period-years added over all sites** mix different sets of sites: for example <Num k="periods.years.1.sitesWithData" digits={0} /> site
+  in summer 2018 and <Num k="periods.years.16.sitesWithData" digits={0} /> sites in summer 2022. The last winter
+  (2025/26) has December only. Use the per-site means of the table to compare years.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `site/src/deep-dives/natural-events.json`. The script
+[`scripts/deep-dives/natural-events.ts`](https://github.com/RJuho/inar-agri/blob/main/scripts/deep-dives/natural-events.ts)
+writes this file. It reads only `db/sites.parquet`, `db/observations.parquet`, `db/events.parquet` and
+`data/calculated/daily.parquet`. The pure helpers are in `scripts/lib/deep-dive/natural-events.ts` (unit test
+`natural-events.test.ts`).
+
+```sh
+npm run build:db && npm run calc         # make the inputs
+npm run deep-dives -- natural-events     # write the JSON again
+npm run deep-dives -- --check            # compare a fresh run with the committed JSON
+```

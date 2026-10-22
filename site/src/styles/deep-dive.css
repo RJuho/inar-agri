@@ -170,6 +170,11 @@
   stroke: var(--text-primary);
 }
 
+/* Sentinel colour #fcfcfb: the background of a text box in a figure (statistics box). */
+.dd-chart [fill='#fcfcfb'] {
+  fill: var(--surface-raised);
+}
+
 .dd-figure figcaption {
   max-width: 72ch;
   color: var(--text-secondary);
