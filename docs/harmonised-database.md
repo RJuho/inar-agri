@@ -59,12 +59,20 @@ One row per field management event. Sorted by `site_id`, `date`.
 | `type` | VARCHAR | `harvest`, `cut`, `grazing`, `fertilisation`, `sowing`, `tillage`, `spraying` or `other`. |
 | `detail` | VARCHAR | Short English text: crop or product, amount and unit as in the source. |
 | `source` | VARCHAR | Source file in `data/`. Two files are separated by `; `. |
+| `crop` | VARCHAR | Crop, product or animal, short English name. NULL = not given. |
+| `amount` | DOUBLE | Amount as in the source, in `amount_unit`. |
+| `amount_unit` | VARCHAR | `kg/ha` (product or seed), `kg/ha fresh` (fresh mass, Qvidja), `m3/ha`, `L/ha`, or `animals` (grazing). |
+| `dm_fraction` | DOUBLE | Dry matter fraction of `amount` (0 to 1). |
+| `dry_mass_kg_ha` | DOUBLE | Harvest yield, kg DW/ha. Only `harvest` and `cut`. Qvidja: `amount × dm_fraction`; 2018-06-12: 1985 (Heimsch et al. 2021). Viikki: yield of the year, on the last harvest of the year. |
+| `n_kg_ha` | DOUBLE | N input, kg N/ha. Only `fertilisation`. Source value (Viikki, Haltiala 2025), or the N share of the grade in the product name (Yara AXAN 27-0-1: 27 %, NPK 23-10-8: 23 %). Finnish saltpetre: NULL (no grade in the file). |
+| `c_g_m2` | DOUBLE | Carbon of the harvest or the organic input, g C m-2. Copied from `scripts/lib/calc/management.ts` (`cGm2()`) by `withCarbon()`: same site, same date, matching type. The report lists carbon rows that match no event. |
+| `area_ha` | DOUBLE | Area of the field parcel (Qvidja "Area of kasvulohko"), ha. |
 
 The rows come from a hand-typed table, `scripts/lib/events.ts`, because the repository has no xlsx, docx or pdf reader. Sources:
 
 - Haltiala: `haltiala_smear_management.xlsx` (2021 to 2025). The parcel card `haltiala_smear_Lohkokortit_2025.pdf` corrects one date: Jett Mn235 was applied on 2025-06-16 in a tank mix with the herbicide, not on 2025-05-16.
 - Qvidja: `Qvidja_management.xlsx` (2018 to 2025) and Table 1 of `Qvidja_C-balance.pdf` (Heimsch et al. 2021) for the 2018 and 2019 events that are not in the xlsx. If a harvest date differs by 1 or 2 days between the two, the xlsx date is used.
-- Viikki: `EC/Management Information.docx` (2022 to 2025). The yield of the year is in the detail of the last harvest of the year.
+- Viikki: `EC/Management Information.docx` (2022 to 2025). The yield of the year is in the detail and in `dry_mass_kg_ha` of the last harvest of the year. The N input of each application is in `n_kg_ha`.
 - Maktau: no dated events (only seasonal practice). Anttila and Särkisuo: no management data.
 
 Type rules: seeding and oversowing are `sowing`; herbicide, glyphosate and a micronutrient tank mix are `spraying`; harrowing, disc work, subsoiling, cultivation and crushing of the crop are `tillage` (as in the source files); a cleaning cut or a cut left on the field is `cut`; the EC installation is `other`.
@@ -118,7 +126,7 @@ Each rule runs in SQL. The report gives its counts.
 - `RegistrySchema`: the registry at start. Unique ids and codes, valid offsets, files that exist, a factor that is finite and not zero, an aggregate rule for every file with a step below 30 minutes.
 - `headerSchema(expected)`: the header of each file must hold every column the mapping uses. A changed file layout stops the build with the list of missing columns.
 - `ObservationRowSchema`: every output row, streamed from DuckDB in chunks. Site id 1-255, timestamp on a 30-minute boundary, finite values in physical ranges (NEE ±100, TA -60 to 60, soil temperature -40 to 60, SWC 0 to 1, QC flag 0 or 1). A range violation is a warning in the report. Any other issue stops the build.
-- `EventRowSchema`: every row of `scripts/lib/events.ts`. Known site code and type, ISO dates in 2014 to 2030, `date_end` after `date`, the source file exists. The build also stops on two equal rows.
+- `EventRowSchema`: every row of `scripts/lib/events.ts`. Known site code and type, ISO dates in 2014 to 2030, `date_end` after `date`, the source file exists. Numbers ≥ 0, `dm_fraction` 0 to 1, `amount` and `amount_unit` together, `dry_mass_kg_ha` only on harvest or cut, `n_kg_ha` only on fertilisation. The build also stops on two equal rows.
 - `ReportSchema`: the report object before it is written.
 
 ## Report
@@ -126,7 +134,7 @@ Each rule runs in SQL. The report gives its counts.
 `db/report.md` has:
 
 - Output files with row counts and bytes.
-- Management events: count per site and type.
+- Management events: count per site and type, with the number of rows with a yield, carbon and N input, and the carbon rows that match no event.
 - Per site: rows, inserted grid rows, first and last period (UTC). Per column: valid count, min, max, mean, conflicts, range warnings. Per year: valid count, min and max per column.
 - Per source file: physical lines, header lines, rows read, lines skipped by the CSV parser, rejected rows, duplicate stamps, rows after aggregation. Per source column: valid values, sentinels, zeros set to NULL, factor.
 - Validation summary.

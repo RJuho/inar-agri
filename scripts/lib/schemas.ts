@@ -4,7 +4,7 @@
 import { existsSync } from 'node:fs';
 import { DuckDBTimestampValue } from '@duckdb/node-api';
 import * as v from 'valibot';
-import { EVENT_TYPES } from './events.ts';
+import { AMOUNT_UNITS, EVENT_TYPES } from './events.ts';
 import { ALL_COLUMNS } from './registry.ts';
 
 const nonEmpty = v.pipe(v.string(), v.nonEmpty());
@@ -135,6 +135,8 @@ const ColumnStatSchema = v.object({
   mean: v.nullable(v.number()),
 });
 
+const positive = v.pipe(v.number(), v.finite(), v.minValue(0));
+
 /** One management event (scripts/lib/events.ts). */
 export const EventRowSchema = v.pipe(
   v.strictObject({
@@ -144,7 +146,18 @@ export const EventRowSchema = v.pipe(
     type: v.picklist(EVENT_TYPES),
     detail: v.pipe(nonEmpty, v.maxLength(240)),
     source: nonEmpty,
+    crop: v.optional(v.pipe(nonEmpty, v.maxLength(60))),
+    amount: v.optional(positive),
+    amount_unit: v.optional(v.picklist(AMOUNT_UNITS)),
+    dm_fraction: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1))),
+    dry_mass_kg_ha: v.optional(positive),
+    n_kg_ha: v.optional(positive),
+    c_g_m2: v.optional(positive),
+    area_ha: v.optional(positive),
   }),
+  v.check((r) => (r.amount === undefined) === (r.amount_unit === undefined), 'amount and amount_unit go together'),
+  v.check((r) => r.dry_mass_kg_ha === undefined || r.type === 'harvest' || r.type === 'cut', 'dry_mass_kg_ha only on harvest or cut'),
+  v.check((r) => r.n_kg_ha === undefined || r.type === 'fertilisation', 'n_kg_ha only on fertilisation'),
   v.check((r) => r.date >= '2014-01-01' && r.date <= '2030-12-31', 'date must be in 2014 to 2030'),
   v.check((r) => r.date_end === undefined || r.date_end > r.date, 'date_end must be after date'),
   v.check((r) => r.source.split('; ').every((s) => existsSync(s.replace(/ \(.*\)$/, ''))), 'source file must exist'),
@@ -155,7 +168,8 @@ export const ReportSchema = v.object({
   duckdb: nonEmpty,
   node: nonEmpty,
   outputs: v.array(v.object({ file: nonEmpty, rows: count, bytes: count })),
-  events: v.array(v.object({ site: nonEmpty, type: v.picklist(EVENT_TYPES), n: count })),
+  events: v.array(v.object({ site: nonEmpty, type: v.picklist(EVENT_TYPES), n: count, withYield: count, withC: count, withN: count })),
+  unmatchedCarbon: v.array(v.object({ site: nonEmpty, date: nonEmpty, action: nonEmpty, product: nonEmpty, cGm2: v.number() })),
   sites: v.array(
     v.object({
       siteId: count,

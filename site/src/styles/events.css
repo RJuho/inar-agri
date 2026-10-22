@@ -1,0 +1,57 @@
+/* Text page "Events" (site/src/pages/events.astro).
+   Colours come only from the tokens in global.css, so dark mode works. */
+
+.events-table .nowrap {
+  white-space: nowrap;
+}
+
+.events-table .date-end {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.events-table td.source {
+  min-width: 14ch;
+  max-width: 28ch;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.events-table tr[data-type='harvest'] td[data-col='yield']:not(:empty) {
+  font-weight: 650;
+}
+
+/* Column help: term and text side by side, one column on phones (as on the Data Report page). */
+.events-page .facts {
+  display: grid;
+  grid-template-columns: minmax(8ch, max-content) minmax(0, 1fr);
+  gap: 6px 16px;
+  max-width: 72ch;
+  margin: 0 0 12px;
+  font-size: 0.9375rem;
+}
+
+.events-page .facts > div {
+  display: contents;
+}
+
+.events-page .facts dt {
+  font-weight: 600;
+}
+
+.events-page .facts dd {
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .events-page .facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .events-page .facts dd {
+    margin-bottom: 6px;
+  }
+}

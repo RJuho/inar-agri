@@ -1,6 +1,6 @@
 # Build report: harmonised core database
 
-Built 2026-10-22T06:08:36.713Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
+Built 2026-10-22T08:03:46.675Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
 
 ## Output files
 
@@ -10,29 +10,35 @@ Built 2026-10-22T06:08:36.713Z with DuckDB v1.5.6 and Node v26.10.0. Generator: 
 | db/sites.parquet | 6 | 3956 |
 | db/variables.parquet | 26 | 2137 |
 | db/site_variables.parquet | 185 | 7734 |
-| db/events.parquet | 83 | 3978 |
+| db/events.parquet | 83 | 6662 |
 
 ## Management events
 
-Rows of events.parquet per site and type. Source: scripts/lib/events.ts.
+Rows of events.parquet per site and type, and the rows with a yield (kg DW/ha), carbon (g C m-2) or N input (kg N/ha). Source: scripts/lib/events.ts; carbon from scripts/lib/calc/management.ts.
 
-| Site | Type | Events |
-|---|---|---|
-| haltiala | fertilisation | 6 |
-| haltiala | harvest | 4 |
-| haltiala | other | 1 |
-| haltiala | sowing | 6 |
-| haltiala | spraying | 4 |
-| haltiala | tillage | 11 |
-| qvidja | cut | 6 |
-| qvidja | fertilisation | 9 |
-| qvidja | grazing | 5 |
-| qvidja | harvest | 11 |
-| qvidja | sowing | 1 |
-| qvidja | tillage | 1 |
-| viikki | fertilisation | 7 |
-| viikki | harvest | 6 |
-| viikki | tillage | 5 |
+| Site | Type | Events | With yield | With C | With N |
+|---|---|---|---|---|---|
+| haltiala | fertilisation | 6 | 0 | 0 | 2 |
+| haltiala | harvest | 4 | 3 | 3 | 0 |
+| haltiala | other | 1 | 0 | 0 | 0 |
+| haltiala | sowing | 6 | 0 | 0 | 0 |
+| haltiala | spraying | 4 | 0 | 0 | 0 |
+| haltiala | tillage | 11 | 0 | 0 | 0 |
+| qvidja | cut | 6 | 0 | 0 | 0 |
+| qvidja | fertilisation | 9 | 0 | 3 | 1 |
+| qvidja | grazing | 5 | 0 | 0 | 0 |
+| qvidja | harvest | 11 | 11 | 11 | 0 |
+| qvidja | sowing | 1 | 0 | 0 | 0 |
+| qvidja | tillage | 1 | 0 | 0 | 0 |
+| viikki | fertilisation | 7 | 0 | 0 | 7 |
+| viikki | harvest | 6 | 4 | 4 | 0 |
+| viikki | tillage | 5 | 0 | 0 | 0 |
+
+Carbon rows of the management table that match no event (same site, date and type):
+
+| Site | Date | Action | Product | C (g C m-2) |
+|---|---|---|---|---|
+| haltiala | 2024-10-10 | harvest | sunflower, crop crushed and left (tillage) | 0 |
 
 ## Sites
 

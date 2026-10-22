@@ -55,6 +55,21 @@ export interface SiteEvent {
   /** harvest, cut, grazing, fertilisation, sowing, tillage, spraying or other. */
   type: string;
   detail: string;
+  /** Crop, product or animal. null = not given. */
+  crop: string | null;
+  /** Amount of the source, in `amountUnit` (kg/ha, kg/ha fresh, m3/ha, L/ha, animals). */
+  amount: number | null;
+  amountUnit: string | null;
+  /** Dry matter fraction of the amount (0 to 1). */
+  dmFraction: number | null;
+  /** Harvest yield, kg DW/ha. */
+  dryMass: number | null;
+  /** Carbon of the event, g C m-2. */
+  cGm2: number | null;
+  /** N input, kg N/ha. */
+  nKgHa: number | null;
+  /** Area of the field parcel, ha. */
+  areaHa: number | null;
 }
 
 /** Facts about the data that the UI needs: sites, variable units, year range, events. */
@@ -273,6 +288,16 @@ function stringAt(table: Table, column: string, row: number): string {
   return v == null ? '' : String(v);
 }
 
+function numberOrNull(table: Table, column: string, row: number): number | null {
+  const v = table.getChild(column)?.get(row);
+  return v == null ? null : Number(v);
+}
+
+function stringOrNull(table: Table, column: string, row: number): string | null {
+  const v = table.getChild(column)?.get(row);
+  return v == null ? null : String(v);
+}
+
 /** Load the sites, the variable units and the year range. */
 export async function loadMeta(): Promise<Meta> {
   const sitesTable = await query(
@@ -301,7 +326,8 @@ export async function loadMeta(): Promise<Meta> {
   if (neeF) variables.set('nee_f', { ...neeF, description: `${neeF.description} Maktau: MDS gap filling of scripts/calc.ts.` });
 
   const evTable = await query(
-    `SELECT site_id::INTEGER AS site_id, strftime(date, '%Y-%m-%d') AS d, strftime(date_end, '%Y-%m-%d') AS d_end, type, detail
+    `SELECT site_id::INTEGER AS site_id, strftime(date, '%Y-%m-%d') AS d, strftime(date_end, '%Y-%m-%d') AS d_end, type, detail,
+            crop, amount, amount_unit, dm_fraction, dry_mass_kg_ha, c_g_m2, n_kg_ha, area_ha
      FROM 'events.parquet' ORDER BY site_id, date, type`,
   );
   const events: SiteEvent[] = [];
@@ -313,6 +339,14 @@ export async function loadMeta(): Promise<Meta> {
       dateEnd: dEnd === '' ? null : dEnd,
       type: stringAt(evTable, 'type', i),
       detail: stringAt(evTable, 'detail', i),
+      crop: stringOrNull(evTable, 'crop', i),
+      amount: numberOrNull(evTable, 'amount', i),
+      amountUnit: stringOrNull(evTable, 'amount_unit', i),
+      dmFraction: numberOrNull(evTable, 'dm_fraction', i),
+      dryMass: numberOrNull(evTable, 'dry_mass_kg_ha', i),
+      cGm2: numberOrNull(evTable, 'c_g_m2', i),
+      nKgHa: numberOrNull(evTable, 'n_kg_ha', i),
+      areaHa: numberOrNull(evTable, 'area_ha', i),
     });
   }
 

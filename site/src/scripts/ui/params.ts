@@ -4,6 +4,7 @@ import type { Meta } from '../db';
 import { siteEmoji } from '../sites';
 import { MONTH_NAMES } from '../diagrams/common';
 import { GLOSSARY, citeShort } from '../glossary';
+import { eventsSummary } from '../events';
 import {
   AGGREGATION_LABELS,
   AGGREGATIONS,
@@ -30,30 +31,21 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
 }
 
 /**
- * One variable: the checkbox label, an info button and the summary text (hidden at start).
+ * One checkbox with an info button and an info panel (hidden at start) on its own line below.
  * The button is not in the label, thus a click on it does not change the checkbox.
  * A button has no "change" event and FormData ignores it, thus the form does not see the click.
  */
-function variableItem(v: Variable, label: HTMLLabelElement): HTMLDivElement {
+function infoItem(label: HTMLLabelElement, id: string, ariaLabel: string, info: HTMLElement): HTMLDivElement {
   const item = el('div', 'var-item');
-  const id = `var-info-${v}`;
-  const entry = GLOSSARY[v];
-
   const btn = el('button', 'var-info-btn', 'ⓘ');
   btn.type = 'button';
   btn.setAttribute('aria-expanded', 'false');
   btn.setAttribute('aria-controls', id);
-  btn.setAttribute('aria-label', `About ${VARIABLE_LABELS[v]}`);
+  btn.setAttribute('aria-label', ariaLabel);
 
-  const info = el('p', 'var-info');
+  info.classList.add('var-info');
   info.id = id;
   info.hidden = true;
-  info.append(document.createTextNode(entry.summary));
-  const cite = citeShort(entry.sources);
-  if (cite) info.append(' ', el('span', 'var-cite', cite));
-  const more = el('a', 'var-more', 'All terms');
-  more.href = `${BASE}variables/#var-${v}`;
-  info.append(' ', more);
 
   btn.addEventListener('click', () => {
     info.hidden = !info.hidden;
@@ -62,6 +54,40 @@ function variableItem(v: Variable, label: HTMLLabelElement): HTMLDivElement {
 
   item.append(label, btn, info);
   return item;
+}
+
+/** One variable: the checkbox label, an info button and the summary text with the sources. */
+function variableItem(v: Variable, label: HTMLLabelElement): HTMLDivElement {
+  const entry = GLOSSARY[v];
+  const info = el('p');
+  info.append(document.createTextNode(entry.summary));
+  const cite = citeShort(entry.sources);
+  if (cite) info.append(' ', el('span', 'var-cite', cite));
+  const more = el('a', 'var-more', 'All terms');
+  more.href = `${BASE}variables/#var-${v}`;
+  info.append(' ', more);
+  return infoItem(label, `var-info-${v}`, `About ${VARIABLE_LABELS[v]}`, info);
+}
+
+/** The Events checkbox with an info panel: one line per site with events (what data the site has). */
+function eventsItem(meta: Meta, label: HTMLLabelElement): HTMLDivElement {
+  const info = el('div', 'events-info');
+  info.append(el('p', undefined, 'Management events from the field records of the sites. Numbers in brackets = events with that value.'));
+  const list = el('ul', 'events-sites');
+  for (const { siteId, text } of eventsSummary(meta)) {
+    const site = meta.sites.find((s) => s.siteId === siteId);
+    if (!site) continue;
+    const li = el('li');
+    li.dataset.site = site.code;
+    const icon = el('span', 'check-emoji', siteEmoji(site.code));
+    icon.setAttribute('aria-hidden', 'true');
+    li.append(icon, el('b', undefined, site.name), document.createTextNode(`: ${text}`));
+    list.append(li);
+  }
+  const more = el('a', 'var-more', 'All events');
+  more.href = `${BASE}events/`;
+  info.append(list, more);
+  return infoItem(label, 'var-info-events', 'About the events', info);
 }
 
 function checkbox(name: string, value: string, label: string, checked: boolean, emoji = '', hint = ''): HTMLLabelElement {
@@ -197,7 +223,9 @@ export class ParamsForm {
     vars.append(el('legend', undefined, 'Variables'), varGroups);
     for (const group of VARIABLE_GROUPS) varGroups.append(this.variableGroup(group.label, group.variables, params.variables));
     const events = el('div', 'var-events');
-    events.append(checkbox('events', 'on', 'Events', params.events, '', 'Management events (harvest, sowing, ...) as markers'));
+    events.append(
+      eventsItem(meta, checkbox('events', 'on', 'Events', params.events, '', 'Management events (harvest, sowing, ...) as markers, with yield, N and carbon')),
+    );
     events.append(checkbox('emojis', 'on', 'Site emojis', params.emojis, '', 'Emoji before the site name in the charts and the alt text'));
     events.append(
       checkbox('fixedY', 'on', 'Fixed y range (all data)', params.fixedY, '', 'Same y range for each export: the minimum and maximum of all sites and years'),

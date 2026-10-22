@@ -1,0 +1,138 @@
+---
+// Text page "Events": the field management events of each site with the numbers of the source
+// (amount, DM fraction, yield, carbon, N input, parcel area). Data: site/src/data/events.json
+// (written by npm run site:sync from db/events.parquet). Only sites with events are listed. No client script.
+import '../styles/events.css';
+import Base from '../layouts/Base.astro';
+import AiNotice from '../components/AiNotice.astro';
+import EVENTS_JSON from '../data/events.json';
+import { siteEmoji } from '../scripts/sites';
+import { eventLabel, factNumber } from '../scripts/events';
+
+interface EventJson {
+  site_code: string;
+  site_name: string;
+  date: string;
+  date_end: string | null;
+  type: string;
+  crop: string | null;
+  amount: number | null;
+  amount_unit: string | null;
+  dm_fraction: number | null;
+  dry_mass_kg_ha: number | null;
+  c_g_m2: number | null;
+  n_kg_ha: number | null;
+  area_ha: number | null;
+  detail: string;
+  source: string;
+}
+
+const events = EVENTS_JSON as EventJson[];
+const sites = [...new Map(events.map((e) => [e.site_code, e.site_name])).entries()].map(([code, name]) => {
+  const list = events.filter((e) => e.site_code === code);
+  const years = list.map((e) => Number(e.date.slice(0, 4)));
+  return { code, name, list, y0: Math.min(...years), y1: Math.max(...years) };
+});
+
+const num = (x: number | null) => (x === null ? '' : factNumber(x));
+const dm = (x: number | null) => (x === null ? '' : String(Math.round(x * 1000) / 1000));
+const amount = (e: EventJson) => (e.amount === null ? '' : `${factNumber(e.amount)} ${e.amount_unit === 'm3/ha' ? 'm³/ha' : e.amount_unit}`);
+/** File name of each source, without the folder. A note in brackets stays. */
+const sourceText = (s: string) => s.split('; ').map((p) => p.replace(/^data\/[^ ]*\//, '')).join('; ');
+const count = (list: EventJson[], f: (e: EventJson) => boolean) => list.filter(f).length;
+---
+
+<Base
+  title="Events – INAR agri"
+  description="Field management events of the INAR agri sites: harvest yield, carbon, N input and other numbers from the management files."
+>
+  <main class="prose events-page">
+    <header>
+      <h1>Events</h1>
+      <AiNotice subject="the event table (typed by hand from the management files) and the text" />
+      <p class="lead">
+        This page lists the field management events of the sites: harvest, cut, grazing, fertilisation, sowing, tillage
+        and spraying. On the <a href={import.meta.env.BASE_URL}>data page</a>, the option "Events" shows them as markers
+        in the charts. Only {sites.map((s) => s.name).join(', ').replace(/, ([^,]*)$/, ' and $1')} have dated events.
+        Maktau has seasonal practice only, Anttila and Särkisuo have no management data.
+      </p>
+    </header>
+
+    <nav class="toc" aria-labelledby="toc-title">
+      <h2 id="toc-title">Contents</h2>
+      <ol>
+        <li><a href="#columns">Columns</a></li>
+        {sites.map((s) => <li><a href={`#site-${s.code}`}>{s.name}</a></li>)}
+      </ol>
+    </nav>
+
+    <section aria-labelledby="columns">
+      <h2 id="columns">Columns</h2>
+      <dl class="facts">
+        <div><dt>Amount</dt><dd>Amount of the product, seed or manure as in the source. "kg/ha fresh" is fresh mass (Qvidja). For grazing: the number of animals.</dd></div>
+        <div><dt>DM</dt><dd>Dry matter fraction of the amount (0 to 1).</dd></div>
+        <div><dt>Yield</dt><dd>Harvest yield in kg dry weight per ha. Qvidja: fresh mass × DM fraction (2018-06-12: the value of Heimsch et al. 2021). Viikki: the yield of the year, on the last harvest of the year.</dd></div>
+        <div><dt>C</dt><dd>Carbon of the harvest (export) or of the organic fertiliser (input) in g C m⁻². Yield × carbon fraction: Qvidja 0.42, Haltiala 0.50, Viikki 0.42 (assumed). Qvidja molasses: paper values. The same values go into the NECB on the <a href={`${import.meta.env.BASE_URL}calculated/`}>Calculated</a> page.</dd></div>
+        <div><dt>N</dt><dd>N input in kg N per ha. Viikki and Haltiala 2025: the source value. Yara AXAN 27-0-1 and NPK 23-10-8: 27 % and 23 % of the product mass (the grade in the product name).</dd></div>
+        <div><dt>Parcel</dt><dd>Area of the field parcel (kasvulohko) of the Qvidja event, in ha.</dd></div>
+      </dl>
+      <p>An empty cell means that the source gives no value.</p>
+    </section>
+
+    {
+      sites.map((s) => (
+        <section aria-labelledby={`site-${s.code}`} class="site-events">
+          <h2 id={`site-${s.code}`}>
+            <span aria-hidden="true">{siteEmoji(s.code)} </span>
+            {s.name}
+          </h2>
+          <p>
+            {s.y0 === s.y1 ? s.y0 : `${s.y0} to ${s.y1}`}: {s.list.length} events. With yield:{' '}
+            {count(s.list, (e) => e.dry_mass_kg_ha !== null)}, with carbon: {count(s.list, (e) => e.c_g_m2 !== null)}, with N
+            input: {count(s.list, (e) => e.n_kg_ha !== null)}.
+          </p>
+          <div class="table-wrap">
+            <table class="events-table" data-site={s.code}>
+              <caption>Management events at {s.name}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Crop or product</th>
+                  <th scope="col" class="num">Amount</th>
+                  <th scope="col" class="num">DM</th>
+                  <th scope="col" class="num">Yield (kg DW ha⁻¹)</th>
+                  <th scope="col" class="num">C (g C m⁻²)</th>
+                  <th scope="col" class="num">N (kg N ha⁻¹)</th>
+                  <th scope="col" class="num">Parcel (ha)</th>
+                  <th scope="col">Detail</th>
+                  <th scope="col">Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                {s.list.map((e) => (
+                  <tr data-type={e.type}>
+                    <td class="nowrap">
+                      {e.date}
+                      {e.date_end && <span class="date-end"> to {e.date_end}</span>}
+                    </td>
+                    <td>{eventLabel(e.type)}</td>
+                    <td>{e.crop ?? ''}</td>
+                    <td class="num">{amount(e)}</td>
+                    <td class="num">{dm(e.dm_fraction)}</td>
+                    <td class="num" data-col="yield">{num(e.dry_mass_kg_ha)}</td>
+                    <td class="num">{num(e.c_g_m2)}</td>
+                    <td class="num">{num(e.n_kg_ha)}</td>
+                    <td class="num">{e.area_ha === null ? '' : String(Math.round(e.area_ha * 100) / 100)}</td>
+                    <td class="wrap">{e.detail}</td>
+                    <td class="source">{sourceText(e.source)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))
+    }
+  </main>
+</Base>

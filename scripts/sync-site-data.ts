@@ -8,6 +8,8 @@
 // 3. Small tables of data/calculated/ -> site/src/data/calculated/: the
 //    "Calculated" page reads them at build time. They are not served.
 // 4. Fixed y ranges of all data -> site/src/data/axis-ranges.json (scripts/axis-ranges.ts).
+// 5. db/events.parquet with the site names -> site/src/data/events.json: the
+//    "Events" page reads it at build time.
 // Steps 2 to 4 need npm run calc. Design: docs/calculated.md.
 
 import { copyFile, mkdir, stat } from 'node:fs/promises';
@@ -22,6 +24,7 @@ const CALC_DIR = 'data/calculated';
 const CALC_FLUXES = `${CALC_DIR}/fluxes_30min.parquet`;
 const OUT_FLUXES = `${OUT_DIR}/fluxes.parquet`;
 const PAGE_DATA_DIR = 'site/src/data/calculated';
+const EVENTS_JSON = 'site/src/data/events.json';
 const PAGE_FILES = [
   'annual.csv',
   'necb.csv',
@@ -91,3 +94,19 @@ console.log(`Copied ${PAGE_FILES.length} files ${CALC_DIR} -> ${PAGE_DATA_DIR}`)
 
 // 4. Fixed y ranges. They need fluxes.parquet (gpp, reco, Maktau nee_f), thus they come last.
 await writeAxisRanges();
+
+// 5. Events for the Events page, in the order of the sites
+{
+  const db = await DuckDBInstance.create(':memory:');
+  const conn = await db.connect();
+  await conn.run(`
+    COPY (
+      SELECT e.site_code, s.name AS site_name, strftime(e.date, '%Y-%m-%d') AS date, strftime(e.date_end, '%Y-%m-%d') AS date_end,
+             e.type, e.crop, e.amount, e.amount_unit, e.dm_fraction, e.dry_mass_kg_ha, e.c_g_m2, e.n_kg_ha, e.area_ha, e.detail, e.source
+      FROM read_parquet('${SRC_DIR}/events.parquet') e JOIN read_parquet('${SRC_DIR}/sites.parquet') s USING (site_id)
+      ORDER BY e.site_id, e.date, e.type, e.detail
+    ) TO '${EVENTS_JSON}' (FORMAT json, ARRAY true)`);
+  conn.closeSync();
+  const { size } = await stat(EVENTS_JSON);
+  console.log(`Wrote ${EVENTS_JSON} (${size} bytes)`);
+}

@@ -11,7 +11,8 @@ import { createReadStream } from 'node:fs';
 import { mkdir, stat, writeFile } from 'node:fs/promises';
 import { DuckDBInstance, type DuckDBConnection } from '@duckdb/node-api';
 import * as v from 'valibot';
-import { EVENTS } from './lib/events.ts';
+import { EVENTS, withCarbon } from './lib/events.ts';
+import { MANAGEMENT_CARBON, cGm2 } from './lib/calc/management.ts';
 import { ALL_COLUMNS, REGISTRY, VARIABLES, type CoreColumn } from './lib/registry.ts';
 import { fail, fmt, ident, lit, log, num, numOrNull, one, rows, str, table } from './lib/duck.ts';
 import {
@@ -274,9 +275,17 @@ function renderMarkdown(report: Report): string {
   parts.push('');
   parts.push('## Management events');
   parts.push('');
-  parts.push('Rows of events.parquet per site and type. Source: scripts/lib/events.ts.');
+  parts.push('Rows of events.parquet per site and type, and the rows with a yield (kg DW/ha), carbon (g C m-2) or N input (kg N/ha). Source: scripts/lib/events.ts; carbon from scripts/lib/calc/management.ts.');
   parts.push('');
-  parts.push(table(['Site', 'Type', 'Events'], report.events.map((e) => [e.site, e.type, e.n])));
+  parts.push(table(['Site', 'Type', 'Events', 'With yield', 'With C', 'With N'], report.events.map((e) => [e.site, e.type, e.n, e.withYield, e.withC, e.withN])));
+  parts.push('');
+  parts.push('Carbon rows of the management table that match no event (same site, date and type):');
+  parts.push('');
+  parts.push(
+    report.unmatchedCarbon.length === 0
+      ? 'None.'
+      : table(['Site', 'Date', 'Action', 'Product', 'C (g C m-2)'], report.unmatchedCarbon.map((m) => [m.site, m.date, m.action, m.product, m.cGm2])),
+  );
   parts.push('');
   parts.push('## Sites');
   parts.push('');
@@ -438,7 +447,10 @@ async function main(): Promise<void> {
     t(site_id, site_code, column_name, source_id, source_path, source_columns, expression, factor, zero_is_null, depth_cm, rank, aggregation, note)`);
 
   // Management events (hand-typed table, checked here)
-  const eventIssues = EVENTS.flatMap((e) => {
+  // Carbon per event from the management table of the calculated products (one source).
+  const carbon = withCarbon(EVENTS, MANAGEMENT_CARBON);
+  const unmatchedCarbon = carbon.unmatched;
+  const eventIssues = carbon.events.flatMap((e) => {
     const p = v.safeParse(EventRowSchema, e);
     return p.success ? [] : [`${e.site} ${e.date} ${e.type}: ${p.issues.map((i) => i.message).join('; ')}`];
   });
@@ -446,10 +458,21 @@ async function main(): Promise<void> {
   const siteIdOf = new Map(registry.sites.map((s) => [s.code, s.siteId]));
   await conn.run(`
     CREATE TABLE events AS
-    SELECT site_id::UTINYINT AS site_id, site_code, date::DATE AS date, date_end::DATE AS date_end, type, detail, source
+    SELECT site_id::UTINYINT AS site_id, site_code, date::DATE AS date, date_end::DATE AS date_end, type, detail, source,
+           crop::VARCHAR AS crop, amount::DOUBLE AS amount, amount_unit::VARCHAR AS amount_unit, dm_fraction::DOUBLE AS dm_fraction,
+           dry_mass_kg_ha::DOUBLE AS dry_mass_kg_ha, n_kg_ha::DOUBLE AS n_kg_ha, c_g_m2::DOUBLE AS c_g_m2, area_ha::DOUBLE AS area_ha
     FROM (VALUES
-      ${EVENTS.map((e) => `(${[siteIdOf.get(e.site)!, e.site, e.date, e.date_end ?? null, e.type, e.detail, e.source].map(lit).join(', ')})`).join(',\n')}
-    ) t(site_id, site_code, date, date_end, type, detail, source)
+      ${carbon.events
+        .map(
+          (e) =>
+            `(${[
+              siteIdOf.get(e.site)!, e.site, e.date, e.date_end ?? null, e.type, e.detail, e.source,
+              e.crop ?? null, e.amount ?? null, e.amount_unit ?? null, e.dm_fraction ?? null,
+              e.dry_mass_kg_ha ?? null, e.n_kg_ha ?? null, e.c_g_m2 ?? null, e.area_ha ?? null,
+            ].map(lit).join(', ')})`,
+        )
+        .join(',\n')}
+    ) t(site_id, site_code, date, date_end, type, detail, source, crop, amount, amount_unit, dm_fraction, dry_mass_kg_ha, n_kg_ha, c_g_m2, area_ha)
     ORDER BY site_id, date, type, detail`);
   const dupEvents = await rows(conn, `SELECT site_code, date::VARCHAR AS d, type, count(*) AS n FROM events GROUP BY ALL HAVING count(*) > 1 AND count(DISTINCT detail) < count(*)`);
   if (dupEvents.length > 0) fail(`duplicate event rows: ${dupEvents.map((r) => `${str(r.site_code)} ${str(r.d)} ${str(r.type)}`).join(', ')}`);
@@ -510,11 +533,21 @@ async function main(): Promise<void> {
     duckdb: version,
     node: process.version,
     outputs,
-    events: (await rows(conn, `SELECT site_code, type, count(*) AS n FROM events GROUP BY ALL ORDER BY min(site_id), type`)).map((r) => ({
+    events: (
+      await rows(
+        conn,
+        `SELECT site_code, type, count(*) AS n, count(dry_mass_kg_ha) AS n_yield, count(c_g_m2) AS n_c, count(n_kg_ha) AS n_n
+         FROM events GROUP BY ALL ORDER BY min(site_id), type`,
+      )
+    ).map((r) => ({
       site: str(r.site_code),
       type: str(r.type),
       n: num(r.n),
+      withYield: num(r.n_yield),
+      withC: num(r.n_c),
+      withN: num(r.n_n),
     })),
+    unmatchedCarbon: unmatchedCarbon.map((m) => ({ site: m.site, date: m.date, action: m.action, product: m.product, cGm2: cGm2(m)! })),
     sites,
     sources: sourceReports,
     validation: { rowsChecked: validation.rowsChecked, errors: validation.errors, warningsByColumn },

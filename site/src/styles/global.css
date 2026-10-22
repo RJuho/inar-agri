@@ -540,6 +540,28 @@ select:disabled {
   flex: none;
 }
 
+/* The open events info takes the full row. */
+.var-events > .var-item:has(> .var-info:not([hidden])) {
+  flex-basis: 100%;
+}
+
+.events-info p {
+  margin: 0 0 4px;
+}
+
+.events-sites {
+  margin: 0 0 4px;
+  padding-left: 1.2em;
+}
+
+.events-sites li {
+  margin-bottom: 2px;
+}
+
+.events-sites .check-emoji {
+  margin-right: 4px;
+}
+
 /* ---------- Diagram cards ---------- */
 
 .diagrams {

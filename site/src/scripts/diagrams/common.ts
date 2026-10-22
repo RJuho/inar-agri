@@ -7,6 +7,17 @@ import { toFloat64, type Meta, type Site, type SiteEvent } from '../db';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import { siteEmoji } from '../sites';
+import {
+  EVENT_TYPE_LABELS,
+  eventDateText,
+  eventFacts,
+  eventLabel,
+  eventMarkLabel,
+  eventMarkLabelWidth,
+  eventSymbol,
+  shortDetail,
+  yieldKeyText,
+} from '../events';
 import { CIRCULAR_VARS, SUM_VARS, periodBounds } from './sql';
 import { niceStep } from './nice.ts';
 import type { NiceRange } from '../axisRanges';
@@ -904,37 +915,7 @@ export function yearOpacity(i: number, n: number): number {
 
 // ---- Management events (events.parquet, Meta.events)
 
-/** Label of each event type. */
-export const EVENT_TYPE_LABELS: Record<string, string> = {
-  harvest: 'Harvest',
-  cut: 'Cut',
-  grazing: 'Grazing',
-  fertilisation: 'Fertilisation',
-  sowing: 'Sowing',
-  tillage: 'Tillage',
-  spraying: 'Spraying',
-  other: 'Other',
-};
-
-/** Short marker label of each event type. It is shown at the top of the marker line. */
-export const EVENT_SYMBOLS: Record<string, string> = {
-  harvest: 'H',
-  cut: 'C',
-  grazing: 'G',
-  fertilisation: 'F',
-  sowing: 'Sw',
-  tillage: 'T',
-  spraying: 'Sp',
-  other: 'O',
-};
-
-export const eventLabel = (type: string) => EVENT_TYPE_LABELS[type] ?? type;
-export const eventSymbol = (type: string) => EVENT_SYMBOLS[type] ?? '?';
-
-/** Date text of an event: "2022-06-01" or "2022-06-01 to 2022-06-15". */
-export function eventDateText(e: SiteEvent): string {
-  return e.dateEnd && e.dateEnd !== e.date ? `${e.date} to ${e.dateEnd}` : e.date;
-}
+export { EVENT_SYMBOLS, EVENT_TYPE_LABELS, eventDateText, eventLabel, eventSymbol, shortDetail } from '../events';
 
 /** Epoch ms of 00:00 of a yyyy-mm-dd date, read as UTC. The time axes hold local wall time as UTC. */
 export function dateMs(date: string): number {
@@ -999,20 +980,22 @@ export function refYearMarks(events: SiteEvent[], siteId: number, year: number):
 
 /** Number of label rows. A fourth label in a crowded place goes back to row 0. */
 const LABEL_ROWS = 3;
-/** Smallest distance in px between two labels in the same row. */
-const LABEL_GAP = 13;
+/** Smallest free space in px between two labels in the same row. */
+const LABEL_GAP = 2;
 
 /**
- * Set the label row of each mark, so that labels closer than LABEL_GAP px go to the next row.
+ * Set the label row of each mark, so that labels that would touch go to the next row.
+ * The labels are centred on the marker line; the width comes from the label text (a yield makes it wider).
  * `px` is the number of px per ms of the x axis at full zoom.
  */
 export function setLabelRows(marks: EventMark[], px: number): void {
-  const lastX = Array.from({ length: LABEL_ROWS }, () => -Infinity);
+  const last = Array.from({ length: LABEL_ROWS }, () => ({ x: -Infinity, w: 0 }));
   for (const m of [...marks].sort((a, b) => a.x - b.x)) {
-    let row = lastX.findIndex((x) => (m.x - x) * px >= LABEL_GAP);
+    const w = eventMarkLabelWidth(m.event);
+    let row = last.findIndex((l) => (m.x - l.x) * px >= (w + l.w) / 2 + LABEL_GAP);
     if (row < 0) row = 0;
     m.row = row;
-    lastX[row] = m.x;
+    last[row] = { x: m.x, w };
   }
 }
 
@@ -1049,7 +1032,7 @@ export function eventMarkers(marks: EventMark[], color: string, tokens: Tokens, 
         xAxis: m.x,
         name: `${eventLabel(m.event.type)} ${eventDateText(m.event)}`,
         // Below the top of the panel, one row per 13 px.
-        label: { formatter: eventSymbol(m.event.type), offset: [0, 13 + m.row * 13] },
+        label: { formatter: eventMarkLabel(m.event), offset: [0, 13 + m.row * 13] },
         emphasis: { label: { formatter: `${eventLabel(m.event.type)} ${eventDateText(m.event)}` } },
       })),
     },
@@ -1066,18 +1049,6 @@ export function eventMarkers(marks: EventMark[], color: string, tokens: Tokens, 
   };
 }
 
-/** Short form of an event detail, for the tooltip and the alt text: about `max` characters, cut at a comma. */
-export function shortDetail(detail: string, max = 60): string {
-  if (detail.length <= max) return detail;
-  const parts = detail.split(', ');
-  let out = parts[0] as string;
-  for (const p of parts.slice(1)) {
-    if (out.length + 2 + p.length > max) break;
-    out += `, ${p}`;
-  }
-  return out.length > max + 20 ? `${out.slice(0, max).trimEnd()}…` : `${out}…`;
-}
-
 /** Tooltip lines (HTML) of the events that overlap [from, to). `marks` belong to the sites in `names`. */
 export function eventTooltipLines(
   marks: Array<{ siteId: number; mark: EventMark }>,
@@ -1090,10 +1061,12 @@ export function eventTooltipLines(
     .filter(({ mark }) => mark.x < to && (mark.xEnd ?? mark.x + DAY) > from)
     .map(({ siteId, mark }) => {
       const e = mark.event;
+      const facts = eventFacts(e);
       const color = colors.get(siteId) ?? 'currentColor';
       return (
         `<span style="color:${color}">&#9646;</span> ${esc(names.get(siteId) ?? String(siteId))} · ${esc(eventDateText(e))} · ` +
-        `<b>${esc(eventLabel(e.type))}</b> · ${esc(shortDetail(e.detail))}`
+        `<b>${esc(eventLabel(e.type))}</b> · ${esc(shortDetail(e.detail, 100))}` +
+        (facts.length ? `<br/><span style="margin-left:1.2em">${esc(facts.join(' · '))}</span>` : '')
       );
     });
   return rows.length ? `<br/>${rows.join('<br/>')}` : '';
@@ -1107,7 +1080,8 @@ export function eventsKeyText(meta: Meta, params: ViewParams): string {
   const multi = events.some((e) => e.dateEnd !== null && e.dateEnd !== e.date);
   return (
     `Event markers (dashed lines): ${types.map((t) => `${eventSymbol(t)} ${eventLabel(t).toLowerCase()}`).join(', ')}.` +
-    (multi ? ' A light band shows a multi-day event.' : '')
+    (multi ? ' A light band shows a multi-day event.' : '') +
+    yieldKeyText(events)
   );
 }
 

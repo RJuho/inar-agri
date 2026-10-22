@@ -168,6 +168,28 @@ export interface ChangeLogEntry {
 /** Newest entry first. */
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    id: 'change-2026-10-22-event-details',
+    date: '2026-10-22',
+    title: 'Management events with yield, carbon, N input and parcel area',
+    site: 'Haltiala, Qvidja, Viikki',
+    variable: 'events',
+    findings: [],
+    summary: [
+      'The management events now have the numbers of the source files as columns: crop or product, amount and unit, DM fraction, harvest yield (kg DW/ha), N input (kg N/ha), carbon (g C m⁻²) and the parcel area (Qvidja). Before, these numbers were only in the free text.',
+      'The carbon values come from the same table as the NECB of the Calculated page. The charts show the yield on the harvest marker (for example `H 3.7 t`) and the numbers in the tooltip and the alt text. The new Events page lists all events per site.',
+    ],
+    facts: [
+      { term: 'Sources', value: '`haltiala_smear_management.xlsx`, `Qvidja_management.xlsx`, Heimsch et al. 2021 Table 1, Viikki `Management Information.docx`.' },
+      { term: 'Derived values', value: 'Qvidja yield = fresh mass × DM fraction. N of Yara AXAN 27-0-1 and NPK 23-10-8 = 27 % and 23 % of the product mass. Viikki: the yield of the year is on the last harvest of the year.' },
+      { term: 'Code', value: '`scripts/lib/events.ts` (`withCarbon()`), `scripts/lib/schemas.ts` (`EventRowSchema`), `site/src/scripts/events.ts`.' },
+    ],
+    formulas: [],
+    tables: [],
+    openPoints: [],
+    openQuestions: [],
+    doc: 'docs/harmonised-database.md',
+  },
+  {
     id: 'change-2026-10-22-qvidja-swc',
     date: '2026-10-22',
     title: 'Qvidja soil water content converted from sensor volts to m³ m⁻³',

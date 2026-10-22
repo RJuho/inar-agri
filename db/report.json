@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-10-22T06:08:36.713Z",
+  "builtAt": "2026-10-22T08:03:46.675Z",
   "duckdb": "v1.5.6",
   "node": "v26.10.0",
   "outputs": [
@@ -26,84 +26,138 @@
     {
       "file": "db/events.parquet",
       "rows": 83,
-      "bytes": 3978
+      "bytes": 6662
     }
   ],
   "events": [
     {
       "site": "haltiala",
       "type": "fertilisation",
-      "n": 6
+      "n": 6,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 2
     },
     {
       "site": "haltiala",
       "type": "harvest",
-      "n": 4
+      "n": 4,
+      "withYield": 3,
+      "withC": 3,
+      "withN": 0
     },
     {
       "site": "haltiala",
       "type": "other",
-      "n": 1
+      "n": 1,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "haltiala",
       "type": "sowing",
-      "n": 6
+      "n": 6,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "haltiala",
       "type": "spraying",
-      "n": 4
+      "n": 4,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "haltiala",
       "type": "tillage",
-      "n": 11
+      "n": 11,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "qvidja",
       "type": "cut",
-      "n": 6
+      "n": 6,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "qvidja",
       "type": "fertilisation",
-      "n": 9
+      "n": 9,
+      "withYield": 0,
+      "withC": 3,
+      "withN": 1
     },
     {
       "site": "qvidja",
       "type": "grazing",
-      "n": 5
+      "n": 5,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "qvidja",
       "type": "harvest",
-      "n": 11
+      "n": 11,
+      "withYield": 11,
+      "withC": 11,
+      "withN": 0
     },
     {
       "site": "qvidja",
       "type": "sowing",
-      "n": 1
+      "n": 1,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "qvidja",
       "type": "tillage",
-      "n": 1
+      "n": 1,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
     },
     {
       "site": "viikki",
       "type": "fertilisation",
-      "n": 7
+      "n": 7,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 7
     },
     {
       "site": "viikki",
       "type": "harvest",
-      "n": 6
+      "n": 6,
+      "withYield": 4,
+      "withC": 4,
+      "withN": 0
     },
     {
       "site": "viikki",
       "type": "tillage",
-      "n": 5
+      "n": 5,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
+    }
+  ],
+  "unmatchedCarbon": [
+    {
+      "site": "haltiala",
+      "date": "2024-10-10",
+      "action": "harvest",
+      "product": "sunflower, crop crushed and left (tillage)",
+      "cGm2": 0
     }
   ],
   "sites": [

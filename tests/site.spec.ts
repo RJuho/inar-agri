@@ -149,8 +149,9 @@ test.describe('first page', () => {
   });
 
   test('variable info toggle shows the summary', async ({ page }) => {
-    // One info button per variable (24 variables in state.ts).
-    await expect(page.locator('.var-info-btn')).toHaveCount(24);
+    // One info button per variable (24 variables in state.ts), plus one for the Events option.
+    await expect(page.locator('.var-info-btn[aria-controls^="var-info-"]:not([aria-controls="var-info-events"])')).toHaveCount(24);
+    await expect(page.locator('.var-info-btn')).toHaveCount(25);
     const box = page.locator('input[name="variable"][value="nee"]');
     const checked = await box.isChecked();
     const btn = page.locator('button.var-info-btn[aria-controls="var-info-nee"]');
@@ -1546,8 +1547,27 @@ test.describe('data report page', () => {
   });
 });
 
+// ---------- Events page ----------
+
+test.describe('events page', () => {
+  test('shows one table per site with events, with yields', async ({ page, baseURL }) => {
+    const errors = trackErrors(page);
+    const foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+    await page.goto('/events/');
+    await expect(page.locator('h1')).toHaveText('Events');
+    const sites = await page.locator('table.events-table').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.site));
+    expect(sites).toEqual(['haltiala', 'qvidja', 'viikki']);
+    // Viikki 2022: yield of the year 3673 kg DW/ha on the second cut.
+    await expect(page.locator('table[data-site="viikki"] tr[data-type="harvest"] td[data-col="yield"]', { hasText: '3673' })).toHaveCount(1);
+    await expect(page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Events' })).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('script')).toHaveCount(0);
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+});
+
 test.describe('AI notice', () => {
-  for (const path of ['/calculated/', '/variables/', '/data-report/']) {
+  for (const path of ['/calculated/', '/variables/', '/events/', '/data-report/']) {
     test(`${path} shows the AI notice below the h1`, async ({ page, baseURL }) => {
       const foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
       await page.goto(path);
@@ -1676,6 +1696,35 @@ test.describe('month range and events', () => {
     await page.goto('/' + viewHash(periodView('p5', { events: true })));
     await waitReady(page);
     await expect(page.locator('input[name="events"]')).toBeChecked();
+  });
+
+  test('the events info lists only the sites with events', async ({ page }) => {
+    await page.goto('/' + viewHash(periodView('p9', {})));
+    await waitReady(page);
+    const btn = page.getByRole('button', { name: 'About the events' });
+    await expect(btn).toHaveAttribute('aria-expanded', 'false');
+    await btn.click();
+    await expect(btn).toHaveAttribute('aria-expanded', 'true');
+    const info = page.locator('#var-info-events');
+    await expect(info).toBeVisible();
+    const codes = await info.locator('li[data-site]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.site));
+    expect(codes.sort()).toEqual(['haltiala', 'qvidja', 'viikki']);
+    await expect(info.locator('li[data-site="qvidja"]')).toContainText('yield');
+    await expect(info.getByRole('link', { name: 'All events' })).toHaveAttribute('href', /\/events\/$/);
+    // The button does not change the checkbox.
+    await expect(page.locator('input[name="events"]')).not.toBeChecked();
+  });
+
+  test('a harvest marker label shows the yield', async ({ page }) => {
+    // Qvidja 2022: silage harvest on 2022-06-21, 868 kg DW/ha.
+    await page.goto('/' + viewHash(periodView('p10', { sites: [4], events: true })));
+    await waitReady(page);
+    const labels = await page.locator('.diagram-chart').first().evaluate((el) => {
+      type Mark = { label?: { formatter?: string } };
+      const c = (el as unknown as { __chart: { getOption(): { series: Array<{ markLine?: { data?: Mark[] } }> } } }).__chart;
+      return c.getOption().series.flatMap((s) => (s.markLine?.data ?? []).map((d) => d.label?.formatter ?? ''));
+    });
+    expect(labels).toContain('H 0.9 t');
   });
 
   test('data file name has the months only when they are set', async ({ page }) => {

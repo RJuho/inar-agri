@@ -21,6 +21,7 @@ import {
   X_NAME_TITLE_ID,
   yearsText,
 } from './diagrams/common';
+import { eventFacts, yieldKeyText } from './events';
 
 /** Statistics of one variable at one site, from all 30-minute values in the view range. */
 export interface SiteStats {
@@ -188,13 +189,13 @@ export function eventsText(params: ViewParams, meta: Meta, markers: boolean): st
   if (markers) {
     const types = [...new Set(events.map((e) => e.type))];
     out.push(
-      `Dashed vertical lines in the site colour mark the management events, labelled ${listText(types.map((t) => `${eventSymbol(t)} (${eventLabel(t).toLowerCase()})`))}.`,
+      `Dashed vertical lines in the site colour mark the management events, labelled ${listText(types.map((t) => `${eventSymbol(t)} (${eventLabel(t).toLowerCase()})`))}.${yieldKeyText(events)}`,
     );
   }
   for (const site of meta.sites) {
     const list = events.filter((e) => e.siteId === site.siteId);
     if (list.length === 0) continue;
-    const parts = list.map((e) => `${eventLabel(e.type).toLowerCase()} ${eventDateText(e)} (${shortDetail(e.detail)})`);
+    const parts = list.map((e) => `${eventLabel(e.type).toLowerCase()} ${eventDateText(e)} (${[shortDetail(e.detail), ...eventFacts(e)].join(', ')})`);
     out.push(`Management events at ${siteLabel(site, params)} (${list.length}): ${parts.join('; ')}.`);
   }
   const without = meta.sites.filter((s) => params.sites.includes(s.siteId) && !events.some((e) => e.siteId === s.siteId));
