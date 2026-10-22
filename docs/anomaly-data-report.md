@@ -1,11 +1,11 @@
 # Anomaly report: site variables (scan of 2026-10-21)
 
-Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
+Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Update 2026-10-22: QVI-01 resolved; the Qvidja `swc` is now converted from volts to m³ m⁻³ (the numbers of QVI-02 and QVI-03 are raw `SM` values in V). Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
 
 ## Summary
 
 - Time axis (S1): the raw time stamps of Anttila, Särkisuo and Viikki are UTC and mark the period start. The build reads them as UTC+2. All data of these three sites sits 2 hours early on the website, in `ts_start` and in the data export. The daily radiation peak is at local hour 10, not 12 (ANT-01, SAR-01, VII-01).
-- Qvidja `swc` (S1, known): `SM` is probably the ML3 sensor output in volts, not m³ m⁻³ (QVI-01, `docs/qvidja-soil-moisture.md`).
+- Qvidja `swc` (S1, resolved 2026-10-22): `SM` is the ML3 sensor output in volts (provider confirmed). The build converts it to m³ m⁻³ with the ML3 manual polynomial for mineral soil (QVI-01, `docs/qvidja-soil-moisture.md`).
 - Qvidja end of 2025 (S2, new): from 2025-11-01 the soil probes follow the air temperature and the net radiation is positive at night, to about 2025-12-22. `sw_out` is missing from 2025-10-26 to 2025-12-28 (QVI-12).
 - Qvidja NEE (S2, open): the annual NEE sums of the file are 25 to 109 g C m-2 more negative than Heimsch 2024 Table 1. The file is probably a different processing version (QVI-11). Qvidja GPP and Reco come from a daytime method and do not close with NEE (QVI-07).
 - Viikki N2O (S1 if wrong, open): the header unit `ug m-2 s-1` can be µg N2O or µg N2O-N. The build assumes µg N2O. The 2022 sum is 16.8 kg N2O ha-1 after 108 kg N ha-1 (VII-06).
@@ -497,18 +497,18 @@ Annual NEE sums (not flagged): `annual.csv` and the raw file agree. `NEE_F` sums
 
 File: `data/Qvidja/Qvidja_2018-2025.csv` (`TIMESTAMP_START` `YYYYMMDDHHMM` in UTC+2, missing = empty, every 2018 to 2023 row twice; read with `DISTINCT ON (TIMESTAMP_START)`: 134 108 rows).
 
-#### QVI-01 swc: `SM` is probably the ML3 sensor output in volts, not m³ m⁻³
+#### QVI-01 swc: `SM` is the ML3 sensor output in volts, not m³ m⁻³ (resolved 2026-10-22)
 
 - Source: `swc` ← `Qvidja_2018-2025.csv`, `SM`
 - Period: whole file (2018-05-09 to 2025-12-31)
 - Observed: 124 023 values, 612 distinct, 0.369 to 0.98; median 0.777; 445 periods above 0.97.
-- Expected: 0.16 to 0.55 m³ m⁻³ (Heimsch 2021 p. 6). The linear Delta-T conversion gives back the published growing-season means within 0.006 (`docs/qvidja-soil-moisture.md`).
+- Expected: 0.16 to 0.55 m³ m⁻³ (Heimsch 2021 p. 6). The ML3 polynomial for mineral soil (ML3 manual p. 22) gives back the published growing-season means within 0.011 (`docs/qvidja-soil-moisture.md`).
 - Raw rows: in the raw file. See `docs/qvidja-soil-moisture.md`.
 - Control: the other sites have `swc` 0.03 to 0.80.
 - Probable cause: unit or scale problem. Alternative tested (a very wet clay loam in m³ m⁻³): 86.5 % of the values are above 0.55, the published site maximum, and 95.3 % above 0.50, the porosity of a clay loam. A volumetric reading cannot give this.
-- Status / Severity: known (`docs/qvidja-soil-moisture.md`, question sent to the provider) / S1
-- Effect: all Qvidja `swc` values on the website and in the export are in the wrong unit. `calc.ts` does not use `swc`.
-- Next action: wait for the provider. Do not correct before the answer.
+- Status / Severity: resolved 2026-10-22. The provider (Mika Korkiakoski) confirmed that `SM` is "raw". `scripts/lib/ml3.ts` converts it in the build: `swc` is now 0.137 to 0.557 m³ m⁻³ (median 0.356), 0 values out of range / S1
+- Effect: until the build of 2026-10-22, all Qvidja `swc` values on the website and in the export were in volts. `calc.ts` does not use `swc`.
+- Next action: none. Run `npm run site:sync` to update the website data.
 - Verify: see `docs/qvidja-soil-moisture.md`, section Reproduce.
 
 #### QVI-02 swc: sensor ceiling 0.98 in wet periods and flat runs
@@ -521,7 +521,7 @@ File: `data/Qvidja/Qvidja_2018-2025.csv` (`TIMESTAMP_START` `YYYYMMDDHHMM` in UT
 - Control: the Parquet runs are the same as in the raw file. Särkisuo (peat) `swc` also sits at 0.80 for days in winter.
 - Probable cause: sensor fault (output ceiling) on top of QVI-01. The flat runs are a saturated wet soil with a 0.001 to 0.01 resolution.
 - Status / Severity: verified / S4
-- Effect: after a unit conversion the ceiling becomes a flat maximum (about 0.46 m³ m⁻³ with the linear formula). No effect on `calc.ts`.
+- Effect: after the unit conversion (2026-10-22) the ceiling is a flat maximum of 0.557 m³ m⁻³ (ML3 polynomial). No effect on `calc.ts`.
 - Next action: document only. Ask the provider together with QVI-01 whether 0.98 is the sensor maximum.
 - Verify:
   ```sql
@@ -542,7 +542,7 @@ File: `data/Qvidja/Qvidja_2018-2025.csv` (`TIMESTAMP_START` `YYYYMMDDHHMM` in UT
 - Next action: document only (a rule could set `swc` to NULL where `tsoil` < 0 at the mineral sites).
 - Verify:
   ```sql
-  SELECT round(median(swc) FILTER (WHERE tsoil <= 0),3) frozen, round(median(swc) FILTER (WHERE tsoil > 0.5),3) thawed FROM 'db/observations.parquet' WHERE site_id=4 AND ts_start BETWEEN '2023-12-01' AND '2024-04-30';  -- 0.567, 0.746 (the thaw is in April; a window to 2024-04-01 gives no thawed value)
+  SELECT round(median(swc) FILTER (WHERE tsoil <= 0),3) frozen, round(median(swc) FILTER (WHERE tsoil > 0.5),3) thawed FROM 'db/observations.parquet' WHERE site_id=4 AND ts_start BETWEEN '2023-12-01' AND '2024-04-30';  -- in m³ m⁻³ since 2026-10-22: 0.227, 0.335 (in V before: 0.567, 0.746; the thaw is in April; a window to 2024-04-01 gives no thawed value)
   ```
 
 #### QVI-04 rh, vpd: dry bias before 2021-10-08, and a faulty sensor in January to June 2021
@@ -1090,7 +1090,7 @@ Night gaps of `nee` at Haltiala, Qvidja and Viikki (night coverage 1 to 41 % aga
 
 | Item | Site | Status | Where it is handled or documented |
 |---|---|---|---|
-| `SM` unit (volts, not m³ m⁻³) | Qvidja | known, open | `docs/qvidja-soil-moisture.md`; QVI-01 |
+| `SM` unit (volts, not m³ m⁻³) | Qvidja | resolved 2026-10-22, converted in the build | `scripts/lib/ml3.ts`; `docs/qvidja-soil-moisture.md`; QVI-01 |
 | `swc` drops in frozen soil | Qvidja | known | Heimsch 2021 p. 6; `docs/qvidja-soil-moisture.md`, Sensor notes; QVI-03 |
 | RH source change 2021-10-08, Kaarina RH 2018 to 2021 | Qvidja | known (article) | Heimsch 2024 p. 4; QVI-04 |
 | `vpd` below 0 in 2 018 rows | Qvidja | known | `docs/harmonised-database.md`, Known range warnings; QVI-05 |
@@ -1214,7 +1214,7 @@ Haltiala provider:
 
 FMI (Qvidja, Mika Korkiakoski):
 
-7. Is `SM` the ML3 ThetaProbe output in volts, not m³ m⁻³, and is 0.98 the sensor maximum? See the five questions in `docs/qvidja-soil-moisture.md`. (QVI-01, QVI-02)
+7. Answered 2026-10-22: `SM` is the raw ML3 output (V). Still open: is 0.98 V the sensor maximum, and is there a soil-specific calibration for Qvidja? (QVI-01, QVI-02)
 8. Which processing version is `Qvidja_2018-2025.csv`: the Heimsch 2024 XGBoost version, or the Vira 2025 reprocessing? The annual NEE sums are 25 to 109 g C m-2 more negative than Heimsch 2024 Table 1. (QVI-11)
 9. What happened on 2025-11-01? Are `TS_1` to `TS_3` and `NETRAD` valid after that date, and why is `SW_OUT` missing from 2025-10-26 to 2025-12-28? (QVI-12)
 10. Is `RH_F` from 2018-05 to 2021-10 the Kaarina series or the faulty on-site sensor? Why is 2021-01 to 2021-06 flagged as measured (`RH_F_QC` = 0) with RH below 30 % at −5 to −20 °C? (QVI-04)

@@ -110,17 +110,28 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
   }
 
   // Column expression with the zero rule applied.
-  const colExpr = (m: ColumnMap): string => (m.zeroIsNull ? `nullif(${m.expr}, 0)` : m.expr);
+  const zeroExpr = (m: ColumnMap): string => (m.zeroIsNull ? `nullif(${m.expr}, 0)` : m.expr);
+  // Then the range rule: a value outside `validRange` becomes NULL.
+  const colExpr = (m: ColumnMap): string => {
+    if (!m.validRange) return zeroExpr(m);
+    const [lo, hi] = m.validRange;
+    return `CASE WHEN (${zeroExpr(m)}) BETWEEN ${lo} AND ${hi} THEN (${zeroExpr(m)}) END`;
+  };
 
   // The expressions are computed in a subquery first. Then an expression can use a
   // window function (for example a daily rule), which is not allowed inside count().
-  const exprSql = maps.flatMap(([c, m]) => [`${colExpr(m)} AS ${ident(`ev_${c}`)}`, `${m.expr} AS ${ident(`ee_${c}`)}`]);
+  const exprSql = maps.flatMap(([c, m]) => [
+    `${colExpr(m)} AS ${ident(`ev_${c}`)}`,
+    `${m.expr} AS ${ident(`ee_${c}`)}`,
+    `${zeroExpr(m)} AS ${ident(`ez_${c}`)}`,
+  ]);
   const statSql = maps.flatMap(([c, m]) => {
     const first = m.sourceColumns[0]!;
     return [
       `count(${ident(`ev_${c}`)}) AS ${ident(`nv_${c}`)}`,
       `count(*) FILTER (WHERE ${ident(first)} IS NOT NULL AND num(${ident(first)}) IS NULL) AS ${ident(`ns_${c}`)}`,
       m.zeroIsNull ? `count(*) FILTER (WHERE ${ident(`ee_${c}`)} = 0) AS ${ident(`nz_${c}`)}` : `0 AS ${ident(`nz_${c}`)}`,
+      `count(${ident(`ez_${c}`)}) - count(${ident(`ev_${c}`)}) AS ${ident(`nr_${c}`)}`,
     ];
   });
   const s = await one(
@@ -160,6 +171,7 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
       n_valid: num(s[`nv_${c}`]),
       n_sentinel: num(s[`ns_${c}`]),
       n_zero_nulled: num(s[`nz_${c}`]),
+      n_range_nulled: num(s[`nr_${c}`]),
       factor: m.factor ?? null,
     };
   }
@@ -318,12 +330,12 @@ function renderMarkdown(report: Report): string {
     ),
   );
   parts.push('');
-  parts.push('Per source column: valid values, sentinel values set to NULL (-9999, NA, inf), exact zeros set to NULL, factor applied.');
+  parts.push('Per source column: valid values, sentinel values set to NULL (-9999, NA, inf), exact zeros set to NULL, values outside the valid range set to NULL, factor applied.');
   parts.push('');
   parts.push(
     table(
-      ['Source', 'Column', 'Valid', 'Sentinels', 'Zeros nulled', 'Factor'],
-      report.sources.flatMap((s) => Object.entries(s.columns).map(([c, cs]) => [s.id, c, cs.n_valid, cs.n_sentinel, cs.n_zero_nulled, cs.factor === null ? '' : String(cs.factor)])),
+      ['Source', 'Column', 'Valid', 'Sentinels', 'Zeros nulled', 'Out of range', 'Factor'],
+      report.sources.flatMap((s) => Object.entries(s.columns).map(([c, cs]) => [s.id, c, cs.n_valid, cs.n_sentinel, cs.n_zero_nulled, cs.n_range_nulled, cs.factor === null ? '' : String(cs.factor)])),
     ),
   );
   parts.push('');

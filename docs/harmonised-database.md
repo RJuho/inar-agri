@@ -88,12 +88,13 @@ The Finnish files use UTC+2 all year (no daylight saving time). All sources stam
 |---|---|---|---|---|---|---|
 | Anttila, Särkisuo | `co2_flux_final_gf_ensemble` where `co2_flux_final_gap` = 0 | `co2_flux_final_gf_ensemble` | `co2_flux_final_gap` | `TA_1_1_1` | `TS_1_1_1` (not known) | `SWC_1_1_1` (not known) |
 | Haltiala | `NEE` | `NEE_F` | 0 where `NEE` has a value, else 1 | `TA_F` | `TS_010_F` (10) | `SWC_010_F` (10) |
-| Qvidja | `NEE` where `NEE_QC` = 0 | `NEE` | `NEE_QC` | `TA_F` | `TS_1` (5) | `SM` (10) |
+| Qvidja | `NEE` where `NEE_QC` = 0 | `NEE` | `NEE_QC` | `TA_F` | `TS_1` (5) | `SM` in V, ML3 polynomial to m³ m⁻³ (10) |
 | Viikki (EC file) | `NEE (mg CO2 m-2 s-1)` × 22.7224 | `NEE_gapfilled (mg CO2 m-2 s-1)` × 22.7224 | 0 where `NEE` has a value, else 1 | `Tair (?C)` | 2022: EC `T1 (?C)` (14). 2023-2025: pit `Temp_T12_Avg_1`, 30-min mean (14) | 2022: EC `WFPS1 (%)` × 0.00509433962 (14). 2023-2025: pit `WC1`, 30-min mean (14) |
 | Maktau | `FC` (continuous file) | NULL | NULL | `TA_1_1_1` | `TS_1_1_1` (10) | `SWC_1_1_1` (10) |
 
 Notes:
 
+- Qvidja `SM` is the raw output of the Delta-T ML3 ThetaProbe in V (provider, 2026-10-22). The build converts it with the polynomial for mineral soil of the ML3 manual (p. 22): θ = −0.071 + 0.735V + 0.75V² − 8.759V³ + 21.838V⁴ − 21.998V⁵ + 8.097V⁶ (`scripts/lib/ml3.ts`). The column map has `validRange: [0, 1]`: a result outside the range becomes NULL, and the report counts it (column "Out of range"; 0 values). Details: `docs/qvidja-soil-moisture.md`.
 - Anttila and Särkisuo: the flux file and the biomet file of the same year share one time grid. The build joins them on the period.
 - Viikki EC files (version of 2026-10-20): the headers give the NEE unit, mg CO2 m-2 s-1, for all four years. The build multiplies by 1000 / 44.0095 = 22.7224 (`MG_CO2_TO_UMOL`). The measured NEE is in `NEE (mg CO2 m-2 s-1)` (about 20 % of the periods) and the gap-filled NEE in `NEE_gapfilled (mg CO2 m-2 s-1)` (2024: `NEE _gapfilled`, with a space). In 2024 (1 750 periods) and 2025 (228) the gap-filled value differs from the measured value. The files are Latin-1; the degree sign is a literal `?` (`Tair (?C)`, two spaces in 2022 and 2023). The source has `encoding: 'latin-1'`.
 - Viikki soil: the soil pit (5-minute step, 2023-2025) gives layer 1 (14 cm). No pit file exists for 2022. The 2022 EC file holds the same sensor: `T1 (?C)` is the 30-minute mean of pit `Temp_T12_Avg_1` (checked for 2023 and 2024, mean absolute difference 0.02 °C), and `WFPS1 (%)` × 0.509433962 / 100 is pit `WC1` exactly (porosity 0.509433962 = 1 − 1.3 / 2.65, columns `Soil Bulk density` and `Soil Particle Density`). The build uses these two columns for 2022 only, from 2022-04-12. On 2022-12-31 both sources exist and the report counts 48 `swc` conflicts from rounding; the pit value (rank 10) loses against the EC file (rank 1) in these 48 periods.
@@ -136,7 +137,7 @@ Physical lines = header lines + rows read + lines skipped by the parser.
 
 1. Add the site to `SITES` in `scripts/lib/registry.ts` with a new `siteId`, the UTC offset and the coordinates.
 2. Add one `Source` per file. Give the delimiter, the number of header lines, the decimal mark, the encoding (if not UTF-8), the timestamp column and formats, the time step, whether the stamp marks the period end, and the rank.
-3. Map each core column with a SQL expression over the cleaned text columns, with `num("col")` for numbers. Add `factor`, `zeroIsNull`, `depthCm` and `note` where they apply.
+3. Map each core column with a SQL expression over the cleaned text columns, with `num("col")` for numbers. Add `factor`, `zeroIsNull`, `validRange`, `depthCm` and `note` where they apply.
 4. Run `npm run typecheck` and `npm run build:db`. Read the report: rejected rows, sentinels, conflicts and range warnings show problems in the mapping.
 
 To add an output column, add it to `CORE_COLUMNS` and `VARIABLES` in the registry, to `ObservationRowSchema` in the schemas, and to the final `SELECT` that builds the `obs` table in the script.

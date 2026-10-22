@@ -338,7 +338,7 @@ Location: N 60°17'43.20", E 22°23'30.60" (about 60.2953 N, 22.3918 E), 7 m a.s
 | `TS_1` | deg C | Soil temperature at 5 cm | 9.07 |
 | `TS_2` | deg C | Soil temperature at 15 cm | (empty) |
 | `TS_3` | deg C | Soil temperature at 30 cm | 10.64 |
-| `SM` | m3 m-3 | Soil moisture at 10 cm | 0.822 |
+| `SM` | V (readme: m3 m-3, not correct) | Soil moisture at 10 cm, raw output of the ML3 ThetaProbe in volts (provider, 2026-10-22). The build converts it to m3 m-3, see `docs/qvidja-soil-moisture.md` | 0.822 |
 
 Other Qvidja files:
 

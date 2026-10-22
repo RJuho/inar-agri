@@ -1,118 +1,178 @@
-# Qvidja soil moisture (`SM`): unit check
+# Qvidja soil moisture (`SM`): unit and conversion
 
-Status: open. We wait for an answer from the data provider (Mika Korkiakoski, FMI). Do not correct the data before the answer. Checked on 2026-10-21.
+Status: resolved on 2026-10-22. The data provider (Mika Korkiakoski, FMI) confirmed on 2026-10-22 that `SM` in `data/Qvidja/Qvidja_2018-2025.csv` is "raw": the output of the sensor, not the volumetric water content. The harmonised database build now converts `SM` to m³ m⁻³ with the polynomial of the sensor manual. First check: 2026-10-21. Conversion: 2026-10-22.
 
 ## Summary
 
-The readme gives `SM` in `data/Qvidja/Qvidja_2018-2025.csv` as soil moisture at 10 cm depth in m3 m-3. The depth and the sensor agree with the articles. The values do not agree: they are 0.37 to 0.98, but the articles give 0.16 to 0.55 m³ m⁻³. The values are probably the raw output voltage (V) of the Delta-T ML3 ThetaProbe sensor. The Delta-T linear conversion with the general mineral-soil calibration gives back the published growing-season means within 0.006 m³ m⁻³.
+- Sensor: Delta-T ML3 ThetaProbe at 10 cm (Heimsch et al. 2021 and 2024). Output: DC voltage, 0 to about 1 V.
+- `SM` is this voltage in V (0.369 to 0.980 V). The readme gives m3 m-3, which is not correct.
+- The build converts `SM` with the Delta-T polynomial for a generalised mineral soil (manual p. 22). Qvidja is clay loam, thus mineral soil.
+- Result: `swc` 0.137 to 0.557 m³ m⁻³ (median 0.356). Before: 0.369 to 0.980 (median 0.777).
+- The growing-season means agree with Heimsch 2021 and 2024 within 0.011 m³ m⁻³. The 2018–2019 range agrees with Heimsch 2021 (0.16 to 0.55).
 
-## What the sources say
+## Manual
 
-| Source | Sensor | Depth | Unit | Values |
-|---|---|---|---|---|
-| `data/Qvidja/Qvidja-readme.xlsx` | not given | 10 cm | m3 m-3 | "Soil moisture at 10 cm depth, measured good quality" |
-| Heimsch et al. 2021, Biogeosciences 18:3467 (`data/articles/Heimsch_2021.pdf` = `data/Qvidja/Qvidja_C-balance.pdf`) | ML3 ThetaProbe, Delta-T Devices (p. 3469, sect. 2.2) | 0.1 m | m³ m⁻³ | 0.16 to 0.55 in 2018–2019 (p. 3472). May–Sep mean 0.26 (2018), 0.30 (2019). Fig. 4c, Table C1 (5-day means 0.20 to 0.37). |
-| Heimsch et al. 2024, AGEE 374:109179 (`data/articles/Heimsch_2024.pdf` = `data/Qvidja/Qvidja.pdf`) | ML3 ThetaProbe (sect. 2.3) | 0.1 m | m³ m⁻³ | May–Sep mean 0.23 to 0.34: 0.34 (2021, highest), 0.23 (2022, lowest) (sect. 3.1, 3.3). Fig. 1c: about 0.2 to 0.5. |
-| Vira et al. 2025 (`data/articles/Vira_2025_C-Sentinel-2_EC.pdf`) | "ML3 ThetaProbe … or Teros-12", not given per site | "5 or 10 cm" | – | No values. |
+Delta-T Devices Ltd, "User Manual for the ML3 ThetaProbe Soil Moisture Sensor", ML3-UM-2.1, January 2017. File: `data/manuals/ML3-user-manual-version-2.1.pdf`. The PDF page numbers are the same as the printed page numbers.
 
-The soil is clay loam (all three articles). The articles give no porosity or bulk density for Qvidja. Heimsch 2021 calls 0.4 m³ m⁻³ "close to the saturated values observed in winter".
+| Page | Section | Content used |
+|---:|---|---|
+| 16 | Operation, Other data loggers | Output 0 to 1.0 V is about 0 to 60 % water content in mineral soils. |
+| 17 | HH2 meter | "use Mineral for sand, silt or clay soils or Organic for peaty soils". |
+| 19–20 | Soil calibration, General soil calibrations | `√ε = a0 + a1·θ`. Mineral: a0 = 1.6, a1 = 8.4. Organic: a0 = 1.3, a1 = 7.7. Bound water in clay can give a higher a1. |
+| 21 | Sensor calibration | `√ε = 1.0 + 6.175V + 6.303V² − 73.578V³ + 183.44V⁴ − 184.78V⁵ + 68.017V⁶`, V in volts. |
+| 22 | Soil moisture reading, Polynomial conversion | θ for a generalised mineral soil (formula below). |
+| 23 | Linearisation table | V against θ (% vol) for mineral and organic soil. Used to check the formula. |
+| 26 | Specifications | Accuracy ±1 % vol over 0 to 50 % vol and 0 to 40 °C with a soil-specific calibration. Measurement range 0 to 100 % vol, with reduced accuracy. |
+| 28 | Temperature response | "ML3 soil moisture readings cannot be interpreted reliably when inserted into soil below 0°C." |
 
-## What the file shows
+## Formula used
 
-`SM` per year (30-min values, all months):
+Generalised mineral soil, manual p. 22 (V = `SM` in volts, θ in m³ m⁻³):
 
-| Year | n | min | 2 % | median | 98 % | max |
-|---:|---:|---:|---:|---:|---:|---:|
-| 2018 | 22 108 | 0.476 | 0.490 | 0.713 | 0.878 | 0.951 |
-| 2019 | 32 912 | 0.422 | 0.495 | 0.845 | 0.953 | 0.965 |
-| 2020 | 35 108 | 0.418 | 0.554 | 0.816 | 0.930 | 0.975 |
-| 2021 | 33 828 | 0.369 | 0.391 | 0.827 | 0.920 | 0.951 |
-| 2022 | 24 092 | 0.444 | 0.447 | 0.588 | 0.873 | 0.980 |
-| 2023 | 33 062 | 0.535 | 0.542 | 0.775 | 0.975 | 0.980 |
-| 2024 | 17 091 | 0.399 | 0.447 | 0.643 | 0.921 | 0.970 |
-| 2025 | 20 802 | 0.509 | 0.559 | 0.831 | 0.966 | 0.978 |
+```
+θ = −0.071 + 0.735·V + 0.75·V² − 8.759·V³ + 21.838·V⁴ − 21.998·V⁵ + 8.097·V⁶
+```
 
-Counts include the duplicate rows of 2018–2023 (see `docs/harmonised-database.md`). The column has only 612 different values. No value is above 1 or below 0.05.
+This is `(√ε − 1.6) / 8.4` with the sensor polynomial of p. 21. Values outside 0 to 1 m³ m⁻³ (the measurement range, p. 26) become NULL. No value of the file is outside this range.
 
-The seasonal pattern is correct for soil moisture: the soil is drier in June and July and wetter from October to April. But the level is too high. Clay loam cannot hold much more than about 0.5 m³ m⁻³ of water. The `swc` of the other sites in `db/observations.parquet`:
+Code: `scripts/lib/ml3.ts` (coefficients, range and SQL expression, one place). `scripts/lib/registry.ts` (Qvidja source, `swc`) uses it. `scripts/build-db.ts` applies the new `validRange` rule and counts the NULL values in `db/report.md` (column "Out of range"). Unit test: `scripts/lib/ml3.test.ts` (16 points of the p. 23 table, all within 0.005 m³ m⁻³; the SQL expression gives the same values as the TypeScript function).
 
-| Site | 2 % | median | 98 % | max |
-|---|---:|---:|---:|---:|
-| Anttila | 0.131 | 0.294 | 0.399 | 0.495 |
-| Haltiala | 0.260 | 0.420 | 0.530 | 0.680 |
-| Maktau | 0.032 | 0.046 | 0.167 | 0.235 |
-| Qvidja (`SM`) | 0.463 | 0.777 | 0.943 | 0.980 |
-| Särkisuo | 0.321 | 0.550 | 0.795 | 0.801 |
-| Viikki | 0.114 | 0.296 | 0.513 | 0.539 |
+### Check of the formula against the manual
 
-## Test of the ML3 conversion
+- The formula in the first version of this file (copied by the user) has the same coefficients and signs as the manual, p. 22. No difference.
+- The text layer of the PDF loses the minus signs. The signs above are confirmed with the linearisation table, p. 23: for example V = 0.514 gives 0.200 (table 20 %), V = 0.838 gives 0.400 (table 40 %), V = 1.004 gives 0.600 (table 60 %). The p. 21 sensor polynomial with these signs gives back the √ε table of p. 23 (V = 0.48: 3.140, table 3.139).
+- Each p. 22 coefficient is the p. 21 coefficient divided by 8.4 (for example 6.175 / 8.4 = 0.735, 68.017 / 8.4 = 8.097). Thus a0 = 1.6 and a1 = 8.4 are correct.
+- Difference to the earlier test in this file (2026-10-21): that test used `√ε = 1.0 + 6.4V − 6.4V² + 4.7V³` and `√ε = 1.1 + 4.44V`. These are the conversions of the older ThetaProbe ML2x, not of the ML3. The ML3 manual gives the 6th-order polynomial above and no linear formula. We use the ML3 polynomial.
+- Mineral or organic: the manual gives mineral for clay soils (p. 17). Qvidja is clay loam (all three articles). The organic calibration would give about +0.04 m³ m⁻³ (2026-10-21 test).
 
-The ML3 output is a DC voltage V (about 0 to 1 V). Delta-T gives two steps:
+## Check results
 
-1. V to the square root of the permittivity √ε:
-   - polynomial: `√ε = 1.0 + 6.4·V − 6.4·V² + 4.7·V³`
-   - linear: `√ε = 1.1 + 4.44·V`
-2. √ε to the volumetric water content θ: `θ = (√ε − a0) / a1`. General calibrations: mineral soil a0 = 1.6, a1 = 8.4; organic soil a0 = 1.3, a1 = 7.7.
+### Before and after, per year
 
-The linear mineral variant is `θ = (4.44·V − 0.5) / 8.4`.
+30-min values, duplicate rows of 2018–2023 removed (124 023 values).
 
-May to September means of θ, from `SM` as V:
+| Year | n | `SM` min (V) | `SM` median (V) | `SM` max (V) | θ min | θ 2 % | θ median | θ 98 % | θ max |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2018 | 11 054 | 0.476 | 0.713 | 0.951 | 0.182 | 0.188 | 0.314 | 0.433 | 0.513 |
+| 2019 | 16 456 | 0.422 | 0.845 | 0.965 | 0.158 | 0.191 | 0.405 | 0.516 | 0.533 |
+| 2020 | 17 554 | 0.418 | 0.816 | 0.975 | 0.157 | 0.220 | 0.383 | 0.487 | 0.549 |
+| 2021 | 16 914 | 0.369 | 0.827 | 0.951 | 0.137 | 0.146 | 0.391 | 0.475 | 0.513 |
+| 2022 | 12 046 | 0.444 | 0.588 | 0.980 | 0.168 | 0.169 | 0.239 | 0.429 | 0.557 |
+| 2023 | 16 531 | 0.535 | 0.775 | 0.980 | 0.210 | 0.214 | 0.354 | 0.549 | 0.557 |
+| 2024 | 17 087 | 0.399 | 0.643 | 0.970 | 0.149 | 0.169 | 0.270 | 0.476 | 0.541 |
+| 2025 | 16 381 | 0.509 | 0.831 | 0.978 | 0.197 | 0.220 | 0.379 | 0.530 | 0.553 |
+| All | 124 023 | 0.369 | 0.777 | 0.980 | 0.137 | 0.176 | 0.356 | 0.503 | 0.557 |
 
-| Year | Article | Linear, mineral | Polynomial, mineral | Polynomial, organic |
-|---:|---:|---:|---:|---:|
-| 2018 | 0.26 | **0.266** | 0.242 | 0.303 |
-| 2019 | 0.30 | **0.305** | 0.282 | 0.346 |
-| 2021 | 0.34 | **0.339** | 0.314 | 0.381 |
-| 2022 | 0.23 | **0.230** | 0.210 | 0.268 |
+Mean θ: 0.339 m³ m⁻³. Out of range (θ < 0 or θ > 1): 0 values. Values above 0.50: 2 765 (2.2 %); above 0.55: 348 (0.3 %, wet periods of 2022–2023 at the sensor ceiling `SM` = 0.98 V, see QVI-02 in `docs/anomaly-data-report.md`).
 
-Range in 2018–2019 (Heimsch 2021 period): linear mineral 0.164 to 0.451, article 0.16 to 0.55. The minimum agrees. The maximum does not agree.
+Monthly median θ (all years): 0.42 in January, 0.38 in April, 0.24 in June, 0.23 in July, 0.34 in September, 0.44 in November. The soil is dry in summer and wet from October to April, as expected.
 
-Result: the linear mineral conversion gives back all four published means within 0.006 m³ m⁻³. The other two variants have a constant offset of about −0.02 and +0.04. Thus `SM` is very probably the ML3 output in V.
+### Against the articles
+
+May to September means (m³ m⁻³):
+
+| Year | Article | ML3 polynomial, mineral (used) | Old linear test (ML2x) |
+|---:|---:|---:|---:|
+| 2018 | 0.26 (Heimsch 2021) | 0.257 | 0.266 |
+| 2019 | 0.30 (Heimsch 2021) | 0.305 | 0.305 |
+| 2021 | 0.34 (Heimsch 2024) | 0.344 | 0.339 |
+| 2022 | 0.23 (Heimsch 2024) | 0.219 | 0.230 |
+
+Range 2018–2019: 0.158 to 0.533 (Heimsch 2021: 0.16 to 0.55). The old linear test gave a maximum of 0.451. Thus the ML3 polynomial agrees better with the published range.
+
+### Against clay loam and the other sites
+
+A clay loam has a porosity of about 0.45 to 0.55 m³ m⁻³. The 98 % value 0.503 and the maximum 0.557 are near saturation, as Heimsch 2021 tells for winter. `swc` of all sites in `db/observations.parquet` after the build of 2026-10-22:
+
+| Site | 2 % | 25 % | median | 75 % | 98 % | max |
+|---|---:|---:|---:|---:|---:|---:|
+| Anttila | 0.131 | 0.233 | 0.294 | 0.344 | 0.399 | 0.495 |
+| Haltiala | 0.260 | 0.340 | 0.420 | 0.450 | 0.530 | 0.680 |
+| Maktau | 0.032 | 0.038 | 0.046 | 0.074 | 0.167 | 0.235 |
+| Qvidja (before, `SM` in V) | 0.463 | – | 0.777 | – | 0.943 | 0.980 |
+| Qvidja (after) | 0.176 | 0.249 | 0.356 | 0.419 | 0.503 | 0.557 |
+| Särkisuo | 0.321 | 0.401 | 0.550 | 0.703 | 0.795 | 0.801 |
+| Viikki | 0.114 | 0.162 | 0.296 | 0.400 | 0.513 | 0.539 |
+
+Qvidja is now in the range of the other Finnish mineral-soil sites (Anttila, Haltiala, Viikki). Särkisuo (peat) is wetter. Maktau (sandy soil, semi-arid) is drier.
+
+## Open points
+
+- Calibration: the general mineral calibration is used. Clay can need a higher a1 (p. 19). No soil-specific a0 and a1 for Qvidja are known. Accuracy with the general calibration is lower than the ±1 % vol of a soil-specific calibration (p. 26).
+- The readme `Qvidja-readme.xlsx` still gives m3 m-3 for `SM`. Ask the provider to correct it.
+- Sensor history 2018–2025 (same sensor, same depth): not confirmed.
 
 ## Sensor notes
 
-- Frozen soil: ice has a low permittivity. The value decreases when the soil freezes, but the water does not go away. Heimsch 2021 tells the same about the winter drops. Do not use winter values when the soil temperature is below 0 °C without a check.
-- Accuracy: the general calibration is less accurate than a soil-specific calibration (Delta-T gives about ±0.05 and ±0.01 m³ m⁻³; check this in the ML3 user manual). Clay soils can need a soil-specific calibration (a0 and a1 from one dry and one wet sample).
+- Frozen soil: ice has a low permittivity. The value decreases when the soil freezes, but the water does not go away. Heimsch 2021 tells the same about the winter drops.
 - The readme says "measured good quality", but the file gives no quality flag for `SM`.
-
-## Questions to the data provider
-
-1. Is `SM` in `Qvidja_2018-2025.csv` the ML3 ThetaProbe output in volts, not m³ m⁻³?
-2. Which conversion did you use for Heimsch et al. 2021 and 2024: the linear or the polynomial V-to-√ε step, and which a0 and a1? Is there a soil-specific calibration for Qvidja?
-3. Heimsch et al. 2021 gives a maximum of 0.55 m³ m⁻³ for 2018–2019. The linear mineral conversion of the file gives 0.45. What is the cause?
-4. Is it the same sensor at the same depth (10 cm) from 2018 to 2025?
-5. Can you send a corrected file or a corrected readme?
-
-## Effect on this repository
-
-- `scripts/lib/registry.ts:343` maps `SM` to `swc` with no conversion (`expr: 'num("SM")'`, `depthCm: 10`). Thus the Qvidja `swc` in `db/observations.parquet`, in the data export and on the website is too high.
-- `docs/data-dictionary.md:341`, `docs/harmonised-database.md:91` and `CLAUDE.md` copy the unit m3 m-3 from the readme.
-- The calculated products (`npm run calc`) do not use `swc`.
-- Correction after the answer: change the `expr` of the Qvidja `swc` in the registry (for example `(1.1 + 4.44 * num("SM") - 1.6) / 8.4`), add a `note`, update the docs above, then run `npm run build:db`, `npm run calc` and `npm run site:sync`. Expected result: Qvidja `swc` about 0.14 to 0.46 m³ m⁻³.
 
 ## Reproduce
 
 DuckDB CLI, from the repository root:
 
 ```sql
+CREATE MACRO ml3(v) AS -0.071 + 0.735*v + 0.75*v^2 - 8.759*v^3 + 21.838*v^4 - 21.998*v^5 + 8.097*v^6;
 CREATE TEMP TABLE q AS
-SELECT strptime(TIMESTAMP_START, '%Y%m%d%H%M') AS ts,
-       try_cast(SM AS DOUBLE) AS v
+SELECT DISTINCT strptime(TIMESTAMP_START, '%Y%m%d%H%M') AS ts, try_cast(SM AS DOUBLE) AS v
 FROM read_csv('data/Qvidja/Qvidja_2018-2025.csv', all_varchar = true, nullstr = '')
 WHERE try_cast(SM AS DOUBLE) IS NOT NULL;
 
--- Statistics per year
-SELECT year(ts) AS y, count(v) AS n, min(v), quantile_cont(v, 0.02),
-       median(v), quantile_cont(v, 0.98), max(v)
+-- Statistics per year, V and θ
+SELECT year(ts) AS y, count(v) AS n, min(v), median(v), max(v),
+       round(min(ml3(v)), 3), round(median(ml3(v)), 3), round(max(ml3(v)), 3)
 FROM q GROUP BY 1 ORDER BY 1;
 
--- May to September means of the three conversions
+-- May to September means against the articles
 WITH p(y, paper) AS (VALUES (2018, 0.26), (2019, 0.30), (2021, 0.34), (2022, 0.23))
-SELECT y, paper,
-       round(avg(((1.1 + 4.44 * v) - 1.6) / 8.4), 3) AS lin_mineral,
-       round(avg(((1 + 6.4 * v - 6.4 * v * v + 4.7 * v * v * v) - 1.6) / 8.4), 3) AS poly_mineral,
-       round(avg(((1 + 6.4 * v - 6.4 * v * v + 4.7 * v * v * v) - 1.3) / 7.7), 3) AS poly_organic
+SELECT y, paper, round(avg(ml3(v)), 3) AS ml3_mineral
 FROM q JOIN p ON year(ts) = y
 WHERE month(ts) BETWEEN 5 AND 9
 GROUP BY ALL ORDER BY y;
+
+-- The harmonised value (after npm run build:db)
+SELECT min(swc), median(swc), max(swc) FROM 'db/observations.parquet' WHERE site_id = 4;
 ```
+
+## History of the check (2026-10-21)
+
+The readme gives `SM` as soil moisture at 10 cm in m3 m-3. The values were 0.37 to 0.98, but the articles give 0.16 to 0.55 m³ m⁻³ (Heimsch et al. 2021, Biogeosciences 18:3467, p. 3472; Heimsch et al. 2024, AGEE 374:109179, sect. 3.1 and 3.3). The column has only 612 different values, none above 1 or below 0.05. We sent five questions to the provider: unit of `SM`, conversion used in the articles, cause of the published maximum 0.55, sensor history, corrected file or readme. The answer of 2026-10-22 confirmed question 1 ("raw"). Until the build of 2026-10-22, `scripts/lib/registry.ts` mapped `SM` to `swc` with no conversion, thus the Qvidja `swc` on the website and in the data export was the voltage. The calculated products (`npm run calc`) do not use `swc`.
+
+## Change log
+
+### 2026-10-22: Qvidja soil water content converted from sensor volts to m³ m⁻³
+
+What changed: the Qvidja soil water content (`swc`, 10 cm) was the raw output of the Delta-T ML3 ThetaProbe sensor in volts. The data provider (Mika Korkiakoski, FMI) confirmed this on 2026-10-22. The values are now converted to volumetric water content in m³ m⁻³.
+
+Formula (generalised mineral soil; Qvidja is clay loam), plain text:
+
+θ = −0.071 + 0.735·V + 0.75·V² − 8.759·V³ + 21.838·V⁴ − 21.998·V⁵ + 8.097·V⁶
+
+LaTeX:
+
+```latex
+\theta = -0.071 + 0.735\,V + 0.75\,V^{2} - 8.759\,V^{3} + 21.838\,V^{4} - 21.998\,V^{5} + 8.097\,V^{6}
+```
+
+V = sensor output in volts (column `SM`), θ = volumetric water content in m³ m⁻³.
+
+| Coefficient | c0 | c1 | c2 | c3 | c4 | c5 | c6 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Value | −0.071 | 0.735 | 0.75 | −8.759 | 21.838 | −21.998 | 8.097 |
+
+Equivalent form: θ = (√ε − a0) / a1 with a0 = 1.6, a1 = 8.4 (general mineral-soil calibration).
+
+Source: Delta-T Devices Ltd, User Manual for the ML3 ThetaProbe Soil Moisture Sensor, ML3-UM-2.1 (January 2017), p. 22, "Polynomial conversion". Valid range: 0 to 1 m³ m⁻³ (p. 26); values outside become empty.
+
+Affected data: all Qvidja `swc` values, 2018-05-09 to 2025-12-31, 124 023 half-hour values. Values set to empty: 0. Other sites: no change.
+
+| Statistic | Before (V) | After (m³ m⁻³) |
+|---|---:|---:|
+| Minimum | 0.369 | 0.137 |
+| 2 % | 0.463 | 0.176 |
+| Median | 0.777 | 0.356 |
+| Mean | 0.737 | 0.339 |
+| 98 % | 0.943 | 0.503 |
+| Maximum | 0.980 | 0.557 |
+
+Check: the May to September means 2018, 2019, 2021 and 2022 (0.257, 0.305, 0.344, 0.219) agree with the published values (0.26, 0.30, 0.34, 0.23; Heimsch et al. 2021 and 2024) within 0.011 m³ m⁻³.

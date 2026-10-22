@@ -8,6 +8,8 @@
 // `ts_parsed` is the parsed source timestamp (local time, as in the file). An
 // expression can use a window function, for example a rule per local day.
 
+import { ML3_THETA_RANGE, ml3MineralThetaSql } from './ml3.ts';
+
 /** Strict core: present at all six sites. */
 export const CORE_COLUMNS = ['nee', 'nee_f', 'nee_qc', 'ta', 'tsoil', 'swc'] as const;
 /** Optional columns: present at some sites only, NULL elsewhere. Inputs of scripts/calc.ts. */
@@ -45,6 +47,8 @@ export type ColumnMap = {
   factor?: number;
   /** Exact 0 becomes NULL after the expression (logger fill value). */
   zeroIsNull?: boolean;
+  /** Valid range [min, max] of the result. Values outside become NULL; the build report counts them. */
+  validRange?: readonly [number, number];
   /** Sensor depth in cm. null = not known. */
   depthCm?: number | null;
   note?: string;
@@ -340,7 +344,10 @@ export const SOURCES: Source[] = [
       nee_qc: { sourceColumns: ['NEE_QC'], expr: 'num("NEE_QC")', note: '0 = measured, 1 = gap-filled.' },
       ta: { sourceColumns: ['TA_F'], expr: 'num("TA_F")' },
       tsoil: { sourceColumns: ['TS_1'], expr: 'num("TS_1")', depthCm: 5 },
-      swc: { sourceColumns: ['SM'], expr: 'num("SM")', depthCm: 10 },
+      swc: {
+        sourceColumns: ['SM'], expr: ml3MineralThetaSql('num("SM")'), validRange: ML3_THETA_RANGE, depthCm: 10,
+        note: 'SM is the raw ML3 ThetaProbe output in V (provider, 2026-10-22). Converted to m3 m-3 with the Delta-T polynomial for mineral soil (ML3 manual ML3-UM-2.1, p. 22). Values outside 0 to 1 m3 m-3 are NULL.',
+      },
       sw_in: { sourceColumns: ['SW_IN_F'], expr: 'num("SW_IN_F")', note: 'Gap-filled.' },
       rh: { sourceColumns: ['RH_F'], expr: 'num("RH_F")', note: 'Gap-filled.' },
       vpd: { sourceColumns: ['VPD_F'], expr: 'num("VPD_F")', note: 'Gap-filled. hPa.' },

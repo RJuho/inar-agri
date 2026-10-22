@@ -15,6 +15,12 @@ export const ColumnMapSchema = v.object({
   expr: nonEmpty,
   factor: v.optional(v.pipe(v.number(), v.finite(), v.notValue(0))),
   zeroIsNull: v.optional(v.boolean()),
+  validRange: v.optional(
+    v.pipe(
+      v.tuple([v.pipe(v.number(), v.finite()), v.pipe(v.number(), v.finite())]),
+      v.check(([lo, hi]) => lo < hi, 'validRange: min must be below max.'),
+    ),
+  ),
   depthCm: v.optional(v.nullable(v.pipe(v.number(), v.minValue(0)))),
   note: v.optional(v.string()),
 });
@@ -175,7 +181,7 @@ export const ReportSchema = v.object({
       linesSkippedByParser: count,
       duplicateStamps: count,
       rowsAfterAggregation: v.nullable(count),
-      columns: v.record(v.string(), v.object({ n_valid: count, n_sentinel: count, n_zero_nulled: count, factor: v.nullable(v.number()) })),
+      columns: v.record(v.string(), v.object({ n_valid: count, n_sentinel: count, n_zero_nulled: count, n_range_nulled: count, factor: v.nullable(v.number()) })),
     }),
   ),
   validation: v.object({

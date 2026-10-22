@@ -1,12 +1,12 @@
 {
-  "builtAt": "2026-10-21T11:18:19.760Z",
+  "builtAt": "2026-10-22T06:08:36.713Z",
   "duckdb": "v1.5.6",
   "node": "v26.10.0",
   "outputs": [
     {
       "file": "db/observations.parquet",
       "rows": 537980,
-      "bytes": 23105969
+      "bytes": 23111672
     },
     {
       "file": "db/sites.parquet",
@@ -21,7 +21,7 @@
     {
       "file": "db/site_variables.parquet",
       "rows": 185,
-      "bytes": 7272
+      "bytes": 7734
     },
     {
       "file": "db/events.parquet",
@@ -2423,9 +2423,9 @@
         },
         "swc": {
           "n_valid": 124023,
-          "min": 0.369,
-          "max": 0.98,
-          "mean": 0.7374820073695727,
+          "min": 0.1370737828286262,
+          "max": 0.5565912199294071,
+          "mean": 0.339108678250362,
           "conflicts": 0,
           "rangeWarnings": 0
         },
@@ -2611,9 +2611,9 @@
             },
             "swc": {
               "n_valid": 11054,
-              "min": 0.476,
-              "max": 0.951,
-              "mean": 0.6999775646824621
+              "min": 0.18185548350775188,
+              "max": 0.5133179240215848,
+              "mean": 0.31181253735520936
             },
             "sw_in": {
               "n_valid": 11376,
@@ -2761,9 +2761,9 @@
             },
             "swc": {
               "n_valid": 16460,
-              "min": 0.422,
-              "max": 0.965,
-              "mean": 0.7801998784933214
+              "min": 0.15837442479116914,
+              "max": 0.5331429840822853,
+              "mean": 0.3691417450167895
             },
             "sw_in": {
               "n_valid": 17520,
@@ -2911,9 +2911,9 @@
             },
             "swc": {
               "n_valid": 17554,
-              "min": 0.418,
-              "max": 0.975,
-              "mean": 0.7882163609433812
+              "min": 0.15671903928080194,
+              "max": 0.5485016107268056,
+              "mean": 0.37220155972717817
             },
             "sw_in": {
               "n_valid": 17568,
@@ -3061,9 +3061,9 @@
             },
             "swc": {
               "n_valid": 16914,
-              "min": 0.369,
-              "max": 0.951,
-              "mean": 0.7681779590871479
+              "min": 0.1370737828286262,
+              "max": 0.5133179240215848,
+              "mean": 0.3597853423545567
             },
             "sw_in": {
               "n_valid": 17520,
@@ -3211,9 +3211,9 @@
             },
             "swc": {
               "n_valid": 12046,
-              "min": 0.444,
-              "max": 0.98,
-              "mean": 0.6298808733189319
+              "min": 0.16766988885349632,
+              "max": 0.5565912199294071,
+              "mean": 0.2699093910937002
             },
             "sw_in": {
               "n_valid": 17520,
@@ -3361,9 +3361,9 @@
             },
             "swc": {
               "n_valid": 16531,
-              "min": 0.535,
-              "max": 0.98,
-              "mean": 0.7476181719194259
+              "min": 0.21039668257131472,
+              "max": 0.5565912199294071,
+              "mean": 0.3448128615113059
             },
             "sw_in": {
               "n_valid": 17520,
@@ -3511,9 +3511,9 @@
             },
             "swc": {
               "n_valid": 17083,
-              "min": 0.399,
-              "max": 0.97,
-              "mean": 0.6672906983550915
+              "min": 0.14897988117611738,
+              "max": 0.5406898043415117,
+              "mean": 0.29218166445464666
             },
             "sw_in": {
               "n_valid": 17568,
@@ -3661,9 +3661,9 @@
             },
             "swc": {
               "n_valid": 16381,
-              "min": 0.509,
-              "max": 0.978,
-              "mean": 0.775900677614326
+              "min": 0.19742270617118923,
+              "max": 0.553321200997451,
+              "mean": 0.36460667352856174
             },
             "sw_in": {
               "n_valid": 17516,
@@ -6755,48 +6755,56 @@
           "n_valid": 10992,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_f": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_qc": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "gpp_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "reco_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ch4": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "le": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 1000
         }
       }
@@ -6817,66 +6825,77 @@
           "n_valid": 17419,
           "n_sentinel": 101,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 17419,
           "n_sentinel": 101,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 17419,
           "n_sentinel": 101,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 17336,
           "n_sentinel": 184,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 17175,
           "n_sentinel": 345,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 17419,
           "n_sentinel": 101,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "pa": {
           "n_valid": 17422,
           "n_sentinel": 98,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "netrad": {
           "n_valid": 17335,
           "n_sentinel": 185,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 17421,
           "n_sentinel": 99,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 17421,
           "n_sentinel": 99,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -6897,48 +6916,56 @@
           "n_valid": 11368,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_f": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_qc": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "gpp_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "reco_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ch4": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "le": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 1000
         }
       }
@@ -6959,66 +6986,77 @@
           "n_valid": 17462,
           "n_sentinel": 58,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 17461,
           "n_sentinel": 59,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 17461,
           "n_sentinel": 59,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 17376,
           "n_sentinel": 144,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 17215,
           "n_sentinel": 305,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 17462,
           "n_sentinel": 58,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 17462,
           "n_sentinel": 58,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "pa": {
           "n_valid": 17462,
           "n_sentinel": 58,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "netrad": {
           "n_valid": 17376,
           "n_sentinel": 144,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 17462,
           "n_sentinel": 58,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 17462,
           "n_sentinel": 58,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7039,48 +7077,56 @@
           "n_valid": 10093,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_f": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_qc": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "gpp_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "reco_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ch4": {
           "n_valid": 11520,
           "n_sentinel": 6000,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "le": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 11520,
           "n_sentinel": 6000,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 1000
         }
       }
@@ -7101,66 +7147,77 @@
           "n_valid": 17302,
           "n_sentinel": 218,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 17300,
           "n_sentinel": 220,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 17300,
           "n_sentinel": 220,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 3234,
           "n_sentinel": 14286,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 17282,
           "n_sentinel": 238,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 17302,
           "n_sentinel": 218,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "pa": {
           "n_valid": 17394,
           "n_sentinel": 126,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "netrad": {
           "n_valid": 3234,
           "n_sentinel": 14286,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 3234,
           "n_sentinel": 14286,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 17302,
           "n_sentinel": 218,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7181,48 +7238,56 @@
           "n_valid": 9555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_f": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_qc": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "gpp_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "reco_src": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ch4": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "le": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 1000
         }
       }
@@ -7243,66 +7308,77 @@
           "n_valid": 13237,
           "n_sentinel": 4283,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 13226,
           "n_sentinel": 4294,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 13229,
           "n_sentinel": 4291,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 13378,
           "n_sentinel": 4142,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 13373,
           "n_sentinel": 4147,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 13237,
           "n_sentinel": 4283,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 13424,
           "n_sentinel": 4096,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "pa": {
           "n_valid": 12831,
           "n_sentinel": 4689,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "netrad": {
           "n_valid": 13381,
           "n_sentinel": 4139,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 13379,
           "n_sentinel": 4141,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 11849,
           "n_sentinel": 5671,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7323,48 +7399,56 @@
           "n_valid": 50077,
           "n_sentinel": 31523,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_f": {
           "n_valid": 81600,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_qc": {
           "n_valid": 81600,
           "n_sentinel": 31523,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ta": {
           "n_valid": 81600,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 81600,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 81600,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 81600,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "vpd": {
           "n_valid": 81600,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7385,108 +7469,126 @@
           "n_valid": 61441,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_f": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_qc": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ta": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 228159,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 219003,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "vpd": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ustar": {
           "n_valid": 222511,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "gpp_src": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": -1
         },
         "reco_src": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 216756,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ws": {
           "n_valid": 222515,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "wd": {
           "n_valid": 222515,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "netrad": {
           "n_valid": 229943,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 224473,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "le": {
           "n_valid": 237555,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7507,96 +7609,112 @@
           "n_valid": 3425,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_f": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_qc": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ta": {
           "n_valid": 17008,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 11603,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 11603,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 0.00509433962
         },
         "sw_in": {
           "n_valid": 16642,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 16642,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 16642,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 17448,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "pa": {
           "n_valid": 16500,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ws": {
           "n_valid": 16500,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "wd": {
           "n_valid": 16500,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 16642,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 9629,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.720559834594326
         }
       }
@@ -7617,84 +7735,98 @@
           "n_valid": 3371,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_f": {
           "n_valid": 16944,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_qc": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ta": {
           "n_valid": 17089,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 17063,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 17086,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 17063,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 17509,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "pa": {
           "n_valid": 17514,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ws": {
           "n_valid": 17514,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "wd": {
           "n_valid": 17514,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 17063,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 13607,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.720559834594326
         }
       }
@@ -7715,78 +7847,91 @@
           "n_valid": 4206,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_f": {
           "n_valid": 17568,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_qc": {
           "n_valid": 17568,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ta": {
           "n_valid": 17559,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 17308,
           "n_sentinel": 7,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 15838,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 17558,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 17557,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ws": {
           "n_valid": 17501,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "wd": {
           "n_valid": 17502,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 17308,
           "n_sentinel": 7,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 8040,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 17568,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.720559834594326
         }
       }
@@ -7807,78 +7952,91 @@
           "n_valid": 3947,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_f": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.7223667617219
         },
         "nee_qc": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ta": {
           "n_valid": 17204,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 17201,
           "n_sentinel": 3,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ppfd": {
           "n_valid": 17201,
           "n_sentinel": 3,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 17204,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 17514,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ws": {
           "n_valid": 16010,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "wd": {
           "n_valid": 16010,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_out": {
           "n_valid": 17201,
           "n_sentinel": 3,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 8672,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "n2o": {
           "n_valid": 17520,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": 22.720559834594326
         }
       }
@@ -7899,12 +8057,14 @@
           "n_valid": 104631,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 104468,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7925,12 +8085,14 @@
           "n_valid": 105409,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 105395,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7951,12 +8113,14 @@
           "n_valid": 106987,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 98334,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -7977,60 +8141,70 @@
           "n_valid": 52648,
           "n_sentinel": 46852,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ta": {
           "n_valid": 86645,
           "n_sentinel": 0,
           "n_zero_nulled": 12855,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 86669,
           "n_sentinel": 0,
           "n_zero_nulled": 12831,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 93121,
           "n_sentinel": 0,
           "n_zero_nulled": 6379,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 86670,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 86670,
           "n_sentinel": 0,
           "n_zero_nulled": 12830,
+          "n_range_nulled": 0,
           "factor": null
         },
         "vpd": {
           "n_valid": 93085,
           "n_sentinel": 6415,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ustar": {
           "n_valid": 45554,
           "n_sentinel": 53946,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "nee_ssitc": {
           "n_valid": 44537,
           "n_sentinel": 54963,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "le": {
           "n_valid": 35021,
           "n_sentinel": 64479,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
@@ -8051,66 +8225,77 @@
           "n_valid": 168582,
           "n_sentinel": 0,
           "n_zero_nulled": 13482,
+          "n_range_nulled": 0,
           "factor": null
         },
         "tsoil": {
           "n_valid": 168605,
           "n_sentinel": 0,
           "n_zero_nulled": 13459,
+          "n_range_nulled": 0,
           "factor": null
         },
         "swc": {
           "n_valid": 175149,
           "n_sentinel": 0,
           "n_zero_nulled": 6915,
+          "n_range_nulled": 0,
           "factor": null
         },
         "sw_in": {
           "n_valid": 168609,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "rh": {
           "n_valid": 168609,
           "n_sentinel": 0,
           "n_zero_nulled": 13455,
+          "n_range_nulled": 0,
           "factor": null
         },
         "precip": {
           "n_valid": 168609,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "pa": {
           "n_valid": 175143,
           "n_sentinel": 0,
           "n_zero_nulled": 6921,
+          "n_range_nulled": 0,
           "factor": null
         },
         "ws": {
           "n_valid": 146377,
           "n_sentinel": 0,
           "n_zero_nulled": 18119,
+          "n_range_nulled": 0,
           "factor": null
         },
         "wd": {
           "n_valid": 82710,
           "n_sentinel": 0,
           "n_zero_nulled": 0,
+          "n_range_nulled": 0,
           "factor": null
         },
         "netrad": {
           "n_valid": 25616,
           "n_sentinel": 156443,
           "n_zero_nulled": 5,
+          "n_range_nulled": 0,
           "factor": null
         },
         "g": {
           "n_valid": 163543,
           "n_sentinel": 0,
           "n_zero_nulled": 18521,
+          "n_range_nulled": 0,
           "factor": null
         }
       }
