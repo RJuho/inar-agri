@@ -18,6 +18,7 @@ import {
   REF_START,
   YEAR_MAX_STEP,
   YEAR_STEP_TEXT,
+  yearExportStep,
   baseOption,
   dayLabel,
   dayOfYearAxis,
@@ -409,6 +410,7 @@ export const years: DiagramDef<YearsData> = {
   prepare: prepareYears,
   build,
   showsEvents: true,
+  exportStep: yearExportStep,
   widthDependent: true,
   relayout: (data, ctx) => yLayout(data, ctx).layout,
   height: (params, data, width) =>

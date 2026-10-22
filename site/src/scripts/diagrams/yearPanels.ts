@@ -11,6 +11,7 @@ import { fixedRange } from '../axisRanges';
 import type { BuildContext, DiagramDef } from './registry';
 import {
   axisName,
+  yearExportStep,
   baseOption,
   dayOfYearAxisName,
   displayUnit,
@@ -217,6 +218,7 @@ export const yearPanels: DiagramDef<YearsData> = {
   prepare: prepareYears,
   build,
   showsEvents: true,
+  exportStep: yearExportStep,
   widthDependent: true,
   height: (params, data, width) => totalHeight(params.variables.length, data?.years.length ?? 1, width),
   describe: (data) =>

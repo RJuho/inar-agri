@@ -12,7 +12,7 @@ import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
 import { fixedColorRange } from '../axisRanges';
-import { VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
+import { AGGREGATION_LABELS, VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, meanExpr, periodBounds, whereClause } from './sql';
 import {
@@ -465,6 +465,8 @@ export const fingerprint: DiagramDef<FingerprintData> = {
   prepare,
   build,
   showsEvents: false,
+  // Always 30-min values, at all steps.
+  exportStep: () => AGGREGATION_LABELS.raw,
   relayout: (data, ctx) => {
     const lay = fullLayout(data, ctx.height);
     const blocks = blockParts(data, ctx, lay);

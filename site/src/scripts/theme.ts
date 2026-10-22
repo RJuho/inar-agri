@@ -8,7 +8,24 @@ export interface Tokens {
   grid: string;
   axis: string;
   surface: string;
+  /** True for EXPORT_TOKENS. The helpers in diagrams/common.ts then use the larger export sizes. */
+  export?: boolean;
 }
+
+/**
+ * Colour tokens of the PNG export: a fixed light set with high contrast. They do not come
+ * from CSS, so that the export is the same in light and dark mode.
+ */
+export const EXPORT_TOKENS: Readonly<Tokens> = Object.freeze({
+  // The light series colours of global.css.
+  series: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'],
+  text: '#000000',
+  textMuted: '#262626',
+  grid: '#cfcfcf',
+  axis: '#404040',
+  surface: '#ffffff',
+  export: true,
+});
 
 export function readTokens(el: HTMLElement): Tokens {
   const css = getComputedStyle(el);

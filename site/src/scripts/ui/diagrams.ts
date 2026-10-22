@@ -17,9 +17,10 @@ import type { Table } from 'apache-arrow';
 import { query, type Meta } from '../db';
 import { diagramDef, type BuildContext, type DiagramDef, type Prepared } from '../diagrams/registry';
 import { axesText, composeAlt, parseStats, statsQuery, type SiteStats } from '../alttext';
-import { onSchemeChange, prefersDark, readTokens } from '../theme';
-import type { Diagram, View, ViewParams } from '../state';
-import type { ExportItem } from '../export';
+import { EXPORT_TOKENS, onSchemeChange, prefersDark, readTokens } from '../theme';
+import { AGGREGATION_LABELS, type Diagram, type View, type ViewParams } from '../state';
+import { EXPORT_WIDTH, type ExportItem } from '../export';
+import { exportStyle, withExportSizes } from '../diagrams/common';
 
 // Components that all diagram types use. Chart types register their own series modules.
 echarts.use([
@@ -221,10 +222,11 @@ class DiagramCard {
     return this.alt;
   }
 
-  /** The card as the PNG export sees it. */
+  /** The card as the PNG export sees it. The chart sizes are the export sizes, not the page sizes. */
   exportItem(): ExportItem {
-    const hasChart = this.status === 'ready' && this.chart !== null && !this.chartEl.hidden;
-    const chart = this.chart;
+    const hasChart = this.status === 'ready' && this.chart !== null && !this.chartEl.hidden && !!this.data && !!this.params;
+    const height = hasChart && this.data && this.params ? this.def.height(this.params, this.data, EXPORT_WIDTH) : 0;
+    const params = this.params;
     return {
       id: this.id,
       type: this.def.type,
@@ -233,15 +235,47 @@ class DiagramCard {
       note: this.noteEl.hidden ? '' : (this.noteEl.textContent ?? ''),
       alt: this.alt,
       ready: this.status !== 'loading',
-      width: hasChart ? this.chartEl.clientWidth : 0,
-      height: hasChart ? this.chartEl.clientHeight : 0,
-      cropBottom: hasChart ? Math.min(this.def.exportCropBottom ?? 0, Math.max(0, this.chartEl.clientHeight - 1)) : 0,
-      // The image has no zoom slider: it is a control, not data.
-      image: (scale, background) =>
-        hasChart && chart
-          ? chart.getDataURL({ type: 'png', pixelRatio: scale, backgroundColor: background, excludeComponents: ['dataZoom'] })
-          : null,
+      step: params ? (this.def.exportStep?.(params) ?? AGGREGATION_LABELS[params.aggregation]) : '',
+      width: hasChart ? EXPORT_WIDTH : 0,
+      height,
+      cropBottom: hasChart ? Math.min(this.def.exportCropBottom ?? 0, Math.max(0, height - 1)) : 0,
+      image: (scale) => (hasChart ? this.renderExport(scale, height) : null),
     };
+  }
+
+  /**
+   * PNG data URL of the chart for the export: EXPORT_WIDTH CSS px wide, `scale` pixels per CSS px,
+   * light high-contrast colours (EXPORT_TOKENS) and larger text. The size does not depend on the
+   * window or the device. The zoom of the card applies. The image has no zoom slider: it is a control, not data.
+   */
+  renderExport(scale: number, height: number): string | null {
+    if (!this.data || !this.params || this.data.note) return null;
+    const div = document.createElement('div');
+    div.setAttribute('aria-hidden', 'true');
+    div.style.cssText = `position:fixed;left:-100000px;top:0;width:${EXPORT_WIDTH}px;height:${height}px;`;
+    document.body.append(div);
+    // No dark theme: the export is always light.
+    const chart = echarts.init(div, undefined, { width: EXPORT_WIDTH, height });
+    try {
+      const ctx: BuildContext = {
+        params: this.params,
+        meta: this.meta,
+        tokens: EXPORT_TOKENS,
+        height,
+        width: EXPORT_WIDTH,
+        zoom: this.zoom,
+        export: true,
+      };
+      const data = this.data;
+      withExportSizes(true, () => {
+        chart.setOption(exportStyle(this.def.build(data, ctx) as Record<string, unknown>, EXPORT_TOKENS), { notMerge: true });
+        if (this.def.relayout) chart.setOption(exportStyle(this.def.relayout(data, ctx) as Record<string, unknown>, EXPORT_TOKENS));
+      });
+      return chart.getDataURL({ type: 'png', pixelRatio: scale, backgroundColor: EXPORT_TOKENS.surface, excludeComponents: ['dataZoom'] });
+    } finally {
+      chart.dispose();
+      div.remove();
+    }
   }
 
   private setAlt(text: string): void {

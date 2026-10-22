@@ -252,6 +252,8 @@ export const cumulative: DiagramDef<CumulativeData> = {
   prepare,
   build,
   showsEvents: true,
+  // Daily running sums of the 30-min values, at all steps.
+  exportStep: () => 'Daily running sum of the 30-min values',
   relayout: (data, ctx) => yLayout(data, ctx.params, ctx.height).layout,
   height: (params) => stackHeight(Math.max(1, sumVars(params).length), 260, YEAR_STACK),
   statsVariables: sumVars,

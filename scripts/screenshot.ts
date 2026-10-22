@@ -33,7 +33,8 @@ Options:
   --diagram <target>   "all" (default): one image with all diagrams, a header and the alt texts.
                        A number: the diagram at this position (0 = first). Other text: a diagram id.
   --scale <n>          Pixels per CSS pixel, 1 to 6. Default: 3.
-  --width <px>         Browser window width. Default: 1400.
+  --width <px>         Browser window width. Default: 1400. It changes only the page layout, not the
+                       image: each chart is exported 1200 CSS px wide (times --scale) on all devices.
   --theme <name>       light (default) or dark.
   --out <file>         PNG file. Default: ${DEFAULT_OUT}
                        The alt text goes to the same path with .alt.txt in place of .png.

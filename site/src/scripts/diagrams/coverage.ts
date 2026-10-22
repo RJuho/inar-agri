@@ -10,7 +10,7 @@ import { VisualMapComponent } from 'echarts/components';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
-import { VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
+import { AGGREGATION_LABELS, VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, periodBounds, whereClause } from './sql';
 import {
@@ -325,6 +325,8 @@ export const coverage: DiagramDef<CoverageData> = {
   build,
   showsEvents: false,
   usesFixedRange: false,
+  // Always the 30-min rows, at all steps.
+  exportStep: () => AGGREGATION_LABELS.raw,
   widthDependent: true,
   relayout: (data, ctx) => {
     const y = leftFor(data, ctx.meta, ctx.params);

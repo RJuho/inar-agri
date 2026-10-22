@@ -50,6 +50,11 @@ export function yearStep(a: Aggregation): YearStep {
  */
 export const WEEK_STEP = 8 * DAY;
 
+/** Export step of the day-of-year diagrams: raw data is shown as daily means. */
+export function yearExportStep(params: ViewParams): string {
+  return AGGREGATION_LABELS[yearStep(params.aggregation)];
+}
+
 /** Longest normal step between two points on a reference-year axis. */
 export const YEAR_MAX_STEP: Record<YearStep, number> = { day: DAY_STEP, week: WEEK_STEP, month: 32 * DAY };
 
@@ -157,16 +162,45 @@ export const FLUX_VARS: ReadonlySet<Variable> = new Set<Variable>([
   'nee', 'nee_f', 'gpp', 'reco', 'gpp_src', 'reco_src', 'ch4', 'n2o', 'le', 'netrad', 'g',
 ]);
 
-/** Font of the axis names and of the tick labels (ECharts default size 12). */
-const NAME_SIZE = 11;
-const NAME_FONT = `${NAME_SIZE}px system-ui, sans-serif`;
-const LABEL_FONT = '12px system-ui, sans-serif';
-/** Line height of a two-line axis name. */
-const NAME_LINE = 13;
+/**
+ * Text sizes in px. The page uses `PAGE_SIZES`. The PNG export (`BuildContext.export`) uses
+ * `EXPORT_SIZES`: larger text and lines, for print. `withExportSizes()` selects the set while
+ * one option is built.
+ */
+interface Sizes {
+  /** Axis names. */
+  name: number;
+  /** Tick labels (ECharts default 12). */
+  label: number;
+  /** Panel titles. */
+  title: number;
+  /** Event marker labels. */
+  event: number;
+  /** Smallest width of a data line. */
+  line: number;
+}
+const PAGE_SIZES: Sizes = { name: 11, label: 12, title: 13, event: 9, line: 1 };
+const EXPORT_SIZES: Sizes = { name: 12, label: 13, title: 14, event: 10, line: 1.5 };
+let sizes = PAGE_SIZES;
 
-/** Width in px of a text, measured with the ECharts text measurer. */
-export function textWidth(text: string, font = LABEL_FONT): number {
-  return echarts.format.getTextRect(text, font).width;
+/** Run `fn` with the export sizes when `on` is true. Option builders run synchronously. */
+export function withExportSizes<T>(on: boolean, fn: () => T): T {
+  const before = sizes;
+  sizes = on ? EXPORT_SIZES : PAGE_SIZES;
+  try {
+    return fn();
+  } finally {
+    sizes = before;
+  }
+}
+
+const font = (size: number) => `${size}px system-ui, sans-serif`;
+/** Line height of a two-line axis name. */
+const nameLine = () => sizes.name + 2;
+
+/** Width in px of a text, measured with the ECharts text measurer. Default font: the tick labels. */
+export function textWidth(text: string, f = font(sizes.label)): number {
+  return echarts.format.getTextRect(text, f).width;
 }
 
 /**
@@ -176,7 +210,7 @@ export function textWidth(text: string, font = LABEL_FONT): number {
 export function axisNameText(symbol: string, unit: string, room = Infinity): string {
   if (!unit) return symbol;
   const one = `${symbol} (${unit})`;
-  return textWidth(one, NAME_FONT) + 8 <= room ? one : `${symbol}\n(${unit})`;
+  return textWidth(one, font(sizes.name)) + 8 <= room ? one : `${symbol}\n(${unit})`;
 }
 
 /** Y axis name of a variable, for example `NEE (µmol CO₂ m⁻² s⁻¹)`. `room` = panel height in px. */
@@ -218,7 +252,7 @@ export function yNameGap(labelWidth: number): number {
  * and 4 px at the chart edge. Use the largest value of all panels, so that the panels line up.
  */
 export function gridLeftFor(labelWidth: number, lines = 1): number {
-  return yNameGap(labelWidth) + lines * NAME_LINE + 4;
+  return yNameGap(labelWidth) + lines * nameLine() + 4;
 }
 
 /**
@@ -238,7 +272,7 @@ export function yAxisName(tokens: Tokens, name: string, labelWidth: number) {
     nameLocation: 'middle',
     nameRotate: 90,
     nameGap: yNameGap(labelWidth),
-    nameTextStyle: { color: tokens.textMuted, fontSize: NAME_SIZE, lineHeight: NAME_LINE, align: 'center' },
+    nameTextStyle: { color: tokens.textMuted, fontSize: sizes.name, lineHeight: nameLine(), align: 'center' },
   };
 }
 
@@ -251,7 +285,7 @@ export function xAxisName(tokens: Tokens, name: string, gap = 28) {
     name,
     nameLocation: 'middle',
     nameGap: gap,
-    nameTextStyle: { color: tokens.textMuted, fontSize: NAME_SIZE, lineHeight: NAME_LINE },
+    nameTextStyle: { color: tokens.textMuted, fontSize: sizes.name, lineHeight: nameLine() },
   };
 }
 
@@ -430,7 +464,7 @@ export function titleText(label: string, unit: string): string {
   return unit ? `${label}  {u|${unit}}` : label;
 }
 
-export function titleStyle(tokens: Tokens, size = 13) {
+export function titleStyle(tokens: Tokens, size = sizes.title) {
   return {
     fontSize: size,
     fontWeight: 600,
@@ -479,6 +513,42 @@ export function tooltipBase(tokens: Tokens, trigger: 'axis' | 'item') {
     borderColor: tokens.grid,
     textStyle: { color: tokens.text, fontSize: 12 },
   };
+}
+
+/** Tick label colour and size: muted text on the page, full text colour and a larger size in the export. */
+export function axisLabelStyle(tokens: Tokens) {
+  return { color: tokens.export ? tokens.text : tokens.textMuted, fontSize: sizes.label };
+}
+
+type Obj = Record<string, unknown>;
+const isObj = (x: unknown): x is Obj => typeof x === 'object' && x !== null && !Array.isArray(x);
+const list = (x: unknown): Obj[] => (Array.isArray(x) ? x.filter(isObj) : isObj(x) ? [x] : []);
+
+/**
+ * Apply the export sizes to the parts of an option that the diagram files set themselves:
+ * tick labels (text colour, `EXPORT_SIZES.label`), title font sizes (+1 px) and thin data
+ * lines (at least `EXPORT_SIZES.line`). The option is changed in place and returned.
+ */
+export function exportStyle(option: Obj, tokens: Tokens): Obj {
+  for (const key of ['xAxis', 'yAxis']) {
+    for (const axis of list(option[key])) {
+      const label = isObj(axis.axisLabel) ? axis.axisLabel : {};
+      if (label.color === undefined || label.color === tokens.textMuted) label.color = tokens.text;
+      if (typeof label.fontSize !== 'number' || label.fontSize < EXPORT_SIZES.label) label.fontSize = EXPORT_SIZES.label;
+      axis.axisLabel = label;
+    }
+  }
+  for (const title of list(option.title)) {
+    const style = isObj(title.textStyle) ? title.textStyle : null;
+    if (style && typeof style.fontSize === 'number' && style.fontSize < EXPORT_SIZES.title) style.fontSize += 1;
+  }
+  for (const s of list(option.series)) {
+    if (s.type !== 'line' || !isObj(s.lineStyle)) continue;
+    const ls = s.lineStyle;
+    if (ls.opacity === 0) continue;
+    if (typeof ls.width === 'number' && ls.width < EXPORT_SIZES.line) ls.width = EXPORT_SIZES.line;
+  }
+  return option;
 }
 
 /**
@@ -535,7 +605,7 @@ function valueAxisBase(tokens: Tokens, gridIndex: number, extra: Record<string, 
     splitNumber: 3,
     axisLine: { show: true, lineStyle: { color: tokens.axis } },
     axisTick: { show: true, inside: false, lineStyle: { color: tokens.axis } },
-    axisLabel: { color: tokens.textMuted, hideOverlap: true },
+    axisLabel: { ...axisLabelStyle(tokens), hideOverlap: true },
     splitLine: { lineStyle: { color: tokens.grid, width: 1 } },
     ...extra,
   };
@@ -553,7 +623,7 @@ export function dayOfYearAxis(tokens: Tokens, gridIndex: number, showLabels: boo
     axisTick: { show: showLabels },
     axisLabel: {
       show: showLabels,
-      color: tokens.textMuted,
+      ...axisLabelStyle(tokens),
       hideOverlap: true,
       showMaxLabel,
       formatter: { year: '{MMM}', month: '{MMM}', day: '{d} {MMM}' },
@@ -846,7 +916,7 @@ export function eventMarkers(marks: EventMark[], color: string, tokens: Tokens, 
       label: {
         show: label,
         position: 'end',
-        fontSize: 9,
+        fontSize: sizes.event,
         fontWeight: 600,
         color,
         backgroundColor: tokens.surface,
@@ -855,7 +925,7 @@ export function eventMarkers(marks: EventMark[], color: string, tokens: Tokens, 
         borderRadius: 2,
         padding: [1, 2],
       },
-      emphasis: { lineStyle: { width: 2, opacity: 1 }, label: { show: true, fontSize: 10 } },
+      emphasis: { lineStyle: { width: 2, opacity: 1 }, label: { show: true, fontSize: sizes.event + 1 } },
       data: marks.map((m) => ({
         xAxis: m.x,
         name: `${eventLabel(m.event.type)} ${eventDateText(m.event)}`,

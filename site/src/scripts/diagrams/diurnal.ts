@@ -275,6 +275,8 @@ export const diurnal: DiagramDef<DiurnalData> = {
   query,
   prepare,
   build,
+  // The view step does not apply: the 30-min values are used.
+  exportStep: () => 'Mean per half hour of the day (30-min values)',
   relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height, LAYOUT, yLayout(data, ctx.meta, ctx.params, ctx.height).left),
   height: (params) => stackHeight(params.variables.length, PANEL_H, LAYOUT),
   describe: (data, ctx) =>

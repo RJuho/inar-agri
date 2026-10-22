@@ -229,6 +229,8 @@ export const monthly: DiagramDef<MonthlyData> = {
   query,
   prepare,
   build,
+  // The view step does not apply: monthly mean (precipitation: mean of the monthly sums).
+  exportStep: () => 'Mean per calendar month',
   relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height, LAYOUT, yLayout(data, ctx.meta, ctx.params, ctx.height).left),
   height: (params) => stackHeight(params.variables.length, PANEL_H, LAYOUT),
   describe: (data) =>

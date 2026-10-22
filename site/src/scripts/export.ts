@@ -1,13 +1,16 @@
-// PNG export of the diagrams. One diagram: the ECharts image at a high pixel ratio.
-// All diagrams: one composite image, drawn on an offscreen canvas. It has a header
-// (view name, parameters, source) and, for each diagram, the title, the chart and the
-// alt text, so that the image tells what it shows. Both images get the title and the
-// alt text as iTXt chunks (keywords Title and Description).
+// PNG export of the diagrams. The charts are drawn again offscreen at a fixed width
+// (EXPORT_WIDTH CSS px) with light, high-contrast colours (EXPORT_TOKENS), so that the
+// image is the same on all devices and in both colour schemes.
+// One diagram: a header (diagram title with the step, view name, parameters, source) and the chart.
+// All diagrams: one composite image with the same header and, for each diagram, the title
+// with the step, the chart and the alt text, so that the image tells what it shows.
+// Both images get iTXt chunks (keywords Title, Description and Step).
 import type { Meta } from './db';
 import { addTextChunks, bytesToDataUrl, dataUrlToBytes } from './png';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type View, type ViewParams } from './state';
 import { displayUnit, selectedSiteLabels, yearsText } from './diagrams/common';
 import { listText } from './alttext';
+import { EXPORT_TOKENS } from './theme';
 
 /** One diagram card, as the export sees it. */
 export interface ExportItem {
@@ -20,13 +23,15 @@ export interface ExportItem {
   note: string;
   alt: string;
   ready: boolean;
-  /** Chart size in CSS px. 0 when the card shows no chart. */
+  /** Step that the diagram shows, for example "Daily mean". */
+  step: string;
+  /** Chart size in the export, in CSS px (width = EXPORT_WIDTH). 0 when the card shows no chart. */
   width: number;
   height: number;
   /** Empty band in CSS px at the bottom of the chart image (place of the zoom slider). The export removes it. */
   cropBottom: number;
-  /** PNG data URL of the chart at `scale` pixels per CSS px, or null when no chart. */
-  image(scale: number, background: string): string | null;
+  /** PNG data URL of the export chart at `scale` pixels per CSS px, or null when no chart. */
+  image(scale: number): string | null;
 }
 
 export interface PngResult {
@@ -41,9 +46,13 @@ const MAX_SCALE = 6;
 const MAX_SIDE = 32_000;
 const MAX_AREA = 200_000_000;
 
+/** Width in CSS px of each chart in the export, on all devices. */
+export const EXPORT_WIDTH = 1200;
+/** Margin in CSS px around the content of a composite image. It is EXPORT_WIDTH + 2 × PAD wide; a single-diagram image is EXPORT_WIDTH wide. */
+export const PAD = 24;
+/** Left and right text inset in CSS px of a single-diagram image (it has no side margin). */
+const TEXT_INSET = 12;
 const FONT = 'system-ui, sans-serif';
-const PAD = 24;
-const MIN_WIDTH = 720;
 
 interface Colors {
   background: string;
@@ -52,15 +61,9 @@ interface Colors {
   rule: string;
 }
 
+/** Colours of the exported image: always EXPORT_TOKENS (light), not the page theme. */
 function readColors(): Colors {
-  const css = getComputedStyle(document.documentElement);
-  const get = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback;
-  return {
-    background: get('--surface', '#ffffff'),
-    text: get('--text-primary', '#000000'),
-    muted: get('--text-secondary', '#555555'),
-    rule: get('--grid-line', '#dddddd'),
-  };
+  return { background: EXPORT_TOKENS.surface, text: EXPORT_TOKENS.text, muted: EXPORT_TOKENS.textMuted, rule: EXPORT_TOKENS.grid };
 }
 
 function cleanScale(scale: unknown): number {
@@ -80,6 +83,7 @@ export function paramsLine(view: View, meta: Meta, types: string[]): string {
     `Step: ${AGGREGATION_LABELS[p.aggregation]}`,
   ];
   if (types.includes('scatter')) parts.push(`X variable: ${VARIABLE_LABELS[p.xVariable]}`);
+  parts.push(p.fixedY ? 'Y range: fixed (all data)' : 'Y range: auto');
   if (p.events) parts.push('Events: shown');
   return `${parts.join('. ')}.`;
 }
@@ -112,10 +116,11 @@ export function slug(name: string): string {
   return s || 'view';
 }
 
-function withText(dataUrl: string, title: string, alt: string): string {
+function withText(dataUrl: string, title: string, alt: string, step: string): string {
   const bytes = addTextChunks(dataUrlToBytes(dataUrl), [
     { keyword: 'Title', text: title },
     { keyword: 'Description', text: alt },
+    { keyword: 'Step', text: step },
   ]);
   return bytesToDataUrl(bytes);
 }
@@ -123,30 +128,7 @@ function withText(dataUrl: string, title: string, alt: string): string {
 /** Chart height in the export: without the empty band at the bottom. */
 const shownHeight = (item: ExportItem) => Math.max(0, item.height - item.cropBottom);
 
-/** Remove `crop` CSS px at the bottom of a chart image made at `scale`. */
-async function cropImage(url: string, crop: number, scale: number): Promise<string> {
-  if (crop <= 0) return url;
-  const img = await loadImage(url);
-  const canvas = document.createElement('canvas');
-  canvas.width = img.naturalWidth;
-  canvas.height = Math.max(1, img.naturalHeight - Math.round(crop * scale));
-  const g = canvas.getContext('2d');
-  if (!g) throw new Error('The browser cannot make a 2D canvas.');
-  g.drawImage(img, 0, 0);
-  return canvas.toDataURL('image/png');
-}
-
-/** PNG of one diagram. The title chunk has the diagram title and the view name. */
-export async function diagramPng(item: ExportItem, viewName: string, scale: number): Promise<PngResult> {
-  if (!item.ready) throw new Error(`Diagram ${item.id} is not ready.`);
-  const s = cleanScale(scale);
-  const url = item.image(s, readColors().background);
-  if (!url) throw new Error(`Diagram ${item.id} has no chart: ${item.note || 'no data'}`);
-  const cropped = await cropImage(url, item.cropBottom, s);
-  return { dataUrl: withText(cropped, `${item.title} – ${viewName}`, item.alt), alt: item.alt };
-}
-
-// ---------- Composite image ----------
+// ---------- Canvas drawing ----------
 
 interface TextBlock {
   lines: string[];
@@ -206,46 +188,31 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   return img.decode().then(() => img);
 }
 
-/**
- * Composite PNG of all diagrams of the view. The alt text of the image is the header
- * text and the alt text of each diagram, in the order of the cards.
- */
-export async function compositePng(view: View, meta: Meta, items: ExportItem[], scale: number): Promise<PngResult> {
-  const waiting = items.filter((i) => !i.ready);
-  if (waiting.length > 0) throw new Error(`Diagrams are not ready: ${waiting.map((i) => i.id).join(', ')}.`);
-  const colors = readColors();
-  const contentW = Math.max(MIN_WIDTH, ...items.map((i) => i.width));
-  const width = contentW + 2 * PAD;
+/** Adds the step in brackets, for example "1. Time series (Step: Daily mean)". */
+const withStep = (text: string, step: string) => (step ? `${text} (Step: ${step})` : text);
 
-  const ctx = document.createElement('canvas').getContext('2d');
-  if (!ctx) throw new Error('The browser cannot make a 2D canvas.');
+/** Diagram title with the step, for example "1. Time series (Step: Daily mean)". */
+const stepTitle = (item: ExportItem) => withStep(item.title, item.step);
 
-  const params = paramsLine(
-    view,
-    meta,
-    items.map((i) => i.type),
-  );
-  const source = sourceLine(view.params);
-  const parts: Part[] = [
-    { kind: 'text', block: block(ctx, view.name, contentW, 22, colors.text, 650), gap: 4 },
+/** Header parts: title, parameters line and source line. */
+function headerParts(ctx: CanvasRenderingContext2D, title: string, params: string, source: string, contentW: number, colors: Colors): Part[] {
+  return [
+    { kind: 'text', block: block(ctx, title, contentW, 22, colors.text, 650), gap: 4 },
     { kind: 'text', block: block(ctx, params, contentW, 14, colors.text), gap: 4 },
     { kind: 'text', block: block(ctx, source, contentW, 13, colors.muted), gap: 16 },
   ];
-  const altParts = [`${view.name}. ${params} ${source}`];
-  if (items.length === 0) parts.push({ kind: 'text', block: block(ctx, 'This view has no diagrams.', contentW, 14, colors.muted), gap: 0 });
-  for (const item of items) {
-    parts.push({ kind: 'rule', gap: 16 });
-    parts.push({ kind: 'text', block: block(ctx, item.title, contentW, 17, colors.text, 600), gap: item.subtitle ? 2 : 8 });
-    if (item.subtitle) parts.push({ kind: 'text', block: block(ctx, item.subtitle, contentW, 13, colors.muted), gap: 8 });
-    if (item.width > 0 && item.height > 0) parts.push({ kind: 'image', item, gap: 10 });
-    if (item.note) parts.push({ kind: 'text', block: block(ctx, item.note, contentW, 14, colors.muted), gap: 8 });
-    if (item.alt) {
-      parts.push({ kind: 'text', block: block(ctx, 'Alt text', contentW, 13, colors.text, 600), gap: 2 });
-      parts.push({ kind: 'text', block: block(ctx, item.alt, contentW, 13, colors.muted), gap: 16 });
-    }
-    altParts.push(`${item.title}. ${item.alt || item.note}`);
-  }
+}
 
+/**
+ * Draw the parts on one canvas, EXPORT_WIDTH + 2 × `side` CSS px wide, and return the PNG data URL.
+ * With `side` = 0 (single diagram) the chart fills the width and the text has an inset of TEXT_INSET px.
+ * The chart images are made at the final scale. The empty band at the bottom of a chart
+ * (`cropBottom`, place of the zoom slider) is not drawn.
+ */
+async function drawParts(parts: Part[], scale: number, colors: Colors, side = PAD): Promise<string> {
+  const contentW = EXPORT_WIDTH;
+  const width = contentW + 2 * side;
+  const textX = side > 0 ? side : TEXT_INSET;
   const partHeight = (p: Part) => (p.kind === 'text' ? blockHeight(p.block) : p.kind === 'image' ? shownHeight(p.item) : 1);
   const height = Math.ceil(PAD + parts.reduce((h, p) => h + partHeight(p) + p.gap, 0) + PAD);
 
@@ -254,11 +221,10 @@ export async function compositePng(view: View, meta: Meta, items: ExportItem[], 
   s = Math.min(s, MAX_SIDE / width, MAX_SIDE / height, Math.sqrt(MAX_AREA / (width * height)));
   s = Math.max(0.5, Math.floor(s * 100) / 100);
 
-  // Make the chart images at the final scale, then load them.
   const images = new Map<ExportItem, HTMLImageElement>();
   for (const p of parts) {
     if (p.kind !== 'image') continue;
-    const url = p.item.image(s, colors.background);
+    const url = p.item.image(s);
     if (url) images.set(p.item, await loadImage(url));
   }
 
@@ -276,26 +242,91 @@ export async function compositePng(view: View, meta: Meta, items: ExportItem[], 
   for (const p of parts) {
     if (p.kind === 'rule') {
       g.fillStyle = colors.rule;
-      g.fillRect(PAD, y, contentW, 1);
+      g.fillRect(side, y, contentW, 1);
     } else if (p.kind === 'image') {
       const img = images.get(p.item);
       // Draw the chart without the empty band at the bottom.
       const h = shownHeight(p.item);
-      if (img) g.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight * (h / p.item.height), PAD, y, p.item.width, h);
+      if (img) g.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight * (h / p.item.height), side, y, p.item.width, h);
     } else {
       const b = p.block;
       g.font = b.font;
       g.fillStyle = b.color;
       // Put the glyphs in the middle of the line box.
       const offset = (b.lineHeight - Number.parseFloat(b.font.split(' ')[1] ?? '13')) / 2;
-      b.lines.forEach((line, i) => g.fillText(line, PAD, y + offset + i * b.lineHeight));
+      b.lines.forEach((line, i) => g.fillText(line, textX, y + offset + i * b.lineHeight));
     }
     y += partHeight(p) + p.gap;
   }
+  return canvas.toDataURL('image/png');
+}
+
+function canvas2d(): CanvasRenderingContext2D {
+  const ctx = document.createElement('canvas').getContext('2d');
+  if (!ctx) throw new Error('The browser cannot make a 2D canvas.');
+  return ctx;
+}
+
+/**
+ * PNG of one diagram: a header band (diagram title with the step and the view name,
+ * parameters line, source line) above the chart. The title chunk has the diagram title and the view name.
+ */
+export async function diagramPng(item: ExportItem, view: View, meta: Meta, scale: number): Promise<PngResult> {
+  if (!item.ready) throw new Error(`Diagram ${item.id} is not ready.`);
+  if (item.width <= 0 || item.height <= 0) throw new Error(`Diagram ${item.id} has no chart: ${item.note || 'no data'}`);
+  const colors = readColors();
+  const ctx = canvas2d();
+  // For example "1. Time series — All data (Step: Daily mean)".
+  const viewTitle = `${item.title} — ${view.name}`;
+  const title = withStep(viewTitle, item.step);
+  const params = paramsLine(view, meta, [item.type]);
+  const source = sourceLine(view.params);
+  // The chart fills the width (EXPORT_WIDTH): the text has an inset on the two sides.
+  const textW = EXPORT_WIDTH - 2 * TEXT_INSET;
+  const parts: Part[] = headerParts(ctx, title, params, source, textW, colors);
+  if (item.subtitle) parts.push({ kind: 'text', block: block(ctx, item.subtitle, textW, 13, colors.muted), gap: 8 });
+  parts.push({ kind: 'image', item, gap: 0 });
+  const url = await drawParts(parts, scale, colors, 0);
+  return { dataUrl: withText(url, viewTitle, item.alt, item.step), alt: item.alt };
+}
+
+/**
+ * Composite PNG of all diagrams of the view. The alt text of the image is the header
+ * text and the alt text of each diagram, in the order of the cards.
+ */
+export async function compositePng(view: View, meta: Meta, items: ExportItem[], scale: number): Promise<PngResult> {
+  const waiting = items.filter((i) => !i.ready);
+  if (waiting.length > 0) throw new Error(`Diagrams are not ready: ${waiting.map((i) => i.id).join(', ')}.`);
+  const colors = readColors();
+  const contentW = EXPORT_WIDTH;
+  const ctx = canvas2d();
+
+  const params = paramsLine(
+    view,
+    meta,
+    items.map((i) => i.type),
+  );
+  const source = sourceLine(view.params);
+  const parts: Part[] = headerParts(ctx, view.name, params, source, contentW, colors);
+  const altParts = [`${view.name}. ${params} ${source}`];
+  if (items.length === 0) parts.push({ kind: 'text', block: block(ctx, 'This view has no diagrams.', contentW, 14, colors.muted), gap: 0 });
+  for (const item of items) {
+    const title = stepTitle(item);
+    parts.push({ kind: 'rule', gap: 16 });
+    parts.push({ kind: 'text', block: block(ctx, title, contentW, 17, colors.text, 600), gap: item.subtitle ? 2 : 8 });
+    if (item.subtitle) parts.push({ kind: 'text', block: block(ctx, item.subtitle, contentW, 13, colors.muted), gap: 8 });
+    if (item.width > 0 && item.height > 0) parts.push({ kind: 'image', item, gap: 10 });
+    if (item.note) parts.push({ kind: 'text', block: block(ctx, item.note, contentW, 14, colors.muted), gap: 8 });
+    if (item.alt) {
+      parts.push({ kind: 'text', block: block(ctx, 'Alt text', contentW, 13, colors.text, 600), gap: 2 });
+      parts.push({ kind: 'text', block: block(ctx, item.alt, contentW, 13, colors.muted), gap: 16 });
+    }
+    altParts.push(`${title}. ${item.alt || item.note}`);
+  }
 
   const alt = altParts.join('\n\n');
-  const url = canvas.toDataURL('image/png');
-  return { dataUrl: withText(url, view.name, alt), alt };
+  const url = await drawParts(parts, scale, colors);
+  return { dataUrl: withText(url, view.name, alt, AGGREGATION_LABELS[view.params.aggregation]), alt };
 }
 
 /** Save a data URL as a file through a temporary link. */

@@ -476,6 +476,8 @@ export const budget: DiagramDef<BudgetData> = {
   query,
   prepare,
   build,
+  // The view step does not apply.
+  exportStep: () => 'Annual sum of the 30-min values',
   widthDependent: true,
   showsEvents: false,
   height: (params, data, width) =>

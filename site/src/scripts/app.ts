@@ -199,7 +199,7 @@ export async function start(): Promise<void> {
     if (target === 'all') return compositePng(view, meta, diagrams.exportItems(), scale);
     const item = diagrams.exportItem(target);
     if (!item) throw new Error(`No diagram ${JSON.stringify(target)} in view ${view.name}.`);
-    return diagramPng(item, view.name, scale);
+    return diagramPng(item, view, meta, scale);
   };
 
   const savePng = async (target: string | number) => {

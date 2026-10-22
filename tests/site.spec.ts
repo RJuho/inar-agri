@@ -774,6 +774,9 @@ function pngText(png: Buffer): Record<string, string> {
 }
 
 const pngWidth = (png: Buffer) => png.readUInt32BE(16);
+/** Width in CSS px of each exported chart (EXPORT_WIDTH in export.ts) and the side margin of a composite (PAD). */
+const EXPORT_WIDTH = 1200;
+const EXPORT_PAD = 24;
 const pngHeight = (png: Buffer) => png.readUInt32BE(20);
 
 interface ExportHook {
@@ -808,14 +811,15 @@ test.describe('PNG export', () => {
     expect(errors).toEqual([]);
   });
 
-  test('one diagram: width is 3x the chart width and the description is the alt text', async ({ page }) => {
-    const chartW = await page.locator('.diagram-chart').first().evaluate((el) => el.clientWidth);
+  test('one diagram: width is 3 x 1200 px and the description is the alt text', async ({ page }) => {
     const { png, alt } = await exportPng(page, 0);
-    expect(pngWidth(png)).toBe(3 * chartW);
+    expect(pngWidth(png)).toBe(3 * EXPORT_WIDTH);
     const text = pngText(png);
+    // Monthly means do not use the view step.
+    expect(text.Step).toBe('Mean per calendar month');
     expect(alt).toBe(await page.evaluate(() => (globalThis as unknown as { __inar: { altText(t: number): string } }).__inar.altText(0)));
     expect(text.Description).toBe(alt);
-    expect(text.Title).toContain('Export view');
+    expect(text.Title).toMatch(/ — Export view$/);
     // By id: the import gives new ids, so read the id of the second card.
     const id = (await page.locator('.diagram').nth(1).getAttribute('data-id')) ?? '';
     expect((await exportPng(page, id)).alt).toContain('Cumulative NEE');
@@ -826,13 +830,51 @@ test.describe('PNG export', () => {
     const two = await exportPng(page, 1);
     const all = await exportPng(page, 'all');
     expect(pngHeight(all.png)).toBeGreaterThanOrEqual(pngHeight(one.png) + pngHeight(two.png));
+    expect(pngWidth(all.png)).toBe(3 * (EXPORT_WIDTH + 2 * EXPORT_PAD));
     expect(pngWidth(all.png)).toBeGreaterThanOrEqual(pngWidth(one.png));
     const text = pngText(all.png);
+    expect(text.Step).toBe('Daily mean');
     expect(text.Title).toBe('Export view');
     expect(text.Description).toBe(all.alt);
     expect(all.alt).toContain(one.alt);
     expect(all.alt).toContain(two.alt);
     expect(all.alt).toContain('Haltiala and Qvidja');
+  });
+
+  test('export size does not depend on the window width', async ({ page }) => {
+    const wide = await exportPng(page, 1);
+    await page.setViewportSize({ width: 600, height: 900 });
+    await expect(page.locator('#chart')).toHaveAttribute('data-status', 'ready');
+    const narrow = await exportPng(page, 1);
+    expect(pngWidth(wide.png)).toBe(3 * EXPORT_WIDTH);
+    expect(pngWidth(narrow.png)).toBe(pngWidth(wide.png));
+    expect(pngHeight(narrow.png)).toBe(pngHeight(wide.png));
+    // The page chart is narrower than the export.
+    expect(await page.locator('.diagram-chart').nth(1).evaluate((el) => el.clientWidth)).toBeLessThan(EXPORT_WIDTH);
+  });
+
+  test('export is light also in the dark colour scheme', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(page.locator('#chart')).toHaveAttribute('data-status', 'ready');
+    const { png } = await exportPng(page, 0, 1);
+    const dataUrl = `data:image/png;base64,${png.toString('base64')}`;
+    // Pixel near the top left corner (header margin) and the mean of the full image.
+    const [corner, mean] = await page.evaluate(async (url) => {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const g = c.getContext('2d') as CanvasRenderingContext2D;
+      g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let sum = 0;
+      for (let i = 0; i < d.length; i += 4) sum += ((d[i] as number) + (d[i + 1] as number) + (d[i + 2] as number)) / 3;
+      return [[d[4 * (2 * c.width + 2)], d[4 * (2 * c.width + 2) + 1], d[4 * (2 * c.width + 2) + 2]], sum / (d.length / 4)];
+    }, dataUrl);
+    expect(corner).toEqual([255, 255, 255]);
+    expect(mean).toBeGreaterThan(200);
   });
 
   test('PNG button and "Download all" save PNG files', async ({ page }) => {
@@ -1454,10 +1496,31 @@ test.describe('month range and events', () => {
           .dataZoom.filter((d) => d.type === 'slider').length,
     );
     expect(sliders).toBe(1);
+    expect(w).toBeGreaterThan(0);
+    expect(h).toBeGreaterThan(0);
     const { png } = await exportPng(page, 0, 2);
-    expect(pngWidth(png)).toBe(2 * w);
-    expect(pngHeight(png)).toBeLessThan(2 * h);
-    expect(pngHeight(png)).toBeGreaterThan(2 * (h - 40));
+    expect(pngWidth(png)).toBe(2 * 1200);
+    // White rows at the bottom of the image: only the bottom margin (24 px) and the space below
+    // the x axis name. With the 32 px slider band, there would be more.
+    const blank = await page.evaluate(async (url) => {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const g = c.getContext('2d') as CanvasRenderingContext2D;
+      g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      for (let y = c.height - 1; y >= 0; y--) {
+        for (let x = 0; x < c.width; x++) {
+          const i = 4 * (y * c.width + x);
+          if ((d[i] as number) < 240 || (d[i + 1] as number) < 240 || (d[i + 2] as number) < 240) return c.height - 1 - y;
+        }
+      }
+      return c.height;
+    }, `data:image/png;base64,${png.toString('base64')}`);
+    expect(blank / 2).toBeLessThan(24 + 24);
   });
 });
 

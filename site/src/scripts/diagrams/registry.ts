@@ -40,6 +40,8 @@ export interface BuildContext {
   width: number;
   /** Zoom range in percent of the full x range. */
   zoom: { start: number; end: number };
+  /** True when the option is for the PNG export: fixed width, EXPORT_TOKENS and larger text. */
+  export?: boolean;
 }
 
 /** Values that the alt text template needs. */
@@ -70,6 +72,11 @@ export interface DiagramDef<D extends Prepared = Prepared> {
   usesFixedRange?: boolean;
   /** Empty band in px at the bottom of the chart, without the slider, to remove from the PNG export. Optional. */
   exportCropBottom?: number;
+  /**
+   * Step that the diagram really shows, for the export title ("Step: <label>"). Optional.
+   * Default: the step of the view (`AGGREGATION_LABELS`).
+   */
+  exportStep?(params: ViewParams): string;
   /** Chart height in px. `data` is null before the first query result. */
   height(params: ViewParams, data: D | null, width: number): number;
   /** Variables for the statistics of the alt text. Default: the variables of the view. */
