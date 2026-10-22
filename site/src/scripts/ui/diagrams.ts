@@ -21,6 +21,7 @@ import { EXPORT_TOKENS, onSchemeChange, prefersDark, readTokens } from '../theme
 import { AGGREGATION_LABELS, type Diagram, type View, type ViewParams } from '../state';
 import { EXPORT_WIDTH, type ExportItem } from '../export';
 import { exportStyle, withExportSizes } from '../diagrams/common';
+import { hardReloadLine } from '../recover';
 
 // Components that all diagram types use. Chart types register their own series modules.
 echarts.use([
@@ -374,6 +375,8 @@ class DiagramCard {
       this.seriesCount = 0;
       this.setAlt('');
       this.showNote(`Cannot draw the diagram: ${err instanceof Error ? err.message : String(err)}`);
+      // The error stays in this card. Tell the user the hard reload, but do not offer to delete the site data.
+      this.noteEl.append(' ', hardReloadLine('span'));
       this.setStatus('error');
     }
   }

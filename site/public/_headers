@@ -4,8 +4,13 @@
   Cache-Control: public, max-age=31536000, immutable
 
 # The Parquet files change when we rebuild the database.
+# db.ts adds ?v=<build time> to the URL, so a new build never reads old cached files.
 /data/*
   Cache-Control: public, max-age=3600
+
+# Build ID of the deploy. The update check (site/src/scripts/update.ts) must get the current file.
+/version.json
+  Cache-Control: no-store
 
 # DuckDB-WASM files (scripts/sync-site-duckdb.ts). The path has the npm version
 # (/duckdb/<npm version>/) or the DuckDB version (/duckdb/extensions/<version>/),

@@ -1,5 +1,5 @@
 ---
-// Shared page frame: <head>, styles, the page navigation and the footer.
+// Shared page frame: <head>, styles, the page navigation, the footer and the update check.
 import '../styles/global.css';
 import '../styles/calculated.css';
 import { REPO_URL } from '../lib/dataReport';
@@ -49,5 +49,10 @@ const pages = [
         Source code: <a href={REPO_URL} rel="noopener">{REPO_URL.replace(/^https:\/\//, '')}</a>
       </p>
     </footer>
+    <script>
+      // All pages: show a notice when a new build of the site is online.
+      import { startUpdateCheck } from '../scripts/update';
+      startUpdateCheck();
+    </script>
   </body>
 </html>

@@ -24,6 +24,7 @@ import {
   viewToHash,
 } from './state';
 import { DiagramList } from './ui/diagrams';
+import { showRecovery } from './recover';
 import { compositePng, DEFAULT_SCALE, diagramPng, download, downloadBlob, slug, type PngResult } from './export';
 import { exportData, sizeText, type DataFormat, type DataScope } from './dataexport';
 import { ParamsForm } from './ui/params';
@@ -71,8 +72,7 @@ export async function start(): Promise<void> {
   } catch (err) {
     console.error(err);
     loaderEl.remove();
-    statusEl.textContent = `Cannot show the data: ${err instanceof Error ? err.message : String(err)}`;
-    statusEl.classList.add('error');
+    showRecovery(statusEl, err);
     chartEl.dataset.status = 'error';
     return;
   }

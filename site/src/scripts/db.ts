@@ -152,7 +152,8 @@ async function readBody(res: Response, key: string): Promise<Uint8Array<ArrayBuf
 const WASM_KEY = 'duckdb.wasm';
 
 async function fetchBuffer(file: string): Promise<Uint8Array> {
-  const res = await fetch(siteUrl(`data/${file}`));
+  // The build time in the URL: after a deploy, the browser does not use the cached files of the old build.
+  const res = await fetch(siteUrl(`data/${file}?v=${__BUILD_TIME__}`));
   if (!res.ok) {
     throw new Error(`Cannot load ${file}: HTTP ${res.status}. Run "npm run build:db" and then the site build.`);
   }

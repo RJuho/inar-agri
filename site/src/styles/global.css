@@ -132,6 +132,89 @@ h1 {
   font-weight: 600;
 }
 
+/* Recovery box below #status after a load error (recover.ts). */
+.recovery {
+  max-width: 70ch;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--error);
+  border-radius: 8px;
+  background: var(--surface-raised);
+}
+
+.recovery p {
+  margin: 0 0 8px;
+}
+
+.recovery p:last-child {
+  margin-bottom: 0;
+}
+
+.recovery-button {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.recovery-note,
+.recovery-hard {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+kbd {
+  display: inline-block;
+  padding: 0 4px;
+  border: 1px solid var(--axis-line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* New version notice at the bottom of all pages (update.ts). */
+.update-notice {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  border: 1px solid var(--axis-line);
+  border-left: 4px solid var(--series-1);
+  border-radius: 8px;
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
+}
+
+.update-notice[hidden] {
+  display: none;
+}
+
+.update-notice p {
+  flex: 1 1 280px;
+  margin: 0;
+}
+
+.update-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.update-reload {
+  font-weight: 600;
+}
+
 /* ---------- Controls ---------- */
 
 button,

@@ -179,6 +179,14 @@ async function waitReady(page: Page): Promise<void> {
   await expect(page.locator('#chart')).toHaveAttribute('data-status', /^(ready|empty)$/, { timeout: READY_TIMEOUT });
 }
 
+/** Text pages have one script only: the shared update check of Base.astro (update.ts). */
+async function expectOnlyUpdateScript(page: Page): Promise<void> {
+  const scripts = page.locator('script');
+  await expect(scripts).toHaveCount(1);
+  await expect(scripts).toHaveAttribute('type', 'module');
+  expect(await scripts.textContent()).toContain('version.json');
+}
+
 /** Encode a view for the URL hash, the same way as state.ts does. */
 function viewHash(view: unknown): string {
   return '#view=' + Buffer.from(JSON.stringify(view), 'utf8').toString('base64url');
@@ -1421,7 +1429,7 @@ test.describe('calculated page', () => {
     expect(await page.locator('.katex').count()).toBeGreaterThan(10);
     expect(await page.locator('math').count()).toBeGreaterThan(10);
     await expect(page.locator('.katex-error')).toHaveCount(0);
-    await expect(page.locator('script')).toHaveCount(0);
+    await expectOnlyUpdateScript(page);
   });
 
   test('has the result tables', async ({ page }) => {
@@ -1467,14 +1475,14 @@ test.describe('variables page', () => {
     expect(foreign).toEqual([]);
   });
 
-  test('lists the 24 variables and has no script', async ({ page }) => {
+  test('lists the 24 variables and has only the update check script', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Variables');
     await expect(page.locator('.glossary dt')).toHaveCount(24);
     await expect(page.locator('#var-precip')).toHaveCount(1);
     await expect(page.locator('#var-n2o')).toHaveCount(1);
     await expect(page.locator('#var-nee')).toHaveCount(1);
     await expect(page.locator('#var-swc')).toHaveCount(1);
-    await expect(page.locator('script')).toHaveCount(0);
+    await expectOnlyUpdateScript(page);
   });
 
   test('has the reference list with DOI links', async ({ page }) => {
@@ -1530,7 +1538,7 @@ test.describe('data report page', () => {
     await expect(page.locator('section:has(> #changelog) article.change').first()).toBeVisible();
     await expect(page.locator('article.change .katex-display .katex').first()).toBeVisible();
     await expect(page.locator('a[href$="/docs/anomaly-data-report.md"]').first()).toHaveAttribute('href', /^https:\/\/github\.com\//);
-    await expect(page.locator('script')).toHaveCount(0);
+    await expectOnlyUpdateScript(page);
   });
 
   test('the page navigation marks the Data Report page', async ({ page }) => {
@@ -1560,7 +1568,7 @@ test.describe('events page', () => {
     // Viikki 2022: yield of the year 3673 kg DW/ha on the second cut.
     await expect(page.locator('table[data-site="viikki"] tr[data-type="harvest"] td[data-col="yield"]', { hasText: '3673' })).toHaveCount(1);
     await expect(page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Events' })).toHaveAttribute('aria-current', 'page');
-    await expect(page.locator('script')).toHaveCount(0);
+    await expectOnlyUpdateScript(page);
     expect(errors).toEqual([]);
     expect(foreign).toEqual([]);
   });
@@ -1986,5 +1994,100 @@ test.describe('loading bar', () => {
     await expect(page.locator('#loader')).toHaveCount(0);
     await expect(page.locator('#status')).toContainText('Loaded in');
     expect(errors).toEqual([]);
+  });
+});
+
+test.describe('update notice and error recovery', () => {
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+  });
+
+  test.afterEach(() => {
+    expect(foreign).toEqual([]);
+  });
+
+  test('a new build time in version.json shows the notice; Later hides it, Reload reloads', async ({ page }) => {
+    const errors = trackErrors(page);
+    await page.route('**/version.json*', (route) =>
+      route.fulfill({ contentType: 'application/json', body: JSON.stringify({ time: 1, commit: 'other' }) }),
+    );
+    // A text page: the notice is on all pages (Base.astro).
+    await page.goto('/events/');
+    const notice = page.locator('.update-notice');
+    // The first check runs 5 s after the load.
+    await expect(notice).toBeVisible({ timeout: 15_000 });
+    await expect(notice).toHaveAttribute('role', 'status');
+    await expect(notice).toContainText('A new version of this site is available.');
+    // The notice does not take the focus.
+    expect(await page.evaluate(() => document.activeElement?.closest('.update-notice') ?? null)).toBeNull();
+
+    await notice.getByRole('button', { name: 'Later' }).click();
+    await expect(notice).toBeHidden();
+
+    // Back from another tab: a new check, but the notice stays hidden until the next page load.
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+    await expect(notice).toBeHidden();
+
+    await page.evaluate(() => ((window as unknown as { __marker: number }).__marker = 1));
+    await page.reload();
+    await expect(notice).toBeVisible({ timeout: 15_000 });
+    await Promise.all([page.waitForEvent('load'), notice.getByRole('button', { name: 'Reload' }).click()]);
+    expect(await page.evaluate(() => (window as unknown as { __marker?: number }).__marker)).toBeUndefined();
+    expect(errors).toEqual([]);
+  });
+
+  test('the same build time in version.json shows no notice', async ({ page }) => {
+    const errors = trackErrors(page);
+    const checked = page.waitForResponse((res) => new URL(res.url()).pathname.endsWith('/version.json'), {
+      timeout: 15_000,
+    });
+    await page.goto('/variables/');
+    const res = await checked;
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toContain('json');
+    const body = (await res.json()) as { time: number; commit: string };
+    expect(typeof body.time).toBe('number');
+    // Give the page time to handle the response.
+    await page.waitForTimeout(500);
+    await expect(page.locator('.update-notice')).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
+  test('a load error shows the recovery box; the button clears the site data and reloads', async ({ page }) => {
+    await page.addInitScript(() => {
+      if (!sessionStorage.getItem('seeded')) {
+        sessionStorage.setItem('seeded', '1');
+        localStorage.setItem('inar-agri.views', '{"version":1,"views":[]}');
+        localStorage.setItem('inar-agri.views.bak', 'old');
+        sessionStorage.setItem('inar-agri.test', 'x');
+        localStorage.setItem('other-site.key', 'keep');
+      }
+    });
+    await page.route('**/data/observations.parquet*', (route) => route.fulfill({ status: 500, body: 'error' }));
+    await page.goto('/');
+    await expect(page.locator('#chart')).toHaveAttribute('data-status', 'error', { timeout: READY_TIMEOUT });
+    await expect(page.locator('#status')).toContainText('Cannot show the data');
+    const box = page.locator('#recovery');
+    await expect(box).toBeVisible();
+    await expect(box).toContainText('Clear the saved views and the cache, then reload the page.');
+    await expect(box).toContainText('If the error stays, do a hard reload:');
+    // Headless Chromium on Linux: Ctrl + Shift + R or Ctrl + F5.
+    await expect(box.locator('kbd')).toHaveText(['Ctrl', 'Shift', 'R', 'Ctrl', 'F5']);
+
+    await page.evaluate(() => ((window as unknown as { __marker: number }).__marker = 1));
+    await Promise.all([
+      page.waitForEvent('load'),
+      box.getByRole('button', { name: 'Clear site data and reload' }).click(),
+    ]);
+    expect(await page.evaluate(() => (window as unknown as { __marker?: number }).__marker)).toBeUndefined();
+    const stored = await page.evaluate(() => ({
+      views: localStorage.getItem('inar-agri.views'),
+      bak: localStorage.getItem('inar-agri.views.bak'),
+      session: sessionStorage.getItem('inar-agri.test'),
+      other: localStorage.getItem('other-site.key'),
+    }));
+    expect(stored).toEqual({ views: null, bak: null, session: null, other: 'keep' });
   });
 });
