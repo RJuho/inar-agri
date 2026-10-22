@@ -357,3 +357,29 @@
   font-size: 0.875rem;
 }
 .site-footer a { color: inherit; }
+
+/* ---------- AI notice (text pages, site/src/components/AiNotice.astro) ---------- */
+.ai-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 72ch;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--axis-line);
+  border-left-width: 4px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+.ai-notice-icon {
+  flex: none;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}

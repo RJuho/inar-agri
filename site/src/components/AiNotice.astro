@@ -1,0 +1,16 @@
+---
+// Notice under the h1 of the text pages: the content was made with AI. Styles: .ai-notice in calculated.css.
+interface Props {
+  /** What the AI assistant wrote on the page. */
+  subject?: string;
+}
+const { subject = 'the text, the calculations and the summaries' } = Astro.props;
+---
+
+<p class="ai-notice" role="note">
+  <span class="ai-notice-icon" aria-hidden="true">AI</span>
+  <span>
+    <strong>AI-generated content.</strong> An AI assistant (Claude, Anthropic) wrote {subject} on this page from the
+    project data and documents. Check important values against the source data and the articles before you use them.
+  </span>
+</p>

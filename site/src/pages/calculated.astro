@@ -3,6 +3,7 @@
 // All formulas and tables are made at build time. The page has no client script.
 import 'katex/dist/katex.min.css';
 import Base from '../layouts/Base.astro';
+import AiNotice from '../components/AiNotice.astro';
 import { readCsv, readJson, type Row } from '../lib/csv';
 import { tex } from '../lib/tex';
 import { budgetFigure, budgetRows } from '../lib/budgetFigure';
@@ -222,6 +223,7 @@ const toc = [
   <main class="prose">
     <header>
       <h1>Calculated data</h1>
+      <AiNotice />
       <p class="lead">
         This page tells how we calculate gross primary production (GPP), ecosystem respiration (Reco), gap-filled NEE
         for Maktau, annual carbon sums and the net ecosystem carbon balance (NECB). It also shows the results and the

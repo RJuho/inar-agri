@@ -4,6 +4,7 @@
 import 'katex/dist/katex.min.css';
 import '../styles/data-report.css';
 import Base from '../layouts/Base.astro';
+import AiNotice from '../components/AiNotice.astro';
 import { tex } from '../lib/tex';
 import {
   CHANGE_LOG,
@@ -41,6 +42,7 @@ const reportUrl = repoFile(SCAN.reportPath);
   <main class="prose data-report">
     <header>
       <h1>Data Report</h1>
+      <AiNotice subject="the text, the checks and the summaries" />
       <p class="lead">
         This page gives a summary of the data checks of the harmonised database and a log of the changes to the data.
         The full report with the evidence and a check query for each finding is{' '}

@@ -1546,6 +1546,26 @@ test.describe('data report page', () => {
   });
 });
 
+test.describe('AI notice', () => {
+  for (const path of ['/calculated/', '/variables/', '/data-report/']) {
+    test(`${path} shows the AI notice below the h1`, async ({ page, baseURL }) => {
+      const foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+      await page.goto(path);
+      const note = page.locator('header .ai-notice[role="note"]');
+      await expect(note).toHaveCount(1);
+      await expect(note).toBeVisible();
+      await expect(note).toContainText('AI-generated content');
+      expect(await page.locator('h1 + .ai-notice').count()).toBe(1);
+      expect(foreign).toEqual([]);
+    });
+  }
+
+  test('the data page has no AI notice', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.ai-notice')).toHaveCount(0);
+  });
+});
+
 // ---------- Month range, events option and PNG without the zoom slider ----------
 
 /** A raw timeseries view of Haltiala (site 3) for the given period. */
