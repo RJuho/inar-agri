@@ -1,0 +1,434 @@
+---
+layout: ../../layouts/DeepDive.astro
+title: Size of management disturbances
+question: How large is the change of NEE, GPP, Reco and soil water content in the days and weeks after a harvest or cut, grazing, fertilisation or tillage?
+shortAnswer: "Harvest and cut are the largest disturbances: net CO₂ uptake falls for weeks and GPP falls by almost half. Fertilisation and tillage: no clear change. Soil water: no change after a cut at equal rain."
+sites: [haltiala, qvidja, viikki]
+variables: [nee_f, gpp, reco, swc, precip]
+period: { from: 2018, to: 2025 }
+date: '2026-10-22'
+status: checked
+models:
+  - model: Claude Fable 5.1
+    role: question, analysis script, text and figures
+  - model: Claude Sonnet
+    role: independent recompute of the numbers (own SQL, without the script and the JSON)
+  - model: Claude Haiku
+    role: language (STE) and reference review
+script: scripts/deep-dives/disturbance-size.ts
+references: [heimsch2021, heimsch2024, shurpali2025, vira2025, gao2026, vettikkat2026, hu2024, qvidja-management, viikki-management, haltiala-management, calculated-doc, anomaly-report]
+checks:
+  - kind: recompute
+    by: Claude Sonnet
+    date: '2026-10-22'
+    result: pass
+    note: All main numbers reproduced from the method text alone. Small differences (one soil water episode, the late window, the rain balance) came from five open points of the method text; the text was made explicit.
+  - kind: review
+    by: Claude Haiku
+    date: '2026-10-22'
+    result: pass
+    note: Two rounds. Round one found the short answer too strong for soil water after fertilisation, a wrong half-hour count of the UTC shift, a wrong Viikki sensor statement, a grazing duration off by one, causal wording and three citation page notes. Round two passed with small fixes of wording and one Hu et al. page check. All fixes were applied by Claude Fable 5.1.
+---
+
+import raw from '../../deep-dives/disturbance-size.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { changeFigure, compositeFigure, disturbanceData, episodeRows, kindRows, rainFigure, soilWaterFigure } from '../../lib/deepDives/disturbanceSize';
+
+export const d = disturbanceData(raw);
+export const fig1 = compositeFigure(d);
+export const fig2 = changeFigure(d);
+export const fig3 = soilWaterFigure(d);
+export const fig4 = rainFigure(d);
+export const rows = episodeRows(d);
+export const kinds = kindRows(d);
+export const base = baseUrl();
+export const U = 'g C m⁻² d⁻¹';
+export const UE = 'g C m⁻²';
+export const US = 'm³ m⁻³';
+export const UM = 'µmol m⁻² s⁻¹';
+
+## Short answer
+
+We compared the mean daily flux in the <Num k="method.afterDays" digits={0} /> days after a management episode with
+the mean in the <Num k="method.beforeDays" digits={0} /> days before it. A higher NEE means less net uptake of CO₂.
+The size of a disturbance is this change, and also the *excess*: the sum of the daily differences to the level
+before the episode over <Num k="method.excessDays" digits={0} /> days.
+
+- **Harvest or cut** (n = <Num k="kinds.harvestCut.nFlux" digits={0} />): NEE <Num k="kinds.harvestCut.nee.delta.mean" sign unit={U} />
+  (<Num k="method.ciLevelPct" digits={0} /> % interval <Num k="kinds.harvestCut.nee.delta.ciLo" sign /> to
+  <Num k="kinds.harvestCut.nee.delta.ciHi" sign />). NEE increased in <Num k="kinds.harvestCut.nee.delta.nPositive" digits={0} /> of
+  the <Num k="kinds.harvestCut.nFlux" digits={0} /> episodes. GPP fell by <Num k="kinds.harvestCut.gpp.delta.mean" abs unit={U} />,
+  that is <Num k="kinds.harvestCut.relGppPct.mean" abs digits={0} unit="%" /> of the GPP before the episode. The change of
+  Reco (<Num k="kinds.harvestCut.reco.delta.mean" sign unit={U} />) has an interval that includes zero. The excess of
+  NEE over <Num k="method.excessDays" digits={0} /> days was <Num k="kinds.harvestCut.nee.excess.mean" sign digits={0} unit={UE} />
+  (n = <Num k="kinds.harvestCut.nee.excess.n" digits={0} />).
+- **Grazing** (n = <Num k="kinds.grazing.nFlux" digits={0} />, Qvidja only): NEE <Num k="kinds.grazing.nee.delta.mean" sign unit={U} />,
+  GPP <Num k="kinds.grazing.gpp.delta.mean" sign unit={U} />. The direction is the same as for a harvest.
+  <Num k="kinds.grazing.nFlux" digits={0} /> episodes are too few for an interval.
+- **Fertilisation** (n = <Num k="kinds.fertilisation.nFlux" digits={0} />): the interval of the change of NEE includes zero
+  (<Num k="kinds.fertilisation.nee.delta.mean" sign unit={U} />, <Num k="kinds.fertilisation.nee.delta.ciLo" sign /> to
+  <Num k="kinds.fertilisation.nee.delta.ciHi" sign />). The mean changes of GPP and Reco are positive, but their
+  intervals include zero. Most fertilisations are in May, during the green-up. After the seasonal baseline is removed, the change of Reco is
+  <Num k="kinds.fertilisation.reco.deltaAdj.mean" sign unit={U} /> (n = <Num k="kinds.fertilisation.reco.deltaAdj.n" digits={0} />).
+- **Tillage** (n = <Num k="kinds.tillage.nFlux" digits={0} />, autumn, bare soil): NEE <Num k="kinds.tillage.nee.delta.mean" sign unit={U} />.
+  The interval includes zero (n = <Num k="kinds.tillage.nFlux" digits={0} />, <Num k="kinds.tillage.nee.delta.ciLo" sign /> to
+  <Num k="kinds.tillage.nee.delta.ciHi" sign />). **Tillage with fertilisation** (spring field work, n = <Num k="kinds.tillageFert.nFlux" digits={0} />):
+  NEE <Num k="kinds.tillageFert.nee.delta.mean" sign unit={U} /> (<Num k="kinds.tillageFert.nee.delta.ciLo" sign /> to
+  <Num k="kinds.tillageFert.nee.delta.ciHi" sign />). One Haltiala episode, where the failed grass was crushed and the
+  field was harrowed, gives most of this mean.
+- **Soil water** after a harvest or cut: <Num k="kinds.harvestCut.swc.delta.mean" sign digits={3} unit={US} />
+  (n = <Num k="kinds.harvestCut.nSwc" digits={0} />, interval <Num k="kinds.harvestCut.swc.delta.ciLo" sign digits={3} /> to
+  <Num k="kinds.harvestCut.swc.delta.ciHi" sign digits={3} />). The change follows the rain difference of the two windows
+  (r = <Num k="kinds.harvestCut.swc.rainFit.r" />). At equal rain, the fit gives <Num k="kinds.harvestCut.swc.rainFit.intercept" sign digits={3} unit={US} />.
+  After a fertilisation, the soil was drier (<Num k="kinds.fertilisation.swc.delta.mean" sign digits={3} unit={US} />, n = <Num k="kinds.fertilisation.nSwc" digits={0} />),
+  but the adjusted change, with the seasonal baseline removed, is near zero (<Num k="kinds.fertilisation.swc.deltaAdj.mean" sign digits={3} unit={US} />,
+  n = <Num k="kinds.fertilisation.swc.deltaAdj.n" digits={0} />).
+
+## Data and method
+
+**Events.** We used the management files of the three sites with dated events
+<Cite ids={['qvidja-management', 'viikki-management', 'haltiala-management']} />. The build stores them in
+`db/events.parquet`: <Num k="counts.events" digits={0} /> events. We analysed four classes:
+*harvest or cut* (<Num k="counts.perType.harvest" digits={0} /> harvests and <Num k="counts.perType.cut" digits={0} /> cuts),
+*grazing* (<Num k="counts.perType.grazing" digits={0} />, all at Qvidja), *fertilisation* (<Num k="counts.perType.fertilisation" digits={0} />)
+and *tillage* (<Num k="counts.perType.tillage" digits={0} />). Sowing (<Num k="counts.perType.sowing" digits={0} />),
+spraying (<Num k="counts.perType.spraying" digits={0} />) and other events are not analysed. They are listed with the
+episode when they are near. A fertilisation is *mineral* when the product text names a mineral product (the word mineral,
+or the product names saltpetre, salpietari, AXAN, Typpi or CAN; the NPK product of Qvidja has the word mineral in its text). All other products (manure, compost, molasses, by-products) are *organic*.
+
+**Episodes.** We sorted the events of each site by date. An event joins the current episode when it starts not more
+than <Num k="method.mergeDays" digits={0} /> days after the end of that episode, whatever its class. The end of an
+episode is the last day of its events (`date_end` where the file gives it, for example the grazing periods). The class
+set of the episode gives its *kind*: harvest or cut; grazing; fertilisation; tillage; tillage with fertilisation
+(spring field work: tillage, sowing and fertilisation within a few days); harvest or cut with fertilisation; or other.
+*Other* is any other combination of classes. There is one such episode: a grazing period followed by a cut within
+<Num k="method.mergeDays" digits={0} /> days at Qvidja in June 2022. Sowing, spraying and other events do not make an
+episode and do not join one. They are listed as events near the episode.
+This gives <Num k="counts.episodes" digits={0} /> episodes from <Num k="counts.classEvents" digits={0} /> events of the four classes.
+
+**Daily values.** NEE, GPP and Reco are the daily sums of the gap-filled, partitioned fluxes in g C m⁻² d⁻¹ from
+`data/calculated/daily.parquet` <Cite ids={['calculated-doc']} />. NEE &gt; 0 is a net release of CO₂. GPP is the
+uptake by photosynthesis. Reco is the temperature model of the night-time partitioning, and GPP is Reco − NEE. The
+soil water content (`swc`, m³ m⁻³), the soil temperature and the rain come from `db/observations.parquet` as the mean
+or sum per local day. A daily mean of soil water or soil temperature needs <Num k="method.minSwcRows" digits={0} /> of the
+<Num k="method.halfHoursPerDay" digits={0} /> half hours of the day. A daily rain sum needs <Num k="method.minRainRows" digits={0} /> half hours. Haltiala has no rain sensor. For Haltiala we
+used the rain of Viikki on the same day (the sites are about five kilometres apart). We did not use the soil water of
+frozen days (daily mean soil temperature at or below zero: <Num k="counts.frozenSwcPct" digits={0} unit="%" /> of the days,
+mostly in winter) and of Haltiala in <Num k="method.haltialaSwcSkipYear" digits={0} />
+(<a href={`${base}data-report/#finding-HAL-03`}>finding HAL-03</a>). A day without a soil temperature mean keeps
+its soil water value. The sensor depth is <Num k="method.sensorDepthCm.haltiala" digits={0} unit="cm" /> at Haltiala
+and Qvidja and <Num k="method.sensorDepthCm.viikki" digits={0} unit="cm" /> at Viikki. At Viikki the 2022 value comes
+from the EC file (water-filled pore space times porosity) and from 2023 from the soil pit file. Both are the same
+sensor <Cite ids={['anomaly-report']} />.
+
+**Windows.** For each episode we calculated the mean of each variable in these windows:
+
+- *before*: the <Num k="method.beforeDays" digits={0} /> days before the first day of the episode,
+- *after*: the <Num k="method.afterDays" digits={0} /> days after the last day of the episode (main result),
+- *late*: days <Num k="method.lateFrom" digits={0} /> to <Num k="method.lateTo" digits={0} /> after the last day.
+
+The days of the episode are not in a window. The late window needs the same minimum of days as rule 2 below, and no
+other episode may start in it. Else the late value is empty. The *change* is the mean after minus the mean before. The *excess* is the
+sum of (daily value − mean before) over the <Num k="method.excessDays" digits={0} /> days after the episode, in g C m⁻².
+It needs <Num k="method.minExcessDays" digits={0} /> days with a value and no other episode in the
+<Num k="method.excessDays" digits={0} /> days. The *relative change of GPP* is the change divided by the mean GPP
+before, for episodes with a GPP before of at least <Num k="method.minGppBefore" digits={1} unit={U} />.
+
+**Seasonal baseline.** The windows also contain the change of the season. For each episode we took the same calendar
+windows in the other years of the same site. A shifted period goes from the start of the before window to the end of
+the after window. We used a year only when no episode of the site (from its first to its last day) overlaps this
+shifted period. The other years are the years with
+data of the site. The shifted windows need the same minimum of days as rule 2. The baseline is
+the mean of these seasonal changes, when at least <Num k="method.minBaselineYears" digits={0} /> years are available.
+The *adjusted change* is the change minus the baseline. <Num k="counts.withBaseline" digits={0} /> of the
+<Num k="counts.fluxUsed" digits={0} /> used episodes have a baseline. The Qvidja harvests in June have none: every year
+has a harvest at that time.
+
+**Rules.** The flux result uses an episode when it passes three rules:
+
+- **Rule 1.** No other episode of the site starts in the *before* or the *after* window.
+- **Rule 2.** Both windows have at least <Num k="method.minDays" digits={0} /> days with NEE, GPP and Reco.
+- **Rule 3.** In both windows, the mean measured fraction of NEE is at least <Num k="method.minFracPct" digits={0} /> %
+  (`frac_measured` of the daily file).
+
+<Num k="counts.fluxUsed" digits={0} /> episodes passed (<Num k="counts.fluxExclusions.overlap" digits={0} /> did not pass
+rule 1, <Num k="counts.fluxExclusions.too-few-days" digits={0} /> rule 2, <Num k="counts.fluxExclusions.low-measured-fraction" digits={0} />
+rule 3). The soil water result uses rules 1 and 2 with the soil water days: <Num k="counts.swcUsed" digits={0} /> episodes.
+An episode is *rain-balanced* when the rain sums of the two windows differ by not more than
+<Num k="method.rainBalanceMm" digits={0} /> mm. The rain sum of a window is the sum of the days with a valid rain sum.
+Each window needs at least <Num k="method.minDays" digits={0} /> such days. <Num k="counts.swcRainBalanced" digits={0} /> episodes
+are rain-balanced. We also fitted
+the change of soil water against the rain difference (least squares) per kind. The intercept of this fit is the change
+at equal rain.
+
+**Statistics.** Per kind, and per kind and site: n, mean, SD, the number of episodes with a positive change, and a
+<Num k="method.ciLevelPct" digits={0} /> % percentile bootstrap interval of the mean (<Num k="method.bootstrapResamples" digits={0} />
+resamples, fixed seed). An interval needs at least three episodes, and with fewer than about ten episodes it is not
+reliable. The tables give the single episodes.
+
+**Checks.** (a) The same change with <Num k="method.shortDays" digits={0} />-day windows. (b) The flux result with the
+episodes that did not pass rule 3. (c) The change of the *measured* day-time NEE (µmol m⁻² s⁻¹, half hours without
+gap filling, at least <Num k="method.minMeasuredDay" digits={0} /> half hours per window).
+
+## Results
+
+<Figure
+  id="figure-1"
+  title="Figure 1. Mean daily NEE, GPP and Reco around the episodes, per kind of management"
+  svg={fig1.svg}
+  alt={fig1.alt}
+  view={{ name: 'Disturbances: daily fluxes', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    Mean of the used episodes of all three sites. Day 0 is the first day of the episode (dashed vertical line). A
+    multi-day episode (grazing, field work) continues after day 0. The band shows ±1 SD of the episodes for NEE.
+    NEE &gt; 0 is a net release of CO₂. Kinds with fewer than three used episodes have no panel.
+  </p>
+</Figure>
+
+<div class="table-wrap">
+<table>
+<caption>Change after − before per kind of management, all sites. Fluxes in g C m⁻² d⁻¹, excess in g C m⁻² over {d.method.excessDays} days, soil water in m³ m⁻³. Adjusted = change minus the seasonal baseline. Interval = {d.method.ciLevelPct} % bootstrap interval (three or more episodes).</caption>
+<thead>
+<tr><th scope="col">Kind</th><th scope="col" class="num">n</th><th scope="col" class="num">ΔNEE</th><th scope="col" class="num">Interval</th><th scope="col" class="num">ΔGPP</th><th scope="col" class="num">ΔReco</th><th scope="col" class="num">ΔNEE adjusted</th><th scope="col" class="num">NEE excess</th><th scope="col" class="num">ΔGPP relative</th><th scope="col" class="num">n soil water</th><th scope="col" class="num">Δ soil water</th><th scope="col" class="num">Interval</th></tr>
+</thead>
+<tbody>
+{kinds.map((r) => (<tr id={`kind-${r.id}`}><td>{r.label}</td><td class="num">{r.nFlux}</td><td class="num">{r.nee}</td><td class="num">{r.neeCi}</td><td class="num">{r.gpp}</td><td class="num">{r.reco}</td><td class="num">{r.neeAdj}</td><td class="num">{r.excess}</td><td class="num">{r.relGpp}</td><td class="num">{r.nSwc}</td><td class="num">{r.swc}</td><td class="num">{r.swcCi}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+**Harvest or cut.** The mean NEE was <Num k="kinds.harvestCut.nee.before" unit={U} /> before the episodes and
+<Num k="kinds.harvestCut.nee.after" unit={U} /> after them. GPP fell from <Num k="kinds.harvestCut.gpp.before" unit={U} />
+to <Num k="kinds.harvestCut.gpp.after" unit={U} />. Reco changed from <Num k="kinds.harvestCut.reco.before" unit={U} />
+to <Num k="kinds.harvestCut.reco.after" unit={U} />. The change of NEE was still <Num k="kinds.harvestCut.nee.deltaLate.mean" sign unit={U} />
+in the late window (days <Num k="method.lateFrom" digits={0} /> to <Num k="method.lateTo" digits={0} />,
+n = <Num k="kinds.harvestCut.nee.deltaLate.n" digits={0} />). The adjusted change (seasonal baseline removed) was
+<Num k="kinds.harvestCut.nee.deltaAdj.mean" sign unit={U} /> (n = <Num k="kinds.harvestCut.nee.deltaAdj.n" digits={0} />,
+interval <Num k="kinds.harvestCut.nee.deltaAdj.ciLo" sign /> to <Num k="kinds.harvestCut.nee.deltaAdj.ciHi" sign />). The
+baseline is available mostly for the late-season harvests, where GPP also decreases without a harvest. The excess
+of GPP over <Num k="method.excessDays" digits={0} /> days was <Num k="kinds.harvestCut.gpp.excess.mean" sign digits={0} unit={UE} />
+(n = <Num k="kinds.harvestCut.gpp.excess.n" digits={0} />). Per site: Qvidja <Num k="kinds.harvestCut.bySite.qvidja.nee.delta.mean" sign unit={U} />
+(n = <Num k="kinds.harvestCut.bySite.qvidja.nFlux" digits={0} />), Viikki <Num k="kinds.harvestCut.bySite.viikki.nee.delta.mean" sign unit={U} />
+(n = <Num k="kinds.harvestCut.bySite.viikki.nFlux" digits={0} />), Haltiala <Num k="kinds.harvestCut.bySite.haltiala.nee.delta.mean" sign unit={U} />
+(n = <Num k="kinds.harvestCut.bySite.haltiala.nFlux" digits={0} />; grain harvests at the end of the season, GPP and
+Reco fell by about the same quantity).
+
+**Grazing.** The <Num k="kinds.grazing.nFlux" digits={0} /> used grazing episodes at Qvidja (horses or cattle; the dates
+are in the table) show NEE <Num k="kinds.grazing.nee.delta.mean" sign unit={U} /> (range <Num k="kinds.grazing.nee.delta.min" sign /> to
+<Num k="kinds.grazing.nee.delta.max" sign />), GPP <Num k="kinds.grazing.gpp.delta.mean" sign unit={U} /> and an excess
+of NEE of <Num k="kinds.grazing.nee.excess.mean" sign digits={0} unit={UE} />. The largest change was the grazing of
+<Num k="highlights.qvidja-2025-07-30.durationDays" digits={0} /> days in July and August 2025 with highland cows:
+GPP <Num k="highlights.qvidja-2025-07-30.delta.gpp" sign unit={U} /> and Reco <Num k="highlights.qvidja-2025-07-30.delta.reco" sign unit={U} />.
+
+**Fertilisation.** The <Num k="kinds.fertilisation.nFlux" digits={0} /> used episodes with fertilisation only show
+GPP <Num k="kinds.fertilisation.gpp.delta.mean" sign unit={U} /> and Reco <Num k="kinds.fertilisation.reco.delta.mean" sign unit={U} />
+(interval <Num k="kinds.fertilisation.reco.delta.ciLo" sign /> to <Num k="kinds.fertilisation.reco.delta.ciHi" sign />). The air
+was warmer after the episodes than before (<Num k="kinds.fertilisation.ta.mean" sign digits={1} unit="°C" />): most
+fertilisations are in May, during the green-up. The adjusted changes are smaller: GPP
+<Num k="kinds.fertilisation.gpp.deltaAdj.mean" sign unit={U} />, Reco <Num k="kinds.fertilisation.reco.deltaAdj.mean" sign unit={U} />,
+NEE <Num k="kinds.fertilisation.nee.deltaAdj.mean" sign unit={U} /> (n = <Num k="kinds.fertilisation.nee.deltaAdj.n" digits={0} />).
+We also grouped all episodes with a fertilisation (also with a harvest or tillage) by product. For mineral products,
+the change of Reco was <Num k="anyFertKinds.mineral.reco.delta.mean" sign unit={U} /> (n = <Num k="anyFertKinds.mineral.nFlux" digits={0} />,
+interval <Num k="anyFertKinds.mineral.reco.delta.ciLo" sign /> to <Num k="anyFertKinds.mineral.reco.delta.ciHi" sign />). For
+organic products, it was <Num k="anyFertKinds.organic.reco.delta.mean" sign unit={U} /> (n = <Num k="anyFertKinds.organic.nFlux" digits={0} />,
+interval <Num k="anyFertKinds.organic.reco.delta.ciLo" sign /> to <Num k="anyFertKinds.organic.reco.delta.ciHi" sign />). The
+mineral group has an interval above zero. The organic group has a larger mean and a much larger spread. The data do
+not separate the two groups.
+
+**Tillage.** The <Num k="kinds.tillage.nFlux" digits={0} /> episodes with tillage only are autumn tillage after the
+harvest. GPP was already low before (<Num k="kinds.tillage.gpp.before" unit={U} />). NEE changed by
+<Num k="kinds.tillage.nee.delta.mean" sign unit={U} /> and Reco by <Num k="kinds.tillage.reco.delta.mean" sign unit={U} />.
+The data show no pulse of respiration in the daily sums. The <Num k="kinds.tillageFert.nFlux" digits={0} /> episodes of
+tillage with fertilisation are spring field work at Haltiala and Viikki, and one summer episode. At Viikki the change
+of NEE was <Num k="kinds.tillageFert.bySite.viikki.nee.delta.mean" sign unit={U} /> (n = <Num k="kinds.tillageFert.bySite.viikki.nFlux" digits={0} />).
+At Haltiala it was <Num k="kinds.tillageFert.bySite.haltiala.nee.delta.mean" sign unit={U} /> (n = <Num k="kinds.tillageFert.bySite.haltiala.nFlux" digits={0} />).
+The Haltiala episode of August 2023 (manure, then the failed grass was crushed and the field was disc-harrowed) had
+GPP <Num k="highlights.haltiala-2023-08-01.before.mean.gpp" unit={U} /> before and
+<Num k="highlights.haltiala-2023-08-01.after.mean.gpp" unit={U} /> after, so NEE changed by
+<Num k="highlights.haltiala-2023-08-01.delta.nee" sign unit={U} />. The data cannot separate the end of the crop from the
+tillage. The other Haltiala episodes of this kind are the spring field work in May (see the table): the smallest
+change of NEE among them is <Num k="kinds.tillageFert.bySite.haltiala.nee.delta.min" sign unit={U} />.
+
+<Figure
+  id="figure-2"
+  title="Figure 2. Change of the mean daily flux per episode, grouped by kind"
+  svg={fig2.svg}
+  alt={fig2.alt}
+  view={{ name: 'Disturbances: cumulative fluxes', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['cumulative'] }}
+>
+  <p>
+    Each symbol is one used episode. The change is the mean of the {d.method.afterDays}-day window after the
+    episode minus the mean of the {d.method.beforeDays}-day window before it. The symbol and the colour give the site.
+    The diamond and the vertical line show the mean of the kind and its bootstrap interval (three or more episodes).
+  </p>
+</Figure>
+
+**Checks.** With <Num k="method.shortDays" digits={0} />-day windows, the change of NEE after a harvest or cut was
+<Num k="kinds.harvestCut.nee.delta7.mean" sign unit={U} /> (interval <Num k="kinds.harvestCut.nee.delta7.ciLo" sign /> to
+<Num k="kinds.harvestCut.nee.delta7.ciHi" sign />). With the episodes that did not pass rule 3, it was
+<Num k="sensitivity.harvestCut.nee.mean" sign unit={U} /> (n = <Num k="sensitivity.harvestCut.n" digits={0} />). The
+measured day-time NEE increased by <Num k="kinds.harvestCut.measuredDay.mean" sign unit={UM} /> after a harvest or cut
+(n = <Num k="kinds.harvestCut.measuredDay.n" digits={0} />) and by <Num k="kinds.grazing.measuredDay.mean" sign unit={UM} />
+after grazing. After a fertilisation it changed by <Num k="kinds.fertilisation.measuredDay.mean" sign unit={UM} />. The
+three checks agree with the main result.
+
+<Figure
+  id="figure-3"
+  title="Figure 3. Soil water content around the episodes, as the difference to the level before, with rain"
+  svg={fig3.svg}
+  alt={fig3.alt}
+  view={{ name: 'Disturbances: soil water and rain', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['swc', 'precip'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    Line: mean of the daily soil water content minus the {d.method.beforeDays}-day mean before the episode, with a
+    ±1 SD band. Bars: mean daily rain of the same episodes (right axis; for Haltiala the Viikki rain). Day 0 is the
+    first day of the episode. Kinds with fewer than three used episodes have no panel.
+  </p>
+</Figure>
+
+**Soil water.** After a harvest or cut, the mean change of soil water was <Num k="kinds.harvestCut.swc.delta.mean" sign digits={3} unit={US} />
+(n = <Num k="kinds.harvestCut.nSwc" digits={0} />, SD <Num k="kinds.harvestCut.swc.delta.sd" digits={3} />). It was
+positive in <Num k="kinds.harvestCut.swc.delta.nPositive" digits={0} /> episodes and negative in the others. For the
+<Num k="kinds.harvestCut.swc.nRainBalanced" digits={0} /> rain-balanced episodes the change was
+<Num k="kinds.harvestCut.swc.deltaRainBalanced.mean" sign digits={3} unit={US} />. Figure 4 shows that the change follows
+the rain difference: Pearson r = <Num k="kinds.harvestCut.swc.rainFit.r" /> (p = <Num k="kinds.harvestCut.swc.rainFit.p" digits={3} />),
+slope <Num k="kinds.harvestCut.swc.rainFit.slope" digits={4} /> m³ m⁻³ per mm, intercept
+<Num k="kinds.harvestCut.swc.rainFit.intercept" sign digits={3} unit={US} />. The data show no change of soil water
+from a harvest or cut at equal rain. We expected a wetter soil after a cut, because a smaller canopy can transpire less
+water. This is an expectation, not a result of the data. The daily means of these sensors do not show it.
+
+After a fertilisation, the soil was drier in all <Num k="kinds.fertilisation.nSwc" digits={0} /> episodes
+(<Num k="kinds.fertilisation.swc.delta.mean" sign digits={3} unit={US} />, interval <Num k="kinds.fertilisation.swc.delta.ciLo" sign digits={3} /> to
+<Num k="kinds.fertilisation.swc.delta.ciHi" sign digits={3} />). The rain-balanced episodes show the same
+(<Num k="kinds.fertilisation.swc.deltaRainBalanced.mean" sign digits={3} unit={US} />, n = <Num k="kinds.fertilisation.swc.nRainBalanced" digits={0} />).
+The adjusted change is <Num k="kinds.fertilisation.swc.deltaAdj.mean" sign digits={3} unit={US} /> (n = <Num k="kinds.fertilisation.swc.deltaAdj.n" digits={0} />):
+in the baseline years, the soil dried by a similar quantity in the same calendar windows. The change is associated with
+the season, not with the fertilisation. After tillage with fertilisation the change was
+<Num k="kinds.tillageFert.swc.delta.mean" sign digits={3} unit={US} /> (n = <Num k="kinds.tillageFert.nSwc" digits={0} />,
+interval <Num k="kinds.tillageFert.swc.delta.ciLo" sign digits={3} /> to <Num k="kinds.tillageFert.swc.delta.ciHi" sign digits={3} />).
+Grazing and tillage only have <Num k="kinds.grazing.nSwc" digits={0} /> and <Num k="kinds.tillage.nSwc" digits={0} />
+episodes with soil water. See the table.
+
+<Figure
+  id="figure-4"
+  title="Figure 4. Change of soil water against the rain difference of the two windows"
+  svg={fig4.svg}
+  alt={fig4.alt}
+  view={{ name: 'Disturbances: soil water, rain and soil temperature', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['swc', 'precip', 'tsoil'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    All episodes of the soil water result. The rain difference is the rain sum of the {d.method.afterDays} days after
+    minus the sum of the {d.method.beforeDays} days before. Dashed lines: least-squares fits of the kinds with five or
+    more episodes. The intercept is the change at equal rain.
+  </p>
+</Figure>
+
+**Comparison with the articles.** Heimsch et al. compared <Num k="literature.heimsch2021.windowDays" digits={0} />-day
+means at Qvidja. The harvest of June 2018 changed NEE from <Num k="literature.heimsch2021.june2018.beforeMgCo2" /> to
+<Num k="literature.heimsch2021.june2018.afterMgCo2" /> mg CO₂ m⁻² s⁻¹. This is an increase of
+<Num k="literature.heimsch2021.june2018.changeMgCo2" /> mg CO₂ m⁻² s⁻¹ or <Num k="literature.heimsch2021.june2018.changeGcDay" digits={1} unit={U} />
+<Cite ids={['heimsch2021']} note="p. 3473; Table C1, PDF p. 13" />. For the same event, our <Num k="method.afterDays" digits={0} />-day
+change is <Num k="highlights.qvidja-2018-06-12.delta.nee" sign unit={U} /> (from <Num k="highlights.qvidja-2018-06-12.before.mean.nee" />
+to <Num k="highlights.qvidja-2018-06-12.after.mean.nee" unit={U} />). The longer window and the gap-filled data give a
+smaller value, in the same direction. Heimsch et al. also report that respiration increased after each organic
+fertilisation, and the mineral fertilisation had no immediate effect on the CO₂ fluxes <Cite ids={['heimsch2021']} note="p. 3477" />. They report that
+the soil moisture at 10 cm stayed the same or decreased after the fertilisations <Cite ids={['heimsch2021']} note="p. 3473" />.
+Our organic group has the larger mean change of Reco, but with <Num k="anyFertKinds.organic.nFlux" digits={0} /> episodes
+the interval includes zero. Our mineral group has a positive change of Reco with an interval above zero
+(n = <Num k="anyFertKinds.mineral.nFlux" digits={0} />). This differs from Heimsch et al., who saw no immediate effect after the
+mineral fertilisation. Our mineral episodes are in May, and the seasonal increase of Reco can be part of the change. Our
+soil water result after fertilisation agrees with their observation.
+
+Heimsch et al. 2024 describe rotational grazing at Qvidja in August 2021 (eight cows, six days) and August 2022 (nine
+cows, nine days). In 2022, the leaf area index fell from 2.0 to 1.1 within six days after the grazing
+<Cite ids={['heimsch2024']} note="PDF p. 2 and p. 7" />. The management file gives grazing periods in June 2021 and June
+2022 (see Limits). The mean drop of GPP after our grazing episodes is of a similar size as after a harvest.
+With n = <Num k="kinds.grazing.nFlux" digits={0} /> the interval includes zero.
+
+Shurpali et al. measured three Finnish grassland fields. After each cut, the fields changed from net uptake to a short
+net release <Cite ids={['shurpali2025']} note="PDF p. 4" />. Summer ploughing increased the release of CO₂ for a few
+days <Cite ids={['shurpali2025']} note="PDF p. 6" />. Our autumn tillage episodes do not show a pulse in the daily
+sums. The crop was already removed before these episodes. Hu et al. describe two effects of ploughing: it can accelerate
+the decomposition of soil organic matter, and it incorporates plant residues and living biomass into the soil as a
+carbon input <Cite ids={['hu2024']} note="PDF p. 4" />. Gao et al. attribute the large carbon loss
+of the Viikki field in 2023 to the low grass biomass of 2022, the ploughing in November 2022 and the change to barley
+<Cite ids={['gao2026']} note="PDF p. 3 and p. 11" />. Our Viikki tillage episode of November 2022 is in the table.
+Vettikkat et al. measured ammonia at Viikki after the manure application of 27 April 2023 and the harrowing on the
+next day <Cite ids={['vettikkat2026']} note="PDF p. 1, 3 and 6" />. In our data this episode shows NEE
+<Num k="highlights.viikki-2023-04-27.delta.nee" sign unit={U} /> and Reco <Num k="highlights.viikki-2023-04-27.delta.reco" sign unit={U} />,
+with a measured fraction of <Num k="highlights.viikki-2023-04-27.before.mean.frac" percent digits={0} /> before and
+<Num k="highlights.viikki-2023-04-27.after.mean.frac" percent digits={0} /> after. The daily sums do not show a pulse of CO₂.
+
+<div class="table-wrap">
+<table>
+<caption>All episodes. Input = harvest dry mass (t DW/ha) or N input (kg N/ha) where the file gives them. Measured % = mean measured fraction of NEE before / after. Changes in g C m⁻² d⁻¹, NEE excess in g C m⁻² over {d.method.excessDays} days, soil water in m³ m⁻³. Rain = sum before / after in mm (* = Viikki rain used for Haltiala).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Dates</th><th scope="col">Kind</th><th scope="col">Events</th><th scope="col" class="num">Input</th><th scope="col" class="num">Measured %</th><th scope="col" class="num">ΔNEE</th><th scope="col" class="num">ΔGPP</th><th scope="col" class="num">ΔReco</th><th scope="col" class="num">ΔNEE adj.</th><th scope="col" class="num">NEE excess</th><th scope="col" class="num">Δ soil water</th><th scope="col" class="num">Rain</th><th scope="col">Flux use</th><th scope="col">Soil water use</th><th scope="col">Other events near</th></tr>
+</thead>
+<tbody>
+{rows.map((r) => (<tr id={`episode-${r.id}`}><td>{r.site}</td><td>{r.dates}</td><td>{r.kind}</td><td class="wrap">{r.what}</td><td class="num">{r.input}</td><td class="num">{r.frac}</td><td class="num">{r.dNee}</td><td class="num">{r.dGpp}</td><td class="num">{r.dReco}</td><td class="num">{r.dNeeAdj}</td><td class="num">{r.excessNee}</td><td class="num">{r.dSwc}</td><td class="num">{r.rain}</td><td>{r.fluxUse}</td><td>{r.swcUse}</td><td class="wrap">{r.others}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+## Limits and uncertainty
+
+- **Small n.** Grazing (n = <Num k="kinds.grazing.nFlux" digits={0} />), tillage (n = <Num k="kinds.tillage.nFlux" digits={0} />)
+  and the site groups have few episodes. Their intervals are not reliable. The SD of the change of NEE after a harvest
+  or cut is <Num k="kinds.harvestCut.nee.delta.sd" unit={U} /> (n = <Num k="kinds.harvestCut.nFlux" digits={0} />).
+- **Season.** The seasonal baseline removes the mean change of the other years, but only where other years are free
+  of events. For the June harvests at Qvidja and the May fertilisations this is often not the case. The change is
+  *associated with* the event. This analysis does not show that the event causes all of the change.
+- **Mixed episodes.** An episode of spring field work has tillage, sowing and fertilisation within a few days. The
+  data cannot separate their effects. <Num k="counts.withOtherEvents" digits={0} /> used episodes have other events
+  from the start of the before window to the end of the late window (see the table).
+- **Gap filling and partitioning.** In the used windows, the mean measured fraction of NEE is <Num k="counts.fracMeasuredMeanPct" digits={0} /> %
+  (lowest <Num k="counts.fracMeasuredMinPct" digits={0} /> %). The gap-filling models do not use the event dates
+  (Vira et al. use the days since the previous harvest as a predictor <Cite ids={['vira2025']} note="PDF p. 6" />;
+  our providers do not). GPP and Reco are model values. The reference respiration of the Reco model comes from
+  windows of <Num k="method.rrefWindowDays" digits={0} /> days, every <Num k="method.rrefStepDays" digits={0} /> days
+  <Cite ids={['calculated-doc']} />. A short pulse of respiration can be absorbed into this reference.
+- **Grazing dates.** The Qvidja management file gives grazing from 1 June 2021 (four horses, seven days) and from
+  1 June 2022 (nine cows, fifteen days) <Cite ids={['qvidja-management']} />. Heimsch et al. 2024 describe grazing
+  in August 2021 and August 2022 <Cite ids={['heimsch2024']} note="PDF p. 2" />. We used the file. The June 2021
+  episode is not used (a harvest follows). If the August periods were also grazed, they are not in our events.
+- **Soil water.** Haltiala `swc` is a gap-filled column at a resolution of <Num k="method.haltialaSwcResolution" digits={2} unit={US} /> with long flat periods
+  (<a href={`${base}data-report/#finding-HAL-01`}>finding HAL-01</a>). Haltiala has no rain; the Viikki rain is a
+  proxy. The Qvidja value is a conversion from sensor volts (<a href={`${base}data-report/#finding-QVI-01`}>finding QVI-01</a>);
+  the level is uncertain, a change over days is less affected. At Viikki the 2022 value is derived from the EC file and the
+  later values come from the soil pit file; both are the same sensor at <Num k="method.sensorDepthCm.viikki" digits={0} unit="cm" />. The soil water of frozen days is not used
+  (<a href={`${base}data-report/#finding-QVI-16`}>finding QVI-16</a>) <Cite ids={['anomaly-report']} />.
+- **Time stamps.** The raw time stamps of Viikki are UTC, but the build reads them as local time, so the Viikki values
+  are <Num k="method.utcShiftHours" digits={0} /> hours early (<a href={`${base}data-report/#finding-VII-01`}>finding VII-01</a>).
+  On a daily scale this moves <Num k="method.utcShiftHalfHours" digits={0} /> of the <Num k="method.halfHoursPerDay" digits={0} />
+  half hours of a day to the next day. The first dive tested this shift and found a small effect on the changes.
+- **Soil temperature at Viikki** spikes after field work in 2025 (<a href={`${base}data-report/#finding-VII-04`}>finding VII-04</a>).
+  We used the soil temperature only to find frozen days.
+- **Event dates and details.** The dates come from the management files. Some differ by one or two days from the
+  articles <Cite ids={['heimsch2021']} note="PDF p. 3, p. 7 and Table C1, PDF p. 13" />. The N content of some Haltiala products is not in the file.
+- **GPP sign.** GPP is Reco − NEE and is not limited to positive values. When the measured NEE is above the Reco
+  model, the daily GPP is negative. This occurs mainly at low light and in winter, and in the Haltiala episode of
+  August 2023 after the crop was crushed <Cite ids={['calculated-doc']} />.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `site/src/deep-dives/disturbance-size.json`. The script
+[`scripts/deep-dives/disturbance-size.ts`](https://github.com/RJuho/inar-agri/blob/main/scripts/deep-dives/disturbance-size.ts)
+writes this file. It reads only `db/events.parquet`, `db/sites.parquet`, `db/observations.parquet`,
+`data/calculated/daily.parquet` and `data/calculated/fluxes_30min.parquet`. The pure helpers are in
+`scripts/lib/deep-dive/disturbance.ts` (unit test `disturbance.test.ts`).
+
+```sh
+npm run build:db && npm run calc         # make the inputs
+npm run deep-dives -- disturbance-size   # write the JSON again
+npm run deep-dives -- --check            # compare a fresh run with the committed JSON
+```

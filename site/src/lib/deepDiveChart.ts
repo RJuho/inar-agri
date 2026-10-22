@@ -55,3 +55,36 @@ export function renderSvg(option: echarts.EChartsOption, width: number, height: 
       .replace(/>$/, ` role="img" aria-label="${escaped}" class="dd-chart">`),
   );
 }
+
+/** Equal value range for panels: includes zero, rounded out to a nice tick interval (about `ticks` ticks). */
+export function niceRange(values: readonly number[], ticks = 6): { min: number; max: number; interval: number } {
+  const lo = Math.min(0, ...values);
+  const hi = Math.max(0, ...values);
+  const raw = (hi - lo) / ticks || 1;
+  const pow = 10 ** Math.floor(Math.log10(raw));
+  const interval = ([1, 2, 5, 10].find((m) => m * pow >= raw) ?? 10) * pow;
+  return { min: Math.floor(lo / interval) * interval, max: Math.ceil(hi / interval) * interval, interval };
+}
+
+export interface PanelBox {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/** Panel boxes in a grid of `cols` columns, filled row by row. */
+export function panelGrid(count: number, cols: number, width: number, margin: { left: number; right: number; top: number; bottom: number }, gap: { x: number; y: number }, panelHeight: number): PanelBox[] {
+  const w = (width - margin.left - margin.right - gap.x * (cols - 1)) / cols;
+  return Array.from({ length: count }, (_, i) => {
+    const c = i % cols;
+    const r = Math.floor(i / cols);
+    return { left: margin.left + c * (w + gap.x), top: margin.top + r * (panelHeight + gap.y), width: w, height: panelHeight };
+  });
+}
+
+/** Total height of a `panelGrid` figure. */
+export function gridHeight(count: number, cols: number, margin: { top: number; bottom: number }, gapY: number, panelHeight: number): number {
+  const rows = Math.ceil(count / cols);
+  return margin.top + rows * panelHeight + (rows - 1) * gapY + margin.bottom;
+}
