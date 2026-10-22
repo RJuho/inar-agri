@@ -21,7 +21,7 @@ const SITES_FILE = 'db/sites.parquet';
 
 const SITE_CODES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'] as const;
 const FI_SITES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki'];
-/** Coordinates for the sites without coordinates in sites.parquet. */
+/** Fallback coordinates for a site with NULL lat or lon in sites.parquet (all six sites have coordinates since 2026-10-22). */
 const DEFAULT_LAT = 60.2;
 const DEFAULT_LON = 25.0;
 

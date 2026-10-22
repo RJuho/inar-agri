@@ -1,13 +1,13 @@
 # Build report: harmonised core database
 
-Built 2026-10-22T08:03:46.675Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
+Built 2026-10-22T14:14:26.910Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
 
 ## Output files
 
 | File | Rows | Bytes |
 |---|---|---|
 | db/observations.parquet | 537980 | 23111672 |
-| db/sites.parquet | 6 | 3956 |
+| db/sites.parquet | 6 | 4119 |
 | db/variables.parquet | 26 | 2137 |
 | db/site_variables.parquet | 185 | 7734 |
 | db/events.parquet | 83 | 6662 |

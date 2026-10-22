@@ -6,7 +6,7 @@ Generated from the first three lines of each file. Row counts include the header
 
 ## 👱🏻‍♂️🫛 Anttila (FI-Ant) and 🐟🌱 Särkisuo (FI-Sar)
 
-Both sites use the same file layouts. Line 1 is the header. Line 2 is a unit row. Data starts on line 3. Missing value: `-9999`. Half-hour time step. Timestamps are local time (UTC+2). Coordinates are not in the data files.
+Both sites use the same file layouts. Line 1 is the header. Line 2 is a unit row. Data starts on line 3. Missing value: `-9999`. Half-hour time step. Timestamps are local time (UTC+2). Coordinates are not in the data files. Anttila 63.1453 N, 27.3128 E; Särkisuo 63.15142822 N, 27.19906425 E (project team, 2026-10-22).
 
 | File | Rows | Columns | Period (first to last timestamp) |
 |---|---|---|---|
@@ -348,7 +348,7 @@ Other Qvidja files:
 
 ## 👩🏻‍🔬🎓 Viikki
 
-Field Alaniitty 1. Crops: 2022 timothy, 2023 barley / mixed grass / red clover, 2024 grassland, 2025 fava bean. Coordinates are not in the data files. Timestamps are UTC+2.
+Field Alaniitty 1. Crops: 2022 timothy, 2023 barley / mixed grass / red clover, 2024 grassland, 2025 fava bean. Coordinates are not in the data files: 60.21845 N, 25.01986 E (project team, 2026-10-22). Timestamps are UTC+2.
 
 ### EC files `data/Viikki/EC/{2022,2023,2024,2025}.csv`
 

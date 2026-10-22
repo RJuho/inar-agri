@@ -81,12 +81,14 @@ Type rules: seeding and oversowing are `sowing`; herbicide, glyphosate and a mic
 
 | `site_id` | `code` | Name | FLUXNET id | Lat, lon | UTC offset | Data (local) | Note |
 |---|---|---|---|---|---|---|---|
-| 1 | `anttila` | Anttila | FI-Ant | not in files | +2 h | 2022-2023 | Legume grassland. |
-| 2 | `sarkisuo` | Särkisuo | FI-Sar | not in files | +2 h | 2022-2023 | Mixed grasses. |
-| 3 | `haltiala` | Haltiala | - | 60.271671, 24.944509 | +2 h | 2021-05 to 2025 | Cropland. |
-| 4 | `qvidja` | Qvidja | - | 60.2953, 22.3918 | +2 h | 2018-05 to 2025 | Forage grassland. |
-| 5 | `viikki` | Viikki | - | not in files | +2 h | 2022-2025 | Grassland in rotation, field Alaniitty 1. |
-| 6 | `maktau` | Maktau | KE-Mkt | -3.425859, 38.140663 | +3 h | 2014-08 to 2025-01 | Maize and vegetables. EC data 2018-12 to 2024-09. |
+| 1 | `anttila` | Anttila | FI-Ant | 63.1453, 27.3128 | +2 h | 2022-2023 | Legume grassland. |
+| 2 | `sarkisuo` | Särkisuo | FI-Sar | 63.15142822, 27.19906425 | +2 h | 2022-2023 | Mixed grasses. |
+| 3 | `haltiala` | Haltiala | - | 60.271683, 24.94395 | +2 h | 2021-05 to 2025 | Cropland. |
+| 4 | `qvidja` | Qvidja | - | 60.295333, 22.391833 | +2 h | 2018-05 to 2025 | Forage grassland. |
+| 5 | `viikki` | Viikki | - | 60.21845, 25.01986 | +2 h | 2022-2025 | Grassland in rotation, field Alaniitty 1. |
+| 6 | `maktau` | Maktau | KE-Mkt | -3.425833, 38.139444 | +3 h | 2014-08 to 2025-01 | Maize and vegetables. EC data 2018-12 to 2024-09. |
+
+The project team gave all coordinates on 2026-10-22 (WGS 84 decimal degrees). They are not in the data files. The Haltiala tower file and the Maktau metadata give points about 30 m and 140 m away.
 
 The Finnish files use UTC+2 all year (no daylight saving time). All sources stamp the start of the period, with one exception: the Viikki soil pit stamps the end of each 5-minute period.
 

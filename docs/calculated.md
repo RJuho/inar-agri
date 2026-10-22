@@ -53,7 +53,7 @@ NECB = -NEE - C_harvest + C_exo - C_CH4        (g C m-2 yr-1, positive = gain)
 Derived inputs:
 
 - Local time `tl = ts_start + utc_offset_min` (Finnish sites UTC+2, Maktau UTC+3). Days and years are local calendar days and years.
-- Night flag: `sw_in < 10 W m-2`. Where `sw_in` is NULL and `ppfd` exists: `ppfd < 20 µmol m-2 s-1`. Haltiala has PPFD only; Särkisuo 2022 has few SW_IN values and uses PPFD in most rows. REddyProc uses the same 10 W m-2 limit plus the potential radiation; three sites have no coordinates, so the script uses the measured radiation only.
+- Night flag: `sw_in < 10 W m-2`. Where `sw_in` is NULL and `ppfd` exists: `ppfd < 20 µmol m-2 s-1`. Haltiala has PPFD only; Särkisuo 2022 has few SW_IN values and uses PPFD in most rows. REddyProc uses the same 10 W m-2 limit plus the potential radiation; the script uses the measured radiation only.
 - VPD: the file value where it exists (Haltiala, Qvidja, Maktau). Else from air temperature and relative humidity with the Magnus formula: `VPD = 6.1078 · exp(17.27 · T / (T + 237.3)) · (1 − RH / 100)` hPa. The report lists the rows per site.
 
 All parameters are in `scripts/lib/calc/constants.ts`. The report and the Parquet metadata contain a copy.

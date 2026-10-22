@@ -168,6 +168,32 @@ export interface ChangeLogEntry {
 /** Newest entry first. */
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    id: 'change-2026-10-22-coordinates',
+    date: '2026-10-22',
+    title: 'Coordinates for all six sites',
+    site: 'All sites',
+    variable: 'lat, lon',
+    findings: [],
+    summary: [
+      'The site table (`sites.parquet`) now has the latitude and longitude of all six sites. Before, Anttila, Särkisuo and Viikki had no coordinates, because the data files do not give them.',
+      'The project team gave the values. For Haltiala and Maktau they replace the earlier values from the tower file and the site metadata (about 30 m and 140 m away). The anomaly scan now uses the true longitude to compute the expected hour of the radiation peak. The 2-hour time offset of Anttila, Särkisuo and Viikki does not change.',
+    ],
+    facts: [
+      { term: 'Anttila', value: '63.1453, 27.3128' },
+      { term: 'Särkisuo (Särkiluoto)', value: '63.15142822, 27.19906425' },
+      { term: 'Haltiala', value: '60.271683, 24.94395 (tower file: 60.271671, 24.944509)' },
+      { term: 'Qvidja', value: '60.295333, 22.391833' },
+      { term: 'Viikki', value: '60.21845, 25.01986' },
+      { term: 'Maktau', value: '-3.425833, 38.139444 (metadata: -3.425859, 38.140663)' },
+      { term: 'Code', value: '`scripts/lib/registry.ts` (`SITES`).' },
+    ],
+    formulas: [],
+    tables: [],
+    openPoints: [],
+    openQuestions: [],
+    doc: 'docs/harmonised-database.md',
+  },
+  {
     id: 'change-2026-10-22-event-details',
     date: '2026-10-22',
     title: 'Management events with yield, carbon, N input and parcel area',

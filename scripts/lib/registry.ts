@@ -97,39 +97,39 @@ const FINNISH = '%-d.%-m.%Y %-H:%M';
 export const SITES: Site[] = [
   {
     siteId: 1, code: 'anttila', fluxnetId: 'FI-Ant', name: 'Anttila', country: 'FI',
-    lat: null, lon: null, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'GRA',
+    lat: 63.1453, lon: 27.3128, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'GRA',
     description: 'Legume grassland. Data 2022-2023.',
-    comment: 'Coordinates are not in the source files. Soil sensor depths are not known.',
+    comment: 'Coordinates given by the project team 2026-10-22. Soil sensor depths are not known.',
   },
   {
     siteId: 2, code: 'sarkisuo', fluxnetId: 'FI-Sar', name: 'Särkisuo', country: 'FI',
-    lat: null, lon: null, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'GRA',
+    lat: 63.15142822, lon: 27.19906425, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'GRA',
     description: 'Mixed grasses. Data 2022-2023.',
-    comment: 'Coordinates are not in the source files. Soil sensor depths are not known.',
+    comment: 'Coordinates given by the project team 2026-10-22 (name in that list: Särkiluoto). Soil sensor depths are not known.',
   },
   {
     siteId: 3, code: 'haltiala', fluxnetId: null, name: 'Haltiala', country: 'FI',
-    lat: 60.271671, lon: 24.944509, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'CRO',
+    lat: 60.271683, lon: 24.94395, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'CRO',
     description: 'Cropland. 2021 barley, 2022 oats, 2023 grass (failed), 2024 sunflowers, 2025 oats. Data 2021-2025.',
-    comment: 'EC tower coordinates from data/Haltiala/geodata/haltiala_ec_tower_coords.txt.',
+    comment: 'Coordinates given by the project team 2026-10-22. data/Haltiala/geodata/haltiala_ec_tower_coords.txt gives 60.271671, 24.944509 (about 30 m east).',
   },
   {
     siteId: 4, code: 'qvidja', fluxnetId: null, name: 'Qvidja', country: 'FI',
-    lat: 60.2953, lon: 22.3918, elevationM: 7, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'CRO',
+    lat: 60.295333, lon: 22.391833, elevationM: 7, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'CRO',
     description: 'Forage grassland, managed intensively with conventional practices until 2017, then more sustainable practices. Data 2018-2025.',
-    comment: 'Coordinates from Qvidja-readme.xlsx (60°17\'43.2" N, 22°23\'30.6" E).',
+    comment: 'Coordinates given by the project team 2026-10-22. Same point as Qvidja-readme.xlsx (60°17\'43.2" N, 22°23\'30.6" E).',
   },
   {
     siteId: 5, code: 'viikki', fluxnetId: null, name: 'Viikki', country: 'FI',
-    lat: null, lon: null, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'CRO',
+    lat: 60.21845, lon: 25.01986, elevationM: null, utcOffsetMin: 120, timestepMin: 30, ecosystem: 'CRO',
     description: 'Grassland in rotation, field Alaniitty 1. 2022 timothy, 2023 barley / mixed grass / red clover, 2024 grassland, 2025 fava bean. Data 2022-2025.',
-    comment: 'Coordinates are not in the source files. NEE unit mg CO2 m-2 s-1 per the file headers, converted to µmol. Soil 2022 from the EC file, 2023-2025 from the soil pit.',
+    comment: 'Coordinates given by the project team 2026-10-22. NEE unit mg CO2 m-2 s-1 per the file headers, converted to µmol. Soil 2022 from the EC file, 2023-2025 from the soil pit.',
   },
   {
     siteId: 6, code: 'maktau', fluxnetId: 'KE-Mkt', name: 'Maktau', country: 'KE',
-    lat: -3.425859, lon: 38.140663, elevationM: null, utcOffsetMin: 180, timestepMin: 30, ecosystem: 'CRO',
+    lat: -3.425833, lon: 38.139444, elevationM: null, utcOffsetMin: 180, timestepMin: 30, ecosystem: 'CRO',
     description: 'Maize 80 %, vegetables 20 %. Taita region. EC data 2018-2024, meteo data 2014-2025.',
-    comment: 'No gap-filled NEE exists. Logger fill value 0 in TA, TS and SWC is set to NULL.',
+    comment: 'Coordinates given by the project team 2026-10-22. The earlier value -3.425859, 38.140663 is about 140 m east. No gap-filled NEE exists. Logger fill value 0 in TA, TS and SWC is set to NULL.',
   },
 ];
 

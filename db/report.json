@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-10-22T08:03:46.675Z",
+  "builtAt": "2026-10-22T14:14:26.910Z",
   "duckdb": "v1.5.6",
   "node": "v26.10.0",
   "outputs": [
@@ -11,7 +11,7 @@
     {
       "file": "db/sites.parquet",
       "rows": 6,
-      "bytes": 3956
+      "bytes": 4119
     },
     {
       "file": "db/variables.parquet",

@@ -28,7 +28,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Key flux columns (µmol m-2 s-1, LE in W m-2): `co2_flux_final_gf_ensemble` (0.44701907), `co2_flux_final_gap` (1 = gap-filled), `LE_final_gf_ensemble` (-0.53086621), `ch4_flux_final_gf_ensemble` (-0.00033240), `n2o_flux_final_gf_ensemble` (0.00047142), `GPP_gf_ensemble_NT` (0.0), `Reco_gf_ensemble_NT` (0.44701907).
 - Key biomet columns: `TA_1_1_1` C (-6.5222), `RH_1_1_1` % (84.6626), `PPFD_1_1_1` umol/m^2/s (-0.0007), `P_RAIN_1_1_1` mm (0.0), `SWC_1_1_1` m^3/m^3 (0.1599), `TS_1_1_1` C (0.4), `SHF_1_1_1` W/m^2 (-1.77), `PA_1_1_1` kPa (98.9632), `D_SNOW_1_1_1` m.
 - Biomet column sets differ: Anttila 2022 has `SO411O2_1_1_1..1_5_1`, `WTD_1_1_1` and `BF5_*`. Anttila 2023 drops `SO411O2_*` and `WTD`. Särkisuo has no `BF5_*`.
-- Coordinates are not in the data files.
+- Coordinates are not in the data files. Anttila 63.1453 N, 27.3128 E; Särkisuo (also called Särkiluoto) 63.15142822 N, 27.19906425 E (project team, 2026-10-22, in `scripts/lib/registry.ts`).
 
 ### 🧚🌾 Haltiala
 
@@ -37,7 +37,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Columns: `NEE` (NA), `NEE_F` (0.559385), `NEE_F_UNC` (0.538254), `TA_F` (4.05), `PPFD_IN_F` (0), `VPD_F` (1.10), `TS_010_F` (7.87), `SWC_010_F` (0.52), `NEE_F1` to `NEE_F10` (ten XGBoost gap-fill models). Units in `data/Haltiala/ReadMe.md`.
 - Annual uncertainty: sum `NEE_F1` to `NEE_F10` per year, then take SD or 95 % CI of the ten sums. Do not aggregate `NEE_F_UNC`.
 - `haltiala_smear_management.xlsx`: Year, Date (Excel serial), Action, Value, Units, Description.
-- `geodata/`: field polygon as Shapefile and GeoPackage, CRS EPSG:3067 (TM35FIN). EC tower at 60.271671 N, 24.944509 E.
+- `geodata/`: field polygon as Shapefile and GeoPackage, CRS EPSG:3067 (TM35FIN). EC tower file: 60.271671 N, 24.944509 E. The registry uses 60.271683 N, 24.943950 E (project team, 2026-10-22).
 - Crops: 2021 barley, 2022 oats, 2023 grass (failed), 2024 sunflowers, 2025 oats.
 
 ### 🐂🐝 Qvidja
@@ -45,7 +45,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - `data/Qvidja/Qvidja_2018-2025.csv`: 237 556 rows, 28 columns, comma delimiter, 30-minute step, 2018-05-09 to 2025-12-31.
 - Timestamp columns `TIMESTAMP_START` and `TIMESTAMP_END`, format `YYYYMMDDHHMM`, example `201805090200`. Missing value: empty field.
 - Columns: `USTAR` (0.0241), `WS` (0.3025), `WD` (335.385), `NEE` µmol m-2 s-1 (2.6142), `NEE_QC` (1.0), `GPP` (0.0), `RECO` (2.4175), `H` (empty), `LE_F` (-4.5349), `NETRAD` (-51.38), `SW_IN_F` (0.0), `SW_OUT` (0.25), `TA_F` (5.44), `P` mm (0.0), `CO2` ppm (459.874), `RH_F` (84.6), `VPD_F` hPa (1.384), `TS_1` 5 cm (9.07), `TS_2` 15 cm (empty), `TS_3` 30 cm (10.64), `SM` 10 cm, raw ML3 ThetaProbe output in V (0.822; the readme says m3 m-3, not correct). `_QC` columns: 0 = measured, 1 = gap-filled.
-- Site: 60°17'43.2" N, 22°23'30.6" E, 7 m a.s.l., clay loam, EC height 2.3 m. Units and descriptions in `Qvidja-readme.xlsx`.
+- Site: 60°17'43.2" N, 22°23'30.6" E (60.295333, 22.391833), 7 m a.s.l., clay loam, EC height 2.3 m. Units and descriptions in `Qvidja-readme.xlsx`.
 - `Qvidja_management.xlsx`: Date, Area (ha), Management action, Name, Amount, Unit, DM fraction, Harvest type, Duration (days), Straws removed, Comment.
 
 ### 👩🏻‍🔬🎓 Viikki
@@ -57,7 +57,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - `EC/Management Information.docx`: management table per year (N input, dates, yield kg DW/ha). Typed by hand into `scripts/lib/events.ts` and `scripts/lib/calc/management.ts`.
 - Soil pit files `data/Viikki/pit1_cleaned_2023.csv` to `2025.csv`: about 105 000 rows each, 35 to 37 columns, comma delimiter, 5-minute step. Timestamp column `TIMESTAMP`, format `yyyy-mm-dd HH:MM:SS`, example `2022-12-31 00:05:00`. Each file starts on 31 December of the previous year.
 - Pit columns, index 1 to 5 = depth 14, 37, 54, 95, 120 cm: `Redox_Avg_n` mV, add +200 mV (471.4), `Temp_T12_Avg_n` C (0.4), `EC_Avg_n` µS/cm (60), `Temp_T21_Avg_n` C, `Matric_potential_Avg_n` kPa (-0.1), `WC1..5` m3/m3 (0.449), `Water_level_Avg` m (1.777), `Temp_ottpls_Avg` C, `shf_plate_Avg` W/m2. Details in `pit1_metadata.txt`.
-- Crops (field Alaniitty 1): 2022 timothy, 2023 barley / mixed grass / red clover, 2024 grassland, 2025 fava bean. Coordinates are not in the data files.
+- Crops (field Alaniitty 1): 2022 timothy, 2023 barley / mixed grass / red clover, 2024 grassland, 2025 fava bean. Coordinates are not in the data files: 60.21845 N, 25.01986 E (project team, 2026-10-22).
 
 ### 🇰🇪🌽 Maktau (KE-Mkt)
 
@@ -66,7 +66,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - `Maktau_meteo_1_hour_KE-Mkt.csv`: 53 380 rows, 25 columns, 2018-11-01 to 2024-12-03. The last column header is empty.
 - All three: comma delimiter, AmeriFlux names, timestamp columns `TIMESTAMP_END` and `TIMESTAMP_START`, format `YYYYMMDDHHMM`, example `201812171200`. Missing value: `-9999`. No unit row.
 - Key continuous columns: `FC` (-8.2375), `CO2` (395.027), `H2O` (21.2876), `H` (254.98), `LE` (-9999), `USTAR` (0.58), `WS`, `WD` (48.3), `TA_1_1_1` (27.43), `RH_1_1_1` (59.79), `PA_1_1_1` (89.7), `P_RAIN_1_1_1` (0), `SW_IN_1_1_1` (754.7), `NETRAD_1_1_1`, `NDVI_1_1_1` (0.3647), `SWC_1_1_1` (0.0845), `TS_1_1_1` (26.49), `G_1_1_1` (19.85), `SWP_2_1_1` (-933.4).
-- Site: -3.425859, 38.140663, UTC+3, maize 80 % and vegetables 20 %, EC height 3.3 m. `Ancillary_KE-Mkt.csv` is a key/value metadata file in Windows-1252 encoding. `BADM-Site-General-Info-KE-Mkt.xlsx` is the AmeriFlux BADM template.
+- Site: -3.425833, 38.139444 (project team, 2026-10-22; earlier value -3.425859, 38.140663), UTC+3, maize 80 % and vegetables 20 %, EC height 3.3 m. `Ancillary_KE-Mkt.csv` is a key/value metadata file in Windows-1252 encoding. `BADM-Site-General-Info-KE-Mkt.xlsx` is the AmeriFlux BADM template.
 
 ## Read rules for `data/`
 
