@@ -1,0 +1,234 @@
+/* Text page "Data Report" (site/src/pages/data-report.astro).
+   Colours come only from the tokens in global.css, so dark mode works.
+   A status shows as text and a symbol, the colour only adds to it. */
+
+.data-report .key-issue {
+  max-width: 72ch;
+  margin: 24px 0 0;
+  padding: 4px 16px 8px;
+  border: 1px solid var(--axis-line);
+  border-left: 6px solid var(--series-2);
+  border-radius: 6px;
+  background: var(--surface-raised);
+}
+
+.data-report .key-issue h2 {
+  margin-top: 8px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.key-ids {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+/* ---------- Status badge ---------- */
+
+.status-badge {
+  --status: var(--axis-line);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px 0 6px;
+  border: 1px solid var(--status);
+  border-left-width: 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--status) 12%, var(--surface-raised));
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.status-badge[data-status='provider'] {
+  --status: var(--series-2);
+}
+
+.status-badge[data-status='open'] {
+  --status: var(--series-1);
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.status-badge[data-status='resolved'] {
+  --status: var(--series-7);
+}
+
+.status-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.status-legend {
+  display: grid;
+  gap: 8px;
+  max-width: 72ch;
+  margin: 0 0 12px;
+}
+
+.status-legend dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-count {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-legend dd {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ---------- Findings table ---------- */
+
+.findings th[scope='row'] {
+  font-weight: 600;
+}
+
+.findings .nowrap {
+  white-space: nowrap;
+}
+
+.findings td.var {
+  min-width: 10ch;
+  max-width: 18ch;
+}
+
+.findings tr.is-key {
+  box-shadow: inset 4px 0 0 var(--series-2);
+}
+
+.findings tr.is-key th[scope='row']::after {
+  content: ' ★';
+}
+
+.findings tr:target {
+  outline: 2px solid var(--series-1);
+  outline-offset: -2px;
+}
+
+/* ---------- Change log ---------- */
+
+.change {
+  margin: 16px 0 24px;
+}
+
+.change h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+}
+
+.change h3 time {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.change h4 {
+  max-width: 72ch;
+  margin: 16px 0 6px;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.change-meta {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: minmax(10ch, max-content) minmax(0, 1fr);
+  gap: 6px 16px;
+  max-width: 72ch;
+  margin: 0 0 12px;
+  font-size: 0.9375rem;
+}
+
+.facts > div {
+  display: contents;
+}
+
+.facts dt {
+  font-weight: 600;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.formula .note {
+  margin-top: -4px;
+}
+
+@media (max-width: 560px) {
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .facts dd {
+    margin-bottom: 6px;
+  }
+}
+
+/* Phone width: one card per finding, with the column name before each value. */
+@media (max-width: 640px) {
+  .findings,
+  .findings tbody,
+  .findings tr,
+  .findings th[scope='row'],
+  .findings td {
+    display: block;
+  }
+
+  .findings thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .findings tr {
+    padding: 8px 0 8px 12px;
+    border-bottom: 1px solid var(--axis-line);
+  }
+
+  .table-wrap .findings th[scope='row'],
+  .table-wrap .findings td {
+    padding: 2px 0;
+    border: 0;
+  }
+
+  .findings caption {
+    display: block;
+  }
+
+  .findings td.var,
+  .findings td.wrap {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .findings td[data-label]::before {
+    content: attr(data-label) ': ';
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .findings td[data-label='Status']::before {
+    content: '';
+  }
+}

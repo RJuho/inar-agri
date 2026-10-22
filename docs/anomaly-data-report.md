@@ -1,11 +1,12 @@
 # Anomaly report: site variables (scan of 2026-10-21)
 
-Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Update 2026-10-22: QVI-01 resolved; the Qvidja `swc` is now converted from volts to m³ m⁻³ (the numbers of QVI-02 and QVI-03 are raw `SM` values in V). Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
+Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Update 2026-10-22: QVI-01 resolved; the Qvidja `swc` is now converted from volts to m³ m⁻³ (the numbers of QVI-02 and QVI-03 are raw `SM` values in V). New finding QVI-16 (2026-10-22): 17 950 Qvidja `swc` values in frozen soil, open. Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
 
 ## Summary
 
 - Time axis (S1): the raw time stamps of Anttila, Särkisuo and Viikki are UTC and mark the period start. The build reads them as UTC+2. All data of these three sites sits 2 hours early on the website, in `ts_start` and in the data export. The daily radiation peak is at local hour 10, not 12 (ANT-01, SAR-01, VII-01).
 - Qvidja `swc` (S1, resolved 2026-10-22): `SM` is the ML3 sensor output in volts (provider confirmed). The build converts it to m³ m⁻³ with the ML3 manual polynomial for mineral soil (QVI-01, `docs/qvidja-soil-moisture.md`).
+- Qvidja `swc` in frozen soil (S2, open, added 2026-10-22): the ML3 manual (p. 28) says that readings below 0 °C are not reliable. 17 950 values (14.5 %) have `tsoil` ≤ 0 °C. The build keeps them. A rule (`swc` NULL where `tsoil` ≤ 0 °C) is not decided (QVI-16).
 - Qvidja end of 2025 (S2, new): from 2025-11-01 the soil probes follow the air temperature and the net radiation is positive at night, to about 2025-12-22. `sw_out` is missing from 2025-10-26 to 2025-12-28 (QVI-12).
 - Qvidja NEE (S2, open): the annual NEE sums of the file are 25 to 109 g C m-2 more negative than Heimsch 2024 Table 1. The file is probably a different processing version (QVI-11). Qvidja GPP and Reco come from a daytime method and do not close with NEE (QVI-07).
 - Viikki N2O (S1 if wrong, open): the header unit `ug m-2 s-1` can be µg N2O or µg N2O-N. The build assumes µg N2O. The 2022 sum is 16.8 kg N2O ha-1 after 108 kg N ha-1 (VII-06).
@@ -20,12 +21,12 @@ Findings per site and severity (counts of findings, not of flags):
 | Anttila | 1 | 0 | 3 | 4 | 8 | 1 |
 | Särkisuo | 1 | 1 | 3 | 2 | 7 | 2 |
 | Haltiala | 0 | 1 | 0 | 4 | 5 | 0 |
-| Qvidja | 1 | 6 | 3 | 5 | 15 | 3 |
+| Qvidja | 1 | 7 | 3 | 5 | 16 | 4 |
 | Viikki | 2 | 0 | 2 | 4 | 8 | 2 |
 | Maktau | 0 | 3 | 4 | 2 | 9 | 5 |
-| Total | 5 | 11 | 15 | 21 | 52 | 13 |
+| Total | 5 | 12 | 15 | 21 | 53 | 14 |
 
-A finding with two severities counts at the higher one (ANT-02, SAR-02, SAR-04, VII-06, MKT-08). "New" = status new, with the part-new findings QVI-04 and QVI-08.
+A finding with two severities counts at the higher one (ANT-02, SAR-02, SAR-04, VII-06, MKT-08). "New" = status new, with the part-new findings QVI-04 and QVI-08, and QVI-16 (open, added 2026-10-22).
 
 ## Method
 
@@ -73,6 +74,7 @@ Sorted by severity, then site. The details are in the site sections.
 | QVI-08 | Qvidja | precip | 2021-12-29 to 2022-05-24 | L | 437 of 7 056 periods | Kaarina fill (article) | known; new for the file | S2 | 2022 sum 388 mm incomplete | ask provider |
 | QVI-11 | Qvidja | nee_f | 2018-19 to 2022-23 | L | NEE −99 to −232 g C m-2 | article +10 to −190 | open question | S2 | stronger sink than article | ask provider |
 | QVI-12 | Qvidja | tsoil, netrad, sw_in, sw_out | 2025-10-26 to 2025-12-28 | N, C, D | tsoil follows ta; night netrad +9 | night netrad −6 to −29 | new | S2 | tsoil = air temperature | ask provider, build rule |
+| QVI-16 | Qvidja | swc | winters 2018 to 2025 | none (manual) | 17 950 values with tsoil ≤ 0 °C | not reliable below 0 °C (ML3 manual p. 28) | open (decision pending) | S2 | winter swc too low | decide build rule |
 | MKT-01 | Maktau | all meteo | 2023-07 to 2024-01 | P | night rows missing | full days | handled in build | S2 | day-time means | document |
 | MKT-03 | Maktau | nee | 2024-04 to 2024-07 | B | FC equal in runs up to 25 | no repeated flux | new (verified) | S2 | 11 % of 2024 NEE | ask provider |
 | MKT-08 | Maktau | ta, vpd | 2024-02 to 2024-11 | D | day ta +1.5 to 2.8 °C; T_SONIC rises too | day and night move together | open question | S2 if sensor, S4 if real | 2024 ta and vpd | ask provider |
@@ -747,6 +749,23 @@ File: `data/Qvidja/Qvidja_2018-2025.csv` (`TIMESTAMP_START` `YYYYMMDDHHMM` in UT
 - Verify:
   ```sql
   SELECT count(*) - count(DISTINCT TIMESTAMP_START) FROM read_csv('data/Qvidja/Qvidja_2018-2025.csv', all_varchar=true);  -- 103 447
+  ```
+
+#### QVI-16 swc: readings in frozen soil are not reliable (ML3 manual); the build keeps them
+
+- Source: `swc` ← `Qvidja_2018-2025.csv`, `SM` (converted with the ML3 polynomial since 2026-10-22); `tsoil` ← `TS_1` (5 cm)
+- Period: winters 2018-19 to 2025 (first value 2018-11-25, last 2025-12-31)
+- Observed: 17 950 of 124 023 Qvidja `swc` values (14.5 %) have `tsoil` ≤ 0 °C; 17 606 of them have `tsoil` < 0 °C. The build keeps all of them.
+- Expected: Delta-T ML3-UM-2.1 (January 2017), p. 28: "ML3 soil moisture readings cannot be interpreted reliably when inserted into soil below 0°C." Ice has a much lower permittivity than liquid water, thus θ reads too low in frozen soil.
+- Raw rows: in `db/observations.parquet` (query below).
+- Control: QVI-03 shows the drops of 0.3 to 0.4 V in the same periods.
+- Probable cause: sensor physics (see QVI-03). Not a data error, but the values do not give the water content.
+- Status / Severity: open (decision pending) / S2
+- Effect: winter `swc` means and minima of Qvidja on the website and in the export are too low.
+- Next action: decide if the build sets `swc` to NULL where `tsoil` ≤ 0 °C (or < 0 °C). The same rule can apply to the other mineral-soil sites. No question to the provider is necessary.
+- Verify:
+  ```sql
+  SELECT count(*) n, count(*) FILTER (WHERE tsoil < 0) n_lt0, min(ts_start), max(ts_start) FROM 'db/observations.parquet' WHERE site_id = 4 AND swc IS NOT NULL AND tsoil <= 0;  -- 17 950, 17 606, 2018-11-25, 2025-12-31 (build of 2026-10-22)
   ```
 
 ### Viikki

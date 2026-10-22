@@ -1,0 +1,270 @@
+---
+// Text page "Data Report": summary of the anomaly scan (docs/anomaly-data-report.md) and the change log
+// of the data. The content is in site/src/lib/dataReport.ts. Formulas: KaTeX at build time. No client script.
+import 'katex/dist/katex.min.css';
+import '../styles/data-report.css';
+import Base from '../layouts/Base.astro';
+import { tex } from '../lib/tex';
+import {
+  CHANGE_LOG,
+  FINDINGS,
+  SCAN,
+  SEVERITY_HELP,
+  STATUS_HELP,
+  STATUS_ICON,
+  STATUS_LABEL,
+  repoFile,
+  type FindingStatus,
+  type Severity,
+} from '../lib/dataReport';
+
+/** Escape HTML, then show the parts in backticks as code. */
+function inline(s: string): string {
+  const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return esc.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+const STATUSES: FindingStatus[] = ['provider', 'open', 'resolved'];
+const SEVERITIES = Object.keys(SEVERITY_HELP) as Severity[];
+const count = (st: FindingStatus) => FINDINGS.filter((f) => f.status === st).length;
+
+/** The most important open item: the 2-hour time shift of three sites. */
+const KEY_IDS = ['ANT-01', 'SAR-01', 'VII-01'];
+const findingIds = new Set(FINDINGS.map((f) => f.id));
+const reportUrl = repoFile(SCAN.reportPath);
+---
+
+<Base
+  title="Data Report – INAR agri"
+  description="Verified anomalies in the harmonised data of the six INAR agri sites, their status, and the change log of the data."
+>
+  <main class="prose data-report">
+    <header>
+      <h1>Data Report</h1>
+      <p class="lead">
+        This page gives a summary of the data checks of the harmonised database and a log of the changes to the data.
+        The full report with the evidence and a check query for each finding is{' '}
+        <a href={reportUrl}><code>{SCAN.reportPath}</code></a> in the repository.
+      </p>
+    </header>
+
+    <nav class="toc" aria-labelledby="toc-title">
+      <h2 id="toc-title">Contents</h2>
+      <ol>
+        <li><a href="#key-issue">Most important open item</a></li>
+        <li><a href="#scan">Anomaly scan</a></li>
+        <li><a href="#findings">Verified findings</a></li>
+        <li><a href="#changelog">Change log</a></li>
+      </ol>
+    </nav>
+
+    <section aria-labelledby="key-issue" class="key-issue">
+      <h2 id="key-issue">Most important open item: three sites are 2 hours early</h2>
+      <p>
+        The raw time stamps of Anttila, Särkisuo and Viikki are UTC and mark the start of the 30-minute period. The build
+        reads them as local time (UTC+2). Thus all values of these three sites sit 2 hours early: on the data page, in{' '}
+        <code>ts_start</code> and in the data export. The daily radiation peak is at local hour 10, not 12.
+      </p>
+      <p>
+        Daily, monthly and annual sums change little. Diurnal cycles, fingerprints and hourly comparisons with Haltiala,
+        Qvidja and Maktau are 2 hours wrong. We asked the providers to confirm the time base. After the answer, the build
+        gets a stamp offset for these sources.
+      </p>
+      <p class="key-ids">
+        <span>
+          Findings:{' '}
+          {KEY_IDS.map((id, i) => (
+            <>{i > 0 && ', '}<a href={`#finding-${id}`}>{id}</a></>
+          ))}
+        </span>
+        <span class="status-badge" data-status="provider">
+          <span aria-hidden="true">{STATUS_ICON.provider}</span>
+          {STATUS_LABEL.provider}
+        </span>
+      </p>
+    </section>
+
+    <section aria-labelledby="scan">
+      <h2 id="scan">Anomaly scan</h2>
+      <p>
+        The scan script <code>scripts/scan-anomalies.ts</code> (<code>{SCAN.command}</code>) reads the harmonised
+        database and runs {SCAN.checks} checks per site and variable on the {SCAN.columns} harmonised columns: range,
+        stuck values, steps, level shifts, fill values, cross-variable rules, time axis, coverage and more. The scan of{' '}
+        {SCAN.date} found {SCAN.episodes.toLocaleString('en-US').replace(/,/g, ' ')} flagged episodes. We checked each
+        group of flags in the raw source files and with the articles. This gave {FINDINGS.length} findings. No data was
+        changed by the scan.
+      </p>
+      <p>
+        Severity: {
+          SEVERITIES.map((s, i) => (
+            <>
+              {i > 0 && '; '}
+              <strong>{s}</strong> = {SEVERITY_HELP[s]}
+            </>
+          ))
+        }.
+      </p>
+
+      <dl class="status-legend">
+        {
+          STATUSES.map((st) => (
+            <div>
+              <dt>
+                <span class="status-badge" data-status={st}>
+                  <span aria-hidden="true">{STATUS_ICON[st]}</span>
+                  {STATUS_LABEL[st]}
+                </span>
+                <span class="status-count">{count(st)}</span>
+              </dt>
+              <dd>{STATUS_HELP[st]}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section aria-labelledby="findings">
+      <h2 id="findings">Verified findings</h2>
+      <p>
+        Sorted by severity, then site. Variable names are the column names of the harmonised database. Last update:{' '}
+        {SCAN.updated}.
+      </p>
+      <div class="table-wrap">
+        <table class="findings">
+          <caption>{FINDINGS.length} verified findings of the anomaly scan</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Site</th>
+              <th scope="col">Variable</th>
+              <th scope="col">Sev.</th>
+              <th scope="col">Finding</th>
+              <th scope="col">Impact</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              FINDINGS.map((f) => (
+                <tr id={`finding-${f.id}`} class={KEY_IDS.includes(f.id) ? 'is-key' : undefined}>
+                  <th scope="row" class="nowrap">{f.id}</th>
+                  <td data-label="Site">{f.site}</td>
+                  <td data-label="Variable" class="var">{f.variable}</td>
+                  <td data-label="Severity" class="nowrap">{f.severity}</td>
+                  <td data-label="Finding" class="wrap" set:html={inline(f.finding)} />
+                  <td data-label="Impact" class="wrap" set:html={inline(f.impact)} />
+                  <td data-label="Status">
+                    <span class="status-badge" data-status={f.status}>
+                      <span aria-hidden="true">{STATUS_ICON[f.status]}</span>
+                      {STATUS_LABEL[f.status]}
+                    </span>
+                    {f.note && <span class="status-note">{f.note}</span>}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Details, raw rows, controls and a check query for each finding: <a href={reportUrl}>{SCAN.reportPath}</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="changelog">
+      <h2 id="changelog">Change log</h2>
+      <p>Changes to the harmonised data, newest first. Each entry gives the reason, the method and the effect.</p>
+
+      {
+        CHANGE_LOG.map((e) => (
+          <article class="change" id={e.id} aria-labelledby={`${e.id}-title`}>
+            <h3 id={`${e.id}-title`}>
+              <time datetime={e.date}>{e.date}</time>
+              <span>{e.title}</span>
+            </h3>
+            <p class="change-meta">
+              Site: {e.site}. Variable: <code>{e.variable}</code>.
+              {e.findings.length > 0 && (
+                <>
+                  {' '}Findings:{' '}
+                  {e.findings.map((id, i) => (
+                    <>{i > 0 && ', '}{findingIds.has(id) ? <a href={`#finding-${id}`}>{id}</a> : id}</>
+                  ))}.
+                </>
+              )}
+            </p>
+            {e.summary.map((p) => <p set:html={inline(p)} />)}
+
+            <dl class="facts">
+              {e.facts.map((f) => (
+                <div>
+                  <dt>{f.term}</dt>
+                  <dd set:html={inline(f.value)} />
+                </div>
+              ))}
+            </dl>
+
+            {e.formulas.map((f) => (
+              <div class="formula">
+                <Fragment set:html={tex(f.tex, true)} />
+                <p class="note" set:html={inline(f.where)} />
+              </div>
+            ))}
+
+            {e.tables.map((t) => (
+              <div class="table-wrap">
+                <table>
+                  <caption>{t.caption}</caption>
+                  <thead>
+                    <tr>
+                      {t.head.map((h, i) => (
+                        <th scope="col" class={t.numeric?.includes(i) ? 'num' : undefined}>
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {t.rows.map((r) => (
+                      <tr>
+                        {r.map((c, i) => (
+                          <td class={t.numeric?.includes(i) ? 'num' : undefined}>{c}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+
+            {e.openPoints.length > 0 && (
+              <>
+                <h4>Open points</h4>
+                <ul>
+                  {e.openPoints.map((q) => (
+                    <li set:html={inline(q)} />
+                  ))}
+                </ul>
+              </>
+            )}
+
+            {e.openQuestions.length > 0 && (
+              <>
+                <h4>Open questions to the provider</h4>
+                <ul>
+                  {e.openQuestions.map((q) => (
+                    <li set:html={inline(q)} />
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <p class="note">
+              Full document: <a href={repoFile(e.doc)}>{e.doc}</a>.
+            </p>
+          </article>
+        ))
+      }
+    </section>
+  </main>
+</Base>

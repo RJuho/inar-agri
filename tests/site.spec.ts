@@ -1436,7 +1436,7 @@ test.describe('calculated page', () => {
   test('page navigation goes both ways', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Pages' });
     await expect(nav.getByRole('link', { name: 'Calculated' })).toHaveAttribute('aria-current', 'page');
-    await nav.getByRole('link', { name: 'Data' }).click();
+    await nav.getByRole('link', { name: 'Data', exact: true }).click();
     await expect(page).toHaveURL(/\/$/);
     await waitReady(page);
     await page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Calculated' }).click();
@@ -1496,6 +1496,53 @@ test.describe('variables page', () => {
   test('the page navigation marks the Variables page', async ({ page }) => {
     const nav = page.getByRole('navigation', { name: 'Pages' });
     await expect(nav.getByRole('link', { name: 'Variables' })).toHaveAttribute('aria-current', 'page');
+  });
+});
+
+// ---------- Data Report page and the AI notice of the text pages ----------
+
+test.describe('data report page', () => {
+  let errors: string[];
+  let foreign: string[];
+
+  test.beforeEach(async ({ page, baseURL }) => {
+    errors = trackErrors(page);
+    foreign = await isolate(page, new URL(baseURL ?? 'http://localhost:4321').origin);
+    await page.goto('/data-report/');
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+    expect(foreign).toEqual([]);
+  });
+
+  test('shows the findings table, the key item and the change log with a formula', async ({ page }) => {
+    await expect(page.locator('h1')).toHaveText('Data Report');
+    expect(await page.locator('table.findings tbody tr').count()).toBeGreaterThan(0);
+    // Each status badge has a text, not only a colour.
+    for (const badge of await page.locator('table.findings .status-badge').all()) {
+      expect((await badge.innerText()).trim()).toMatch(/Open|Resolved|Waits for provider/);
+    }
+    await expect(page.locator('#finding-ANT-01')).toHaveClass(/is-key/);
+    await expect(page.locator('#finding-QVI-16')).toContainText('Open');
+    await expect(page.locator('#key-issue')).toBeVisible();
+    await expect(page.locator('section:has(> #changelog) article.change').first()).toBeVisible();
+    await expect(page.locator('article.change .katex-display .katex').first()).toBeVisible();
+    await expect(page.locator('a[href$="/docs/anomaly-data-report.md"]').first()).toHaveAttribute('href', /^https:\/\/github\.com\//);
+    await expect(page.locator('script')).toHaveCount(0);
+  });
+
+  test('the page navigation marks the Data Report page', async ({ page }) => {
+    const nav = page.getByRole('navigation', { name: 'Pages' });
+    await expect(nav.getByRole('link', { name: 'Data Report' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('each finding link goes to a row on the page', async ({ page }) => {
+    const hrefs = await page.locator('a[href^="#finding-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) {
+      await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    }
   });
 });
 

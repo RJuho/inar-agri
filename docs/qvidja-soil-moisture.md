@@ -98,6 +98,7 @@ Qvidja is now in the range of the other Finnish mineral-soil sites (Anttila, Hal
 
 ## Open points
 
+- Frozen soil (open, QVI-16 in `docs/anomaly-data-report.md`): the manual (p. 28) says that the readings are not reliable below 0 °C. Ice has a much lower permittivity than liquid water, thus θ reads too low. 17 950 of 124 023 Qvidja `swc` values (14.5 %) have `tsoil` (`TS_1`, 5 cm) ≤ 0 °C (checked on `db/observations.parquet`, 2026-10-22). The build keeps them (QVI-03). Decision pending: set `swc` to NULL where `tsoil` ≤ 0 °C, or keep the values.
 - Calibration: the general mineral calibration is used. Clay can need a higher a1 (p. 19). No soil-specific a0 and a1 for Qvidja are known. Accuracy with the general calibration is lower than the ±1 % vol of a soil-specific calibration (p. 26).
 - The readme `Qvidja-readme.xlsx` still gives m3 m-3 for `SM`. Ask the provider to correct it.
 - Sensor history 2018–2025 (same sensor, same depth): not confirmed.
@@ -176,3 +177,5 @@ Affected data: all Qvidja `swc` values, 2018-05-09 to 2025-12-31, 124 023 half-h
 | Maximum | 0.980 | 0.557 |
 
 Check: the May to September means 2018, 2019, 2021 and 2022 (0.257, 0.305, 0.344, 0.219) agree with the published values (0.26, 0.30, 0.34, 0.23; Heimsch et al. 2021 and 2024) within 0.011 m³ m⁻³.
+
+Open point: readings in frozen soil (below 0 °C) are not reliable (manual p. 28). 17 950 values have `tsoil` ≤ 0 °C. They are not removed. A NULL rule is not decided (QVI-16).

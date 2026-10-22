@@ -2,6 +2,7 @@
 // Shared page frame: <head>, styles, the page navigation and the footer.
 import '../styles/global.css';
 import '../styles/calculated.css';
+import { REPO_URL } from '../lib/dataReport';
 
 interface Props {
   title: string;
@@ -15,6 +16,7 @@ const pages = [
   { href: base, label: 'Data' },
   { href: `${base}calculated/`, label: 'Calculated' },
   { href: `${base}variables/`, label: 'Variables' },
+  { href: `${base}data-report/`, label: 'Data Report' },
 ];
 ---
 
@@ -43,7 +45,7 @@ const pages = [
     <slot />
     <footer class="site-footer">
       <p>
-        Source code: <a href="https://github.com/RJuho/inar-agri" rel="noopener">github.com/RJuho/inar-agri</a>
+        Source code: <a href={REPO_URL} rel="noopener">{REPO_URL.replace(/^https:\/\//, '')}</a>
       </p>
     </footer>
   </body>
