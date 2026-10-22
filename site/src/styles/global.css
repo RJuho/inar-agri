@@ -12,14 +12,19 @@
   --grid-line: #e4e3df;
   --axis-line: #8a8984; /* 3.5:1 against --surface-raised */
   --error: #b42318;
-  --series-1: #2a78d6;
-  --series-2: #eb6834;
-  --series-3: #1baf7a;
-  --series-4: #eda100;
-  --series-5: #e87ba4;
-  --series-6: #008300;
-  --series-7: #6250d6;
-  --series-8: #e34948;
+  /* Okabe-Ito palette, in an order with no green and red pair in the first six slots (sites).
+     Slot 8: dark olive in place of the Okabe-Ito yellow, which has too little contrast on white
+     and looks like vermillion with protanopia. */
+  --series-1: #0072b2;
+  --series-2: #e69f00;
+  --series-3: #56b4e9;
+  --series-4: #cc79a7;
+  --series-5: #000000;
+  --series-6: #d55e00;
+  --series-7: #009e73;
+  --series-8: #6b5a00;
+  /* Text colour of links and active text: 4.5:1 or more against the surfaces. */
+  --link: #0072b2;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -32,14 +37,16 @@
     --grid-line: #343432;
     --axis-line: #7a7974; /* 3.5:1 against --surface-raised */
     --error: #f97066;
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --series-5: #d55181;
-    --series-6: #008300;
-    --series-7: #9085e9;
-    --series-8: #e66767;
+    /* Okabe-Ito, dark: blue a little lighter (3:1 against the surface), light grey in place of black. */
+    --series-1: #0a7bc0;
+    --series-2: #e69f00;
+    --series-3: #56b4e9;
+    --series-4: #cc79a7;
+    --series-5: #e0e0e0;
+    --series-6: #d55e00;
+    --series-7: #009e73;
+    --series-8: #f0e442;
+    --link: #56b4e9;
   }
 }
 
@@ -449,7 +456,7 @@ select:disabled {
 
 .var-info-btn[aria-expanded='true'] {
   border-color: var(--series-1);
-  color: var(--series-1);
+  color: var(--link);
 }
 
 .var-info-btn:focus-visible {
@@ -472,7 +479,7 @@ select:disabled {
 }
 
 .var-info a {
-  color: var(--series-1);
+  color: var(--link);
 }
 
 /* Long labels with a site hint can wrap: no horizontal scroll on phones. */

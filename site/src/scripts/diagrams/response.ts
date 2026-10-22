@@ -31,6 +31,10 @@ import {
   signNote,
   statText,
   siteColors,
+  siteDash,
+  siteSlots,
+  siteSymbol,
+  SITE_SYMBOL_SIZE,
   siteLegend,
   siteNames,
   tickLabelWidth,
@@ -326,6 +330,7 @@ function binRangeText(data: ResponseData, k: number): string {
 function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = siteColors(meta, tokens);
+  const slots = siteSlots(meta);
   const names = siteNames(meta, ctx.params);
   const cols = columns(ctx.width, data.ys.length);
   const y = yLayout(data, meta, ctx.params);
@@ -378,8 +383,20 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
         areaStyle: { color, opacity: 0.14 },
         tooltip: { show: false },
       });
-      // Mean per bin. Small symbols, so that a single bin without neighbours is visible.
-      series.push({ ...common, silent: false, showSymbol: true, symbol: 'circle', symbolSize: 4, type: 'line', data: pairs(curve.mean), lineStyle: { width: 2 }, z: 3 });
+      // Mean per bin. A symbol on each bin, so that a single bin without neighbours is visible.
+      // Dash and symbol per site, so that the sites differ also without colour.
+      const slot = slots.get(s.siteId) ?? 0;
+      series.push({
+        ...common,
+        silent: false,
+        showSymbol: true,
+        symbol: siteSymbol(slot),
+        symbolSize: SITE_SYMBOL_SIZE,
+        type: 'line',
+        data: pairs(curve.mean),
+        lineStyle: { width: 2, type: siteDash(slot) },
+        z: 3,
+      });
       lines.push(null, null, { curve, unit });
       if (curve.fit) {
         series.push({ ...common, type: 'line', data: fitPoints(data, curve), lineStyle: { width: 1.5, type: 'dashed' }, z: 4, tooltip: { show: false } });
@@ -406,7 +423,7 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right, 'line'),
     title,
     grid,
     xAxis,

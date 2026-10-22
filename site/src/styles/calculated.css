@@ -44,7 +44,7 @@
 
 .lead a,
 .prose a {
-  color: var(--series-1);
+  color: var(--link);
 }
 
 /* ---------- Text page ---------- */
@@ -315,7 +315,7 @@
 }
 
 .glossary dt:target {
-  color: var(--series-1);
+  color: var(--link);
 }
 
 .glossary dd {

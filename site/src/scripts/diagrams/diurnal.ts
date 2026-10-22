@@ -25,6 +25,9 @@ import {
   panelTitle,
   signNote,
   siteColors,
+  siteDash,
+  siteSlots,
+  siteSymbolOptions,
   siteLegend,
   siteNames,
   stackHeight,
@@ -172,6 +175,8 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
   const y = yLayout(data, meta, ctx.params, ctx.height);
   const layout = stackLayout(vars.length, ctx.height, LAYOUT, y.left);
   const colors = siteColors(meta, tokens);
+  const slots = siteSlots(meta);
+  const plotW = ctx.width - y.left - LAYOUT.right;
   const names = siteNames(meta, ctx.params);
   const last = vars.length - 1;
   const series: unknown[] = [];
@@ -197,13 +202,23 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
         lineStyle: { opacity: 0 },
         areaStyle: { color, opacity: 0.14 },
       });
-      series.push({ ...common, silent: false, type: 'line', data: curve.mean, lineStyle: { width: 2 }, z: 3 });
+      // Mean: dash and symbol per site, so that the sites differ also without colour.
+      const slot = slots.get(s.siteId) ?? 0;
+      series.push({
+        ...common,
+        ...siteSymbolOptions(slot, curve.mean.length, plotW),
+        silent: false,
+        type: 'line',
+        data: curve.mean,
+        lineStyle: { width: 2, type: siteDash(slot) },
+        z: 3,
+      });
       lines.push(null, null, { curve, unit: displayUnit(meta, v) });
     }
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, LAYOUT.right, 'line'),
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({ ...layout.title[i], text: panelTitle(v, CIRCULAR_VARS.has(v) ? `circular ${STAT}` : STAT), textStyle: titleStyle(tokens) })),
     grid: layout.grid,

@@ -27,6 +27,8 @@ import {
   panelTitle,
   signNote,
   siteColors,
+  siteSlots,
+  siteSymbol,
   siteLegend,
   siteNames,
   tickLabelWidth,
@@ -166,6 +168,7 @@ function yLayout(data: ScatterData, meta: Meta, params: ViewParams) {
 function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = siteColors(meta, tokens);
+  const slots = siteSlots(meta);
   const names = siteNames(meta, ctx.params);
   const cols = columns(ctx.width, data.ys.length);
   const y = yLayout(data, meta, ctx.params);
@@ -201,7 +204,9 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
         xAxisIndex: i,
         yAxisIndex: i,
         color: colors.get(s.siteId),
-        symbolSize: 4,
+        // Symbol per site, so that the sites differ also without colour.
+        symbol: siteSymbol(slots.get(s.siteId) ?? di),
+        symbolSize: 5,
         itemStyle: { opacity: 0.45 },
         emphasis: { itemStyle: { opacity: 1, borderColor: tokens.surface, borderWidth: 2 }, scale: 2 },
       });
@@ -209,7 +214,7 @@ function build(data: ScatterData, ctx: BuildContext): EChartsCoreOption {
   });
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.sites.map((s) => s.siteId)), y.left, L.right, 'symbol'),
     title,
     grid,
     xAxis,

@@ -13,12 +13,26 @@ export interface Tokens {
 }
 
 /**
+ * Series colours of the PNG export: the Okabe-Ito palette, the same as the light series colours of global.css.
+ * Change the export palette here only.
+ */
+export const EXPORT_SERIES: readonly string[] = [
+  '#0072b2',
+  '#e69f00',
+  '#56b4e9',
+  '#cc79a7',
+  '#000000',
+  '#d55e00',
+  '#009e73',
+  '#6b5a00',
+];
+
+/**
  * Colour tokens of the PNG export: a fixed light set with high contrast. They do not come
  * from CSS, so that the export is the same in light and dark mode.
  */
 export const EXPORT_TOKENS: Readonly<Tokens> = Object.freeze({
-  // The light series colours of global.css.
-  series: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'],
+  series: [...EXPORT_SERIES],
   text: '#000000',
   textMuted: '#262626',
   grid: '#cfcfcf',

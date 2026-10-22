@@ -66,6 +66,112 @@ export function siteColors(meta: Meta, tokens: Tokens): Map<number, string> {
   return new Map(meta.sites.map((s, i) => [s.siteId, tokens.series[i % tokens.series.length] as string]));
 }
 
+/** Position of each site in sites.parquet. `siteDash()` and `siteSymbol()` use it, as `siteColors()` does. */
+export function siteSlots(meta: Meta): Map<number, number> {
+  return new Map(meta.sites.map((s, i) => [s.siteId, i]));
+}
+
+/** ECharts `lineStyle.type` value: a keyword or a dash array in px. */
+export type LineDash = 'solid' | 'dashed' | number[];
+
+/** Dash pattern per site slot. The lines then differ also without colour. */
+const SITE_DASHES: readonly LineDash[] = ['solid', [6, 3], [2, 2], [8, 3, 2, 3], [12, 4], [2, 5]];
+/** Symbol per site slot. */
+const SITE_SYMBOLS = ['circle', 'rect', 'triangle', 'diamond', 'roundRect', 'pin'] as const;
+export type SiteSymbol = (typeof SITE_SYMBOLS)[number];
+
+/** Dash pattern of the site in slot `i` (position in sites.parquet). */
+export function siteDash(i: number): LineDash {
+  return SITE_DASHES[((i % SITE_DASHES.length) + SITE_DASHES.length) % SITE_DASHES.length] as LineDash;
+}
+
+/** Symbol of the site in slot `i` (position in sites.parquet). */
+export function siteSymbol(i: number): SiteSymbol {
+  return SITE_SYMBOLS[((i % SITE_SYMBOLS.length) + SITE_SYMBOLS.length) % SITE_SYMBOLS.length] as SiteSymbol;
+}
+
+/** Symbol size in px on the site lines. */
+export const SITE_SYMBOL_SIZE = 5;
+/** About one symbol per this number of px along a line. More symbols hide the line. */
+const SYMBOL_SPACING = 40;
+
+/**
+ * Symbol options of a site line: the symbol of the slot on about one point per `SYMBOL_SPACING` px
+ * at full zoom. ECharts thins symbols on a category axis only, so a callback keeps one point per
+ * block of `k` rows. `points` = number of rows, `px` = plot width.
+ * The callback gets the raw row index (`dataIndex`), also after sampling, so the symbols stay at
+ * about equal distances when the sampler drops rows. Each slot starts at a different row, so that
+ * the symbols of the sites do not cover each other.
+ * The legend icon does not come from the series: use `siteLegend()` or `lineLegendIcon()`.
+ */
+export function siteSymbolOptions(slot: number, points: number, px: number) {
+  const symbol = siteSymbol(slot);
+  const k = Math.max(1, Math.ceil(points / Math.max(3, Math.max(px, 1) / SYMBOL_SPACING)));
+  if (k === 1) return { showSymbol: true, symbolSize: SITE_SYMBOL_SIZE, symbol };
+  const n = SITE_SYMBOLS.length;
+  const offset = Math.round((((slot % n) + n) % n) * (k / n));
+  // ECharts calls the callback in row order. A smaller index starts a new pass.
+  let lastIndex = -1;
+  let lastBlock = -1;
+  const pick = (_value: unknown, p: { dataIndex: number }) => {
+    if (p.dataIndex <= lastIndex) lastBlock = -1;
+    lastIndex = p.dataIndex;
+    const block = Math.floor((p.dataIndex + offset) / k);
+    if (block === lastBlock) return 'none';
+    lastBlock = block;
+    return symbol;
+  };
+  return { showSymbol: true, symbolSize: SITE_SYMBOL_SIZE, symbol: pick };
+}
+
+/** SVG path of a symbol in the box x 9 to 19, y 0 to 10 (path of the legend icon). */
+const ICON_SYMBOL_PATH: Record<SiteSymbol, string> = {
+  circle: 'M9 5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z',
+  rect: 'M10 1h8v8h-8Z',
+  triangle: 'M14 0L19 10L9 10Z',
+  diamond: 'M14 0L19 5L14 10L9 5Z',
+  roundRect: 'M11 1h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2Z',
+  pin: 'M10.5 3.5a3.5 3.5 0 1 1 7 0Q17.5 6 14 10Q10.5 6 10.5 3.5Z',
+};
+
+/** Dash segments [from, to] of a dash pattern from x = 0 to x = `len`. */
+function dashSegments(dash: LineDash, len: number): Array<[number, number]> {
+  const pattern = dash === 'solid' ? [len, 0] : dash === 'dashed' ? [5, 3] : dash;
+  const out: Array<[number, number]> = [];
+  let x = 0;
+  for (let i = 0; x < len && pattern.length > 0; i++) {
+    const d = pattern[i % pattern.length] as number;
+    if (i % 2 === 0 && d > 0) out.push([x, Math.min(x + d, len)]);
+    x += Math.max(d, 0.5);
+  }
+  return out;
+}
+
+/**
+ * Legend icon of a line with a symbol: an ECharts `path://` icon, 28 × 10 px. The line has the
+ * dash pattern and stops on each side of the symbol. Use the legend sizes `LINE_ICON_SIZE`.
+ * A series callback for `symbol` makes ECharts draw a default circle in the legend, so the icon is set here.
+ */
+export function lineLegendIcon(dash: LineDash, symbol: SiteSymbol | 'none'): string {
+  const half = symbol === 'none' ? 14 : 8;
+  const rects: string[] = [];
+  for (const [a, b] of dashSegments(dash, half)) {
+    rects.push(`M${a} 4.25H${b}V5.75H${a}Z`, `M${28 - b} 4.25H${28 - a}V5.75H${28 - b}Z`);
+  }
+  // Points at the ends and at the top and bottom, so that the bounding box is the full 28 × 10 box.
+  const box = 'M0 4.99h0.01v0.01h-0.01Z M27.99 4.99h0.01v0.01h-0.01Z M13.99 0h0.01v0.01h-0.01Z M13.99 9.99h0.01v0.01h-0.01Z';
+  const sym = symbol === 'none' ? '' : ICON_SYMBOL_PATH[symbol];
+  return `path://${[...rects, sym, box].filter(Boolean).join(' ')}`;
+}
+
+/** Legend item size of `lineLegendIcon()`. */
+export const LINE_ICON_SIZE = { itemWidth: 28, itemHeight: 10 } as const;
+
+/** Legend icon of a site line: the dash and the symbol of the site slot. */
+export function siteLineIcon(slot: number): string {
+  return lineLegendIcon(siteDash(slot), siteSymbol(slot));
+}
+
 /**
  * Site name for the charts and the alt text. When the view option "Site emojis" is on,
  * the site emoji and a space come before the name, for example "🐂🐝 Qvidja".
@@ -473,8 +579,22 @@ export function titleStyle(tokens: Tokens, size = sizes.title) {
   };
 }
 
-/** Scroll legend at the top. It lists the shown sites in the order of sites.parquet. */
-export function siteLegend(meta: Meta, params: ViewParams, tokens: Tokens, shown: Set<number>, left: number, right: number) {
+/**
+ * Scroll legend at the top. It lists the shown sites in the order of sites.parquet.
+ * `marks`: `bar` = short bars, `line` = the line with the dash and the symbol of the site
+ * (`siteLineIcon()`), `symbol` = the symbol of the site (scatter points).
+ */
+export function siteLegend(
+  meta: Meta,
+  params: ViewParams,
+  tokens: Tokens,
+  shown: Set<number>,
+  left: number,
+  right: number,
+  marks: 'bar' | 'line' | 'symbol' = 'bar',
+) {
+  const sites = meta.sites.map((s, slot) => ({ s, slot })).filter(({ s }) => shown.has(s.siteId));
+  const marked = marks === 'line' ? siteLineIcon : marks === 'symbol' ? siteSymbol : null;
   return {
     type: 'scroll',
     top: 0,
@@ -483,14 +603,12 @@ export function siteLegend(meta: Meta, params: ViewParams, tokens: Tokens, shown
     pageIconColor: tokens.textMuted,
     pageIconInactiveColor: tokens.grid,
     pageTextStyle: { color: tokens.textMuted },
-    icon: 'roundRect',
-    // Opaque legend marks, also when the series marks are transparent.
-    itemStyle: { opacity: 1 },
-    itemWidth: 14,
-    itemHeight: 4,
+    ...(marked === null ? { icon: 'roundRect', itemWidth: 14, itemHeight: 4 } : marks === 'line' ? LINE_ICON_SIZE : { itemWidth: 10, itemHeight: 10 }),
+    // Opaque legend marks, also when the series marks are transparent. No outline: the icon has the dash.
+    itemStyle: { opacity: 1, borderWidth: 0 },
     textStyle: { color: tokens.text },
     inactiveColor: tokens.grid,
-    data: meta.sites.filter((s) => shown.has(s.siteId)).map((s) => siteLabel(s, params)),
+    data: sites.map(({ s, slot }) => (marked === null ? siteLabel(s, params) : { name: siteLabel(s, params), icon: marked(slot) })),
   };
 }
 
@@ -912,7 +1030,8 @@ export function eventMarkers(marks: EventMark[], color: string, tokens: Tokens, 
       silent: false,
       animation: false,
       symbol: ['none', 'none'],
-      lineStyle: { color, type: 'dashed', width: 1, opacity: 0.9 },
+      // Thin and a little transparent, so that the marker does not look like a site line.
+      lineStyle: { color, type: 'dashed', width: 1, opacity: 0.7 },
       label: {
         show: label,
         position: 'end',

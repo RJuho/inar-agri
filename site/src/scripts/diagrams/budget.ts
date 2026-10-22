@@ -5,7 +5,8 @@
 // One panel per site, years on the x axis, one bar per variable. GPP is drawn negative
 // (carbon into the ecosystem), so that NEE = Reco - GPP reads from the bars.
 // A partial year (fewer than 90 % of the half hours have a value, or the period cuts the
-// year) has a lighter, hatched bar and a "*" at the year label. The step setting does not apply.
+// year) has a lighter bar with a dashed outline and a "*" at the year label. The step setting does not apply.
+// Each variable has a colour and a decal pattern, so that the bars do not depend on colour alone.
 import * as echarts from 'echarts/core';
 import { BarChart, LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
@@ -86,17 +87,52 @@ const ROW_H = L.head + L.panel + L.xLabels;
 /** Unit of the annual sum of `v`, raw form. Use `unitText()` for display. */
 const unitOfSum = (v: Variable) => FLUXES[v] ?? '';
 
-/** Colour per variable. The sites are separated by panel, so the colour tells the variable. */
+/** Grey of `nee_f`: about 3:1 against the light and the dark surface. */
+const GREY = '#8f8f8f';
+
+/**
+ * Colour per variable. The sites are separated by panel, so the colour tells the variable.
+ * No green and red pair: GPP is blue, Reco is orange (series slots of the Okabe-Ito palette).
+ */
 function varColors(tokens: Tokens): Partial<Record<Variable, string>> {
   const s = tokens.series;
   return {
-    nee: s[0],
-    nee_f: tokens.text,
-    gpp: s[2],
-    gpp_src: s[5],
+    nee: tokens.text,
+    nee_f: GREY,
+    gpp: s[0],
+    gpp_src: s[2],
     reco: s[1],
-    reco_src: s[7],
-    ch4: s[6],
+    reco_src: s[5],
+    ch4: s[3],
+  };
+}
+
+/** Hex colour with an alpha value, for example `#ffffff` and 0.6 give `#ffffff99`. */
+function withAlpha(hex: string, alpha: number): string {
+  const h = hex.trim();
+  if (!/^#[0-9a-f]{6}$/i.test(h)) return h;
+  return h + Math.round(alpha * 255).toString(16).padStart(2, '0');
+}
+
+/** Lines of the decal patterns: 2 px line, 4 px gap. */
+const STRIPES = { symbol: 'rect', symbolSize: 1, dashArrayX: [1, 0], dashArrayY: [2, 4] };
+
+/**
+ * Decal pattern per variable (ECharts `decal`), so that the bars do not depend on colour alone:
+ * NEE plain, NEE gap-filled diagonal lines, GPP dots, GPP (source) horizontal lines,
+ * Reco diagonal lines in the other direction, Reco (source) vertical lines, CH₄ small triangles.
+ * The pattern colour is the surface colour, a little transparent.
+ */
+function varDecals(tokens: Tokens): Partial<Record<Variable, Record<string, unknown>>> {
+  const color = withAlpha(tokens.surface, 0.6);
+  return {
+    nee: { symbol: 'none' },
+    nee_f: { ...STRIPES, color, rotation: -Math.PI / 4 },
+    gpp: { symbol: 'circle', symbolSize: 0.7, dashArrayX: [3, 2], dashArrayY: [3, 2], color },
+    gpp_src: { ...STRIPES, color },
+    reco: { ...STRIPES, color, rotation: Math.PI / 4 },
+    reco_src: { ...STRIPES, color, rotation: Math.PI / 2 },
+    ch4: { symbol: 'triangle', symbolSize: 0.8, dashArrayX: [4, 2], dashArrayY: [4, 2], color },
   };
 }
 
@@ -293,14 +329,11 @@ function yLayout(data: BudgetData, params: ViewParams) {
   return { ranges, names, widths, left };
 }
 
-/** Hatch pattern of a partial bar: thin diagonal lines in the surface colour. */
-function hatch(tokens: Tokens) {
-  return { symbol: 'rect', symbolSize: 1, color: tokens.surface, dashArrayX: [1, 0], dashArrayY: [2, 4], rotation: -Math.PI / 4 };
-}
 
 function build(data: BudgetData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = varColors(tokens);
+  const decals = varDecals(tokens);
   const siteColor = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
   const yl = yLayout(data, ctx.params);
@@ -377,13 +410,17 @@ function build(data: BudgetData, ctx: BuildContext): EChartsCoreOption {
           barMaxWidth: 28,
           barGap: '10%',
           barCategoryGap: '30%',
-          itemStyle: { borderRadius: 1, borderColor: tokens.surface, borderWidth: 0.5 },
+          itemStyle: { borderRadius: 1, borderColor: tokens.surface, borderWidth: 0.5, decal: decals[v] },
           emphasis: { disabled: true },
           data: s.years.map((y) => {
             const e = y.sums[v];
             if (!e || !Number.isFinite(e.sum)) return null;
             const value = drawn(v, e.sum);
-            return e.partial ? { value, itemStyle: { opacity: 0.45, decal: hatch(tokens) } } : value;
+            // Partial year: lighter bar with a dashed outline in the bar colour. The decal stays.
+            const color = colors[v] ?? tokens.text;
+            return e.partial
+              ? { value, itemStyle: { opacity: 0.45, decal: decals[v], borderColor: color, borderType: 'dashed', borderWidth: 1 } }
+              : value;
           }),
         });
       }
@@ -405,9 +442,10 @@ function build(data: BudgetData, ctx: BuildContext): EChartsCoreOption {
       pageTextStyle: { color: tokens.textMuted },
       icon: 'roundRect',
       // Opaque legend marks, also when the bars of partial years are transparent.
+      // The marks are large enough to show the decal pattern.
       itemStyle: { opacity: 1 },
-      itemWidth: 14,
-      itemHeight: 10,
+      itemWidth: 20,
+      itemHeight: 12,
       textStyle: { color: tokens.text },
       inactiveColor: tokens.grid,
       data: legendVars.map((v) => VARIABLE_LABELS[v]),

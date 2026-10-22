@@ -26,6 +26,9 @@ import {
   readGroups,
   refDateSql,
   siteColors,
+  siteDash,
+  siteSlots,
+  siteSymbolOptions,
   siteLegend,
   siteNames,
   stackHeight,
@@ -158,6 +161,8 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
   const ranks = yearRanks(data.groups);
+  const slots = siteSlots(meta);
+  const plotW = ctx.width - y.left - STACK.right;
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
   const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - y.left - STACK.right));
@@ -175,10 +180,10 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
         xAxisIndex: panel,
         yAxisIndex: panel,
         color: colors.get(g.siteId),
-        showSymbol: false,
-        symbol: 'none',
+        // Dash and symbol per site, so that the sites differ also without colour.
+        ...siteSymbolOptions(slots.get(g.siteId) ?? 0, g.x.length, plotW),
         connectNulls: false,
-        lineStyle: { width: 1.75, opacity: yearOpacity(rank, count) },
+        lineStyle: { width: 1.75, opacity: yearOpacity(rank, count), type: siteDash(slots.get(g.siteId) ?? 0) },
         emphasis: { focus: 'series', lineStyle: { width: 2.5, opacity: 1 } },
         ...eventMarkers(marks.byGroup.get(g) ?? [], colors.get(g.siteId) ?? tokens.text, tokens, panel === 0),
       });
@@ -188,7 +193,7 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
   series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), y.left, STACK.right, 'line'),
     title: vars.map((v, i) => ({
       ...y.layout.title[i],
       text: sumTitle(v),

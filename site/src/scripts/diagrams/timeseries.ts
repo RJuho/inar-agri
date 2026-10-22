@@ -26,7 +26,11 @@ import {
   setLabelRows,
   signNote,
   siteColors,
+  siteDash,
+  siteLegend,
   siteNames,
+  siteSlots,
+  siteSymbolOptions,
   statText,
   stepStatNote,
   tickLabelWidth,
@@ -281,6 +285,8 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
   const allMarks = [...marks.entries()].flatMap(([siteId, list]) => list.map((mark) => ({ siteId, mark })));
   if (tMax > tMin) setLabelRows(allMarks.map((m) => m.mark), (ctx.width - y.left - LAYOUT.right) / (tMax - tMin));
   const markColors = siteColors(meta, tokens);
+  const slots = siteSlots(meta);
+  const plotW = ctx.width - y.left - LAYOUT.right;
 
   return {
     animation: false,
@@ -289,21 +295,8 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
     textStyle: { fontFamily: 'system-ui, sans-serif', color: tokens.text },
     color: tokens.series,
     // Scroll legend: on a narrow screen it stays on one line and does not cover the first panel.
-    legend: {
-      type: 'scroll',
-      top: 0,
-      left: y.left - 8,
-      right: LAYOUT.right,
-      pageIconColor: tokens.textMuted,
-      pageIconInactiveColor: tokens.grid,
-      pageTextStyle: { color: tokens.textMuted },
-      icon: 'roundRect',
-      itemWidth: 14,
-      itemHeight: 4,
-      textStyle: { color: tokens.text },
-      inactiveColor: tokens.grid,
-      data: meta.sites.filter((s) => shown.has(s.siteId)).map((s) => siteName.get(s.siteId) ?? s.name),
-    },
+    // The legend marks show the dash and the symbol of each site.
+    legend: siteLegend(meta, ctx.params, tokens, shown, y.left, LAYOUT.right, 'line'),
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
       ...layout.title[i],
@@ -360,11 +353,11 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
           xAxisIndex: panel,
           yAxisIndex: panel,
           color: siteColor.get(s.siteId),
-          showSymbol: false,
-          symbol: 'none',
+          // Dash and symbol per site, so that the sites differ also without colour.
+          ...siteSymbolOptions(slots.get(s.siteId) ?? di, s.t.length, plotW),
           connectNulls: false,
           sampling: extremeSampler,
-          lineStyle: { width: 1 },
+          lineStyle: { width: 1, type: siteDash(slots.get(s.siteId) ?? di) },
           emphasis: { disabled: true },
           ...eventMarkers(marks.get(s.siteId) ?? [], markColors.get(s.siteId) ?? tokens.text, tokens, panel === 0),
         })),

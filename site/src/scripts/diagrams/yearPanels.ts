@@ -30,6 +30,9 @@ import {
   YEAR_STEP_TEXT,
   niceRange,
   siteColors,
+  siteDash,
+  siteSlots,
+  siteSymbolOptions,
   siteLegend,
   siteNames,
   valueAxis,
@@ -104,6 +107,7 @@ function yLayout(data: YearsData, meta: Meta, params: ViewParams) {
 function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const colors = siteColors(meta, tokens);
+  const slots = siteSlots(meta);
   const names = siteNames(meta, ctx.params);
   const years = data.years;
   const yl = yLayout(data, meta, ctx.params);
@@ -182,10 +186,10 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
           xAxisIndex: gi,
           yAxisIndex: gi,
           color: colors.get(g.siteId),
-          showSymbol: false,
-          symbol: 'none',
+          // Dash and symbol per site, so that the sites differ also without colour.
+          ...siteSymbolOptions(slots.get(g.siteId) ?? 0, g.x.length, panelW),
           connectNulls: false,
-          lineStyle: { width: 1.25 },
+          lineStyle: { width: 1.25, type: siteDash(slots.get(g.siteId) ?? 0) },
           emphasis: { disabled: true },
           ...eventMarkers(marks.byGroup.get(g) ?? [], colors.get(g.siteId) ?? tokens.text, tokens, vi === 0),
         });
@@ -197,7 +201,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   series.push(...zeroLines);
   return {
     ...baseOption(tokens),
-    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), yl.left, L.right),
+    legend: siteLegend(meta, ctx.params, tokens, new Set(data.groups.map((g) => g.siteId)), yl.left, L.right, 'line'),
     title,
     grid,
     xAxis,

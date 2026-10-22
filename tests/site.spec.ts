@@ -85,6 +85,26 @@ test.describe('first page', () => {
     await expect(page.locator('#chart')).toHaveAttribute('data-series', '30');
   });
 
+  test('each site has its own dash pattern, symbol and legend icon', async ({ page }) => {
+    const info = await page.locator('#chart .diagram-chart').first().evaluate((el) => {
+      type Series = { name: string; xAxisIndex: number; datasetIndex?: number; lineStyle?: { type?: unknown }; symbol?: unknown; showSymbol?: boolean };
+      type Option = { series: Series[]; legend: Array<{ data: Array<string | { name: string; icon?: string }> }> };
+      const o = (el as unknown as { __chart: { getOption(): Option } }).__chart.getOption();
+      const first = o.series.filter((s) => s.datasetIndex !== undefined && s.xAxisIndex === 0);
+      return {
+        dashes: first.map((s) => JSON.stringify(s.lineStyle?.type)),
+        symbols: first.map((s) => s.showSymbol === true && s.symbol !== 'none'),
+        icons: (o.legend[0]?.data ?? []).map((d) => (typeof d === 'string' ? '' : (d.icon ?? ''))),
+      };
+    });
+    expect(info.dashes.length).toBe(6);
+    expect(new Set(info.dashes).size).toBe(6);
+    expect(info.symbols.every(Boolean)).toBe(true);
+    expect(info.icons.length).toBe(6);
+    expect(info.icons.every((i) => i.startsWith('path://'))).toBe(true);
+    expect(new Set(info.icons).size).toBe(6);
+  });
+
   test('shows a visible canvas', async ({ page }) => {
     await expect(page.locator('#chart canvas').first()).toBeVisible();
   });
@@ -100,8 +120,10 @@ test.describe('first page', () => {
     const chart = page.locator('#chart .diagram-chart').first();
     // Read the name of the first legend item from the ECharts instance (test hook in ui/diagrams.ts).
     const firstName = await chart.evaluate((el) => {
-      const c = (el as unknown as { __chart: { getOption(): { legend: Array<{ data: string[] }> } } }).__chart;
-      return c.getOption().legend[0]?.data[0] ?? '';
+      type Item = string | { name: string };
+      const c = (el as unknown as { __chart: { getOption(): { legend: Array<{ data: Item[] }> } } }).__chart;
+      const item = c.getOption().legend[0]?.data[0];
+      return typeof item === 'string' ? item : (item?.name ?? '');
     });
     expect(firstName).not.toBe('');
 
@@ -649,6 +671,15 @@ test.describe('diagram types', () => {
     const first = qvidjaNee?.data[0] as { value: number; itemStyle: { opacity: number; decal: unknown } };
     expect(first.itemStyle.opacity).toBe(0.45);
     expect(first.itemStyle.decal).toBeTruthy();
+    // Each variable has its own decal pattern on all bars, so that the bars do not depend on colour alone.
+    const decals = await card.locator('.diagram-chart').evaluate((el) => {
+      type Series = { type: string; name: string; xAxisIndex: number; itemStyle?: { decal?: unknown } };
+      const o = (el as unknown as { __chart: { getOption(): { series: Series[] } } }).__chart.getOption();
+      return o.series.filter((s) => s.type === 'bar' && s.xAxisIndex === 0).map((s) => JSON.stringify(s.itemStyle?.decal ?? null));
+    });
+    expect(decals.length).toBe(3);
+    expect(decals.every((d) => d !== 'null')).toBe(true);
+    expect(new Set(decals).size).toBe(3);
     // The sums match the calculated annual table within 1.5 % (the local-year definition differs a little).
     const csv = await readFile('data/calculated/annual.csv', 'utf8');
     const [header, ...lines] = csv.trim().split('\n') as [string, ...string[]];
@@ -1629,8 +1660,9 @@ test.describe('site emojis', () => {
     await waitReady(page);
     await expect(page.locator('input[name="emojis"]')).toBeChecked();
     const legend = await page.locator('.diagram-chart').first().evaluate((el) => {
-      const c = (el as unknown as { __chart: { getOption(): { legend: Array<{ data: string[] }> } } }).__chart;
-      return c.getOption().legend.flatMap((l) => l.data);
+      type Item = string | { name: string };
+      const c = (el as unknown as { __chart: { getOption(): { legend: Array<{ data: Item[] }> } } }).__chart;
+      return c.getOption().legend.flatMap((l) => l.data.map((d) => (typeof d === 'string' ? d : d.name)));
     });
     expect(legend).toEqual(['🧚🌾 Haltiala', '🐂🐝 Qvidja']);
     const alt = await page.evaluate(() => (globalThis as unknown as { __inar: { altText(t: number): string } }).__inar.altText(0));

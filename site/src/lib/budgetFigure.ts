@@ -35,21 +35,40 @@ export interface BudgetFigure {
   rows: BudgetRow[];
 }
 
-// Colours of the carbon terms. They are the categorical slots of global.css (light values).
-// A mid-tone reads on the light and the dark background. The text colour is not fixed here:
+// Colours of the carbon terms: the same Okabe-Ito colours as the budget diagram of the data page
+// (site/src/scripts/diagrams/budget.ts): GPP blue, Reco orange, NEE (gap-filled) grey. No green and
+// red pair. A mid-tone reads on the light and the dark background. The text colour is not fixed here:
 // calculated.css overrides the `fill` of all text elements with the page tokens.
 const COLOR = {
-  gpp: '#1baf7a',
-  reco: '#eb6834',
-  nee: '#2a78d6',
-  harvest: '#eda100',
-  exo: '#6250d6',
+  gpp: '#0072b2',
+  reco: '#e69f00',
+  nee: '#8f8f8f',
+  harvest: '#cc79a7',
+  exo: '#56b4e9',
   // Sentinel colour of the NECB marker. calculated.css maps it to the text colour.
   necb: '#7a7974',
   axis: '#8a8984',
   grid: '#8a8984',
   text: '#555555',
 };
+
+/** Colour of the decal patterns: white, a little transparent (as in budget.ts). */
+const DECAL_COLOR = '#ffffff99';
+/** Lines of the decal patterns: 2 px line, 4 px gap. */
+const STRIPES = { symbol: 'rect', symbolSize: 1, dashArrayX: [1, 0], dashArrayY: [2, 4], color: DECAL_COLOR };
+/**
+ * Decal pattern per bar term, so that the bars do not depend on colour alone. GPP (dots) and
+ * Reco (diagonal lines) have the patterns of budget.ts; C harvest has vertical lines, C exo
+ * horizontal lines.
+ */
+const DECAL = {
+  gpp: { symbol: 'circle', symbolSize: 0.7, dashArrayX: [3, 2], dashArrayY: [3, 2], color: DECAL_COLOR },
+  reco: { ...STRIPES, rotation: Math.PI / 4 },
+  harvest: { ...STRIPES, rotation: Math.PI / 2 },
+  exo: { ...STRIPES },
+};
+/** Decal key of each bar term. */
+const BAR_DECAL = { gpp: 'gpp', reco: 'reco', cHarvest: 'harvest', cExo: 'exo' } as const;
 const FONT = 'system-ui, sans-serif';
 /** Opacity of the bars of a year that is not reliable. */
 const UNRELIABLE_OPACITY = 0.45;
@@ -131,7 +150,8 @@ export function budgetFigure(rows: BudgetRow[], width = 1200, height = 520): Bud
       const v = r[key];
       if (v === null) return null;
       const pt: Pt = { value: [index.get(r)!, sign * v] };
-      if (!r.reliable) pt.itemStyle = { opacity: UNRELIABLE_OPACITY };
+      // The decal stays on a lighter bar.
+      if (!r.reliable) pt.itemStyle = { opacity: UNRELIABLE_OPACITY, decal: DECAL[BAR_DECAL[key]] };
       return pt;
     }).filter((p): p is Pt => p !== null);
   const marker = (get: (r: BudgetRow) => number | null, offset: number, keep: (r: BudgetRow) => boolean) =>
@@ -209,10 +229,10 @@ export function budgetFigure(rows: BudgetRow[], width = 1200, height = 520): Bud
       splitLine: { lineStyle: { color: COLOR.grid, opacity: 0.3 } },
     },
     series: [
-      { ...barBase, name: 'Reco', stack: 'flux', color: COLOR.reco, data: bar('reco', 1) },
-      { ...barBase, name: 'GPP (drawn negative)', stack: 'flux', color: COLOR.gpp, data: bar('gpp', -1) },
-      { ...barBase, name: 'C harvest', stack: 'mgmt', color: COLOR.harvest, data: bar('cHarvest', 1) },
-      { ...barBase, name: 'C exo (drawn negative)', stack: 'mgmt', color: COLOR.exo, data: bar('cExo', -1) },
+      { ...barBase, name: 'Reco', stack: 'flux', color: COLOR.reco, itemStyle: { decal: DECAL.reco }, data: bar('reco', 1) },
+      { ...barBase, name: 'GPP (drawn negative)', stack: 'flux', color: COLOR.gpp, itemStyle: { decal: DECAL.gpp }, data: bar('gpp', -1) },
+      { ...barBase, name: 'C harvest', stack: 'mgmt', color: COLOR.harvest, itemStyle: { decal: DECAL.harvest }, data: bar('cHarvest', 1) },
+      { ...barBase, name: 'C exo (drawn negative)', stack: 'mgmt', color: COLOR.exo, itemStyle: { decal: DECAL.exo }, data: bar('cExo', -1) },
       // Zero line, on top of the bars.
       {
         type: 'line',

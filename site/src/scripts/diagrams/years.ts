@@ -52,7 +52,14 @@ import {
   readGroups,
   refDateSql,
   siteColors,
+  siteDash,
   siteLegend,
+  siteSlots,
+  siteSymbol,
+  siteSymbolOptions,
+  lineLegendIcon,
+  LINE_ICON_SIZE,
+  type LineDash,
   siteNames,
   stackHeight,
   stackLayout,
@@ -92,8 +99,8 @@ const LEGEND_LEFT_MAX = 96;
 /** Font of the legend text (the ECharts default). */
 const LEGEND_FONT = '12px sans-serif';
 
-/** Width in px of the legend marks: lines with two sites, else short bars. */
-const legendItemWidth = (data: YearsData) => (data.dashedSite !== undefined ? 24 : 14);
+/** Width in px of the legend marks: a line with the site symbol (`lineLegendIcon()`). */
+const legendItemWidth = (_data: YearsData) => LINE_ICON_SIZE.itemWidth;
 
 /**
  * Number of legend rows at the given chart width. The legend wraps, so that all entries show
@@ -120,14 +127,38 @@ const yearsStack = (data: YearsData, width: number) => ({ ...YEAR_STACK, top: YE
 /** Largest number of selected sites that gives one colour per year. */
 export const YEAR_COLOR_MAX_SITES = 2;
 
+/** Viridis stops, equally spaced from 0 to 1. */
+const VIRIDIS = ['#440154', '#472d7b', '#3b528b', '#2c728e', '#21918c', '#28ae80', '#5ec962', '#addc30', '#fde725'];
+
+/** Colour at `t` (0 to 1) on the viridis ramp, linear between the stops. */
+export function viridisAt(t: number): string {
+  const x = Math.min(Math.max(t, 0), 1) * (VIRIDIS.length - 1);
+  const i = Math.min(Math.floor(x), VIRIDIS.length - 2);
+  const f = x - i;
+  const rgb = (hex: string) => [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+  const a = rgb(VIRIDIS[i] as string);
+  const b = rgb(VIRIDIS[i + 1] as string);
+  return `#${a.map((c, k) => Math.round(c + ((b[k] as number) - c) * f).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** True when the hex colour is dark (relative luminance below 0.2). */
+function isDark(hex: string): boolean {
+  const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return false;
+  const [r, g, b] = [0, 2, 4].map((k) => parseInt((m[1] as string).slice(k, k + 2), 16) / 255) as [number, number, number];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.2;
+}
+
 /**
- * Colour of each year: the theme series colours for up to 8 years, else evenly spaced hues,
- * so that no colour repeats.
+ * Colour of each year: the theme series colours for up to 8 years. For more years, a sequential
+ * viridis ramp from the first to the last year (the years are in order, so a ramp is correct).
+ * The ramp leaves out the end that is too near the surface: light surface 0 to 0.85, dark surface 0.2 to 1.
  */
 export function yearColors(years: number[], tokens: Tokens): Map<number, string> {
   const n = years.length;
-  const many = n > tokens.series.length;
-  return new Map(years.map((y, i) => [y, many ? `hsl(${Math.round((360 * i) / n)}, 65%, 50%)` : (tokens.series[i] as string)]));
+  if (n <= tokens.series.length) return new Map(years.map((y, i) => [y, tokens.series[i] as string]));
+  const [lo, hi] = isDark(tokens.surface) ? [0.2, 1] : [0, 0.85];
+  return new Map(years.map((y, i) => [y, viridisAt(lo + ((hi - lo) * i) / Math.max(n - 1, 1))]));
 }
 
 /**
@@ -341,7 +372,12 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const ranks = yearRanks(data.groups);
   const byYear = data.colorBy === 'year';
   const yColors = yearColors(data.years, tokens);
-  const twoSites = data.dashedSite !== undefined;
+  const slots = siteSlots(meta);
+  // Dash: one colour per year (one or two sites): solid, and dashed for the second site.
+  // One colour per site: the dash of the site slot. The symbol is always the symbol of the site.
+  const dashOf = (g: Group): LineDash => (byYear ? (g.siteId === data.dashedSite ? 'dashed' : 'solid') : siteDash(slots.get(g.siteId) ?? 0));
+  const symbolOf = (g: Group) => siteSymbol(slots.get(g.siteId) ?? 0);
+  const plotW = ctx.width - y.left - STACK.right;
   const info: SeriesInfo[] = [];
   const series: unknown[] = [];
   const marks = yearEventMarks(ctx, data.groups, refYearPx(ctx.width - y.left - STACK.right));
@@ -359,13 +395,12 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
         xAxisIndex: panel,
         yAxisIndex: panel,
         color,
-        showSymbol: false,
-        symbol: 'none',
+        ...siteSymbolOptions(slots.get(g.siteId) ?? 0, g.x.length, plotW),
         connectNulls: false,
         lineStyle: {
           width: 1.5,
           opacity: byYear ? 1 : yearOpacity(rank, count),
-          ...(g.siteId === data.dashedSite ? { type: 'dashed' } : {}),
+          type: dashOf(g),
         },
         emphasis: { focus: 'series', lineStyle: { width: 2.5, opacity: 1 } },
         ...eventMarkers(marks.byGroup.get(g) ?? [], color, tokens, panel === 0),
@@ -374,16 +409,24 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   });
   // The zero lines come after all data series, so that the tooltip index `info` stays correct.
   series.push(...vars.flatMap((v, i) => zeroLineSeries(meta, tokens, v, i, y.extents[i] as [number, number]) ?? []));
+  // First group of each legend entry, for the legend icon.
+  const legendGroup = new Map<string, Group>();
+  for (const g of data.groups) {
+    const name = seriesNameOf(data, names, g);
+    if (!legendGroup.has(name)) legendGroup.set(name, g);
+  }
   return {
     ...baseOption(tokens),
     legend: {
-      ...siteLegend(meta, ctx.params, tokens, new Set(), y.left, STACK.right),
+      ...siteLegend(meta, ctx.params, tokens, new Set(), y.left, STACK.right, 'line'),
       // A plain legend wraps to more rows. `yearsStack()` gives the space for the rows.
       type: 'plain',
       itemGap: 10,
-      // With two sites, the legend marks are lines without a symbol, so that the dashed site is visible.
-      ...(twoSites ? { icon: undefined, itemWidth: legendItemWidth(data), itemHeight: 10, itemStyle: { opacity: 0 }, lineStyle: { opacity: 1 } } : {}),
-      data: data.legend,
+      // The legend marks are lines with the dash and the symbol of the site.
+      data: data.legend.map((name) => {
+        const g = legendGroup.get(name);
+        return g ? { name, icon: lineLegendIcon(dashOf(g), symbolOf(g)) } : name;
+      }),
     },
     // Panel label and statistic. The unit is in the y axis name.
     title: vars.map((v, i) => ({
