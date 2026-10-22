@@ -12,6 +12,7 @@ import { yearPanels } from './yearPanels';
 import { monthly } from './monthly';
 import { diurnal } from './diurnal';
 import { scatter } from './scatter';
+import { anscombe } from './anscombe';
 import { cumulative } from './cumulative';
 import { fingerprint } from './fingerprint';
 import { response } from './response';
@@ -86,7 +87,7 @@ export interface DiagramDef<D extends Prepared = Prepared> {
 }
 
 // Each def has its own data type. The registry stores them with the base type.
-const DEFS = [timeseries, years, yearPanels, monthly, diurnal, scatter, cumulative, fingerprint, response, budget, coverage] as unknown as DiagramDef[];
+const DEFS = [timeseries, years, yearPanels, monthly, diurnal, scatter, anscombe, cumulative, fingerprint, response, budget, coverage] as unknown as DiagramDef[];
 
 export const DIAGRAM_DEFS: ReadonlyMap<string, DiagramDef> = new Map(DEFS.map((d) => [d.type, d]));
 export const DIAGRAM_TYPES: ReadonlySet<string> = new Set(DIAGRAM_DEFS.keys());

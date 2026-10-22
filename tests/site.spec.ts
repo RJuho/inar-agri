@@ -337,7 +337,7 @@ test.describe('views and diagrams', () => {
   });
 });
 
-const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'cumulative', 'fingerprint', 'response', 'budget', 'coverage'] as const;
+const ALL_TYPES = ['timeseries', 'years', 'yearPanels', 'monthly', 'diurnal', 'scatter', 'anscombe', 'cumulative', 'fingerprint', 'response', 'budget', 'coverage'] as const;
 const SITE_NAMES = ['Anttila', 'Särkisuo', 'Haltiala', 'Qvidja', 'Viikki', 'Maktau'];
 
 /** A view with one diagram of `type`. */
@@ -770,6 +770,86 @@ test.describe('diagram types', () => {
     await waitReady(page);
     await expect(page.locator('.diagram')).toHaveAttribute('data-series', '0');
     await expect(page.locator('.diagram-note')).toContainText('x variable');
+  });
+
+  test('anscombe with only the x variable shows a note', async ({ page }) => {
+    await page.goto('/' + viewHash(typeView('anscombe', ['ta'])));
+    await waitReady(page);
+    await expect(page.locator('.diagram')).toHaveAttribute('data-series', '0');
+    await expect(page.locator('.diagram-note')).toContainText('x variable');
+  });
+
+  test('anscombe statistics in the panels match a DuckDB query over all rows', async ({ page }) => {
+    // Haltiala (3) and Qvidja (4), NEE gap-filled against air temperature, 30-min values.
+    const base = typeView('anscombe', ['nee_f', 'ta']);
+    await page.goto('/' + viewHash({ ...base, params: { ...base.params, sites: [3, 4] } }));
+    await waitReady(page);
+    const card = page.locator('.diagram');
+    await expect(card).toHaveAttribute('data-status', 'ready');
+    await expect(card).toHaveAttribute('data-series', '2');
+    const option = await card.locator('.diagram-chart').evaluate((el) => {
+      type Graphic = { elements?: Array<{ id?: string; style?: { text?: string } }> };
+      type Axis = { min?: number; max?: number };
+      const o = (el as unknown as { __chart: { getOption(): { graphic?: Graphic[]; xAxis: Axis[]; yAxis: Axis[]; series: Array<{ type: string }> } } }).__chart.getOption();
+      const texts: Record<string, string> = {};
+      for (const g of o.graphic ?? []) for (const e of g.elements ?? []) if (e.id && e.style?.text) texts[e.id] = e.style.text;
+      return {
+        texts,
+        x: o.xAxis.map((a) => [a.min, a.max]),
+        y: o.yAxis.map((a) => [a.min, a.max]),
+        lines: o.series.filter((s) => s.type === 'line').length,
+      };
+    });
+    // Same x and y range in both panels of the block.
+    expect(option.x[0]).toEqual(option.x[1]);
+    expect(option.y[0]).toEqual(option.y[1]);
+    // One OLS line per panel (and maybe zero lines).
+    expect(option.lines).toBeGreaterThanOrEqual(2);
+
+    // The same table `obs` as db.ts, from the files of the page.
+    const instance = await DuckDBInstance.create(':memory:');
+    const conn = await instance.connect();
+    let ref: Array<Record<string, number>>;
+    try {
+      const reader = await conn.runAndReadAll(
+        `WITH obs AS (
+           SELECT o.site_id, o.ta, coalesce(o.nee_f, f.nee_f_calc::DOUBLE) AS nee_f
+           FROM 'site/public/data/observations.parquet' o
+           LEFT JOIN 'site/public/data/fluxes.parquet' f USING (site_id, ts_start))
+         SELECT site_id::INTEGER AS site_id, count(*)::DOUBLE AS n, avg(ta) AS mx, avg(nee_f) AS my,
+           var_samp(ta) AS vx, var_samp(nee_f) AS vy, corr(nee_f, ta) AS r,
+           regr_slope(nee_f, ta) AS b, regr_intercept(nee_f, ta) AS a, regr_r2(nee_f, ta) AS r2
+         FROM obs WHERE site_id IN (3, 4) AND ta IS NOT NULL AND nee_f IS NOT NULL
+         GROUP BY site_id ORDER BY site_id`,
+      );
+      ref = reader.getRowObjects().map((r) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, Number(v)])));
+    } finally {
+      conn.closeSync();
+      instance.closeSync();
+    }
+    expect(ref.length).toBe(2);
+    const num = (s: string) => Number(s.replace(/−/g, '-').replace(/ /g, ''));
+    for (const r of ref) {
+      const text = option.texts[`anscombe-stats-0-${r.site_id}`] ?? '';
+      const m = text.match(
+        /^n = ([\d ]+)\nmean x = (\S+), mean y = (\S+)\nvar x = (\S+), var y = (\S+)\nr = (\S+), R² = (\S+)\ny = (\S+) x ([+−]) (\S+)$/,
+      );
+      expect(m, text).not.toBeNull();
+      const g = m as RegExpMatchArray;
+      expect(num(g[1] as string)).toBe(r.n);
+      // The panel gives 3 significant digits.
+      const close = (shown: string, exact: number) => expect(Math.abs(num(shown) - exact)).toBeLessThanOrEqual(Math.abs(exact) * 0.006 + 1e-12);
+      close(g[2] as string, r.mx as number);
+      close(g[3] as string, r.my as number);
+      close(g[4] as string, r.vx as number);
+      close(g[5] as string, r.vy as number);
+      close(g[6] as string, r.r as number);
+      close(g[7] as string, r.r2 as number);
+      close(g[8] as string, r.b as number);
+      close(`${g[9] === '−' ? '-' : ''}${g[10]}`, r.a as number);
+    }
+    const alt = (await card.locator('.diagram-alt p').textContent()) ?? '';
+    expect(alt).toContain('Equal statistics can hide different patterns');
   });
 
   test('site checkboxes show the site emoji, hidden from screen readers', async ({ page }) => {
