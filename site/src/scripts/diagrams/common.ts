@@ -8,6 +8,8 @@ import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, t
 import type { Tokens } from '../theme';
 import { siteEmoji } from '../sites';
 import { CIRCULAR_VARS, SUM_VARS, periodBounds } from './sql';
+import { niceStep } from './nice.ts';
+import type { NiceRange } from '../axisRanges';
 
 // Event markers are drawn with markLine (start day) and markArea (multi-day events).
 echarts.use([MarkLineComponent, MarkAreaComponent]);
@@ -493,14 +495,36 @@ export const VARIABLE_AXIS: Partial<Record<Variable, Record<string, unknown>>> =
  * Give `variable` when the axis shows one variable. Then the fixed settings of
  * `VARIABLE_AXIS` (for example 0 to 360° for `wd`) replace the range in `extra`.
  */
-export function valueAxis(tokens: Tokens, gridIndex: number, extra: Record<string, unknown> = {}, variable?: Variable) {
-  const fixed = variable ? VARIABLE_AXIS[variable] : undefined;
+export function valueAxis(
+  tokens: Tokens,
+  gridIndex: number,
+  extra: Record<string, unknown> = {},
+  variable?: Variable,
+  range?: NiceRange | null,
+) {
+  // VARIABLE_AXIS comes first: wd stays 0 to 360°. Then the fixed range of all data (axisRanges.ts).
+  const fixed = (variable ? VARIABLE_AXIS[variable] : undefined) ?? (range ? fixedAxis(range) : undefined);
   if (fixed) {
     // A fixed interval needs no `splitNumber`.
     const { splitNumber: _unused, ...rest } = extra;
     return valueAxisBase(tokens, gridIndex, { ...rest, ...fixed });
   }
   return valueAxisBase(tokens, gridIndex, extra);
+}
+
+/** Axis settings for a fixed range from fixedRange() or blockRange(). */
+export function fixedAxis(r: NiceRange): Record<string, unknown> {
+  return { scale: false, min: r.min, max: r.max, interval: r.interval };
+}
+
+/**
+ * Value extent for tickLabelWidth() and the left margin: the fixed range when there is one
+ * (also wd: 0 to 360), else `auto`.
+ */
+export function axisExtent(variable: Variable | undefined, range: NiceRange | null | undefined, auto: [number, number]): [number, number] {
+  const fixed = variable ? VARIABLE_AXIS[variable] : undefined;
+  if (fixed && typeof fixed.min === 'number' && typeof fixed.max === 'number') return [fixed.min, fixed.max];
+  return range ? [range.min, range.max] : auto;
 }
 
 function valueAxisBase(tokens: Tokens, gridIndex: number, extra: Record<string, unknown>) {
@@ -641,21 +665,8 @@ export function extent(groups: Group[], v: Variable): [number, number] {
   return lo <= hi ? [lo, hi] : [0, 1];
 }
 
-/** Nice step near `raw`: 1, 2 or 5 times a power of 10, not smaller than `raw`. */
-export function niceStep(raw: number): number {
-  const pow = 10 ** Math.floor(Math.log10(raw));
-  const f = raw / pow;
-  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * pow;
-}
-
-/** Axis range rounded outwards to a nice step (1, 2 or 5 times a power of 10), about 4 steps. */
-export function niceRange([lo, hi]: [number, number]): { min: number; max: number; interval: number } {
-  const span = hi - lo || Math.abs(hi) || 1;
-  const step = niceStep(span / 4);
-  // Round to remove float noise such as 0.30000000000000004.
-  const round = (v: number) => Number(v.toPrecision(12));
-  return { min: round(Math.floor(lo / step) * step), max: round(Math.ceil(hi / step) * step), interval: round(step) };
-}
+// niceStep() and niceRange() are in nice.ts (no DOM and no chart code: axisRanges.ts and its unit test use them).
+export { niceRange, niceStep } from './nice.ts';
 
 /**
  * Period text, for example "2018 to 2025", "all years", "Mar 2022 to Oct 2023" or

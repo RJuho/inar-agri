@@ -2,6 +2,9 @@
 // and connect the add-diagram list, the tabs, the parameter form and the diagrams.
 import { loadMeta, setLoadProgress } from './db';
 import { setYearBounds } from './diagrams/sql';
+import { setAxisRanges } from './axisRanges';
+// Fixed y ranges of all data: npm run site:sync writes the file, Vite puts it in the bundle.
+import axisRangesData from '../data/axis-ranges.json';
 import { DIAGRAM_DEFS, DIAGRAM_TYPES } from './diagrams/registry';
 import {
   activeView,
@@ -76,6 +79,7 @@ export async function start(): Promise<void> {
   setLoadProgress(null);
   loaderEl.remove();
   setYearBounds(meta.yearMin, meta.yearMax);
+  setAxisRanges(axisRangesData);
   const loadSec = ((performance.now() - t0) / 1000).toFixed(1);
   const baseStatus =
     `${fmt(meta.rowCount)} rows, ${meta.sites.length} sites, ${meta.yearMin} to ${meta.yearMax}. ` + `Loaded in ${loadSec} s.`;

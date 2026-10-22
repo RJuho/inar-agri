@@ -11,6 +11,7 @@ import { BarChart, LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
+import { blockRange } from '../axisRanges';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
@@ -283,8 +284,9 @@ function blockExtent(data: BudgetData, b: Block): [number, number] {
 }
 
 /** Y ranges, y axis names, tick label widths and the shared left margin of all panels. */
-function yLayout(data: BudgetData) {
-  const ranges = data.blocks.map((b) => niceRange(blockExtent(data, b)));
+function yLayout(data: BudgetData, params: ViewParams) {
+  // Fixed range of all data (view option): the annual sums of all sites and years, else the drawn values.
+  const ranges = data.blocks.map((b) => blockRange(params, 'budget', b.vars) ?? niceRange(blockExtent(data, b)));
   const names = data.blocks.map((b) => axisNameText('Annual sum', unitText(b.unit), L.panel));
   const widths = ranges.map((r) => tickLabelWidth([r.min, r.max]));
   const left = Math.max(L.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
@@ -301,7 +303,7 @@ function build(data: BudgetData, ctx: BuildContext): EChartsCoreOption {
   const colors = varColors(tokens);
   const siteColor = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
-  const yl = yLayout(data);
+  const yl = yLayout(data, ctx.params);
   const panels = data.blocks.map((b) => blockPanels(data, b));
   const { cols, rows } = rowsOf(
     panels.map((p) => p.length),

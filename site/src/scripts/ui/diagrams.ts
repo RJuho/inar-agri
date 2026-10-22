@@ -329,6 +329,7 @@ class DiagramCard {
             statsVars,
             this.def.showsEvents === true,
             axesText(option),
+            params.fixedY && this.def.usesFixedRange !== false,
           ),);
       }
       this.setStatus('ready');

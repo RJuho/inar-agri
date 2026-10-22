@@ -5,6 +5,7 @@
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from './db';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from './state';
+import { FIXED_Y_SENTENCE } from './axisRanges';
 import { CIRCULAR_VARS, col, meanExpr, whereClause } from './diagrams/sql';
 import {
   displayUnit,
@@ -201,7 +202,10 @@ export function eventsText(params: ViewParams, meta: Meta, markers: boolean): st
   return out.join(' ');
 }
 
-/** Alt text: type sentence, sites and years, axis names (`axesText()`), then statistics, then the events when `params.events` is on. */
+/**
+ * Alt text: type sentence, sites and years, axis names (`axesText()`), the fixed range sentence
+ * when `fixedRange` is true, then statistics, then the events when `params.events` is on.
+ */
 export function composeAlt(
   label: string,
   describe: string,
@@ -211,9 +215,10 @@ export function composeAlt(
   variables: Variable[],
   markers = false,
   axes = '',
+  fixedRange = false,
 ): string {
   const head = `${label}: ${listText(variables.map((v) => VARIABLE_LABELS[v]))} at ${siteListText(params, meta)}, ${yearsText(params)}.`;
-  const axesPart = axes ? ` ${axes}` : '';
+  const axesPart = `${axes ? ` ${axes}` : ''}${fixedRange ? ` ${FIXED_Y_SENTENCE}` : ''}`;
   const body = stats.length > 0 ? ` ${statsText(stats, variables, meta, params)}` : '';
   const events = params.events ? ` ${eventsText(params, meta, markers)}` : '';
   return `${head} ${describe}${axesPart}${body}${events}`.trim();

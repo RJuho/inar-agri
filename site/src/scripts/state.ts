@@ -97,6 +97,8 @@ export interface ViewParams {
   events: boolean;
   /** Put the site emoji before the site name in the charts and the alt text. */
   emojis: boolean;
+  /** Use the fixed y range of all data (axis-ranges.json), not the range of the loaded rows. */
+  fixedY: boolean;
 }
 
 export interface Diagram {
@@ -145,6 +147,7 @@ export function defaultParams(allSites: number[]): ViewParams {
     aggregation: 'raw',
     events: false,
     emojis: false,
+    fixedY: true,
   };
 }
 
@@ -234,6 +237,8 @@ export function parseParams(x: unknown): ViewParams | null {
   if (aggregation === null) return null;
   const events = x.events === true;
   const emojis = x.emojis === true;
+  // Views from before the fixedY field have no key: then the fixed range.
+  const fixedY = x.fixedY !== false;
   // Fixed key order: sameView() compares the JSON text.
   return {
     sites,
@@ -246,6 +251,7 @@ export function parseParams(x: unknown): ViewParams | null {
     aggregation,
     events,
     emojis,
+    fixedY,
   };
 }
 

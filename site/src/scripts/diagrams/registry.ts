@@ -66,6 +66,8 @@ export interface DiagramDef<D extends Prepared = Prepared> {
   widthDependent?: boolean;
   /** True when the type draws management event markers (when `params.events` is on). Optional. */
   showsEvents?: boolean;
+  /** False when the type has no value range that `params.fixedY` changes (coverage). Default true. */
+  usesFixedRange?: boolean;
   /** Empty band in px at the bottom of the chart, without the slider, to remove from the PNG export. Optional. */
   exportCropBottom?: number;
   /** Chart height in px. `data` is null before the first query result. */

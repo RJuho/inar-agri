@@ -11,6 +11,7 @@ import { VisualMapComponent } from 'echarts/components';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
+import { fixedColorRange } from '../axisRanges';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, meanExpr, periodBounds, whereClause } from './sql';
@@ -104,6 +105,8 @@ interface FingerprintData extends Prepared {
   columns: number;
   panels: Panel[];
   scales: Scale[];
+  /** True when the colour ranges come from all data (axis-ranges.json), not from the cells. */
+  fixed: boolean;
 }
 
 const panelCount = (params: ViewParams) => params.variables.length * params.sites.length;
@@ -117,6 +120,8 @@ function query(params: ViewParams): string | null {
   // colour range. The last SELECT adds d0, bin and the quantiles to each row.
   // A period limit sets the first or last day, also when there is no data near it.
   const hasValue = vars.map((v) => `${v} IS NOT NULL`).join(' OR ');
+  // Fixed colour ranges of all data (view option) for all variables: then no quantiles in the query.
+  const fixed = fixedColors(params);
   const { from, to } = periodBounds(params);
   // min() and max() also around the constants: r must have one row, also when both limits are set.
   const d0 = from ? `min(make_date(${from[0]}, ${from[1]}, 1))` : 'min(tl::DATE)';
@@ -130,13 +135,16 @@ function query(params: ViewParams): string | null {
         ${vars.map((v) => `${meanExpr(v)} AS ${v}`).join(', ')}
       FROM obs, b WHERE ${where} GROUP BY ALL
       HAVING ${vars.map((v) => `count(${v})`).join(' + ')} > 0
-    ), q AS (
+    )${fixed ? '' : `, q AS (
       SELECT ${vars.map((v) => `quantile_cont(${v}, ${Q_LO}) AS ${v}__lo, quantile_cont(${v}, ${Q_HI}) AS ${v}__hi`).join(', ')} FROM c
-    )
+    )`}
     SELECT c.site_id::DOUBLE AS site_id, c.x::DOUBLE AS x, c.slot::DOUBLE AS slot, ${vars.map((v) => `c.${v}`).join(', ')},
-      epoch_ms(b.d0::TIMESTAMP)::DOUBLE AS d0, epoch_ms(b.d1::TIMESTAMP)::DOUBLE AS d1, b.bin::DOUBLE AS bin, q.*
-    FROM c, b, q ORDER BY 1, 2, 3`;
+      epoch_ms(b.d0::TIMESTAMP)::DOUBLE AS d0, epoch_ms(b.d1::TIMESTAMP)::DOUBLE AS d1, b.bin::DOUBLE AS bin${fixed ? '' : ', q.*'}
+    FROM c, b${fixed ? '' : ', q'} ORDER BY 1, 2, 3`;
 }
+
+/** True when each variable has a fixed colour range (view option "Fixed y range"). */
+const fixedColors = (params: ViewParams) => params.variables.every((v) => fixedColorRange(params, v) !== null);
 
 /** Colour range of a variable from the quantiles of the cell values. Fluxes get a symmetric range around 0. */
 function makeScale(v: Variable, lo: number, hi: number): Scale {
@@ -150,7 +158,7 @@ function makeScale(v: Variable, lo: number, hi: number): Scale {
 }
 
 function prepare(table: Table | null, params: ViewParams, meta: Meta): FingerprintData {
-  const base = { variables: params.variables, day0: 0, bin: 1, columns: 0, panels: [] as Panel[], scales: [] as Scale[] };
+  const base = { variables: params.variables, day0: 0, bin: 1, columns: 0, panels: [] as Panel[], scales: [] as Scale[], fixed: false };
   if (table === null) {
     let note = params.sites.length === 0 ? 'Select one or more sites.' : 'Select one or more variables.';
     if (params.sites.length > 0 && params.variables.length > 0) {
@@ -176,6 +184,7 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Fingerpri
   const siteIds = [...new Set(Array.from(site))].sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0));
   const panels: Panel[] = [];
   const scales: Scale[] = [];
+  const fixed = fixedColors(params);
   for (const v of params.variables) {
     const values = read(v);
     const bySite = new Map<number, Panel>(siteIds.map((id) => [id, { variable: v, siteId: id, cells: [] }]));
@@ -187,15 +196,17 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Fingerpri
       const p = bySite.get(id) as Panel;
       if (p.cells.length > 0) panels.push(p);
     }
-    scales.push(makeScale(v, read(`${v}__lo`)[0] as number, read(`${v}__hi`)[0] as number));
+    const range = fixed ? fixedColorRange(params, v) : null;
+    scales.push(range ? makeScale(v, range[0], range[1]) : makeScale(v, read(`${v}__lo`)[0] as number, read(`${v}__hi`)[0] as number));
   }
   const binText = bin === 1 ? 'Each column is one day' : `Each column is the mean of ${bin} days`;
   const subtitle = joinSubtitle(
     signNote(params.variables),
     `30-minute values in site local time, one row per half hour; the step setting does not apply. ${binText}. ` +
-      `Empty cells = no data. The colour range is the 2nd to 98th percentile of the cell values; values outside it get the end colour.`,
+      `Empty cells = no data. The colour range is the 2nd to 98th percentile of ${fixed ? 'all 30-minute values of all sites and years' : 'the cell values'}; ` +
+      `values outside it get the end colour.`,
   );
-  const data: FingerprintData = { ...base, day0, bin, columns, panels, scales, rowCount: n, seriesCount: panels.length, subtitle };
+  const data: FingerprintData = { ...base, day0, bin, columns, panels, scales, fixed, rowCount: n, seriesCount: panels.length, subtitle };
   if (panels.length === 0) data.note = 'No values for these variables, sites and years.';
   return data;
 }
@@ -475,7 +486,7 @@ export const fingerprint: DiagramDef<FingerprintData> = {
     return (
       `Fingerprint heatmap: the date on the x axis, the time of day (site local time) on the y axis, ` +
       `one panel per site and variable (${n} ${n === 1 ? 'panel' : 'panels'}); the colour gives the value, empty cells are gaps. ` +
-      `${cols}. Colour range (2nd to 98th percentile): ${scalesText(data, ctx.meta)}.`
+      `${cols}. Colour range (2nd to 98th percentile${data.fixed ? ' of all 30-minute values' : ''}): ${scalesText(data, ctx.meta)}.`
     );
   },
 };

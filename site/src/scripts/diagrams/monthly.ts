@@ -6,6 +6,7 @@ import { BarChart, LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
+import { fixedRange } from '../axisRanges';
 import type { Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { CIRCULAR_VARS, SUM_VARS, col, whereClause } from './sql';
@@ -32,6 +33,7 @@ import {
   titleStyle,
   tooltipBase,
   valueAxis,
+  axisExtent,
   valueWithUnit,
   xAxisName,
   yAxisName,
@@ -143,19 +145,21 @@ function panelHeight(n: number, height: number): number {
 }
 
 /** Y axis names, tick label widths and the shared left margin of all panels. */
-function yLayout(data: MonthlyData, meta: Meta, height: number) {
+function yLayout(data: MonthlyData, meta: Meta, params: ViewParams, height: number) {
   const panelH = panelHeight(data.variables.length, height);
-  const extents = data.variables.map((v) => valueExtent(data, v));
+  // Fixed range of all data (view option), else the range of the loaded rows.
+  const ranges = data.variables.map((v) => fixedRange(params, 'monthly', v));
+  const extents = data.variables.map((v, i) => axisExtent(v, ranges[i], valueExtent(data, v)));
   const names = data.variables.map((v) => axisName(meta, v, panelH));
   const widths = extents.map((e) => tickLabelWidth(e));
   const left = Math.max(LAYOUT.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
-  return { extents, names, widths, left };
+  return { ranges, extents, names, widths, left };
 }
 
 function build(data: MonthlyData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const vars = data.variables;
-  const y = yLayout(data, meta, ctx.height);
+  const y = yLayout(data, meta, ctx.params, ctx.height);
   const layout = stackLayout(vars.length, ctx.height, LAYOUT, y.left);
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
@@ -198,7 +202,7 @@ function build(data: MonthlyData, ctx: BuildContext): EChartsCoreOption {
       ...(i === last ? xAxisName(tokens, 'Month') : {}),
     })),
     yAxis: vars.map((v, i) =>
-      valueAxis(tokens, i, { scale: false, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }, v),
+      valueAxis(tokens, i, { scale: false, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }, v, y.ranges[i]),
     ),
     tooltip: {
       ...tooltipBase(tokens, 'axis'),
@@ -225,7 +229,7 @@ export const monthly: DiagramDef<MonthlyData> = {
   query,
   prepare,
   build,
-  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height, LAYOUT, yLayout(data, ctx.meta, ctx.height).left),
+  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height, LAYOUT, yLayout(data, ctx.meta, ctx.params, ctx.height).left),
   height: (params) => stackHeight(params.variables.length, PANEL_H, LAYOUT),
   describe: (data) =>
     `Grouped bars: one panel per variable, twelve calendar months on the x axis, one bar per site (${data.sites.length} sites). ` +

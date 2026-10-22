@@ -7,10 +7,12 @@
 //    full file is 29 MB, above the 25 MiB limit of Cloudflare static assets.
 // 3. Small tables of data/calculated/ -> site/src/data/calculated/: the
 //    "Calculated" page reads them at build time. They are not served.
-// Steps 2 and 3 need npm run calc. Design: docs/calculated.md.
+// 4. Fixed y ranges of all data -> site/src/data/axis-ranges.json (scripts/axis-ranges.ts).
+// Steps 2 to 4 need npm run calc. Design: docs/calculated.md.
 
 import { copyFile, mkdir, stat } from 'node:fs/promises';
 import { DuckDBInstance } from '@duckdb/node-api';
+import { writeAxisRanges } from './axis-ranges.ts';
 
 const SRC_DIR = 'db';
 const OUT_DIR = 'site/public/data';
@@ -86,3 +88,6 @@ if (out !== null && out >= src) {
 await mkdir(PAGE_DATA_DIR, { recursive: true });
 for (const file of PAGE_FILES) await copyFile(`${CALC_DIR}/${file}`, `${PAGE_DATA_DIR}/${file}`);
 console.log(`Copied ${PAGE_FILES.length} files ${CALC_DIR} -> ${PAGE_DATA_DIR}`);
+
+// 4. Fixed y ranges. They need fluxes.parquet (gpp, reco, Maktau nee_f), thus they come last.
+await writeAxisRanges();

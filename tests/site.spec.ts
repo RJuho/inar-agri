@@ -6,6 +6,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import zlib from 'node:zlib';
 import { dirname, join } from 'node:path';
 import { promisify } from 'node:util';
+import { niceRange } from '../site/src/scripts/diagrams/nice.ts';
 
 const OBS_FILE = 'db/observations.parquet';
 const READY_TIMEOUT = 60_000;
@@ -1583,6 +1584,71 @@ test.describe('site emojis', () => {
     expect(alt).toContain('Qvidja');
     expect(alt).not.toContain('🐂🐝');
     expect(alt).not.toContain('🧚🌾');
+  });
+});
+
+const AXIS_RANGES_FILE = 'site/src/data/axis-ranges.json';
+
+/** Min and max of the y axes of the first diagram, and the `scale` setting. */
+async function yAxes(page: Page): Promise<Array<{ min: unknown; max: unknown; scale: unknown }>> {
+  return page.locator('.diagram-chart').first().evaluate((el) => {
+    const c = (el as unknown as { __chart: { getOption(): { yAxis: Array<{ min: unknown; max: unknown; scale: unknown }> } } }).__chart;
+    return c.getOption().yAxis.map((a) => ({ min: a.min, max: a.max, scale: a.scale }));
+  });
+}
+
+function rangeView(id: string, sites: number[], fixedY?: boolean) {
+  return {
+    id,
+    name: `Range ${id}`,
+    params: { sites, variables: ['nee_f', 'ta'], xVariable: 'ta', yearFrom: 2022, yearTo: 2022, aggregation: 'day', ...(fixedY === undefined ? {} : { fixedY }) },
+    diagrams: [{ id: 'd1', type: 'timeseries' }],
+  };
+}
+
+test.describe('fixed y range', () => {
+  let errors: string[];
+
+  test.beforeEach(async ({ page }) => {
+    errors = trackErrors(page);
+  });
+
+  test.afterEach(() => {
+    expect(errors).toEqual([]);
+  });
+
+  test('on (default): the time series y axes use the range of all data, the same for one site and all sites', async ({ page }) => {
+    const ranges = JSON.parse(await readFile(AXIS_RANGES_FILE, 'utf8')) as { step: Record<string, Record<string, [number, number]>> };
+    const expected = (['nee_f', 'ta'] as const).map((v) => {
+      const r = niceRange(ranges.step.day![v]!);
+      return { min: r.min, max: r.max, scale: false };
+    });
+    // A view without the key gets the fixed range.
+    await page.goto('/' + viewHash(rangeView('fy1', [4])));
+    await waitReady(page);
+    await expect(page.locator('input[name="fixedY"]')).toBeChecked();
+    expect(await yAxes(page)).toEqual(expected);
+    const alt = await altOf(page, 0);
+    expect(alt).toContain('range of all sites and years');
+
+    // A full page load, so that the ready state is of the new view.
+    await page.goto('about:blank');
+    await page.goto('/' + viewHash(rangeView('fy2', [1, 2, 3, 4, 5, 6], true)));
+    await waitReady(page);
+    expect(await yAxes(page)).toEqual(expected);
+  });
+
+  test('off: the y axes use the range of the loaded rows', async ({ page }) => {
+    await page.goto('/' + viewHash(rangeView('fy3', [4], false)));
+    await waitReady(page);
+    await expect(page.locator('input[name="fixedY"]')).not.toBeChecked();
+    const axes = await yAxes(page);
+    expect(axes.map((a) => a.scale)).toEqual([true, true]);
+    expect(await altOf(page, 0)).not.toContain('range of all sites and years');
+    // The checkbox turns the fixed range on.
+    await page.locator('input[name="fixedY"]').check();
+    await expect(page.locator('#chart')).toHaveAttribute('data-status', 'ready', { timeout: READY_TIMEOUT });
+    await expect.poll(async () => (await yAxes(page)).map((a) => a.scale)).toEqual([false, false]);
   });
 });
 

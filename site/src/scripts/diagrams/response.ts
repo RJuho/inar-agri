@@ -9,6 +9,7 @@ import { GraphicComponent } from 'echarts/components';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
+import { fixedRange } from '../axisRanges';
 import type { Aggregation, Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { CIRCULAR_VARS, col, meanExpr, stepExpr, whereClause } from './sql';
@@ -36,6 +37,7 @@ import {
   titleStyle,
   tooltipBase,
   valueAxis,
+  axisExtent,
   varLabel,
   xAxisName,
   yAxisName,
@@ -304,12 +306,15 @@ function valueExtent(data: ResponseData, v: Variable): [number, number] {
  * Y axis names, tick label widths and the left margin of the panels. All panels use the same
  * left margin, so that the columns have the same width and line up.
  */
-function yLayout(data: ResponseData, meta: Meta) {
-  const extents = data.ys.map((v) => valueExtent(data, v));
+function yLayout(data: ResponseData, meta: Meta, params: ViewParams) {
+  // Fixed ranges of all data (view option) for the x and y axes, else the range of the loaded rows.
+  const ranges = data.ys.map((v) => fixedRange(params, 'step', v, data.aggregation));
+  const xRange = fixedRange(params, 'step', data.x, data.aggregation);
+  const extents = data.ys.map((v, i) => axisExtent(v, ranges[i], valueExtent(data, v)));
   const names = data.ys.map((v) => axisName(meta, v, L.panel));
   const widths = extents.map((e) => tickLabelWidth(e, 4));
   const left = Math.max(L.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
-  return { extents, names, widths, left };
+  return { ranges, xRange, extents, names, widths, left };
 }
 
 /** Bin range as text for the tooltip, for example "120 to 160". */
@@ -323,7 +328,7 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
   const cols = columns(ctx.width, data.ys.length);
-  const y = yLayout(data, meta);
+  const y = yLayout(data, meta, ctx.params);
   const panelW = (Math.max(ctx.width, 200) - y.left - L.right - (cols - 1) * (L.gapX + y.left)) / cols;
   const xUnit = displayUnit(meta, data.x);
   const xName = axisName(meta, data.x, panelW);
@@ -345,8 +350,8 @@ function build(data: ResponseData, ctx: BuildContext): EChartsCoreOption {
     title.push({ top: top - 24, left: left - 8, text: panelTitle(v, binStat(v, data.aggregation)), textStyle: titleStyle(tokens) });
     // The axis lines stay at the bottom and the left edge of the panel, not at 0.
     const edge = { axisLine: { show: true, onZero: false, lineStyle: { color: tokens.axis } } };
-    xAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...xAxisName(tokens, xName) }, data.x));
-    yAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }, v));
+    xAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...xAxisName(tokens, xName) }, data.x, y.xRange));
+    yAxis.push(valueAxis(tokens, i, { splitNumber: 4, ...edge, ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number) }, v, y.ranges[i]));
     const unit = displayUnit(meta, v);
     // Fit text at the top of the panel: right for NEE (the curve goes to the bottom right),
     // left for GPP and Reco (the curve goes to the top right).

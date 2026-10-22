@@ -6,6 +6,8 @@ import * as echarts from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Meta } from '../db';
+import type { ViewParams } from '../state';
+import { fixedRange } from '../axisRanges';
 import type { BuildContext, DiagramDef } from './registry';
 import {
   axisName,
@@ -89,8 +91,9 @@ const blockHeight = (rows: number) => L.head + rows * ROW_H + L.xName;
  * Y ranges, y axis names, tick label widths and the shared left margin. The panels of a
  * variable have the same y axis, so only the first column shows the labels and the name.
  */
-function yLayout(data: YearsData, meta: Meta) {
-  const ranges = data.variables.map((v) => niceRange(extent(data.groups, v)));
+function yLayout(data: YearsData, meta: Meta, params: ViewParams) {
+  // Fixed range of all data (view option), else the range of the loaded rows.
+  const ranges = data.variables.map((v) => fixedRange(params, 'step', v, data.step) ?? niceRange(extent(data.groups, v)));
   const names = data.variables.map((v) => axisName(meta, v, L.panel));
   const widths = ranges.map((r) => tickLabelWidth([r.min, r.max]));
   const left = Math.max(L.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
@@ -102,7 +105,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
   const years = data.years;
-  const yl = yLayout(data, meta);
+  const yl = yLayout(data, meta, ctx.params);
   // Use the default left margin for the panel count, so that the chart height (from `height()`) fits.
   const cols = perRow(ctx.width, years.length);
   const rows = Math.ceil(years.length / cols);

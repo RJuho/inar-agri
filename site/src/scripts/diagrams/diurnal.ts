@@ -6,6 +6,7 @@ import { LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import { toFloat64, type Meta } from '../db';
+import { fixedRange } from '../axisRanges';
 import type { Variable, ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { CIRCULAR_VARS, col, meanExpr, whereClause } from './sql';
@@ -33,6 +34,7 @@ import {
   titleStyle,
   tooltipBase,
   valueAxis,
+  axisExtent,
   varLabel,
   xAxisName,
   yAxisName,
@@ -153,19 +155,21 @@ function panelHeight(n: number, height: number): number {
 }
 
 /** Y axis names, tick label widths and the shared left margin of all panels. */
-function yLayout(data: DiurnalData, meta: Meta, height: number) {
+function yLayout(data: DiurnalData, meta: Meta, params: ViewParams, height: number) {
   const panelH = panelHeight(data.variables.length, height);
-  const extents = data.variables.map((v) => valueExtent(data, v));
+  // Fixed range of all data (view option), else the range of the loaded rows.
+  const ranges = data.variables.map((v) => fixedRange(params, 'diurnal', v));
+  const extents = data.variables.map((v, i) => axisExtent(v, ranges[i], valueExtent(data, v)));
   const names = data.variables.map((v) => axisName(meta, v, panelH));
   const widths = extents.map((e) => tickLabelWidth(e));
   const left = Math.max(LAYOUT.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
-  return { extents, names, widths, left };
+  return { ranges, extents, names, widths, left };
 }
 
 function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const vars = data.variables;
-  const y = yLayout(data, meta, ctx.height);
+  const y = yLayout(data, meta, ctx.params, ctx.height);
   const layout = stackLayout(vars.length, ctx.height, LAYOUT, y.left);
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
@@ -217,7 +221,7 @@ function build(data: DiurnalData, ctx: BuildContext): EChartsCoreOption {
       // Time base on the bottom panel only.
       ...(i === last ? xAxisName(tokens, timeAxisName(meta, ctx.params, 'Hour of day')) : {}),
     })),
-    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v)),
+    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v, y.ranges[i])),
     tooltip: {
       ...tooltipBase(tokens, 'axis'),
       axisPointer: { type: 'line', lineStyle: { color: tokens.axis } },
@@ -271,7 +275,7 @@ export const diurnal: DiagramDef<DiurnalData> = {
   query,
   prepare,
   build,
-  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height, LAYOUT, yLayout(data, ctx.meta, ctx.height).left),
+  relayout: (data, ctx) => stackLayout(data.variables.length, ctx.height, LAYOUT, yLayout(data, ctx.meta, ctx.params, ctx.height).left),
   height: (params) => stackHeight(params.variables.length, PANEL_H, LAYOUT),
   describe: (data, ctx) =>
     `One panel per variable, the hour of the day (site local time) on the x axis, one line per site for the mean ` +

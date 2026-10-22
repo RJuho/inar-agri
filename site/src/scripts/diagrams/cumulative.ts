@@ -8,6 +8,7 @@ import { LineChart } from 'echarts/charts';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Table } from 'apache-arrow';
 import type { Meta } from '../db';
+import { blockRange } from '../axisRanges';
 import { VARIABLE_LABELS, type Variable, type ViewParams } from '../state';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, whereClause } from './sql';
@@ -30,6 +31,7 @@ import {
   stackHeight,
   unitText,
   valueAxis,
+  axisExtent,
   VARIABLE_SYMBOLS,
   varLabel,
   yAxisName,
@@ -94,9 +96,11 @@ function sumExtent(groups: Group[], v: Variable): [number, number] {
 }
 
 /** Y layout: one panel per summed variable. */
-function yLayout(data: CumulativeData, height: number) {
-  const extents = data.variables.map((v) => sumExtent(data.groups, v));
-  return { extents, ...stackYLayout(height, extents, (i, panelH) => sumAxisName(data.variables[i] as Variable, panelH)) };
+function yLayout(data: CumulativeData, params: ViewParams, height: number) {
+  // Fixed range of all data (view option): the running sums of all sites and years, with 0.
+  const ranges = data.variables.map((v) => blockRange(params, 'cumulative', [v]));
+  const extents = data.variables.map((v, i) => axisExtent(undefined, ranges[i], sumExtent(data.groups, v)));
+  return { ranges, extents, ...stackYLayout(height, extents, (i, panelH) => sumAxisName(data.variables[i] as Variable, panelH)) };
 }
 
 interface CumulativeData extends Prepared {
@@ -150,7 +154,7 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Cumulativ
 function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta } = ctx;
   const vars = data.variables;
-  const y = yLayout(data, ctx.height);
+  const y = yLayout(data, ctx.params, ctx.height);
   const colors = siteColors(meta, tokens);
   const names = siteNames(meta, ctx.params);
   const ranks = yearRanks(data.groups);
@@ -193,10 +197,16 @@ function build(data: CumulativeData, ctx: BuildContext): EChartsCoreOption {
     grid: y.layout.grid,
     xAxis: stackDayAxes(tokens, vars.length, dayOfYearAxisName(meta, ctx.params)),
     yAxis: vars.map((_, i) =>
-      valueAxis(tokens, i, {
-        scale: false,
-        ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number),
-      }),
+      valueAxis(
+        tokens,
+        i,
+        {
+          scale: false,
+          ...yAxisName(tokens, y.names[i] as string, y.widths[i] as number),
+        },
+        undefined,
+        y.ranges[i],
+      ),
     ),
     tooltip: siteYearTooltip(ctx, 'day', info, marks.all),
     dataset: data.groups.map((g) => ({
@@ -242,7 +252,7 @@ export const cumulative: DiagramDef<CumulativeData> = {
   prepare,
   build,
   showsEvents: true,
-  relayout: (data, ctx) => yLayout(data, ctx.height).layout,
+  relayout: (data, ctx) => yLayout(data, ctx.params, ctx.height).layout,
   height: (params) => stackHeight(Math.max(1, sumVars(params).length), 260, YEAR_STACK),
   statsVariables: sumVars,
   describe: (data, ctx) => {

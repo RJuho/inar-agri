@@ -9,6 +9,7 @@ import { AGGREGATION_LABELS, type Aggregation, type Variable, type ViewParams } 
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, periodMs, stepExpr, whereClause } from './sql';
+import { fixedRange } from '../axisRanges';
 import {
   axisName,
   displayUnit,
@@ -32,6 +33,7 @@ import {
   timeAxisName,
   timeMarks,
   valueAxis,
+  axisExtent,
   valueWithUnit,
   X_NAME_SPACE,
   xAxisName,
@@ -127,13 +129,15 @@ function valueExtent(data: TimeseriesData, v: Variable): [number, number] {
  * Y axis names, tick label widths and the shared left margin. All panels use the
  * same left margin, so that the time axes line up.
  */
-function yLayout(data: TimeseriesData, meta: Meta, height: number) {
+function yLayout(data: TimeseriesData, meta: Meta, params: ViewParams, height: number) {
   const panelH = panelHeight(data.variables.length, height);
-  const extents = data.variables.map((v) => valueExtent(data, v));
+  // Fixed range of all data (view option), else the range of the loaded rows.
+  const ranges = data.variables.map((v) => fixedRange(params, 'step', v, data.aggregation));
+  const extents = data.variables.map((v, i) => axisExtent(v, ranges[i], valueExtent(data, v)));
   const names = data.variables.map((v) => axisName(meta, v, panelH));
   const widths = extents.map((e) => tickLabelWidth(e));
   const left = Math.max(LAYOUT.left, ...names.map((n, i) => gridLeftFor(widths[i] as number, nameLines(n))));
-  return { extents, names, widths, left };
+  return { ranges, extents, names, widths, left };
 }
 
 /** Time label in site local time. The epoch values hold local wall time, so read them as UTC. */
@@ -244,7 +248,7 @@ function prepare(table: Table | null, params: ViewParams, meta: Meta): Timeserie
 function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
   const { tokens, meta, zoom } = ctx;
   const vars = data.variables;
-  const y = yLayout(data, meta, ctx.height);
+  const y = yLayout(data, meta, ctx.params, ctx.height);
   const layout = panelLayout(vars.length, ctx.height, y.left);
   const siteName = siteNames(meta, ctx.params);
   // Colour follows the site: slot = position of the site in sites.parquet.
@@ -319,7 +323,7 @@ function build(data: TimeseriesData, ctx: BuildContext): EChartsCoreOption {
       // Time base on the bottom panel only.
       ...(i === last ? xAxisName(tokens, timeAxisName(meta, ctx.params)) : {}),
     })),
-    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v)),
+    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v, y.ranges[i])),
     axisPointer: { link: [{ xAxisIndex: 'all' }], lineStyle: { color: tokens.axis } },
     tooltip: tooltip(data, tokens, nSites, unit, (from, to) => eventTooltipLines(allMarks, from, to, siteName, markColors)),
     dataZoom: [
@@ -435,7 +439,7 @@ export const timeseries: DiagramDef<TimeseriesData> = {
   prepare,
   build,
   showsEvents: true,
-  relayout: (data, ctx) => panelLayout(data.variables.length, ctx.height, yLayout(data, ctx.meta, ctx.height).left),
+  relayout: (data, ctx) => panelLayout(data.variables.length, ctx.height, yLayout(data, ctx.meta, ctx.params, ctx.height).left),
   describe: (data) =>
     `One panel per variable, one line per site, ${AGGREGATION_LABELS[data.aggregation].toLowerCase()}, time axis in site local time.` +
     stepStatNote(data.variables, data.aggregation),

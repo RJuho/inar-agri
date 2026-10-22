@@ -324,6 +324,7 @@ export const coverage: DiagramDef<CoverageData> = {
   prepare,
   build,
   showsEvents: false,
+  usesFixedRange: false,
   widthDependent: true,
   relayout: (data, ctx) => {
     const y = leftFor(data, ctx.meta, ctx.params);

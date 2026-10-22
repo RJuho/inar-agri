@@ -11,6 +11,7 @@ import type { Variable, ViewParams } from '../state';
 import type { Tokens } from '../theme';
 import type { BuildContext, DiagramDef, Prepared } from './registry';
 import { col, stepExpr, whereClause } from './sql';
+import { fixedRange } from '../axisRanges';
 import {
   DAY,
   REF_END,
@@ -58,6 +59,7 @@ import {
   STACK,
   tooltipBase,
   valueAxis,
+  axisExtent,
   yearOpacity,
   yearStep,
   type Group,
@@ -313,10 +315,12 @@ export function stackYLayout(
 
 /** Y layout of the years overlay: one panel per variable, name `axisName()`. */
 function yLayout(data: YearsData, ctx: BuildContext) {
-  const extents = data.variables.map((v) => extent(data.groups, v));
+  // Fixed range of all data (view option), else the range of the loaded rows.
+  const ranges = data.variables.map((v) => fixedRange(ctx.params, 'step', v, data.step));
+  const extents = data.variables.map((v, i) => axisExtent(v, ranges[i], extent(data.groups, v)));
   const stack = yearsStack(data, ctx.width);
   const name = (i: number, panelH: number) => axisName(ctx.meta, data.variables[i] as Variable, panelH);
-  return { extents, ...stackYLayout(ctx.height, extents, name, stack) };
+  return { ranges, extents, ...stackYLayout(ctx.height, extents, name, stack) };
 }
 
 /** Day-of-year x axes of stacked panels. Labels and the axis name on the bottom panel only. */
@@ -388,7 +392,7 @@ function build(data: YearsData, ctx: BuildContext): EChartsCoreOption {
     })),
     grid: y.layout.grid,
     xAxis: stackDayAxes(tokens, vars.length, dayOfYearAxisName(meta, ctx.params)),
-    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v)),
+    yAxis: vars.map((v, i) => valueAxis(tokens, i, yAxisName(tokens, y.names[i] as string, y.widths[i] as number), v, y.ranges[i])),
     tooltip: siteYearTooltip(ctx, data.step, info, marks.all),
     dataset: data.groups.map((g) => ({
       dimensions: [{ name: 'x', type: 'time' }, ...vars.map((v) => ({ name: v, type: 'float' }))],
