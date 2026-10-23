@@ -53,8 +53,9 @@ const count = (list: EventJson[], f: (e: EventJson) => boolean) => list.filter(f
       <p class="lead">
         This page lists the field management events of the sites: harvest, cut, grazing, fertilisation, sowing, tillage
         and spraying. On the <a href={import.meta.env.BASE_URL}>data page</a>, the option "Events" shows them as markers
-        in the charts. Only {sites.map((s) => s.name).join(', ').replace(/, ([^,]*)$/, ' and $1')} have dated events.
-        Maktau has seasonal practice only, Anttila and Särkisuo have no management data.
+        in the charts. Haltiala, Qvidja and Viikki have a management file. Anttila, Särkisuo and Maktau have no
+        management file: their events come from the articles (Shurpali et al. 2025, Räsänen et al. 2026) and cover
+        one or two years only. Month-level facts of the articles are not in the table.
       </p>
     </header>
 
@@ -71,10 +72,10 @@ const count = (list: EventJson[], f: (e: EventJson) => boolean) => list.filter(f
       <dl class="facts">
         <div><dt>Amount</dt><dd>Amount of the product, seed or manure as in the source. "kg/ha fresh" is fresh mass (Qvidja). For grazing: the number of animals.</dd></div>
         <div><dt>DM</dt><dd>Dry matter fraction of the amount (0 to 1).</dd></div>
-        <div><dt>Yield</dt><dd>Harvest yield in kg dry weight per ha. Qvidja: fresh mass × DM fraction (2018-06-12: the value of Heimsch et al. 2021). Viikki: the yield of the year, on the last harvest of the year.</dd></div>
-        <div><dt>C</dt><dd>Carbon of the harvest (export) or of the organic fertiliser (input) in g C m⁻². Yield × carbon fraction: Qvidja 0.42, Haltiala 0.50, Viikki 0.42 (assumed). Qvidja molasses: paper values. The same values go into the NECB on the <a href={`${import.meta.env.BASE_URL}calculated/`}>Calculated</a> page.</dd></div>
-        <div><dt>N</dt><dd>N input in kg N per ha. Viikki and Haltiala 2025: the source value. Yara AXAN 27-0-1 and NPK 23-10-8: 27 % and 23 % of the product mass (the grade in the product name).</dd></div>
-        <div><dt>Parcel</dt><dd>Area of the field parcel (kasvulohko) of the Qvidja event, in ha.</dd></div>
+        <div><dt>Yield</dt><dd>Harvest yield in kg dry weight per ha. Qvidja: fresh mass × DM fraction (2018-06-12: the value of Heimsch et al. 2021). Viikki, Anttila and Särkisuo: the yield of the year, on the last harvest of the year.</dd></div>
+        <div><dt>C</dt><dd>Carbon of the harvest (export) or of the organic fertiliser (input) in g C m⁻². Yield × carbon fraction: Qvidja 0.42, Haltiala 0.50, Viikki 0.42 (assumed), Anttila and Särkisuo 0.47 (Shurpali et al. 2025). Qvidja molasses: paper values. The same values go into the NECB on the <a href={`${import.meta.env.BASE_URL}calculated/`}>Calculated</a> page.</dd></div>
+        <div><dt>N</dt><dd>N input in kg N per ha. Viikki, Haltiala 2025, Anttila and Särkisuo: the source value. Yara AXAN 27-0-1 and NPK 23-10-8: 27 % and 23 % of the product mass (the grade in the product name).</dd></div>
+        <div><dt>Parcel</dt><dd>Area of the field parcel in ha: Qvidja (kasvulohko), Anttila and Särkisuo (Shurpali et al. 2025).</dd></div>
       </dl>
       <p>An empty cell means that the source gives no value.</p>
     </section>

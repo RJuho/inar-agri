@@ -168,6 +168,31 @@ export interface ChangeLogEntry {
 /** Newest entry first. */
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    id: 'change-2026-10-23-article-events',
+    date: '2026-10-23',
+    title: 'Management events of Anttila, Särkisuo and Maktau from the articles',
+    site: 'Anttila, Särkisuo, Maktau, Viikki',
+    variable: 'events',
+    findings: [],
+    summary: [
+      'The event table (`events.parquet`) now has rows for all six sites. Anttila, Särkisuo and Maktau have no management file. Their events come from the articles in `data/articles/`: Shurpali et al. 2025 (Table 2: the 2022 fertilisations in kg N/ha, two cuts, a herbicide, ditch work, the parcel areas; Table 4: the annual yield of 2022 with a grass carbon content of 0.47; p. 2: the sowing of 2021) and Räsänen et al. 2026 (p. 3: the sowing and the harvest of the 2019 long rains at Maktau and the harvest of 2020).',
+      'Viikki gets the sowing of 2023-05-25 from Gao et al. 2026 and the product and amount of the manure of 2023-04-27 from Vettikkat et al. 2026. Only events with an exact day or a stated day range are rows. Month-level facts and the values that differ between the articles and the management files are listed in the documentation.',
+      'The calculated NECB of Anttila and Särkisuo 2022 now has the harvest term (`necb_complete` true). For 2023 the harvest is unknown and the NECB has no harvest term. The natural events Deep Dive keeps its human-disturbance mask on the events of Haltiala, Qvidja and Viikki; its results do not change.',
+    ],
+    facts: [
+      { term: 'Anttila', value: '6 events (2021 to 2022), parcel 6.4 ha, C harvest 2022 352.5 g C m⁻²' },
+      { term: 'Särkisuo', value: '8 events (2021 to 2022), parcel 7.1 ha, C harvest 2022 220.9 g C m⁻²' },
+      { term: 'Maktau', value: '3 events (2019 to 2020), no yields' },
+      { term: 'Viikki', value: '1 new event (sowing 2023-05-25), 2 events with more detail' },
+      { term: 'Code', value: '`scripts/lib/events.ts`, `scripts/lib/calc/management.ts`, `scripts/calc.ts`' },
+    ],
+    formulas: [],
+    tables: [],
+    openPoints: [],
+    openQuestions: [],
+    doc: 'docs/harmonised-database.md',
+  },
+  {
     id: 'change-2026-10-22-coordinates',
     date: '2026-10-22',
     title: 'Coordinates for all six sites',

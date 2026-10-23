@@ -13,7 +13,10 @@
 // 2. Daily NEE (g C m-2 d-1) = nee_f_gc of data/calculated/daily.parquet (provider gap filling at five
 //    sites, MDS at Maktau). Maktau: only the local years 2019 to 2024.
 // 3. Human mask: the days from 2 days before to 14 days after each dated management event of
-//    db/events.parquet are not used for NEE and soil water. Anttila, Särkisuo and Maktau have no events.
+//    db/events.parquet are not used for NEE and soil water. Only the events of Haltiala, Qvidja and
+//    Viikki (HUMAN_SITES): the dive was computed before the article events of Anttila, Särkisuo and
+//    Maktau were added (2026-10-23), and the mask keeps these three sites so that the committed
+//    JSON stays valid.
 // 4. Soil water: at Qvidja, Viikki and Haltiala only on days with a daily mean tsoil above 0.5 °C.
 //    Site percentiles (p10, p90, percent rank) over the used days.
 // 5. Classes (detectClasses() in scripts/lib/deep-dive/natural-events.ts). Weather classes use all
@@ -50,6 +53,10 @@ export const slug = 'natural-events';
 export const title = 'Natural events and disturbances';
 
 export const inputs = ['db/sites.parquet', 'db/observations.parquet', 'db/events.parquet', 'data/calculated/daily.parquet'] as const;
+
+/** Sites whose events make the human mask (see the method comment). */
+const HUMAN_SITES = ['haltiala', 'qvidja', 'viikki'] as const;
+const humanSiteList = HUMAN_SITES.map((s) => `'${s}'`).join(', ');
 
 /** Minimum half hours with a value for a daily value. */
 const MIN_HALF_HOURS = 40;
@@ -133,7 +140,7 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
     human AS (
       SELECT DISTINCT site_code,
              CAST(unnest(generate_series(date - INTERVAL ${HUMAN_WINDOW.before} DAY, coalesce(date_end, date) + INTERVAL ${HUMAN_WINDOW.after} DAY, INTERVAL 1 DAY)) AS DATE) AS d
-      FROM 'db/events.parquet'
+      FROM 'db/events.parquet' WHERE site_code IN (${humanSiteList})
     )
     SELECT v.*, f.nee, h.d IS NOT NULL AS human,
            CASE WHEN v.site_code IN (${tsoilSites}) AND (v.tsoil IS NULL OR v.tsoil <= ${SOIL.tsoilMinC}) THEN NULL ELSE v.swc END AS swc_ok
@@ -162,7 +169,10 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
   );
 
   // Check of the SQL mask with the TS helper.
-  const evRows = await rows(conn, `SELECT site_code, CAST(date AS VARCHAR) AS date, CAST(date_end AS VARCHAR) AS date_end FROM 'db/events.parquet'`);
+  const evRows = await rows(
+    conn,
+    `SELECT site_code, CAST(date AS VARCHAR) AS date, CAST(date_end AS VARCHAR) AS date_end FROM 'db/events.parquet' WHERE site_code IN (${humanSiteList})`,
+  );
   const mask = eventDayMask(
     evRows.map((r) => ({ site: str(r.site_code), date: str(r.date), dateEnd: r.date_end === null ? null : str(r.date_end) })),
     HUMAN_WINDOW.before,

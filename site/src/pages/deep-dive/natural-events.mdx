@@ -111,8 +111,9 @@ percentiles and the NEE use only the years <Num k="method.maktauFluxYears.from" 
 <Num k="method.humanWindow.after" digits={0} /> days after each dated management event of `db/events.parquet`
 (harvest, cut, grazing, fertilisation, tillage, sowing, spraying and other). The other days are the *used days*.
 This removed <Num k="sites.qvidja.days.human" digits={0} /> days at Qvidja, <Num k="sites.viikki.days.human" digits={0} />
-at Viikki and <Num k="sites.haltiala.days.human" digits={0} /> at Haltiala. Anttila, Särkisuo and Maktau have no dated
-events, thus all their days are used. The weather classes are detected on all days, because the weather does not
+at Viikki and <Num k="sites.haltiala.days.human" digits={0} /> at Haltiala. The mask uses the events of these three
+sites only. The events of Anttila, Särkisuo and Maktau from the articles were added to the database after this dive
+was computed, and they are not used, thus all days of these sites are used. The weather classes are detected on all days, because the weather does not
 depend on the management. The removed days are not used in the NEE analysis and in the soil classes. In total there are
 <Num k="totals.usedDays" digits={0} /> used days, <Num k="totals.usedNeeDays" digits={0} /> of them with NEE.
 
@@ -382,8 +383,9 @@ or the rain sum of a failed season). NEE = mean ± SD of the used days of the ep
   have few days. Their results are not reliable.
 - **Human-disturbance window.** The weather classes are detected on all days. The removed days (<Num k="method.humanWindow.before" digits={0} />
   days before to <Num k="method.humanWindow.after" digits={0} /> days after each event) apply to the NEE and soil
-  analysis only. Anttila, Särkisuo and Maktau have no dated events in the database, thus their NEE can include
-  management effects (for example cuts).
+  analysis only. The mask uses the events of Haltiala, Qvidja and Viikki. The events of Anttila, Särkisuo and Maktau
+  from the articles were added later and are not used, thus their NEE can include management effects (for example the
+  two cuts of 2022 at Anttila and Särkisuo).
 - **Soil drought in winter.** At Anttila and Särkisuo the soil water is used also in frozen soil, thus part of their
   soil drought days are winter days with a low sensor reading, not dry soil.
 - **Zero curtain is an indirect sign.** The database has no snow depth and no water table. A flat soil temperature near zero

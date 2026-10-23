@@ -127,7 +127,7 @@ Haltiala uncertainty (rule in `CLAUDE.md`): the script sums each of `NEE_F1` to 
 - Carbon fraction per site: Qvidja 0.42 (both Qvidja papers), Haltiala 0.50 (the xlsx gives kg C/ha equal to 0.50 × kg DW/ha), Viikki 0.42 as an assumption (`c_fraction_source = assumed`).
 - Organic inputs without a carbon content (Qvidja compost, NPK mix, broiler litter, Soilfood fibre; Haltiala manure in m3/ha; Viikki manure in kg N/ha) get `c_g_m2 = NULL` and count as `n_exo_unknown`. The note of each row gives the size with an assumed 0.30 g C per g DM. The Qvidja molasses fertiliser of 2018 and 2019 has a carbon content in Heimsch et al. 2021 (205 g C per kg), and those paper values are used.
 - Grazing events have no carbon value; the NECB note says "Grazing not quantified".
-- Anttila, Särkisuo and Maktau have no harvest data. For Anttila and Särkisuo the table gives `NECB = −NEE − C_CH4` and `necb_complete = false`. For Maktau it gives no NECB.
+- Anttila and Särkisuo have harvest data for 2022 only: the annual yield (7.5 and 4.7 t DM/ha) and the grass carbon content (0.47) of Shurpali et al. 2025 (Table 4). For 2023 the table gives `NECB = −NEE − C_CH4`, `c_harvest` NULL and `necb_complete = false`. Maktau has no harvest data; the table gives no NECB.
 
 Known problems of the sources, kept in the row notes: the Qvidja cut of 2018-06-12 is 615 kg/ha × 0.30 in the xlsx but 1 985 kg DW/ha in Heimsch et al. 2021 (the paper value is used); two Qvidja cuts have a DM fraction of 0.70 and 0.79, which can mean that the amount is already dry; the Haltiala 2025 yield can be a fresh grain weight. The Viikki docx gives the yields in kg DW/ha (2022 3 673, 2023 6 773, 2024 2 336, 2025 1 973.7).
 

@@ -19,10 +19,15 @@
 //   name (Yara AXAN 27-0-1, NPK 23-10-8). Finnish saltpetre has no grade in
 //   the file, thus no N value. c_g_m2 comes from MANAGEMENT_CARBON
 //   (calc/management.ts) through withCarbon(), not from this table.
-// - Viikki gives one yield per year. It is on the last harvest of the year.
+// - Viikki, Anttila and Särkisuo give one yield per year. It is on the last
+//   harvest of the year.
 // - Excel serial dates: 1899-12-30 + n days.
-// - Maktau has only seasonal practice (no dates). Anttila and Särkisuo have
-//   no management data. These sites have no rows.
+// - Anttila, Särkisuo and Maktau have no management file. Their rows come
+//   from the articles in data/articles/ (Shurpali et al. 2025, Räsänen et
+//   al. 2026). Only events with an exact day or a stated day range are rows.
+//   Month-level facts (for example "harvested in August 2020") and the
+//   differences between the articles and the management files are listed
+//   in docs/harmonised-database.md, not here. Ditch work -> other.
 //
 // Design: docs/harmonised-database.md.
 
@@ -70,6 +75,10 @@ const HA_PDF = 'data/Haltiala/haltiala_smear_Lohkokortit_2025.pdf';
 const QV_XLSX = 'data/Qvidja/Qvidja_management.xlsx';
 const QV_2021 = 'data/Qvidja/Qvidja_C-balance.pdf (Heimsch et al. 2021, Table 1)';
 const VI_DOCX = 'data/Viikki/EC/Management Information.docx';
+const SH_2025 = 'data/articles/Shurpali_2025.pdf (Shurpali et al. 2025, p. 2, Tables 2 and 4)';
+const RA_2026 = 'data/articles/Räsänen_2026_kenia.pdf (Räsänen et al. 2026, p. 3)';
+const GAO_2026 = 'data/articles/Gao_2026_Cfootprint_milk-DNDC.pdf (Gao et al. 2026, Table A2)';
+const VE_2026 = 'data/articles/Vettikkat_2026_NH3-flux_SMEAR-Agri_mass-spec_EC.pdf (Vettikkat et al. 2026, Table 1)';
 
 type Facts = EventFacts & { end?: string };
 type Short = [date: string, type: EventType, detail: string, facts?: Facts];
@@ -201,8 +210,14 @@ export const EVENTS: EventRow[] = [
     ['2022-07-01', 'harvest', 'Timothy, first cut', { crop: 'Timothy' }],
     ['2022-08-27', 'harvest', 'Timothy, second cut; yield of the year 3673 kg DW/ha', { crop: 'Timothy', dry_mass_kg_ha: 3673 }],
     ['2022-11-02', 'tillage', 'Tillage'],
-    ['2023-04-27', 'fertilisation', 'Dry manure, 18.4 kg N/ha', viN('Dry manure', 18.4)],
-    ['2023-04-28', 'tillage', 'Tillage'],
+    // Vettikkat et al. 2026 give the product and the amount of the same day (field Alaniitty 1, 6.86 ha); the N value is from the docx.
+    [
+      '2023-04-27',
+      'fertilisation',
+      'Dry manure (separated solid fraction of cow manure, 43 m3/ha, 18.5 kg TAN/ha), 18.4 kg N/ha',
+      { ...viN('Dry manure', 18.4), amount: 43, amount_unit: 'm3/ha' },
+    ],
+    ['2023-04-28', 'tillage', 'Levelling harrow, about 5 cm, manure worked in'],
     ['2023-05-25', 'fertilisation', 'Mineral N, 67.5 kg N/ha', viN('Mineral N', 67.5)],
     ['2023-05-25', 'tillage', 'Tillage'],
     ['2023-08-17', 'harvest', 'Barley, clover and grasses, first cut', { crop: 'Barley, clover and grasses' }],
@@ -215,6 +230,40 @@ export const EVENTS: EventRow[] = [
     ['2025-05-08', 'tillage', 'Tillage', { end: '2025-05-09' }],
     ['2025-05-10', 'fertilisation', 'Mineral fertiliser, 21.6 kg N/ha', viN('Mineral fertiliser', 21.6)],
     ['2025-09-10', 'harvest', 'Faba beans; yield of the year 1973.7 kg DW/ha', { crop: 'Faba beans', dry_mass_kg_ha: 1973.7 }],
+  ]),
+  // The 2023 sowing is only in Gao et al. 2026 (Table A2).
+  ...rowsOf('viikki', GAO_2026, [['2023-05-25', 'sowing', 'Barley, 200 kg/ha, undersown with mixed grass seed, 20 kg/ha', kgHa('Barley', 200)]]),
+
+  // ---- Anttila: Shurpali et al. 2025. Field parcel 6.4 ha (Table 2). The fertiliser
+  // products are not named; the paper gives kg N/ha only. The yield of 2022 is an
+  // annual value (Table 4, dry biomass, grass C content 0.47).
+  ...rowsOf('anttila', SH_2025, [
+    ['2021-06-03', 'sowing', 'Harrowed, sown and fertilised: red clover and timothy with barley as cover crop; fertiliser amount not given', { crop: 'Legume grass', area_ha: 6.4 }],
+    ['2021-08-02', 'harvest', 'Whole crop harvest; no yield given', { crop: 'Legume grass', area_ha: 6.4 }],
+    ['2022-05-23', 'fertilisation', 'Synthetic N fertiliser, 52 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 52, area_ha: 6.4 }],
+    ['2022-06-21', 'harvest', 'Grass, first cut (red clover and timothy, sown 2021-06-03)', { crop: 'Legume grass', area_ha: 6.4 }],
+    ['2022-06-22', 'fertilisation', 'Synthetic N fertiliser, 44 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 44, area_ha: 6.4 }],
+    ['2022-09-08', 'harvest', 'Grass, second cut; yield of the year 7500 kg DM/ha (grass C content 0.47)', { crop: 'Legume grass', dry_mass_kg_ha: 7500, area_ha: 6.4 }],
+  ]),
+
+  // ---- Särkisuo: Shurpali et al. 2025. Field parcel 7.1 ha (Table 2), drained peat soil.
+  ...rowsOf('sarkisuo', SH_2025, [
+    ['2021-06-09', 'sowing', 'Sown and fertilised: wheat, oat and grasses; amounts not given', { crop: 'Mixed grasses', area_ha: 7.1 }],
+    ['2022-03-10', 'other', 'Ditch preparation', { end: '2022-03-17', area_ha: 7.1 }],
+    ['2022-05-30', 'fertilisation', 'Synthetic N fertiliser, 90 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 90, area_ha: 7.1 }],
+    ['2022-06-08', 'spraying', 'Herbicide against weeds, product not given', { area_ha: 7.1 }],
+    ['2022-06-30', 'harvest', 'Mixed grasses, first cut', { crop: 'Mixed grasses', area_ha: 7.1 }],
+    ['2022-07-04', 'fertilisation', 'Synthetic N fertiliser, 69 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 69, area_ha: 7.1 }],
+    ['2022-08-03', 'other', 'Ditch preparation', { end: '2022-08-15', area_ha: 7.1 }],
+    ['2022-08-15', 'harvest', 'Mixed grasses, second cut; yield of the year 4700 kg DM/ha (grass C content 0.47)', { crop: 'Mixed grasses', dry_mass_kg_ha: 4700, area_ha: 7.1 }],
+  ]),
+
+  // ---- Maktau: Räsänen et al. 2026 (site description). Only the long rains of 2019
+  // and 2020 have exact days. The 2020 sowing is "the third week of March" only.
+  ...rowsOf('maktau', RA_2026, [
+    ['2019-04-12', 'sowing', 'Maize (hybrid DH02), after 24 mm rain in the second week of April', { crop: 'Maize' }],
+    ['2019-08-13', 'harvest', 'Maize, 123 days after sowing; no yield given', { crop: 'Maize' }],
+    ['2020-07-30', 'harvest', 'Maize, 135 days after sowing (sown in the third week of March); no yield given', { crop: 'Maize' }],
   ]),
 ];
 

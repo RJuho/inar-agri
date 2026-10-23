@@ -629,13 +629,19 @@ const toc = [
       <Fragment set:html={f.dry} />
       <Fragment set:html={f.cMass} />
       <ul>
-        <li>Carbon fraction: Qvidja 0.42 (both Qvidja papers), Haltiala 0.50 (management file), Viikki 0.42 (assumed).</li>
+        <li>
+          Carbon fraction: Qvidja 0.42 (both Qvidja papers), Haltiala 0.50 (management file), Viikki 0.42 (assumed),
+          Anttila and Särkisuo 0.47 (Shurpali et al. 2025).
+        </li>
         <li>
           An organic input without a carbon content gets no carbon value. Then the NECB is a lower bound. The Qvidja
           molasses fertiliser of 2018 and 2019 uses the value of Heimsch et al. 2021.
         </li>
         <li>Grazing gets no carbon value.</li>
-        <li>Anttila, Särkisuo and Maktau have no harvest data. For Maktau we give no NECB.</li>
+        <li>
+          Anttila and Särkisuo have harvest data for 2022 only (the annual yield of Shurpali et al. 2025). For 2023
+          the NECB has no harvest term. Maktau has no harvest data; we give no NECB.
+        </li>
       </ul>
       <div class="table-wrap">
         <table>

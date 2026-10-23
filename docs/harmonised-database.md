@@ -63,19 +63,30 @@ One row per field management event. Sorted by `site_id`, `date`.
 | `amount` | DOUBLE | Amount as in the source, in `amount_unit`. |
 | `amount_unit` | VARCHAR | `kg/ha` (product or seed), `kg/ha fresh` (fresh mass, Qvidja), `m3/ha`, `L/ha`, or `animals` (grazing). |
 | `dm_fraction` | DOUBLE | Dry matter fraction of `amount` (0 to 1). |
-| `dry_mass_kg_ha` | DOUBLE | Harvest yield, kg DW/ha. Only `harvest` and `cut`. Qvidja: `amount × dm_fraction`; 2018-06-12: 1985 (Heimsch et al. 2021). Viikki: yield of the year, on the last harvest of the year. |
+| `dry_mass_kg_ha` | DOUBLE | Harvest yield, kg DW/ha. Only `harvest` and `cut`. Qvidja: `amount × dm_fraction`; 2018-06-12: 1985 (Heimsch et al. 2021). Viikki, Anttila and Särkisuo: yield of the year, on the last harvest of the year. |
 | `n_kg_ha` | DOUBLE | N input, kg N/ha. Only `fertilisation`. Source value (Viikki, Haltiala 2025), or the N share of the grade in the product name (Yara AXAN 27-0-1: 27 %, NPK 23-10-8: 23 %). Finnish saltpetre: NULL (no grade in the file). |
 | `c_g_m2` | DOUBLE | Carbon of the harvest or the organic input, g C m-2. Copied from `scripts/lib/calc/management.ts` (`cGm2()`) by `withCarbon()`: same site, same date, matching type. The report lists carbon rows that match no event. |
-| `area_ha` | DOUBLE | Area of the field parcel (Qvidja "Area of kasvulohko"), ha. |
+| `area_ha` | DOUBLE | Area of the field parcel, ha (Qvidja "Area of kasvulohko"; Anttila 6.4 and Särkisuo 7.1 from Shurpali et al. 2025, Table 2). |
 
 The rows come from a hand-typed table, `scripts/lib/events.ts`, because the repository has no xlsx, docx or pdf reader. Sources:
 
 - Haltiala: `haltiala_smear_management.xlsx` (2021 to 2025). The parcel card `haltiala_smear_Lohkokortit_2025.pdf` corrects one date: Jett Mn235 was applied on 2025-06-16 in a tank mix with the herbicide, not on 2025-05-16.
 - Qvidja: `Qvidja_management.xlsx` (2018 to 2025) and Table 1 of `Qvidja_C-balance.pdf` (Heimsch et al. 2021) for the 2018 and 2019 events that are not in the xlsx. If a harvest date differs by 1 or 2 days between the two, the xlsx date is used.
-- Viikki: `EC/Management Information.docx` (2022 to 2025). The yield of the year is in the detail and in `dry_mass_kg_ha` of the last harvest of the year. The N input of each application is in `n_kg_ha`.
-- Maktau: no dated events (only seasonal practice). Anttila and Särkisuo: no management data.
+- Viikki: `EC/Management Information.docx` (2022 to 2025). The yield of the year is in the detail and in `dry_mass_kg_ha` of the last harvest of the year. The N input of each application is in `n_kg_ha`. Two articles add to the docx: Gao et al. 2026 (`data/articles/Gao_2026_Cfootprint_milk-DNDC.pdf`, Table A2) gives the sowing of 2023-05-25 (barley 200 kg/ha with 20 kg/ha grass seed), and Vettikkat et al. 2026 (`data/articles/Vettikkat_2026_NH3-flux_SMEAR-Agri_mass-spec_EC.pdf`, Table 1) gives the product and the amount of the manure of 2023-04-27 (43 m3/ha of the separated solid fraction of cow manure, field Alaniitty 1, 6.86 ha) and the harrowing of 2023-04-28.
+- Anttila and Särkisuo: no management file. The rows come from Shurpali et al. 2025 (`data/articles/Shurpali_2025.pdf`, added 2026-10-23): the 2021 sowing (p. 2) and the 2022 events of Table 2 (fertilisation with kg N/ha, two cuts, herbicide, ditch work) with the parcel areas. The annual yield of 2022 (Table 4, 7.5 and 4.7 t DM/ha, grass carbon content 0.47) is on the second cut. The article has no 2023 data. Fertiliser products are not named.
+- Maktau: no management file. The rows come from Räsänen et al. 2026 (`data/articles/Räsänen_2026_kenia.pdf`, p. 3): the sowing and the harvest of the 2019 long rains and the harvest of 2020. No yields.
 
-Type rules: seeding and oversowing are `sowing`; herbicide, glyphosate and a micronutrient tank mix are `spraying`; harrowing, disc work, subsoiling, cultivation and crushing of the crop are `tillage` (as in the source files); a cleaning cut or a cut left on the field is `cut`; the EC installation is `other`.
+Only events with an exact day or a stated day range are rows. Type rules: seeding and oversowing are `sowing`; herbicide, glyphosate and a micronutrient tank mix are `spraying`; harrowing, disc work, subsoiling, cultivation and crushing of the crop are `tillage` (as in the source files); a cleaning cut or a cut left on the field is `cut`; the EC installation and ditch work are `other`.
+
+### Article facts that are not events
+
+These facts of the articles have no exact day, or they differ from the management file. They are not rows of `events.parquet`.
+
+- Anttila, 2020 (Shurpali et al. 2025, p. 2): ploughed and sown in May 2020 (timothy, tall fescue, barley as cover crop), barley harvested in August, glyphosate in September, autumn ploughing in November, bare soil over the winter. 2021: one whole crop harvest on 2 August (a row, no yield). The EC data start in 2022.
+- Särkisuo, 2020 (p. 2): fertilised early in May and in late June, grass harvested in June and August, glyphosate in late September, fallow over the winter. 2021: ploughing in June, whole crop harvest in July (month only). The EC data start in 2022.
+- Maktau (Räsänen et al. 2026): the 2020 sowing was in the third week of March (p. 3). The 2021 long rains gave 0.22 t/ha (p. 11, from Tuure et al. 2025, not in the repository); the 2022 long rains were a complete crop failure (p. 11). `Ancillary_KE-Mkt.csv` gives seasonal practice only: stover burning in June and July after the long rains and in January and February after the short rains, weeding and burning in March and April and in September and October, ox-plough tillage before sowing.
+- Qvidja (Heimsch et al. 2024, `data/articles/Heimsch_2024.pdf`, p. 2; `data/Qvidja/Qvidja.pdf` is the same file): grazing in August 2021 (8 cows, 6 days, rotational) and in August 2022 (9 cows, 9 days). The xlsx gives June 2021 (4 horses, 7 days) and June 2022 (9 cows, 15 days). The 2020 fertilisation was on about 26 May (p. 7, "one day after the fertilisation, i.e. on 27 May"); the xlsx gives 2020-05-25. Table 1 (p. 5) gives the annual carbon input and output per measurement year (4 May to 3 May).
+- Viikki (Gao et al. 2026, Table A2 and p. 3): yield 3000 kg/ha for the 2022 cuts (docx: 3673 kg DW/ha), 6595 kg/ha for the 2023 barley whole crop (docx: 6773; the article gives 17 August only), tillage on 2022-11-01 (docx: 2022-11-02), manure of 2023-04-27 with 1701 kg DM/ha and 12.9 kg N/ha (docx: 18.4 kg N/ha; Vettikkat et al. 2026: 18.5 kg TAN/ha). The docx values are used. Table A1 gives the crop history of the field 1996 to 2021.
 
 ## Sites
 

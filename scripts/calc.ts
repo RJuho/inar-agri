@@ -437,19 +437,19 @@ async function main(): Promise<void> {
              count(*) FILTER (WHERE action = 'grazing') AS n_grazing
       FROM management GROUP BY ALL)
     SELECT a.site_id, a.site_code, a.year, a.nee_f_gc, a.full_year, a.reliable,
-           CASE WHEN a.site_code IN ('qvidja', 'haltiala', 'viikki') THEN COALESCE(m.c_harvest, 0) END AS c_harvest,
-           CASE WHEN a.site_code IN ('qvidja', 'haltiala', 'viikki') THEN COALESCE(m.c_exo, 0) END AS c_exo,
+           CASE WHEN k.known THEN COALESCE(m.c_harvest, 0) END AS c_harvest,
+           CASE WHEN k.known THEN COALESCE(m.c_exo, 0) END AS c_exo,
            a.ch4_gc AS c_ch4,
            COALESCE(m.n_harvest, 0) AS n_harvest, COALESCE(m.n_harvest_unknown, 0) AS n_harvest_unknown, COALESCE(m.n_exo_unknown, 0) AS n_exo_unknown,
            COALESCE(m.n_assumed, 0) AS n_assumed, COALESCE(m.n_grazing, 0) AS n_grazing,
            CASE WHEN a.nee_f_gc IS NULL THEN NULL
-                WHEN a.site_code IN ('qvidja', 'haltiala', 'viikki') THEN -a.nee_f_gc - COALESCE(m.c_harvest, 0) + COALESCE(m.c_exo, 0) - COALESCE(a.ch4_gc, 0)
+                WHEN k.known THEN -a.nee_f_gc - COALESCE(m.c_harvest, 0) + COALESCE(m.c_exo, 0) - COALESCE(a.ch4_gc, 0)
                 WHEN a.site_code IN ('anttila', 'sarkisuo') THEN -a.nee_f_gc - COALESCE(a.ch4_gc, 0)
                 END AS necb,
-           (a.nee_f_gc IS NOT NULL AND a.full_year AND a.site_code IN ('qvidja', 'haltiala', 'viikki')
+           (a.nee_f_gc IS NOT NULL AND a.full_year AND k.known
             AND COALESCE(m.n_harvest_unknown, 0) = 0 AND COALESCE(m.n_exo_unknown, 0) = 0 AND COALESCE(m.n_assumed, 0) = 0 AND COALESCE(m.n_grazing, 0) = 0) AS necb_complete,
            CASE WHEN a.site_code = 'maktau' THEN 'No harvest data. NECB not computed.'
-                WHEN a.site_code IN ('anttila', 'sarkisuo') THEN 'No harvest data. NECB = -NEE - C_CH4 only.'
+                WHEN NOT k.known THEN 'No harvest data for this year. NECB = -NEE - C_CH4 only.'
                 WHEN a.nee_f_gc IS NULL THEN 'Incomplete year.'
                 ELSE concat_ws(' ',
                   CASE WHEN NOT a.full_year THEN 'Partial year.' END,
@@ -460,6 +460,13 @@ async function main(): Promise<void> {
                   CASE WHEN COALESCE(m.n_harvest, 0) = 0 THEN 'No harvest row.' END)
                 END AS note
     FROM annual a LEFT JOIN m USING (site_code, year)
+    -- known: the management of the site and year is known. Haltiala, Qvidja and Viikki have
+    -- a management file for all years (a year without a harvest row is a year without a
+    -- harvest). Anttila and Särkisuo have harvest data only for the years with a row
+    -- (2022, Shurpali et al. 2025). Maktau has none.
+    LEFT JOIN (SELECT a.site_code, a.year,
+                      a.site_code IN ('qvidja', 'haltiala', 'viikki') OR (a.site_code IN ('anttila', 'sarkisuo') AND COALESCE(m.n_harvest, 0) > 0) AS known
+               FROM annual a LEFT JOIN m USING (site_code, year)) k USING (site_code, year)
     ORDER BY a.site_id, a.year`);
 
   // 6. Validation

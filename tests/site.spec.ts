@@ -1564,7 +1564,9 @@ test.describe('events page', () => {
     await page.goto('/events/');
     await expect(page.locator('h1')).toHaveText('Events');
     const sites = await page.locator('table.events-table').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.site));
-    expect(sites).toEqual(['haltiala', 'qvidja', 'viikki']);
+    expect(sites).toEqual(['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau']);
+    // Anttila 2022: yield of the year 7500 kg DM/ha on the second cut (Shurpali et al. 2025).
+    await expect(page.locator('table[data-site="anttila"] tr[data-type="harvest"] td[data-col="yield"]', { hasText: '7500' })).toHaveCount(1);
     // Viikki 2022: yield of the year 3673 kg DW/ha on the second cut.
     await expect(page.locator('table[data-site="viikki"] tr[data-type="harvest"] td[data-col="yield"]', { hasText: '3673' })).toHaveCount(1);
     await expect(page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Events' })).toHaveAttribute('aria-current', 'page');
@@ -1840,8 +1842,9 @@ test.describe('month range and events', () => {
     const info = page.locator('#var-info-events');
     await expect(info).toBeVisible();
     const codes = await info.locator('li[data-site]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.site));
-    expect(codes.sort()).toEqual(['haltiala', 'qvidja', 'viikki']);
+    expect(codes.sort()).toEqual(['anttila', 'haltiala', 'maktau', 'qvidja', 'sarkisuo', 'viikki']);
     await expect(info.locator('li[data-site="qvidja"]')).toContainText('yield');
+    await expect(info.locator('li[data-site="anttila"]')).toContainText('2021–2022, 6 events');
     await expect(info.getByRole('link', { name: 'All events' })).toHaveAttribute('href', /\/events\/$/);
     // The button does not change the checkbox.
     await expect(page.locator('input[name="events"]')).not.toBeChecked();
@@ -1910,12 +1913,12 @@ test.describe('month range and events', () => {
   });
 });
 
-/** A Qvidja (site 4) view of 2022 with the given diagram types and events on or off. */
-function eventsView(id: string, sites: number[], events: boolean, types: string[] = ['timeseries', 'cumulative']) {
+/** A view of one year (default 2022) of the given sites with the given diagram types and events on or off. */
+function eventsView(id: string, sites: number[], events: boolean, types: string[] = ['timeseries', 'cumulative'], year = 2022) {
   return {
     id,
     name: `Events ${id}`,
-    params: { sites, variables: ['nee_f', 'ta'], xVariable: 'ta', yearFrom: 2022, yearTo: 2022, aggregation: 'day', events },
+    params: { sites, variables: ['nee_f', 'ta'], xVariable: 'ta', yearFrom: year, yearTo: year, aggregation: 'day', events },
     diagrams: types.map((type, i) => ({ id: `e${i}`, type })),
   };
 }
@@ -1969,11 +1972,23 @@ test.describe('events', () => {
     await expect(page.locator('.diagram-sub').first()).toContainText('Event markers');
   });
 
-  test('events on for Anttila only: alt text says no events', async ({ page }) => {
-    await page.goto('/' + viewHash(eventsView('ev2', [1], true)));
+  test('events on for Anttila 2023 only: alt text says no events', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev2', [1], true, undefined, 2023)));
     await waitReady(page);
     expect(await markLineXs(page, 0)).toEqual([]);
     expect(await altOf(page, 0)).toContain('No management events for the selected sites in this period.');
+  });
+
+  test('events on for Anttila 2022: markers of the article events', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev2b', [1], true)));
+    await waitReady(page);
+    // Shurpali et al. 2025: 2 fertilisations and 2 cuts in 2022.
+    const ts = (await markLineXs(page, 0)).filter((x) => x !== undefined);
+    expect(new Set(ts)).toEqual(new Set([Date.UTC(2022, 4, 23), Date.UTC(2022, 5, 21), Date.UTC(2022, 5, 22), Date.UTC(2022, 8, 8)]));
+    const alt = await altOf(page, 0);
+    expect(alt).toContain('Management events at Anttila');
+    expect(alt).toContain('harvest 2022-09-08');
+    expect(alt).toContain('7500');
   });
 
   test('events on: types without markers still get the alt text sentence', async ({ page }) => {

@@ -3,33 +3,33 @@
   "title": "Natural events and disturbances",
   "script": "scripts/deep-dives/natural-events.ts",
   "dataVersion": {
-    "generatedAt": "2026-10-22T16:37:47.724Z",
+    "generatedAt": "2026-10-23T06:49:57.575Z",
     "git": {
-      "commit": "bee0354",
+      "commit": "d651f8c",
       "dirty": true
     },
-    "dbBuiltAt": "2026-10-22T14:14:26.910Z",
-    "calcBuiltAt": "2026-10-22T14:14:27.785Z",
+    "dbBuiltAt": "2026-10-23T06:46:55.036Z",
+    "calcBuiltAt": "2026-10-23T06:49:08.021Z",
     "inputs": [
       {
         "path": "db/sites.parquet",
-        "bytes": 4119,
-        "sha256": "7170af3bcf5432286ddc1ccfa5144903d47b6fa7915198c0d98aa1703892e693"
+        "bytes": 4133,
+        "sha256": "673d3b4f0fd715d85fe1006d49def83e88b0afc7ba03d6f1e4426bc0ad5791a5"
       },
       {
         "path": "db/observations.parquet",
         "bytes": 23111672,
-        "sha256": "248ec27b237bdc579c1ab8d2eccf825f9601a2949bad2c7fea42e13720fc82f5"
+        "sha256": "688df866e3c5014760cd27639718dc498b5c9799bbfbfb56b24c9ec6e2543777"
       },
       {
         "path": "db/events.parquet",
-        "bytes": 6662,
-        "sha256": "79b0ada38e6d5be37eeb0d1111f52814861b1b7912be4ca03c224997edc87ab8"
+        "bytes": 7583,
+        "sha256": "c76c4711ad7d0d2531e70c097ac9559de183b8ed0b3c2ae5c6a14a64f4191573"
       },
       {
         "path": "data/calculated/daily.parquet",
         "bytes": 427350,
-        "sha256": "abfd3f722df5b639ac86b2353a18a9faaa86a867a763ae016286891b8acd0207"
+        "sha256": "5ae50b3eaf574856aa0a2758dc6638fc381534bed1b0dd1f5e7240fd36b5b947"
       }
     ]
   },
@@ -286,7 +286,7 @@
       ],
       "hasPrecip": true,
       "hasEvents": true,
-      "nEvents": 18,
+      "nEvents": 19,
       "heatLimitC": 25,
       "swcP10": 0.1346996267,
       "swcP90": 0.4960393056,

@@ -6,7 +6,9 @@
 //
 // Carbon fraction per site (user decision 2026-10-21): Qvidja 0.42
 // (Heimsch et al. 2021, 2024), Haltiala 0.50 (the xlsx gives kg C/ha that
-// equal 0.50 x kg DW/ha), Viikki 0.42 as an assumption.
+// equal 0.50 x kg DW/ha), Viikki 0.42 as an assumption. Anttila and
+// Särkisuo 0.47 (Shurpali et al. 2025, Table 4, added 2026-10-23); these
+// two sites have harvest data for 2022 only.
 //
 // Design: docs/calculated.md.
 
@@ -34,6 +36,7 @@ const QV_2021 = 'data/Qvidja/Qvidja_C-balance.pdf (Heimsch et al. 2021, Table 1)
 const QV_2024 = 'data/Qvidja/Qvidja.pdf (Heimsch et al. 2024)';
 const HA_XLSX = 'data/Haltiala/haltiala_smear_management.xlsx';
 const VI_DOCX = 'data/Viikki/EC/Management Information.docx';
+const SH_2025 = 'data/articles/Shurpali_2025.pdf (Shurpali et al. 2025, Table 4)';
 
 const qvHarvest = (date: string, fresh: number, dm: number, note = ''): ManagementRow => ({
   site: 'qvidja', date, action: 'harvest', product: 'silage feed, whole crop', fresh_kg_ha: fresh, dm_fraction: dm, dry_mass_kg_ha: null,
@@ -134,6 +137,15 @@ export const MANAGEMENT_CARBON: ManagementRow[] = [
   {
     site: 'viikki', date: '2025-09-10', action: 'harvest', product: 'faba beans', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: 1973.7,
     c_fraction: 0.42, c_fraction_source: 'assumed', c_g_m2: null, source: VI_DOCX, note: 'Yield 1973.7 kg DW/ha (docx). C fraction 0.42 assumed.',
+  },
+  // ---- Anttila and Särkisuo: Shurpali et al. 2025 give the annual yield of 2022 and the grass C content.
+  {
+    site: 'anttila', date: '2022-09-08', action: 'harvest', product: 'grass, two cuts (21 June and 8 September)', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: 7500,
+    c_fraction: 0.47, c_fraction_source: 'site', c_g_m2: null, source: SH_2025, note: 'Yield of the year 2022, 7.5 t DM/ha (Table 4). Grass C content 0.47 from the paper.',
+  },
+  {
+    site: 'sarkisuo', date: '2022-08-15', action: 'harvest', product: 'grass, two cuts (30 June and 15 August)', fresh_kg_ha: null, dm_fraction: null, dry_mass_kg_ha: 4700,
+    c_fraction: 0.47, c_fraction_source: 'site', c_g_m2: null, source: SH_2025, note: 'Yield of the year 2022, 4.7 t DM/ha (Table 4). Grass C content 0.47 from the paper.',
   },
 ];
 

@@ -3,38 +3,38 @@
   "title": "Size of management disturbances",
   "script": "scripts/deep-dives/disturbance-size.ts",
   "dataVersion": {
-    "generatedAt": "2026-10-22T13:35:35.131Z",
+    "generatedAt": "2026-10-23T06:49:55.469Z",
     "git": {
-      "commit": "07852be",
+      "commit": "d651f8c",
       "dirty": true
     },
-    "dbBuiltAt": "2026-10-22T08:03:46.675Z",
-    "calcBuiltAt": "2026-10-22T09:39:20.819Z",
+    "dbBuiltAt": "2026-10-23T06:46:55.036Z",
+    "calcBuiltAt": "2026-10-23T06:49:08.021Z",
     "inputs": [
       {
         "path": "db/events.parquet",
-        "bytes": 6662,
-        "sha256": "af4b091f51114099849461c2c1b31812c3997667e52fd5803dca0fd4ef56483c"
+        "bytes": 7583,
+        "sha256": "c76c4711ad7d0d2531e70c097ac9559de183b8ed0b3c2ae5c6a14a64f4191573"
       },
       {
         "path": "db/sites.parquet",
-        "bytes": 3956,
-        "sha256": "643050ad56d1bc507356be4c2882b66ead6a4fc3f600c36eedf3083eb42665ba"
+        "bytes": 4133,
+        "sha256": "673d3b4f0fd715d85fe1006d49def83e88b0afc7ba03d6f1e4426bc0ad5791a5"
       },
       {
         "path": "db/observations.parquet",
         "bytes": 23111672,
-        "sha256": "3728ce5ab2c8e9238884ef3b40217d3406ce604f9292e5a40e27d9c98dbe972f"
+        "sha256": "688df866e3c5014760cd27639718dc498b5c9799bbfbfb56b24c9ec6e2543777"
       },
       {
         "path": "data/calculated/daily.parquet",
         "bytes": 427350,
-        "sha256": "a805ad3b1379a625e21c38666c594cd109f8d8caae957f87206978034c6db5de"
+        "sha256": "5ae50b3eaf574856aa0a2758dc6638fc381534bed1b0dd1f5e7240fd36b5b947"
       },
       {
         "path": "data/calculated/fluxes_30min.parquet",
         "bytes": 29135406,
-        "sha256": "97ae485b220b71089ec09c750b7293d09c95e5f7d35ce7fe9d53a20afa559a93"
+        "sha256": "0bf5e2088c9016dc39510c9779d977c5a294c8125f03b46ca28ebccd080db4f7"
       }
     ]
   },
@@ -145,7 +145,7 @@
     }
   },
   "counts": {
-    "events": 83,
+    "events": 84,
     "classEvents": 71,
     "perType": {
       "harvest": 21,
@@ -153,7 +153,7 @@
       "grazing": 5,
       "fertilisation": 22,
       "tillage": 17,
-      "sowing": 7,
+      "sowing": 8,
       "spraying": 4,
       "other": 1
     },
@@ -186,7 +186,7 @@
     "withSwcBaseline": 22,
     "withExcess": 32,
     "withLate": 32,
-    "withOtherEvents": 11,
+    "withOtherEvents": 12,
     "sensitivity": 42,
     "frozenSwcDays": 789,
     "swcDaysTotal": 5569,
@@ -236,7 +236,7 @@
       "name": "Viikki",
       "siteId": 5,
       "slot": 4,
-      "events": 18,
+      "events": 19,
       "episodes": 13,
       "fluxUsed": 9,
       "swcUsed": 9,
@@ -11328,7 +11328,7 @@
           "dateEnd": null,
           "type": "fertilisation",
           "crop": "Dry manure",
-          "detail": "Dry manure, 18.4 kg N/ha",
+          "detail": "Dry manure (separated solid fraction of cow manure, 43 m3/ha, 18.5 kg TAN/ha), 18.4 kg N/ha",
           "dryMassKgHa": null,
           "nKgHa": 18.4
         },
@@ -11337,7 +11337,7 @@
           "dateEnd": null,
           "type": "tillage",
           "crop": null,
-          "detail": "Tillage",
+          "detail": "Levelling harrow, about 5 cm, manure worked in",
           "dryMassKgHa": null,
           "nKgHa": null
         }
@@ -11456,6 +11456,11 @@
           "date": "2023-05-25",
           "type": "fertilisation",
           "detail": "Mineral N, 67.5 kg N/ha"
+        },
+        {
+          "date": "2023-05-25",
+          "type": "sowing",
+          "detail": "Barley, 200 kg/ha, undersown with mixed grass seed, 20 kg/ha"
         },
         {
           "date": "2023-05-25",
@@ -18934,7 +18939,7 @@
           "dateEnd": null,
           "type": "fertilisation",
           "crop": "Dry manure",
-          "detail": "Dry manure, 18.4 kg N/ha",
+          "detail": "Dry manure (separated solid fraction of cow manure, 43 m3/ha, 18.5 kg TAN/ha), 18.4 kg N/ha",
           "dryMassKgHa": null,
           "nKgHa": 18.4
         },
@@ -18943,7 +18948,7 @@
           "dateEnd": null,
           "type": "tillage",
           "crop": null,
-          "detail": "Tillage",
+          "detail": "Levelling harrow, about 5 cm, manure worked in",
           "dryMassKgHa": null,
           "nKgHa": null
         }
@@ -19062,6 +19067,11 @@
           "date": "2023-05-25",
           "type": "fertilisation",
           "detail": "Mineral N, 67.5 kg N/ha"
+        },
+        {
+          "date": "2023-05-25",
+          "type": "sowing",
+          "detail": "Barley, 200 kg/ha, undersown with mixed grass seed, 20 kg/ha"
         },
         {
           "date": "2023-05-25",
@@ -19244,7 +19254,13 @@
         "after": 2.479447906,
         "delta": -2.285859062
       },
-      "otherEvents": []
+      "otherEvents": [
+        {
+          "date": "2023-05-25",
+          "type": "sowing",
+          "detail": "Barley, 200 kg/ha, undersown with mixed grass seed, 20 kg/ha"
+        }
+      ]
     },
     {
       "id": "viikki-2023-08-17",

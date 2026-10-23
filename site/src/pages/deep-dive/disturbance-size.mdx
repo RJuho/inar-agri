@@ -91,9 +91,11 @@ before the episode over <Num k="method.excessDays" digits={0} /> days.
 
 ## Data and method
 
-**Events.** We used the management files of the three sites with dated events
-<Cite ids={['qvidja-management', 'viikki-management', 'haltiala-management']} />. The build stores them in
-`db/events.parquet`: <Num k="counts.events" digits={0} /> events. We analysed four classes:
+**Events.** We used the dated events of Haltiala, Qvidja and Viikki, from their management files
+<Cite ids={['qvidja-management', 'viikki-management', 'haltiala-management']} /> (one Viikki sowing comes from an
+article, see the Events page). The build stores them in `db/events.parquet`: <Num k="counts.events" digits={0} /> events
+of these three sites. The events of Anttila, Särkisuo and Maktau from the articles were added to the database after
+this dive was computed and are not analysed. We analysed four classes:
 *harvest or cut* (<Num k="counts.perType.harvest" digits={0} /> harvests and <Num k="counts.perType.cut" digits={0} /> cuts),
 *grazing* (<Num k="counts.perType.grazing" digits={0} />, all at Qvidja), *fertilisation* (<Num k="counts.perType.fertilisation" digits={0} />)
 and *tillage* (<Num k="counts.perType.tillage" digits={0} />). Sowing (<Num k="counts.perType.sowing" digits={0} />),

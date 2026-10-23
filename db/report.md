@@ -1,16 +1,16 @@
 # Build report: harmonised core database
 
-Built 2026-10-22T14:14:26.910Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
+Built 2026-10-23T06:46:55.036Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
 
 ## Output files
 
 | File | Rows | Bytes |
 |---|---|---|
 | db/observations.parquet | 537980 | 23111672 |
-| db/sites.parquet | 6 | 4119 |
+| db/sites.parquet | 6 | 4133 |
 | db/variables.parquet | 26 | 2137 |
 | db/site_variables.parquet | 185 | 7734 |
-| db/events.parquet | 83 | 6662 |
+| db/events.parquet | 101 | 7583 |
 
 ## Management events
 
@@ -18,6 +18,14 @@ Rows of events.parquet per site and type, and the rows with a yield (kg DW/ha), 
 
 | Site | Type | Events | With yield | With C | With N |
 |---|---|---|---|---|---|
+| anttila | fertilisation | 2 | 0 | 0 | 2 |
+| anttila | harvest | 3 | 1 | 1 | 0 |
+| anttila | sowing | 1 | 0 | 0 | 0 |
+| sarkisuo | fertilisation | 2 | 0 | 0 | 2 |
+| sarkisuo | harvest | 2 | 1 | 1 | 0 |
+| sarkisuo | other | 2 | 0 | 0 | 0 |
+| sarkisuo | sowing | 1 | 0 | 0 | 0 |
+| sarkisuo | spraying | 1 | 0 | 0 | 0 |
 | haltiala | fertilisation | 6 | 0 | 0 | 2 |
 | haltiala | harvest | 4 | 3 | 3 | 0 |
 | haltiala | other | 1 | 0 | 0 | 0 |
@@ -32,7 +40,10 @@ Rows of events.parquet per site and type, and the rows with a yield (kg DW/ha), 
 | qvidja | tillage | 1 | 0 | 0 | 0 |
 | viikki | fertilisation | 7 | 0 | 0 | 7 |
 | viikki | harvest | 6 | 4 | 4 | 0 |
+| viikki | sowing | 1 | 0 | 0 | 0 |
 | viikki | tillage | 5 | 0 | 0 | 0 |
+| maktau | harvest | 2 | 0 | 0 | 0 |
+| maktau | sowing | 1 | 0 | 0 | 0 |
 
 Carbon rows of the management table that match no event (same site, date and type):
 
