@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { bootstrapMeanCi, incompleteBeta, pearsonP, tTestP, finite, mean, median, ols, pearson, quantile, rng, sd, summarise } from './stats.ts';
+import { bootstrapMeanCi, incompleteBeta, pearsonP, tTestP, finite, mean, median, ols, olsMulti, pearson, predictMulti, quantile, rng, sd, summarise } from './stats.ts';
 
 test('mean, sd and median of a small list', () => {
   assert.equal(mean([1, 2, 3, 4]), 2.5);
@@ -61,4 +61,39 @@ test('p-values of t and of a Pearson r match reference values', () => {
   assert.ok(Math.abs(incompleteBeta(0.5, 2, 2) - 0.5) < 1e-12);
   assert.equal(pearsonP(null, 10), null);
   assert.equal(pearsonP(0.9, 2), null);
+});
+
+test('olsMulti finds the exact coefficients of a two-predictor plane', () => {
+  const X = [
+    [1, 2],
+    [2, 1],
+    [3, 5],
+    [4, 3],
+    [5, 8],
+    [6, 2],
+  ];
+  const y = X.map(([a, b]) => 1.5 + 2 * a! - 0.5 * b!);
+  const fit = olsMulti(X, y)!;
+  assert.equal(fit.n, 6);
+  assert.ok(Math.abs(fit.coef[0]! - 1.5) < 1e-9);
+  assert.ok(Math.abs(fit.coef[1]! - 2) < 1e-9);
+  assert.ok(Math.abs(fit.coef[2]! + 0.5) < 1e-9);
+  assert.ok(fit.residSd < 1e-9);
+  assert.ok(Math.abs(fit.r2 - 1) < 1e-12);
+  assert.ok(Math.abs(predictMulti(fit.coef, [10, 4]) - (1.5 + 20 - 2)) < 1e-9);
+});
+
+test('olsMulti with one predictor equals ols, and gives null when it cannot fit', () => {
+  const xs = [1, 2, 3, 4, 5, 7];
+  const ys = [2.1, 3.9, 6.2, 7.8, 10.1, 14.5];
+  const a = ols(xs, ys)!;
+  const b = olsMulti(xs.map((x) => [x]), ys)!;
+  assert.ok(Math.abs(b.coef[0]! - a.intercept) < 1e-9);
+  assert.ok(Math.abs(b.coef[1]! - a.slope) < 1e-9);
+  assert.ok(b.r2 > 0.99 && b.r2 < 1);
+  assert.ok(Math.abs(b.residuals.reduce((s, r) => s + r, 0)) < 1e-9);
+  // n <= k + 2
+  assert.equal(olsMulti([[1], [2], [3]], [1, 2, 3]), null);
+  // Collinear predictors: singular.
+  assert.equal(olsMulti([[1, 2], [2, 4], [3, 6], [4, 8], [5, 10]], [1, 2, 3, 4, 5]), null);
 });

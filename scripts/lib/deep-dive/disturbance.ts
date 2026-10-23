@@ -27,11 +27,11 @@ export function classify(type: string): EventClass | null {
 
 /**
  * Mineral or organic fertiliser, from the detail text of the event. Mineral products: the text
- * says "mineral", or names a mineral product (saltpetre, AXAN, Typpi, CAN, NPK with a grade).
+ * says "mineral" or "synthetic", or names a mineral product (saltpetre, AXAN, Typpi, CAN, NPK with a grade).
  * All other products (manure, compost, molasses, by-products, own mixes) are organic.
  */
 export function fertiliserKind(detail: string): FertKind {
-  return /\bmineral\b|saltpetre|salpietari|\bAXAN\b|\bTyppi\b|\bCAN\b/i.test(detail) ? 'mineral' : 'organic';
+  return /\bmineral\b|\bsynthetic\b|saltpetre|salpietari|\bAXAN\b|\bTyppi\b|\bCAN\b/i.test(detail) ? 'mineral' : 'organic';
 }
 
 /** One event of db/events.parquet with its class. */

@@ -211,3 +211,75 @@ export function summarise(values: readonly (number | null | undefined)[], seed =
     nPositive: xs.filter((x) => x > 0).length,
   };
 }
+
+/** Result of a multiple linear regression. `coef[0]` is the intercept, `coef[j]` the slope of predictor j. */
+export interface OlsMultiFit {
+  coef: number[];
+  residuals: number[];
+  /** Residual standard deviation, √(SSE / (n − k − 1)). */
+  residSd: number;
+  r2: number;
+  n: number;
+}
+
+/**
+ * Ordinary least squares with k predictors: y = b0 + b1·x1 + … + bk·xk. The function adds the
+ * intercept. It solves the normal equations with Gaussian elimination and partial pivoting.
+ * Null when n ≤ k + 2 (too few rows for a useful residual SD) or when the system is singular.
+ */
+export function olsMulti(X: readonly (readonly number[])[], y: readonly number[]): OlsMultiFit | null {
+  if (X.length !== y.length) throw new Error('olsMulti: X and y have different lengths');
+  const n = y.length;
+  if (n === 0) return null;
+  const k = X[0]!.length;
+  if (X.some((row) => row.length !== k)) throw new Error('olsMulti: rows of X have different lengths');
+  if (n <= k + 2) return null;
+  const p = k + 1;
+  // Normal equations A b = c with A = Z'Z, c = Z'y, Z = [1, X].
+  const a: number[][] = Array.from({ length: p }, () => new Array<number>(p + 1).fill(0));
+  for (let i = 0; i < n; i++) {
+    const z = [1, ...X[i]!];
+    for (let r = 0; r < p; r++) {
+      for (let c = 0; c < p; c++) a[r]![c]! += z[r]! * z[c]!;
+      a[r]![p]! += z[r]! * y[i]!;
+    }
+  }
+  // Scale for the singularity test.
+  let scale = 0;
+  for (let r = 0; r < p; r++) scale = Math.max(scale, Math.abs(a[r]![r]!));
+  const eps = 1e-12 * (scale || 1);
+  for (let col = 0; col < p; col++) {
+    let piv = col;
+    for (let r = col + 1; r < p; r++) if (Math.abs(a[r]![col]!) > Math.abs(a[piv]![col]!)) piv = r;
+    if (Math.abs(a[piv]![col]!) <= eps) return null;
+    [a[col], a[piv]] = [a[piv]!, a[col]!];
+    for (let r = col + 1; r < p; r++) {
+      const f = a[r]![col]! / a[col]![col]!;
+      for (let c = col; c <= p; c++) a[r]![c]! -= f * a[col]![c]!;
+    }
+  }
+  const coef = new Array<number>(p).fill(0);
+  for (let r = p - 1; r >= 0; r--) {
+    let s = a[r]![p]!;
+    for (let c = r + 1; c < p; c++) s -= a[r]![c]! * coef[c]!;
+    coef[r] = s / a[r]![r]!;
+  }
+  if (!coef.every(Number.isFinite)) return null;
+  const residuals = y.map((yi, i) => yi - predictMulti(coef, X[i]!));
+  const my = mean(y)!;
+  let sse = 0;
+  let sst = 0;
+  for (let i = 0; i < n; i++) {
+    sse += residuals[i]! ** 2;
+    sst += (y[i]! - my) ** 2;
+  }
+  return { coef, residuals, residSd: Math.sqrt(sse / (n - p)), r2: sst === 0 ? 0 : 1 - sse / sst, n };
+}
+
+/** Value of a fit of olsMulti at the predictors x (without the intercept term). */
+export function predictMulti(coef: readonly number[], x: readonly number[]): number {
+  if (x.length !== coef.length - 1) throw new Error('predictMulti: wrong number of predictors');
+  let s = coef[0]!;
+  for (let j = 0; j < x.length; j++) s += coef[j + 1]! * x[j]!;
+  return s;
+}

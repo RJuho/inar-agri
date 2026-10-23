@@ -1757,6 +1757,29 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
+  test('the disturbance detail dive has the fixed sections, six figures, three tables and numbers from the JSON', async ({ page }) => {
+    await page.goto('/deep-dive/disturbance-detail/');
+    await expect(page.locator('h1')).toHaveText('Management disturbances in detail: cut, harvest, timing and weather');
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #4');
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    expect(await page.locator('main h3').allInnerTexts()).toEqual(['Cut or harvest', 'Timing', 'Fertilisation or weather']);
+    const figures = page.locator('figure.dd-figure svg[role="img"]');
+    expect(await figures.count()).toBe(6);
+    for (const svg of await figures.all()) expect((await svg.getAttribute('aria-label'))?.length ?? 0).toBeGreaterThan(40);
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(60);
+    // The group table, the harvest episode table and the fertilisation table.
+    expect(await page.locator('tr[id^="group-"]').count()).toBeGreaterThanOrEqual(3);
+    expect(await page.locator('tr[id^="episode-"]').count()).toBeGreaterThanOrEqual(25);
+    expect(await page.locator('tr[id^="fert-"]').count()).toBeGreaterThanOrEqual(10);
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    // The short answer links to the first disturbance dive.
+    await expect(page.locator('main a[href$="deep-dive/disturbance-size/"]').first()).toBeVisible();
+    await expectOnlyUpdateScript(page);
+  });
+
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -1774,7 +1797,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);

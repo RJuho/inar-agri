@@ -34,6 +34,7 @@ test('classify maps the event types to the four classes', () => {
 
 test('fertiliserKind reads the detail text', () => {
   assert.equal(fertiliserKind('Finnish saltpetre (Suomen salpietari), 320 kg/ha'), 'mineral');
+  assert.equal(fertiliserKind('Synthetic N fertiliser, 52 kg N/ha, product not given'), 'mineral');
   assert.equal(fertiliserKind('Yara AXAN 27-0-1, 200 kg/ha'), 'mineral');
   assert.equal(fertiliserKind('Viljelijän Typpi 26-S4, 300 kg/ha (78 kg N/ha)'), 'mineral');
   assert.equal(fertiliserKind('CAN mineral fertiliser, 108 kg N/ha'), 'mineral');
