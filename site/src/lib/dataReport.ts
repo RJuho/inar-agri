@@ -65,7 +65,7 @@ export interface Finding {
 /** Date of the scan and of the report. */
 export const SCAN = {
   date: '2026-10-21',
-  updated: '2026-10-22',
+  updated: '2026-10-23',
   command: 'npm run scan:anomalies',
   checks: 16,
   columns: 22,
@@ -81,7 +81,7 @@ export const FINDINGS: Finding[] = [
   { id: 'VII-01', site: 'Viikki', variable: 'all', severity: 'S1', finding: 'Raw stamps are UTC, period start; the build reads them as UTC+2. SWin centroid at hour 10.1 to 10.4.', impact: 'All values 2 h early', status: 'provider' },
   { id: 'VII-06', site: 'Viikki', variable: 'n2o', severity: 'S1', finding: 'Unit `ug m-2 s-1` can be µg N2O or µg N2O-N. 2022: 16.8 kg N2O ha⁻¹.', impact: 'Factor 1.57 on all N2O if the unit is N2O-N', status: 'provider' },
   { id: 'SAR-04', site: 'Särkisuo', variable: 'tsoil', severity: 'S2', finding: 'Constant 0.2 °C for 33 days in 2023-03 and most of winter 2022-23.', impact: 'Flat winter tsoil (sensor floor or zero curtain)', status: 'provider' },
-  { id: 'HAL-03', site: 'Haltiala', variable: 'swc', severity: 'S2', finding: '2021 medians 0.46 to 0.51, 0.06 to 0.10 above the later years.', impact: '2021 not comparable with the later years', status: 'provider' },
+  { id: 'HAL-03', site: 'Haltiala', variable: 'swc', severity: 'S2', finding: '2021 medians 0.46 to 0.51, 0.06 to 0.10 above the later years.', impact: 'Provider confirmed 2026-10-23: the 2021 values are correct and are used', status: 'resolved', note: '2026-10-23' },
   { id: 'QVI-03', site: 'Qvidja', variable: 'swc', severity: 'S2', finding: 'Drops of 0.3 to 0.4 when the soil is frozen.', impact: 'Low winter means (sensor physics, kept)', status: 'resolved' },
   { id: 'QVI-04', site: 'Qvidja', variable: 'rh, vpd', severity: 'S2', finding: 'Dry bias before 2021-10-08; RH 46.3 % at −5 °C in 2021-02.', impact: 'Not comparable before 2021-10', status: 'provider' },
   { id: 'QVI-07', site: 'Qvidja', variable: 'nee_f, gpp_src, reco_src', severity: 'S2', finding: 'Daytime partitioning: NEE ≠ Reco − GPP in 26 to 48 % of the periods.', impact: 'Budget bars do not add up', status: 'resolved' },
@@ -167,6 +167,27 @@ export interface ChangeLogEntry {
 
 /** Newest entry first. */
 export const CHANGE_LOG: ChangeLogEntry[] = [
+  {
+    id: 'change-2026-10-23-hal-03',
+    date: '2026-10-23',
+    title: 'Haltiala soil water 2021 confirmed by the provider',
+    site: 'Haltiala',
+    variable: 'swc',
+    findings: ['HAL-03'],
+    summary: [
+      'The provider confirmed that the 2021 level of `swc` is correct. The finding HAL-03 is resolved.',
+      'The build and the database do not change. Deep Dives #1 to #3 keep their snapshots. Deep Dive #1 did not use the Haltiala soil water of 2021. New analyses use the 2021 values.',
+    ],
+    facts: [
+      { term: 'Provider', value: 'Haltiala data provider, 2026-10-23' },
+      { term: 'Finding', value: 'HAL-03 (2021 medians 0.46 to 0.51, 0.06 to 0.10 above the later years)' },
+    ],
+    formulas: [],
+    tables: [],
+    openPoints: [],
+    openQuestions: [],
+    doc: 'docs/anomaly-data-report.md',
+  },
   {
     id: 'change-2026-10-23-article-events',
     date: '2026-10-23',

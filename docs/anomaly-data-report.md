@@ -1,6 +1,6 @@
 # Anomaly report: site variables (scan of 2026-10-21)
 
-Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Update 2026-10-22: QVI-01 resolved; the Qvidja `swc` is now converted from volts to m³ m⁻³ (the numbers of QVI-02 and QVI-03 are raw `SM` values in V). New finding QVI-16 (2026-10-22): 17 950 Qvidja `swc` values in frozen soil, open. Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
+Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Update 2026-10-23: HAL-03 resolved (provider confirmed the 2021 `swc` values). Update 2026-10-22: QVI-01 resolved; the Qvidja `swc` is now converted from volts to m³ m⁻³ (the numbers of QVI-02 and QVI-03 are raw `SM` values in V). New finding QVI-16 (2026-10-22): 17 950 Qvidja `swc` values in frozen soil, open. Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
 
 ## Summary
 
@@ -11,7 +11,7 @@ Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21
 - Qvidja NEE (S2, open): the annual NEE sums of the file are 25 to 109 g C m-2 more negative than Heimsch 2024 Table 1. The file is probably a different processing version (QVI-11). Qvidja GPP and Reco come from a daytime method and do not close with NEE (QVI-07).
 - Viikki N2O (S1 if wrong, open): the header unit `ug m-2 s-1` can be µg N2O or µg N2O-N. The build assumes µg N2O. The 2022 sum is 16.8 kg N2O ha-1 after 108 kg N ha-1 (VII-06).
 - Maktau (S2): `FC` repeats one value for up to 25 periods in 2024-04 to 2024-07, 11 % of the 2024 NEE values (MKT-03). The logger stored day-time rows only from 2023-07 to 2024-01 (MKT-01). Day-time `ta` in 2024 is 1.5 to 2.8 °C above the earlier years; the sonic temperature of the EC system shows the same rise, so the warm 2024 is probably real (MKT-08).
-- Haltiala `swc` 2021 (S2, open): the level is 0.06 to 0.10 above the later years (HAL-03).
+- Haltiala `swc` 2021 (S2, resolved: provider confirmed the values on 2026-10-23): the level is 0.06 to 0.10 above the later years (HAL-03).
 - Radiometers (S3 for winter sums): the CNR4 night offset at Anttila stepped from −1 to −5 W m-2 on 2022-10-14, and at Särkisuo to −6 W m-2 from 2023-08-08. Viikki has −7 W m-2 at night (ANT-02, SAR-02, VII-02).
 
 Findings per site and severity (counts of findings, not of flags):
@@ -67,7 +67,7 @@ Sorted by severity, then site. The details are in the site sections.
 | VII-01 | Viikki | all | 2022 to 2025 | G | SWin centroid 10.1 to 10.4 raw | 12.1 to 12.2 for UTC+2 | new (verified) | S1 | all values 2 h early | ask provider, then build rule |
 | VII-06 | Viikki | n2o | 2022, all years | D | 16.8 kg N2O ha-1 in 2022 | unit µg N2O or µg N2O-N | open question | S1 if wrong | factor 1.57 on all N2O | ask provider |
 | SAR-04 | Särkisuo | tsoil | winter 2022-23 | B, E, F9 | 0.2 °C for 33 days in 2023-03 | zero curtain, or sensor floor | open question | S2 if sensor, S4 if real | flat winter tsoil | ask provider |
-| HAL-03 | Haltiala | swc | 2021-05 to 2021-11 | D | medians 0.46 to 0.51 | 0.26 to 0.44 as later years | open question | S2 | 2021 not comparable | ask provider |
+| HAL-03 | Haltiala | swc | 2021-05 to 2021-11 | D | medians 0.46 to 0.51 | 0.26 to 0.44 as later years | resolved (provider confirmed 2026-10-23) | S2 | none | none |
 | QVI-03 | Qvidja | swc | winters 2021 to 2025 | D | drops of 0.3 to 0.4 in frozen soil | sensor physics (article) | known | S2 | low winter means | document |
 | QVI-04 | Qvidja | rh, vpd | 2018-05 to 2021-10 | D, N, B | RH 46.3 % at −5 °C in 2021-02 | 80 to 95 % | known; new for 2021-01 to 06 | S2 | not comparable before 2021-10 | ask provider |
 | QVI-07 | Qvidja | nee_f, gpp_src, reco_src | all years | F6, F7 | NEE ≠ Reco − GPP in 26 to 48 % | equal (night-time method) | known | S2 | budget bars do not add up | document |
@@ -450,10 +450,10 @@ File: `data/Haltiala/haltiala.csv` (`TIMESTAMP_START` in UTC+2, missing `NA`, 81
 - Expected: the same autumn saturation level each year. The field polygon and the tower did not move (ReadMe, `geodata/`).
 - Raw rows: in the raw file. 2021-11 median 0.51, p90 0.53; 2022-11 median 0.43.
 - Control: Qvidja `swc` 2021-08 0.83 against 0.59 in other years (wet August, P 197 mm against 93 mm median), but 2021-11 0.89 against 0.90: the Qvidja autumn level did not change. Haltiala events: barley harvest 2021-09-10 and 09-15; tillage 2022-04-29 and 2022-05-03.
-- Probable cause: open; a sensor re-installation at the 2022 tillage, or a different calibration in the first season. The ReadMe says `SWC_010_F` was a predictor "where available for the whole year", so the 2021 column can come from a different sensor or fill. Alternative tested (a constant offset of the 2021 column): the dry end of 2021 equals the later years (annual minimum 0.26 against 0.25 to 0.29; July median 0.33 against 0.26 to 0.34; 5th percentile 0.31 against 0.26 to 0.32), so a constant offset is excluded. A higher saturation level in 2021 (before the 2022 tillage) or a wet 2021 autumn remains possible; Haltiala has no rain column to test it.
-- Status / Severity: open question / S2
-- Effect: `swc` 2021 is not comparable with 2022 to 2025 on the website (`years`, `monthly`, `fingerprint`). No effect on `calc.ts`.
-- Next action: ask provider (was the SWC sensor moved, replaced or recalibrated between the 2021 and 2022 seasons; was 2021 SWC gap-filled from another source?).
+- Probable cause: real. The provider confirmed the 2021 values on 2026-10-23. The higher level in the first season is real. Earlier analysis (history): a sensor re-installation at the 2022 tillage, or a different calibration in the first season. The ReadMe says `SWC_010_F` was a predictor "where available for the whole year", so the 2021 column can come from a different sensor or fill. Alternative tested (a constant offset of the 2021 column): the dry end of 2021 equals the later years (annual minimum 0.26 against 0.25 to 0.29; July median 0.33 against 0.26 to 0.34; 5th percentile 0.31 against 0.26 to 0.32), so a constant offset is excluded. A higher saturation level in 2021 (before the 2022 tillage) or a wet 2021 autumn remains possible; Haltiala has no rain column to test it.
+- Status / Severity: resolved (provider confirmed the data on 2026-10-23) / S2
+- Effect: none. The values are used.
+- Next action: none.
 - Verify:
   ```sql
   SELECT strftime(tl,'%Y-%m') m, round(median(swc),2) med FROM (SELECT strptime(TIMESTAMP_START,'%Y-%m-%d %H:%M') tl, try_cast(SWC_010_F AS DOUBLE) swc FROM read_csv('data/Haltiala/haltiala.csv', all_varchar=true, nullstr='NA')) WHERE month(tl)=11 GROUP BY m ORDER BY m;
@@ -1228,7 +1228,7 @@ ICOS / Shurpali group (Anttila, Särkisuo):
 
 Haltiala provider:
 
-5. Was the SWC sensor moved, replaced or recalibrated between the 2021 and 2022 seasons? Was the 2021 `SWC_010_F` gap-filled from another source? (HAL-03)
+5. Was the SWC sensor moved, replaced or recalibrated between the 2021 and 2022 seasons? Was the 2021 `SWC_010_F` gap-filled from another source? (HAL-03) — Answered 2026-10-23: the provider confirmed the values; the data is correct and is used.
 6. Is a 3-decimal `SWC_010` available? (HAL-01)
 
 FMI (Qvidja, Mika Korkiakoski):
