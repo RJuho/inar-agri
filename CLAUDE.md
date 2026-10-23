@@ -160,7 +160,7 @@ A Deep Dive is a short article that an AI assistant writes from our data. Each d
 
 - Use subagents to keep the context window of the main agent small. Give them the tasks that read much text: read PDFs and long files, explore the data, run builds and tests, and draft long parts. The main agent keeps the decisions and the final text.
 - Give each subagent a clear and short brief: the goal, the files to read, the limits, and the output that you want back (a short summary, not file dumps).
-- Use the model that fits the task. Examples: Opus for the question, the method, the script and the article; Sonnet for an independent recompute and for code or test runs; Haiku for searches, simple checks and the language review. The verification steps below must use different models.
+- Use the model that fits the task. The models are Fable, Opus, Sonnet and Haiku. Examples: Fable for difficult method decisions and as a further independent reviewer; Opus for the question, the method, the script and the article; Sonnet for an independent recompute and for code or test runs; Haiku for searches, simple checks and the language review. The verification steps below must use different models.
 - Run independent subagents in parallel. Do not do the same work again in the main agent.
 
 ### Files
