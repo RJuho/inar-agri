@@ -1,6 +1,6 @@
 # Build report: harmonised core database
 
-Built 2026-10-23T15:58:35.911Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
+Built 2026-10-23T19:03:07.928Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
 
 ## Output files
 

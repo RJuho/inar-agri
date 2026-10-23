@@ -1,0 +1,6362 @@
+{
+  "slug": "fertilisation-weather",
+  "script": "analysis/fertilisation-weather/fertilisation-weather.py",
+  "question": "Does GPP change more after a fertilisation than the weather of the same days explains?",
+  "method": {
+    "sites": [
+      "anttila",
+      "sarkisuo",
+      "haltiala",
+      "qvidja",
+      "viikki"
+    ],
+    "light": {
+      "anttila": {
+        "lightVar": "ppfd",
+        "lightUnit": "mol m-2 d-1",
+        "rainSource": "own"
+      },
+      "sarkisuo": {
+        "lightVar": "ppfd",
+        "lightUnit": "mol m-2 d-1",
+        "rainSource": "own"
+      },
+      "haltiala": {
+        "lightVar": "ppfd",
+        "lightUnit": "mol m-2 d-1",
+        "rainSource": "viikki-proxy"
+      },
+      "qvidja": {
+        "lightVar": "sw_in",
+        "lightUnit": "MJ m-2 d-1",
+        "rainSource": "own"
+      },
+      "viikki": {
+        "lightVar": "ppfd",
+        "lightUnit": "mol m-2 d-1",
+        "rainSource": "own"
+      }
+    },
+    "minLightForLue": {
+      "ppfd": 1.0,
+      "sw_in": 0.5
+    },
+    "beforeDays": [
+      -14,
+      -1
+    ],
+    "afterDays": [
+      1,
+      14
+    ],
+    "minDays": 12,
+    "minFrac": 0.1,
+    "minGppBefore": 0.5,
+    "mergeDays": 7,
+    "minSwcRows": 36,
+    "minRainRows": 44,
+    "minLightRows": 44,
+    "controlHalfWidth": 21,
+    "controlHalfWidthSens": 10,
+    "maskBefore": 14,
+    "maskAfter": 14,
+    "tolTa": 1.0,
+    "tolLightPct": 10.0,
+    "minMatched": 3,
+    "collinearR": 0.7,
+    "minControlYears": 3,
+    "rankHigh": 90.0,
+    "rankLow": 10.0,
+    "bootstrapResamples": 10000,
+    "bootstrapLevel": 0.95,
+    "mineralRegex": "\\bmineral\\b|\\bsynthetic\\b|saltpetre|salpietari|\\bAXAN\\b|\\bTyppi\\b|\\bCAN\\b",
+    "windowDays": 14,
+    "minFracPct": 10,
+    "ciLevelPct": 95,
+    "halfHoursPerDay": 48,
+    "utcShiftHours": 2,
+    "utcShiftHalfHours": 4,
+    "minLueLightPpfd": 1.0,
+    "minLueLightSwIn": 0.5,
+    "nSitesWithFit": 3,
+    "nSites": 5,
+    "openFindings": [
+      "ANT-01, SAR-01, VII-01 (open): the raw stamps of Anttila, Sarkisuo and Viikki are UTC, but the build reads them as UTC+2. The local day of these sites is thus 2 hours early. The effect on 14-day window means is small (2 of 48 half hours per day move to the next day).",
+      "QVI-16 (open): Qvidja swc in frozen soil is not reliable. This script sets the daily swc to null when the daily soil temperature is 0 degC or less (all sites).",
+      "QVI-11 and QVI-07 (open): Qvidja NEE is probably a different processing version, and the provider GPP and Reco do not close with NEE. This dive uses the calculated GPP of data/calculated/daily.parquet."
+    ]
+  },
+  "counts": {
+    "events": 111,
+    "classEpisodes": 67,
+    "fertEpisodes": 30,
+    "fertFluxUsed": 22,
+    "fertWithHarvest": 5,
+    "fertInSummary": 14,
+    "fertExclusions": {
+      "overlap": 5,
+      "too-few-days": 2,
+      "low-measured-fraction": 1
+    },
+    "controlPairs": 554,
+    "nControlSites": 3,
+    "fertNoFit": 4,
+    "controlPairsPerSite": {
+      "anttila": 0,
+      "sarkisuo": 1,
+      "haltiala": 239,
+      "qvidja": 246,
+      "viikki": 68
+    },
+    "perSite": {
+      "anttila": {
+        "fertEpisodes": 4,
+        "fertInSummary": 0
+      },
+      "sarkisuo": {
+        "fertEpisodes": 4,
+        "fertInSummary": 0
+      },
+      "haltiala": {
+        "fertEpisodes": 6,
+        "fertInSummary": 5
+      },
+      "qvidja": {
+        "fertEpisodes": 9,
+        "fertInSummary": 4
+      },
+      "viikki": {
+        "fertEpisodes": 7,
+        "fertInSummary": 5
+      }
+    }
+  },
+  "controls": {
+    "anttila": {
+      "nPairs": 0,
+      "nYears": 0,
+      "years": [],
+      "fewYears": true,
+      "rTaLight": null,
+      "collinear": false,
+      "fit": null,
+      "fitSwc": null,
+      "fitTa": {
+        "n": 0,
+        "slope": null,
+        "intercept": null,
+        "r": null,
+        "p": null
+      },
+      "fitLight": {
+        "n": 0,
+        "slope": null,
+        "intercept": null,
+        "r": null,
+        "p": null
+      },
+      "sensitivity10": {
+        "nPairs": 0,
+        "fit": null
+      },
+      "dGpp": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null,
+        "ciLo": null,
+        "ciHi": null,
+        "nPositive": 0
+      },
+      "dTa": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null,
+        "ciLo": null,
+        "ciHi": null,
+        "nPositive": 0
+      },
+      "dLightPct": {
+        "n": 0,
+        "mean": null,
+        "sd": null,
+        "min": null,
+        "max": null,
+        "ciLo": null,
+        "ciHi": null,
+        "nPositive": 0
+      },
+      "residualQuantiles": null
+    },
+    "sarkisuo": {
+      "nPairs": 1,
+      "nYears": 1,
+      "years": [
+        2022
+      ],
+      "fewYears": true,
+      "rTaLight": null,
+      "collinear": false,
+      "fit": null,
+      "fitSwc": null,
+      "fitTa": {
+        "n": 1,
+        "slope": null,
+        "intercept": null,
+        "r": null,
+        "p": null
+      },
+      "fitLight": {
+        "n": 1,
+        "slope": null,
+        "intercept": null,
+        "r": null,
+        "p": null
+      },
+      "sensitivity10": {
+        "nPairs": 0,
+        "fit": null
+      },
+      "dGpp": {
+        "n": 1,
+        "mean": 0.06730206453,
+        "sd": null,
+        "min": 0.06730206453,
+        "max": 0.06730206453,
+        "ciLo": null,
+        "ciHi": null,
+        "nPositive": 1
+      },
+      "dTa": {
+        "n": 1,
+        "mean": 3.67719539,
+        "sd": null,
+        "min": 3.67719539,
+        "max": 3.67719539,
+        "ciLo": null,
+        "ciHi": null,
+        "nPositive": 1
+      },
+      "dLightPct": {
+        "n": 1,
+        "mean": -11.9974322,
+        "sd": null,
+        "min": -11.9974322,
+        "max": -11.9974322,
+        "ciLo": null,
+        "ciHi": null,
+        "nPositive": 0
+      },
+      "residualQuantiles": null
+    },
+    "haltiala": {
+      "nPairs": 239,
+      "nYears": 5,
+      "years": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "fewYears": false,
+      "rTaLight": 0.8064746635,
+      "collinear": true,
+      "fit": {
+        "coef": [
+          -0.6786826683,
+          0.9961347936,
+          -0.008901009465
+        ],
+        "residSd": 3.851840459,
+        "r2": 0.4029059777,
+        "n": 239
+      },
+      "fitSwc": {
+        "coef": [
+          -0.1047737813,
+          1.166168246,
+          0.01470727893,
+          14.90534191
+        ],
+        "residSd": 3.774300738,
+        "r2": 0.4612769939,
+        "n": 225
+      },
+      "fitTa": {
+        "n": 239,
+        "slope": 0.9543673604,
+        "intercept": -0.6244983516,
+        "r": 0.634422262,
+        "p": 2.54587624e-28
+      },
+      "fitLight": {
+        "n": 239,
+        "slope": 0.1291695365,
+        "intercept": 0.2580965812,
+        "r": 0.4996095518,
+        "p": 1.704939911e-16
+      },
+      "sensitivity10": {
+        "nPairs": 132,
+        "fit": {
+          "coef": [
+            -1.204925853,
+            1.039715324,
+            0.008607973541
+          ],
+          "residSd": 3.176423071,
+          "r2": 0.5676410465,
+          "n": 132
+        }
+      },
+      "dGpp": {
+        "n": 239,
+        "mean": -0.3606339121,
+        "sd": 4.963802026,
+        "min": -11.34781387,
+        "max": 13.06238126,
+        "ciLo": -0.9867027161,
+        "ciHi": 0.25093706,
+        "nPositive": 112
+      },
+      "dTa": {
+        "n": 239,
+        "mean": 0.2764809972,
+        "sd": 3.299721512,
+        "min": -5.839657738,
+        "max": 7.899360119,
+        "ciLo": -0.1353372637,
+        "ciHi": 0.7029417728,
+        "nPositive": 113
+      },
+      "dLightPct": {
+        "n": 239,
+        "mean": -4.790065137,
+        "sd": 19.19928625,
+        "min": -42.59468638,
+        "max": 53.71712478,
+        "ciLo": -7.153440197,
+        "ciHi": -2.325866326,
+        "nPositive": 90
+      },
+      "residualQuantiles": {
+        "p10": -4.725140377,
+        "p90": 6.431838996
+      }
+    },
+    "qvidja": {
+      "nPairs": 246,
+      "nYears": 7,
+      "years": [
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "fewYears": false,
+      "rTaLight": 0.438297855,
+      "collinear": false,
+      "fit": {
+        "coef": [
+          1.321283304,
+          0.212690705,
+          -0.004701890239
+        ],
+        "residSd": 1.352504958,
+        "r2": 0.1878346751,
+        "n": 246
+      },
+      "fitSwc": {
+        "coef": [
+          1.426822107,
+          0.152639146,
+          0.003936264581,
+          -3.11061369
+        ],
+        "residSd": 1.373786454,
+        "r2": 0.2192848825,
+        "n": 190
+      },
+      "fitTa": {
+        "n": 246,
+        "slope": 0.1959742177,
+        "intercept": 1.261809931,
+        "r": 0.426916567,
+        "p": 2.564901381e-12
+      },
+      "fitLight": {
+        "n": 246,
+        "slope": 0.006790613784,
+        "intercept": 1.504639734,
+        "r": 0.1199931049,
+        "p": 0.06021334613
+      },
+      "sensitivity10": {
+        "nPairs": 185,
+        "fit": {
+          "coef": [
+            1.493877581,
+            0.124639525,
+            0.005175292042
+          ],
+          "residSd": 1.289233621,
+          "r2": 0.1115661919,
+          "n": 185
+        }
+      },
+      "dGpp": {
+        "n": 246,
+        "mean": 1.636718784,
+        "sd": 1.494640474,
+        "min": -2.235146847,
+        "max": 7.256061776,
+        "ciLo": 1.451268405,
+        "ciHi": 1.824246268,
+        "nPositive": 221
+      },
+      "dTa": {
+        "n": 246,
+        "mean": 1.913051916,
+        "sd": 3.255973095,
+        "min": -7.491941964,
+        "max": 8.418861607,
+        "ciLo": 1.49714933,
+        "ciHi": 2.313689667,
+        "nPositive": 186
+      },
+      "dLightPct": {
+        "n": 246,
+        "mean": 19.45023737,
+        "sd": 26.41094855,
+        "min": -33.1486424,
+        "max": 119.0094094,
+        "ciLo": 16.10615098,
+        "ciHi": 22.82995634,
+        "nPositive": 194
+      },
+      "residualQuantiles": {
+        "p10": -1.634625646,
+        "p90": 1.972059591
+      }
+    },
+    "viikki": {
+      "nPairs": 68,
+      "nYears": 4,
+      "years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "fewYears": false,
+      "rTaLight": 0.1187702746,
+      "collinear": false,
+      "fit": {
+        "coef": [
+          0.6185579227,
+          0.1806074214,
+          0.02001960101
+        ],
+        "residSd": 1.615198555,
+        "r2": 0.2519991995,
+        "n": 68
+      },
+      "fitSwc": {
+        "coef": [
+          1.454594416,
+          0.3112032182,
+          0.04226900279,
+          4.070522722
+        ],
+        "residSd": 1.428980064,
+        "r2": 0.4505506035,
+        "n": 65
+      },
+      "fitTa": {
+        "n": 68,
+        "slope": 0.1987447873,
+        "intercept": 0.06186122413,
+        "r": 0.3991052329,
+        "p": 0.000748007409
+      },
+      "fitLight": {
+        "n": 68,
+        "slope": 0.02283171109,
+        "intercept": 0.414226606,
+        "r": 0.3497366704,
+        "p": 0.003461614208
+      },
+      "sensitivity10": {
+        "nPairs": 25,
+        "fit": {
+          "coef": [
+            0.5357671456,
+            0.195230804,
+            0.02880092867
+          ],
+          "residSd": 0.2736632457,
+          "r2": 0.6433960333,
+          "n": 25
+        }
+      },
+      "dGpp": {
+        "n": 68,
+        "mean": -0.2534893231,
+        "sd": 1.839476157,
+        "min": -2.046754063,
+        "max": 4.704591863,
+        "ciLo": -0.6637945605,
+        "ciHi": 0.2045020127,
+        "nPositive": 20
+      },
+      "dTa": {
+        "n": 68,
+        "mean": -1.586711036,
+        "sd": 3.693905989,
+        "min": -8.608550542,
+        "max": 5.410191439,
+        "ciLo": -2.462601946,
+        "ciHi": -0.7293610455,
+        "nPositive": 32
+      },
+      "dLightPct": {
+        "n": 68,
+        "mean": -29.24511117,
+        "sd": 28.17713766,
+        "min": -75.00745534,
+        "max": 59.28811241,
+        "ciLo": -35.83658622,
+        "ciHi": -22.43171906,
+        "nPositive": 7
+      },
+      "residualQuantiles": {
+        "p10": -1.102599892,
+        "p90": 3.543607289
+      }
+    }
+  },
+  "pooledRelative": {
+    "nPairs": 482,
+    "fit": {
+      "coef": [
+        51.70225454,
+        10.91868276,
+        0.9024775733
+      ],
+      "residSd": 86.26303876,
+      "r2": 0.3089525916,
+      "n": 482
+    }
+  },
+  "summary": {
+    "all": {
+      "n": 14,
+      "sites": {
+        "anttila": 0,
+        "sarkisuo": 0,
+        "haltiala": 5,
+        "qvidja": 4,
+        "viikki": 5
+      },
+      "observed": {
+        "n": 14,
+        "mean": -0.06760403914,
+        "sd": 4.144230909,
+        "min": -11.43086584,
+        "max": 6.03086645,
+        "ciLo": -2.361848462,
+        "ciHi": 1.818944483,
+        "nPositive": 6
+      },
+      "expected": {
+        "n": 14,
+        "mean": 2.235728909,
+        "sd": 2.326437291,
+        "min": -0.2643505036,
+        "max": 8.467707856,
+        "ciLo": 1.198354152,
+        "ciHi": 3.519921514,
+        "nPositive": 12
+      },
+      "residual": {
+        "n": 14,
+        "mean": -2.303332948,
+        "sd": 4.367815613,
+        "min": -11.16651534,
+        "max": 3.459789057,
+        "ciLo": -4.627601993,
+        "ciHi": -0.1798598315,
+        "nPositive": 5
+      },
+      "residualRank": {
+        "n": 14,
+        "mean": 39.03509204,
+        "sd": 40.74566071,
+        "min": 0.0,
+        "max": 98.37398374,
+        "ciLo": 19.03023452,
+        "ciHi": 60.53611886,
+        "nPositive": 11
+      },
+      "relGppPct": {
+        "n": 11,
+        "mean": 43.46680224,
+        "sd": 149.7112866,
+        "min": -109.5990148,
+        "max": 290.2495978,
+        "ciLo": -35.65792615,
+        "ciHi": 130.9831836,
+        "nPositive": 4
+      },
+      "reco": {
+        "n": 14,
+        "mean": 0.7317128494,
+        "sd": 2.11709117,
+        "min": -3.880623216,
+        "max": 5.044744086,
+        "ciLo": -0.3375968146,
+        "ciHi": 1.757422919,
+        "nPositive": 10
+      },
+      "nee": {
+        "n": 14,
+        "mean": 0.7993168885,
+        "sd": 3.213805251,
+        "min": -2.990220458,
+        "max": 10.56172316,
+        "ciLo": -0.5798403943,
+        "ciHi": 2.610272096,
+        "nPositive": 8
+      },
+      "ta": {
+        "n": 14,
+        "mean": 3.040667769,
+        "sd": 3.282086605,
+        "min": -1.72987186,
+        "max": 9.486830357,
+        "ciLo": 1.417942934,
+        "ciHi": 4.696147779,
+        "nPositive": 11
+      },
+      "lightPct": {
+        "n": 14,
+        "mean": 3.765184875,
+        "sd": 25.35844139,
+        "min": -41.98246379,
+        "max": 34.12773312,
+        "ciLo": -9.274039299,
+        "ciHi": 16.06343034,
+        "nPositive": 9
+      },
+      "rain": {
+        "n": 14,
+        "mean": 2.658956044,
+        "sd": 24.09194014,
+        "min": -55.4,
+        "max": 52.61538462,
+        "ciLo": -9.901740385,
+        "ciHi": 14.71676923,
+        "nPositive": 8
+      },
+      "swc": {
+        "n": 14,
+        "mean": -0.01860178929,
+        "sd": 0.05459613454,
+        "min": -0.09543949557,
+        "max": 0.1385902627,
+        "ciLo": -0.04252592733,
+        "ciHi": 0.01202301024,
+        "nPositive": 3
+      },
+      "matchedDiff": {
+        "n": 7,
+        "mean": -1.411387417,
+        "sd": 3.071791271,
+        "min": -5.809098208,
+        "max": 2.967736831,
+        "ciLo": -3.488925994,
+        "ciHi": 0.6303257437,
+        "nPositive": 3
+      },
+      "lightNormPct": {
+        "n": 11,
+        "mean": 41.23328642,
+        "sd": 142.8912924,
+        "min": -117.6183604,
+        "max": 287.4033711,
+        "ciLo": -34.87682887,
+        "ciHi": 124.9412733,
+        "nPositive": 6
+      },
+      "residualSwc": {
+        "n": 14,
+        "mean": -3.052248722,
+        "sd": 4.667777876,
+        "min": -11.39687686,
+        "max": 3.66263045,
+        "ciLo": -5.455881459,
+        "ciHi": -0.8435165807,
+        "nPositive": 4
+      },
+      "residual10": {
+        "n": 14,
+        "mean": -2.1639627,
+        "sd": 4.310452254,
+        "min": -9.906980152,
+        "max": 3.798740299,
+        "ciLo": -4.435423623,
+        "ciHi": -0.06633160794,
+        "nPositive": 5
+      },
+      "pooledResidualPct": {
+        "n": 11,
+        "mean": -37.73366642,
+        "sd": 155.6711067,
+        "min": -265.4491903,
+        "max": 232.0534761,
+        "ciLo": -123.3144886,
+        "ciHi": 52.04304996,
+        "nPositive": 4
+      },
+      "nResidualAbove90": 2,
+      "nResidualBelow10": 6,
+      "nRawAbove90": 2,
+      "nMatched": 7,
+      "ids": [
+        "haltiala-2022-04-29",
+        "haltiala-2023-06-19",
+        "haltiala-2023-08-01",
+        "haltiala-2024-05-08",
+        "haltiala-2025-05-10",
+        "qvidja-2019-05-08",
+        "qvidja-2020-07-27",
+        "qvidja-2021-04-20",
+        "qvidja-2021-05-12",
+        "viikki-2022-05-10",
+        "viikki-2023-04-27",
+        "viikki-2023-05-25",
+        "viikki-2024-10-09",
+        "viikki-2025-05-08"
+      ]
+    },
+    "fertOnly": {
+      "n": 5,
+      "sites": {
+        "anttila": 0,
+        "sarkisuo": 0,
+        "haltiala": 1,
+        "qvidja": 3,
+        "viikki": 1
+      },
+      "observed": {
+        "n": 5,
+        "mean": 1.943257547,
+        "sd": 4.088292256,
+        "min": -3.852057576,
+        "max": 6.03086645,
+        "ciLo": -1.211856216,
+        "ciHi": 5.016472298,
+        "nPositive": 3
+      },
+      "expected": {
+        "n": 5,
+        "mean": 2.083480776,
+        "sd": 0.3702277959,
+        "min": 1.630058737,
+        "max": 2.571077393,
+        "ciLo": 1.808914684,
+        "ciHi": 2.358046867,
+        "nPositive": 5
+      },
+      "residual": {
+        "n": 5,
+        "mean": -0.1402232291,
+        "sd": 3.762296332,
+        "min": -5.482116312,
+        "max": 3.459789057,
+        "ciLo": -3.269562381,
+        "ciHi": 2.675553825,
+        "nPositive": 3
+      },
+      "residualRank": {
+        "n": 5,
+        "mean": 60.60680462,
+        "sd": 45.65941791,
+        "min": 0.0,
+        "max": 98.37398374,
+        "ciLo": 23.87318434,
+        "ciHi": 94.78240077,
+        "nPositive": 4
+      },
+      "relGppPct": {
+        "n": 4,
+        "mean": 105.7312173,
+        "sd": 156.7473619,
+        "min": -39.17689116,
+        "max": 290.2495978,
+        "ciLo": -23.90030163,
+        "ciHi": 235.3627363,
+        "nPositive": 2
+      },
+      "reco": {
+        "n": 5,
+        "mean": 1.750333115,
+        "sd": 3.356645834,
+        "min": -3.880623216,
+        "max": 5.044744086,
+        "ciLo": -1.265302638,
+        "ciHi": 4.012819747,
+        "nPositive": 4
+      },
+      "nee": {
+        "n": 5,
+        "mean": -0.1929244314,
+        "sd": 2.262319076,
+        "min": -2.990220458,
+        "max": 3.191653033,
+        "ciLo": -1.805558531,
+        "ciHi": 1.687494001,
+        "nPositive": 2
+      },
+      "ta": {
+        "n": 5,
+        "mean": 3.906771511,
+        "sd": 1.962583575,
+        "min": 1.26577381,
+        "max": 5.892425595,
+        "ciLo": 2.327988095,
+        "ciHi": 5.404578058,
+        "nPositive": 5
+      },
+      "lightPct": {
+        "n": 5,
+        "mean": 4.41938281,
+        "sd": 20.4709568,
+        "min": -20.60834516,
+        "max": 27.28558903,
+        "ciLo": -11.46094407,
+        "ciHi": 20.29970969,
+        "nPositive": 3
+      },
+      "rain": {
+        "n": 5,
+        "mean": 0.37,
+        "sd": 17.50800103,
+        "min": -23.51,
+        "max": 22.5,
+        "ciLo": -12.238,
+        "ciHi": 13.116,
+        "nPositive": 3
+      },
+      "swc": {
+        "n": 5,
+        "mean": -0.03123718214,
+        "sd": 0.01898370878,
+        "min": -0.05520293254,
+        "max": -0.01188988095,
+        "ciLo": -0.04599367506,
+        "ciHi": -0.01648068923,
+        "nPositive": 0
+      },
+      "matchedDiff": {
+        "n": 4,
+        "mean": -1.64496396,
+        "sd": 4.234777865,
+        "min": -5.809098208,
+        "max": 2.967736831,
+        "ciLo": -5.212235086,
+        "ciHi": 1.922307166,
+        "nPositive": 2
+      },
+      "lightNormPct": {
+        "n": 4,
+        "mean": 102.3861374,
+        "sd": 141.6276755,
+        "min": -32.83652539,
+        "max": 287.4033711,
+        "ciLo": -5.999841735,
+        "ciHi": 220.7617388,
+        "nPositive": 3
+      },
+      "residualSwc": {
+        "n": 5,
+        "mean": -0.5702147613,
+        "sd": 3.769497696,
+        "min": -5.543137949,
+        "max": 3.66263045,
+        "ciLo": -3.467171812,
+        "ciHi": 2.32674229,
+        "nPositive": 2
+      },
+      "residual10": {
+        "n": 5,
+        "mean": 0.05624794052,
+        "sd": 3.719486626,
+        "min": -5.460160755,
+        "max": 3.798740299,
+        "ciLo": -2.864481952,
+        "ciHi": 2.785552389,
+        "nPositive": 3
+      },
+      "pooledResidualPct": {
+        "n": 4,
+        "mean": 13.30678319,
+        "sd": 123.3930204,
+        "min": -97.10716426,
+        "max": 173.5437756,
+        "ciLo": -83.01169074,
+        "ciHi": 112.9287774,
+        "nPositive": 2
+      },
+      "nResidualAbove90": 2,
+      "nResidualBelow10": 1,
+      "nRawAbove90": 2,
+      "nMatched": 4,
+      "ids": [
+        "haltiala-2023-06-19",
+        "qvidja-2019-05-08",
+        "qvidja-2020-07-27",
+        "qvidja-2021-05-12",
+        "viikki-2022-05-10"
+      ]
+    },
+    "withTillage": {
+      "n": 9,
+      "sites": {
+        "anttila": 0,
+        "sarkisuo": 0,
+        "haltiala": 4,
+        "qvidja": 1,
+        "viikki": 4
+      },
+      "observed": {
+        "n": 9,
+        "mean": -1.184749365,
+        "sd": 3.952277331,
+        "min": -11.43086584,
+        "max": 1.755774673,
+        "ciLo": -3.962688909,
+        "ciHi": 0.5466437882,
+        "nPositive": 3
+      },
+      "expected": {
+        "n": 9,
+        "mean": 2.320311206,
+        "sd": 2.95024314,
+        "min": -0.2643505036,
+        "max": 8.467707856,
+        "ciLo": 0.7038454392,
+        "ciHi": 4.275344365,
+        "nPositive": 7
+      },
+      "residual": {
+        "n": 9,
+        "mean": -3.50506057,
+        "sd": 4.401697336,
+        "min": -11.16651534,
+        "max": 1.409314896,
+        "ciLo": -6.352040913,
+        "ciHi": -0.9787559923,
+        "nPositive": 2
+      },
+      "residualRank": {
+        "n": 9,
+        "mean": 27.05080728,
+        "sd": 34.68480186,
+        "min": 0.0,
+        "max": 88.23529412,
+        "ciLo": 7.265208246,
+        "ciHi": 49.57383537,
+        "nPositive": 7
+      },
+      "relGppPct": {
+        "n": 7,
+        "mean": 7.887136464,
+        "sd": 144.9463517,
+        "min": -109.5990148,
+        "max": 266.6858526,
+        "ciLo": -81.0337524,
+        "ciHi": 114.5210975,
+        "nPositive": 2
+      },
+      "reco": {
+        "n": 9,
+        "mean": 0.1658127017,
+        "sd": 0.8006690362,
+        "min": -1.136632816,
+        "max": 1.475993727,
+        "ciLo": -0.328497049,
+        "ciHi": 0.6290545013,
+        "nPositive": 6
+      },
+      "nee": {
+        "n": 9,
+        "mean": 1.350562066,
+        "sd": 3.642478014,
+        "min": -1.515716682,
+        "max": 10.56172316,
+        "ciLo": -0.3598416693,
+        "ciHi": 3.925788537,
+        "nPositive": 6
+      },
+      "ta": {
+        "n": 9,
+        "mean": 2.559499024,
+        "sd": 3.853502893,
+        "min": -1.72987186,
+        "max": 9.486830357,
+        "ciLo": 0.3379527481,
+        "ciHi": 5.065357916,
+        "nPositive": 6
+      },
+      "lightPct": {
+        "n": 9,
+        "mean": 3.401741577,
+        "sd": 28.89655724,
+        "min": -41.98246379,
+        "max": 34.12773312,
+        "ciLo": -15.3794466,
+        "ciHi": 19.91679438,
+        "nPositive": 6
+      },
+      "rain": {
+        "n": 9,
+        "mean": 3.930598291,
+        "sd": 28.01475029,
+        "min": -55.4,
+        "max": 52.61538462,
+        "ciLo": -14.32005556,
+        "ciHi": 20.53479487,
+        "nPositive": 5
+      },
+      "swc": {
+        "n": 9,
+        "mean": -0.01158212659,
+        "sd": 0.06714380206,
+        "min": -0.09543949557,
+        "max": 0.1385902627,
+        "ciLo": -0.04842245546,
+        "ciHi": 0.03274753305,
+        "nPositive": 3
+      },
+      "matchedDiff": {
+        "n": 3,
+        "mean": -1.099952026,
+        "sd": 1.073818181,
+        "min": -2.098732859,
+        "max": 0.03576623151,
+        "ciLo": -2.098732859,
+        "ciHi": 0.03576623151,
+        "nPositive": 1
+      },
+      "lightNormPct": {
+        "n": 7,
+        "mean": 6.288800149,
+        "sd": 141.7142162,
+        "min": -117.6183604,
+        "max": 265.8932018,
+        "ciLo": -79.76485596,
+        "ciHi": 111.0798033,
+        "nPositive": 3
+      },
+      "residualSwc": {
+        "n": 9,
+        "mean": -4.431156478,
+        "sd": 4.723538929,
+        "min": -11.39687686,
+        "max": 1.14285954,
+        "ciLo": -7.443946524,
+        "ciHi": -1.647484569,
+        "nPositive": 2
+      },
+      "residual10": {
+        "n": 9,
+        "mean": -3.397413056,
+        "sd": 4.299162487,
+        "min": -9.906980152,
+        "max": 1.499712238,
+        "ciLo": -6.151830986,
+        "ciHi": -0.8749767556,
+        "nPositive": 2
+      },
+      "pooledResidualPct": {
+        "n": 7,
+        "mean": -66.89963762,
+        "sd": 173.340866,
+        "min": -265.4491903,
+        "max": 232.0534761,
+        "ciLo": -176.6057298,
+        "ciHi": 61.34751234,
+        "nPositive": 2
+      },
+      "nResidualAbove90": 0,
+      "nResidualBelow10": 5,
+      "nRawAbove90": 0,
+      "nMatched": 3,
+      "ids": [
+        "haltiala-2022-04-29",
+        "haltiala-2023-08-01",
+        "haltiala-2024-05-08",
+        "haltiala-2025-05-10",
+        "qvidja-2021-04-20",
+        "viikki-2023-04-27",
+        "viikki-2023-05-25",
+        "viikki-2024-10-09",
+        "viikki-2025-05-08"
+      ]
+    },
+    "mineral": {
+      "n": 6,
+      "sites": {
+        "anttila": 0,
+        "sarkisuo": 0,
+        "haltiala": 3,
+        "qvidja": 0,
+        "viikki": 3
+      },
+      "observed": {
+        "n": 6,
+        "mean": 0.6317903231,
+        "sd": 1.528778511,
+        "min": -0.9004517334,
+        "max": 3.122278738,
+        "ciLo": -0.3996734527,
+        "ciHi": 1.77184873,
+        "nPositive": 3
+      },
+      "expected": {
+        "n": 6,
+        "mean": 3.543625907,
+        "sd": 2.962214778,
+        "min": 0.3464597774,
+        "max": 8.467707856,
+        "ciLo": 1.574670433,
+        "ciHi": 5.838357606,
+        "nPositive": 6
+      },
+      "residual": {
+        "n": 6,
+        "mean": -2.911835584,
+        "sd": 4.220492528,
+        "min": -9.368159589,
+        "max": 1.409314896,
+        "ciLo": -6.116088644,
+        "ciHi": 0.07485593783,
+        "nPositive": 2
+      },
+      "residualRank": {
+        "n": 6,
+        "mean": 33.56202314,
+        "sd": 41.90772426,
+        "min": 0.0,
+        "max": 88.23529412,
+        "ciLo": 5.027073591,
+        "ciHi": 62.62511281,
+        "nPositive": 5
+      },
+      "relGppPct": {
+        "n": 3,
+        "mean": 45.8157163,
+        "sd": 191.8465781,
+        "min": -79.36373095,
+        "max": 266.6858526,
+        "ciLo": -79.36373095,
+        "ciHi": 266.6858526,
+        "nPositive": 1
+      },
+      "reco": {
+        "n": 6,
+        "mean": 0.8191371597,
+        "sd": 0.7180486592,
+        "min": 0.04846347257,
+        "max": 1.889220485,
+        "ciLo": 0.3307417949,
+        "ciHi": 1.339482299,
+        "nPositive": 6
+      },
+      "nee": {
+        "n": 6,
+        "mean": 0.1873468366,
+        "sd": 1.417017713,
+        "min": -1.515716682,
+        "max": 1.990545688,
+        "ciLo": -0.8614786595,
+        "ciHi": 1.236172333,
+        "nPositive": 4
+      },
+      "ta": {
+        "n": 6,
+        "mean": 4.603649031,
+        "sd": 3.731558252,
+        "min": -1.72987186,
+        "max": 9.486830357,
+        "ciLo": 1.643087703,
+        "ciHi": 7.177979235,
+        "nPositive": 5
+      },
+      "lightPct": {
+        "n": 6,
+        "mean": 19.56420052,
+        "sd": 16.43722446,
+        "min": -3.775252034,
+        "max": 34.12773312,
+        "ciLo": 7.111309636,
+        "ciHi": 31.14086651,
+        "nPositive": 5
+      },
+      "rain": {
+        "n": 6,
+        "mean": 3.0,
+        "sd": 5.307730212,
+        "min": -1.1,
+        "max": 11.7,
+        "ciLo": -0.4666666667,
+        "ciHi": 7.1,
+        "nPositive": 3
+      },
+      "swc": {
+        "n": 6,
+        "mean": -0.04481007259,
+        "sd": 0.03623258867,
+        "min": -0.09543949557,
+        "max": 0.01287764825,
+        "ciLo": -0.07049532141,
+        "ciHi": -0.01845336786,
+        "nPositive": 1
+      },
+      "matchedDiff": {
+        "n": 2,
+        "mean": -1.667811155,
+        "sd": 0.6094153179,
+        "min": -2.098732859,
+        "max": -1.236889451,
+        "ciLo": null,
+        "ciHi": null,
+        "nPositive": 0
+      },
+      "lightNormPct": {
+        "n": 3,
+        "mean": 38.80462992,
+        "sd": 196.8886375,
+        "min": -84.13225842,
+        "max": 265.8932018,
+        "ciLo": -84.13225842,
+        "ciHi": 265.8932018,
+        "nPositive": 1
+      },
+      "residualSwc": {
+        "n": 6,
+        "mean": -4.355271609,
+        "sd": 4.696160181,
+        "min": -11.39687686,
+        "max": 1.14285954,
+        "ciLo": -7.883191048,
+        "ciHi": -1.047656516,
+        "nPositive": 1
+      },
+      "residual10": {
+        "n": 6,
+        "mean": -3.033857125,
+        "sd": 4.399807243,
+        "min": -9.852899401,
+        "max": 1.499712238,
+        "ciLo": -6.262326438,
+        "ciHi": 0.02500112688,
+        "nPositive": 2
+      },
+      "pooledResidualPct": {
+        "n": 3,
+        "mean": -79.09967999,
+        "sd": 271.2179719,
+        "min": -265.4491903,
+        "max": 232.0534761,
+        "ciLo": -265.4491903,
+        "ciHi": 232.0534761,
+        "nPositive": 1
+      },
+      "nResidualAbove90": 0,
+      "nResidualBelow10": 3,
+      "nRawAbove90": 0,
+      "nMatched": 2,
+      "ids": [
+        "haltiala-2022-04-29",
+        "haltiala-2024-05-08",
+        "haltiala-2025-05-10",
+        "viikki-2022-05-10",
+        "viikki-2023-05-25",
+        "viikki-2025-05-08"
+      ]
+    },
+    "organic": {
+      "n": 8,
+      "sites": {
+        "anttila": 0,
+        "sarkisuo": 0,
+        "haltiala": 2,
+        "qvidja": 4,
+        "viikki": 2
+      },
+      "observed": {
+        "n": 8,
+        "mean": -0.5921498108,
+        "sd": 5.430713293,
+        "min": -11.43086584,
+        "max": 6.03086645,
+        "ciLo": -4.329118043,
+        "ciHi": 2.646970245,
+        "nPositive": 3
+      },
+      "expected": {
+        "n": 8,
+        "mean": 1.254806161,
+        "sd": 1.103579325,
+        "min": -0.2643505036,
+        "max": 2.571077393,
+        "ciLo": 0.5318017674,
+        "ciHi": 1.942742489,
+        "nPositive": 6
+      },
+      "residual": {
+        "n": 8,
+        "mean": -1.846955972,
+        "sd": 4.706543983,
+        "min": -11.16651534,
+        "max": 3.459789057,
+        "ciLo": -5.058090228,
+        "ciHi": 0.9723203726,
+        "nPositive": 3
+      },
+      "residualRank": {
+        "n": 8,
+        "mean": 43.13989373,
+        "sd": 42.23557476,
+        "min": 0.0,
+        "max": 98.37398374,
+        "ciLo": 16.57515198,
+        "ciHi": 70.70630081,
+        "nPositive": 6
+      },
+      "relGppPct": {
+        "n": 8,
+        "mean": 42.58595947,
+        "sd": 146.6296185,
+        "min": -109.5990148,
+        "max": 290.2495978,
+        "ciLo": -45.83865432,
+        "ciHi": 139.3141934,
+        "nPositive": 3
+      },
+      "reco": {
+        "n": 8,
+        "mean": 0.6661446166,
+        "sd": 2.818529361,
+        "min": -3.880623216,
+        "max": 5.044744086,
+        "ciLo": -1.136192172,
+        "ciHi": 2.495217049,
+        "nPositive": 4
+      },
+      "nee": {
+        "n": 8,
+        "mean": 1.258294427,
+        "sd": 4.145549272,
+        "min": -2.990220458,
+        "max": 10.56172316,
+        "ciLo": -0.9746631649,
+        "ciHi": 4.307467079,
+        "nPositive": 4
+      },
+      "ta": {
+        "n": 8,
+        "mean": 1.868431822,
+        "sd": 2.528805699,
+        "min": -0.9055364925,
+        "max": 5.892425595,
+        "ciLo": 0.3682435802,
+        "ciHi": 3.578945406,
+        "nPositive": 6
+      },
+      "lightPct": {
+        "n": 8,
+        "mean": -8.084076862,
+        "sd": 25.03669309,
+        "min": -41.98246379,
+        "max": 27.28558903,
+        "ciLo": -24.63219691,
+        "ciHi": 7.493778002,
+        "nPositive": 4
+      },
+      "rain": {
+        "n": 8,
+        "mean": 2.403173077,
+        "sd": 32.52120028,
+        "min": -55.4,
+        "max": 52.61538462,
+        "ciLo": -18.67375,
+        "ciHi": 23.01384615,
+        "nPositive": 5
+      },
+      "swc": {
+        "n": 8,
+        "mean": 0.001054423188,
+        "sd": 0.05972964349,
+        "min": -0.05520293254,
+        "max": 0.1385902627,
+        "ciLo": -0.02952820895,
+        "ciHi": 0.04455606913,
+        "nPositive": 2
+      },
+      "matchedDiff": {
+        "n": 5,
+        "mean": -1.308817922,
+        "sd": 3.743658433,
+        "min": -5.809098208,
+        "max": 2.967736831,
+        "ciLo": -4.233157818,
+        "ciHi": 1.544998979,
+        "nPositive": 3
+      },
+      "lightNormPct": {
+        "n": 8,
+        "mean": 42.14403261,
+        "sd": 134.4962094,
+        "min": -117.6183604,
+        "max": 287.4033711,
+        "ciLo": -38.67904917,
+        "ciHi": 133.1624703,
+        "nPositive": 5
+      },
+      "residualSwc": {
+        "n": 8,
+        "mean": -2.074981557,
+        "sd": 4.707876849,
+        "min": -11.06875229,
+        "max": 3.66263045,
+        "ciLo": -5.308077627,
+        "ciHi": 0.7840392812,
+        "nPositive": 3
+      },
+      "residual10": {
+        "n": 8,
+        "mean": -1.511541881,
+        "sd": 4.420777922,
+        "min": -9.906980152,
+        "max": 3.798740299,
+        "ciLo": -4.515919826,
+        "ciHi": 1.193192611,
+        "nPositive": 3
+      },
+      "pooledResidualPct": {
+        "n": 8,
+        "mean": -22.22141133,
+        "sd": 112.2230409,
+        "min": -156.1058082,
+        "max": 173.5437756,
+        "ciLo": -90.63287928,
+        "ciHi": 54.88858621,
+        "nPositive": 3
+      },
+      "nResidualAbove90": 2,
+      "nResidualBelow10": 3,
+      "nRawAbove90": 2,
+      "nMatched": 5,
+      "ids": [
+        "haltiala-2023-06-19",
+        "haltiala-2023-08-01",
+        "qvidja-2019-05-08",
+        "qvidja-2020-07-27",
+        "qvidja-2021-04-20",
+        "qvidja-2021-05-12",
+        "viikki-2023-04-27",
+        "viikki-2024-10-09"
+      ]
+    }
+  },
+  "episodes": [
+    {
+      "id": "anttila-2022-05-23",
+      "site": "anttila",
+      "siteName": "Anttila",
+      "start": "2022-05-23",
+      "end": "2022-05-23",
+      "doy": 143,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "Synthetic N fertiliser, 52 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2022-05-23",
+          "type": "fertilisation",
+          "detail": "Synthetic N fertiliser, 52 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 52.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.532448331,
+          "reco": 2.387473774,
+          "nee": -0.1449745565,
+          "ta": 8.293912772,
+          "light": 31.87235764,
+          "rain": 1.192857143,
+          "swc": 0.3066008485,
+          "frac": 0.443452381,
+          "lue": 0.08278312985
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 13,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 13
+        },
+        "mean": {
+          "gpp": 10.53814836,
+          "reco": 6.883358498,
+          "nee": -3.654789863,
+          "ta": 12.46545749,
+          "light": 33.88943141,
+          "rain": 1.278571429,
+          "swc": 0.2553694086,
+          "frac": 0.4702380952,
+          "lue": 0.3501531126
+        }
+      },
+      "delta": {
+        "gpp": 8.00570003,
+        "reco": 4.495884724,
+        "nee": -3.509815307,
+        "ta": 4.171544716,
+        "light": 2.017073763,
+        "rain": 0.08571428571,
+        "swc": -0.05123143997,
+        "frac": 0.02678571429
+      },
+      "rain14": 1.2,
+      "lightPct": 6.328599176,
+      "observed": 8.00570003,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": null,
+      "nControls": 0,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.08278312985,
+        "after": 0.3501531126,
+        "delta": 0.2673699827,
+        "pct": 322.9764123
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": 316.124911,
+      "pooledResidualPct": 213.1634642,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "anttila-2022-06-21",
+      "site": "anttila",
+      "siteName": "Anttila",
+      "start": "2022-06-21",
+      "end": "2022-06-22",
+      "doy": 172,
+      "kind": "harvestCutFert",
+      "classes": [
+        "fertilisation",
+        "harvest-cut"
+      ],
+      "fert": "mineral",
+      "product": "Synthetic N fertiliser, 44 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2022-06-21",
+          "type": "harvest",
+          "detail": "Timothy and red clover, first cut, 3360 kg DW/ha"
+        },
+        {
+          "date": "2022-06-22",
+          "type": "fertilisation",
+          "detail": "Synthetic N fertiliser, 44 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": true,
+      "withTillage": false,
+      "nKgHa": 44.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 12.84409509,
+          "reco": 6.177896186,
+          "nee": -6.666198909,
+          "ta": 13.86443603,
+          "light": 32.28657952,
+          "rain": 2.514285714,
+          "swc": 0.2524056263,
+          "frac": 0.7455357143,
+          "lue": 0.4497859988
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 8.941249447,
+          "reco": 7.752326233,
+          "nee": -1.188923213,
+          "ta": 20.8577189,
+          "light": 46.67609098,
+          "rain": 0.8285714286,
+          "swc": 0.207496131,
+          "frac": 0.5535714286,
+          "lue": 0.2011571282
+        }
+      },
+      "delta": {
+        "gpp": -3.902845648,
+        "reco": 1.574430047,
+        "nee": 5.477275695,
+        "ta": 6.993282871,
+        "light": 14.38951146,
+        "rain": -1.685714286,
+        "swc": -0.04490949531,
+        "frac": -0.1919642857
+      },
+      "rain14": -23.6,
+      "lightPct": 44.56808891,
+      "observed": -3.902845648,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": null,
+      "nControls": 0,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.4497859988,
+        "after": 0.2011571282,
+        "delta": -0.2486288706,
+        "pct": -55.27714763
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": -30.38630296,
+      "pooledResidualPct": -198.6676953,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "anttila-2023-05-16",
+      "site": "anttila",
+      "siteName": "Anttila",
+      "start": "2023-05-16",
+      "end": "2023-05-16",
+      "doy": 136,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "N fertiliser, 48 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2023-05-16",
+          "type": "fertilisation",
+          "detail": "N fertiliser, 48 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 48.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 3.515173121,
+          "reco": 3.010912394,
+          "nee": -0.504260727,
+          "ta": 8.694980655,
+          "light": 33.88456948,
+          "rain": 1.128571429,
+          "swc": 0.327327381,
+          "frac": 0.6517857143,
+          "lue": 0.09989457048
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 12.14604385,
+          "reco": 6.583004371,
+          "nee": -5.563039481,
+          "ta": 11.88671994,
+          "light": 36.815536,
+          "rain": 0.8928571429,
+          "swc": 0.2422755952,
+          "frac": 0.7455357143,
+          "lue": 0.3491602126
+        }
+      },
+      "delta": {
+        "gpp": 8.630870731,
+        "reco": 3.572091977,
+        "nee": -5.058778754,
+        "ta": 3.191739286,
+        "light": 2.930966524,
+        "rain": -0.2357142857,
+        "swc": -0.08505178571,
+        "frac": 0.09375
+      },
+      "rain14": -3.3,
+      "lightPct": 8.649856172,
+      "observed": 8.630870731,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": null,
+      "nControls": 0,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.09989457048,
+        "after": 0.3491602126,
+        "delta": 0.2492656421,
+        "pct": 249.528719
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": 245.5318823,
+      "pooledResidualPct": 151.1737379,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "anttila-2023-06-21",
+      "site": "anttila",
+      "siteName": "Anttila",
+      "start": "2023-06-21",
+      "end": "2023-06-28",
+      "doy": 172,
+      "kind": "harvestCutFert",
+      "classes": [
+        "fertilisation",
+        "harvest-cut"
+      ],
+      "fert": "organic",
+      "product": "N fertiliser, 48 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2023-06-21",
+          "type": "harvest",
+          "detail": "Timothy and red clover, first cut, 5138 kg DW/ha"
+        },
+        {
+          "date": "2023-06-28",
+          "type": "fertilisation",
+          "detail": "N fertiliser, 48 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": true,
+      "withTillage": false,
+      "nKgHa": 48.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 15.48282246,
+          "reco": 6.520020174,
+          "nee": -8.962802286,
+          "ta": 15.49937024,
+          "light": 46.00126268,
+          "rain": 0.6642857143,
+          "swc": 0.1816102679,
+          "frac": 0.6889880952,
+          "lue": 0.3541617555
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 7.86529191,
+          "reco": 5.986338888,
+          "nee": -1.878953022,
+          "ta": 15.34498626,
+          "light": 32.31912483,
+          "rain": 3.678571429,
+          "swc": 0.2850050469,
+          "frac": 0.7529761905,
+          "lue": 0.2671986515
+        }
+      },
+      "delta": {
+        "gpp": -7.61753055,
+        "reco": -0.5336812866,
+        "nee": 7.083849263,
+        "ta": -0.1543839824,
+        "light": -13.68213785,
+        "rain": 3.014285714,
+        "swc": 0.103394779,
+        "frac": 0.06398809524
+      },
+      "rain14": 42.2,
+      "lightPct": -29.7429615,
+      "observed": -7.61753055,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": null,
+      "nControls": 0,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.3541617555,
+        "after": 0.2671986515,
+        "delta": -0.08696310404,
+        "pct": -24.55462869
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": -49.19988309,
+      "pooledResidualPct": -72.37411219,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "haltiala-2021-05-13",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "start": "2021-05-13",
+      "end": "2021-05-13",
+      "doy": 133,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "Finnish saltpetre (Suomen salpietari), 320 kg/ha",
+      "events": [
+        {
+          "date": "2021-05-13",
+          "type": "fertilisation",
+          "detail": "Finnish saltpetre (Suomen salpietari), 320 kg/ha"
+        }
+      ],
+      "coEvents": [
+        {
+          "date": "2021-05-13",
+          "type": "sowing",
+          "detail": "Barley (Harbinger), 370 kg/ha"
+        }
+      ],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 6,
+          "reco": 6,
+          "nee": 6,
+          "ta": 6,
+          "light": 6,
+          "rain": 0,
+          "swc": 6,
+          "frac": 6,
+          "lue": 6
+        },
+        "mean": {
+          "gpp": 1.814624465,
+          "reco": 2.67674438,
+          "nee": 0.8621199152,
+          "ta": 10.371875,
+          "light": 31.029,
+          "rain": null,
+          "swc": 0.5183333333,
+          "frac": 0.02777777778,
+          "lue": 0.066909521
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 0,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.7032791989,
+          "reco": 2.380232095,
+          "nee": 1.676952896,
+          "ta": 11.81160714,
+          "light": 26.37424286,
+          "rain": null,
+          "swc": 0.5179613095,
+          "frac": 0.6785714286,
+          "lue": 0.03325231189
+        }
+      },
+      "delta": {
+        "gpp": null,
+        "reco": null,
+        "nee": null,
+        "ta": null,
+        "light": null,
+        "rain": null,
+        "swc": null,
+        "frac": null
+      },
+      "rain14": null,
+      "lightPct": null,
+      "observed": null,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": null,
+      "nControls": 239,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": null,
+        "after": 0.03325231189,
+        "delta": null,
+        "pct": null
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": null,
+      "pooledResidualPct": null,
+      "fluxUsed": false,
+      "fluxExclusion": "too-few-days",
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "haltiala-2022-04-29",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "start": "2022-04-29",
+      "end": "2022-05-04",
+      "doy": 119,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "mineral",
+      "product": "Finnish saltpetre (Suomen salpietari), 300 kg/ha",
+      "events": [
+        {
+          "date": "2022-04-29",
+          "type": "tillage",
+          "detail": "Plate modification"
+        },
+        {
+          "date": "2022-05-03",
+          "type": "tillage",
+          "detail": "Harrowing, two times"
+        },
+        {
+          "date": "2022-05-04",
+          "type": "fertilisation",
+          "detail": "Finnish saltpetre (Suomen salpietari), 300 kg/ha"
+        }
+      ],
+      "coEvents": [
+        {
+          "date": "2022-05-04",
+          "type": "sowing",
+          "detail": "Green manure grass (viherlannoitusnurmi), 15 kg/ha"
+        },
+        {
+          "date": "2022-05-04",
+          "type": "sowing",
+          "detail": "Oats (Pettiina), 200 kg/ha"
+        }
+      ],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 13,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.04777751775,
+          "reco": 1.267091927,
+          "nee": 1.314869445,
+          "ta": 5.813467262,
+          "light": 33.03128571,
+          "rain": 0.1,
+          "swc": 0.4919070513,
+          "frac": 0.6711309524,
+          "lue": -0.0008958948665
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.129018519,
+          "reco": 1.315555399,
+          "nee": 1.444573918,
+          "ta": 9.292559524,
+          "light": 31.78427143,
+          "rain": 0.9357142857,
+          "swc": 0.4422619048,
+          "frac": 0.6279761905,
+          "lue": -0.004440138813
+        }
+      },
+      "delta": {
+        "gpp": -0.08124100122,
+        "reco": 0.04846347257,
+        "nee": 0.1297044738,
+        "ta": 3.479092262,
+        "light": -1.247014286,
+        "rain": 0.8357142857,
+        "swc": -0.04964514652,
+        "frac": -0.0431547619
+      },
+      "rain14": 11.7,
+      "lightPct": -3.775252034,
+      "observed": -0.08124100122,
+      "expected": 2.820565738,
+      "residual": -2.901806739,
+      "residualRank": 21.33891213,
+      "rawRank": 52.71966527,
+      "nControls": 239,
+      "matched": {
+        "n": 18,
+        "controlDelta": 1.15564845,
+        "diff": -1.236889451
+      },
+      "lightNorm": {
+        "before": -0.0008958948665,
+        "after": -0.004440138813,
+        "delta": -0.003544243946,
+        "pct": null
+      },
+      "expectedSwc": 3.15693157,
+      "residualSwc": -3.238172571,
+      "residual10": -2.461083416,
+      "residualRank10": 25.0,
+      "relGppPct": null,
+      "pooledResidualPct": null,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "haltiala-2023-06-19",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "start": "2023-06-19",
+      "end": "2023-06-21",
+      "doy": 170,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Manure, 10 m3/ha (could be 45-60 m3/ha), north sector; dry grass crushed",
+      "events": [
+        {
+          "date": "2023-06-19",
+          "type": "fertilisation",
+          "detail": "Manure, 10 m3/ha (could be 45-60 m3/ha), north sector; dry grass crushed"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 6.191936821,
+          "reco": 2.406235319,
+          "nee": -3.785701502,
+          "ta": 15.5859375,
+          "light": 47.27391429,
+          "rain": 0.0,
+          "swc": 0.2808035714,
+          "frac": 0.6577380952,
+          "lue": 0.1322996664
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 5.657962016,
+          "reco": 5.063913547,
+          "nee": -0.5940484692,
+          "ta": 18.07605655,
+          "light": 37.53154286,
+          "rain": 1.607142857,
+          "swc": 0.2689136905,
+          "frac": 0.681547619,
+          "lue": 0.1598667387
+        }
+      },
+      "delta": {
+        "gpp": -0.5339748052,
+        "reco": 2.657678228,
+        "nee": 3.191653033,
+        "ta": 2.490119048,
+        "light": -9.742371429,
+        "rain": 1.607142857,
+        "swc": -0.01188988095,
+        "frac": 0.02380952381
+      },
+      "rain14": 22.5,
+      "lightPct": -20.60834516,
+      "observed": -0.5339748052,
+      "expected": 1.985246631,
+      "residual": -2.519221436,
+      "residualRank": 23.43096234,
+      "rawRank": 51.0460251,
+      "nControls": 239,
+      "matched": {
+        "n": 3,
+        "controlDelta": 4.081397158,
+        "diff": -4.615371963
+      },
+      "lightNorm": {
+        "before": 0.1322996664,
+        "after": 0.1598667387,
+        "delta": 0.02756707234,
+        "pct": 20.83684192
+      },
+      "expectedSwc": 2.318808558,
+      "residualSwc": -2.852783363,
+      "residual10": -1.740667794,
+      "residualRank10": 27.27272727,
+      "relGppPct": -8.623712105,
+      "pooledResidualPct": -68.91621723,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "haltiala-2023-08-01",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "start": "2023-08-01",
+      "end": "2023-08-15",
+      "doy": 213,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "organic",
+      "product": "Manure, 10 m3/ha, south sector",
+      "events": [
+        {
+          "date": "2023-08-01",
+          "type": "fertilisation",
+          "detail": "Manure, 10 m3/ha, south sector"
+        },
+        {
+          "date": "2023-08-04",
+          "type": "tillage",
+          "detail": "Disc harrowing (lautasmuokkaus), 4-10 cm, to stop the grass and cover the manure"
+        },
+        {
+          "date": "2023-08-15",
+          "type": "tillage",
+          "detail": "Harrowing, whole field"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 11.33437396,
+          "reco": 6.600772669,
+          "nee": -4.733601289,
+          "ta": 16.5390625,
+          "light": 32.74367143,
+          "rain": 2.157142857,
+          "swc": 0.3017113095,
+          "frac": 0.7336309524,
+          "lue": 0.3553992803
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 13,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.09649188638,
+          "reco": 5.731629986,
+          "nee": 5.828121872,
+          "ta": 16.57986607,
+          "light": 18.99707143,
+          "rain": 5.915384615,
+          "swc": 0.3226785714,
+          "frac": 0.6547619048,
+          "lue": -0.008035219825
+        }
+      },
+      "delta": {
+        "gpp": -11.43086584,
+        "reco": -0.8691426831,
+        "nee": 10.56172316,
+        "ta": 0.04080357143,
+        "light": -13.7466,
+        "rain": 3.758241758,
+        "swc": 0.0209672619,
+        "frac": -0.07886904762
+      },
+      "rain14": 52.61538462,
+      "lightPct": -41.98246379,
+      "observed": -11.43086584,
+      "expected": -0.2643505036,
+      "residual": -11.16651534,
+      "residualRank": 0.0,
+      "rawRank": 0.0,
+      "nControls": 239,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.3553992803,
+        "after": -0.008035219825,
+        "delta": -0.3634345001,
+        "pct": -102.2608993
+      },
+      "expectedSwc": -0.3621135494,
+      "residualSwc": -11.06875229,
+      "residual10": -9.906980152,
+      "residualRank10": 0.0,
+      "relGppPct": -100.8513208,
+      "pooledResidualPct": -115.1108646,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "haltiala-2024-05-08",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "start": "2024-05-08",
+      "end": "2024-05-16",
+      "doy": 129,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "mineral",
+      "product": "Yara AXAN 27-0-1, 200 kg/ha",
+      "events": [
+        {
+          "date": "2024-05-08",
+          "type": "tillage",
+          "detail": "Harrowing"
+        },
+        {
+          "date": "2024-05-14",
+          "type": "tillage",
+          "detail": "Harrowing"
+        },
+        {
+          "date": "2024-05-16",
+          "type": "fertilisation",
+          "detail": "Yara AXAN 27-0-1, 200 kg/ha"
+        }
+      ],
+      "coEvents": [
+        {
+          "date": "2024-05-16",
+          "type": "sowing",
+          "detail": "Sunflower, 10 kg/ha (probably 12-14 kg/ha)"
+        }
+      ],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": 54.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 1.134588461,
+          "reco": 1.349295511,
+          "nee": 0.2147070507,
+          "ta": 7.894404762,
+          "light": 33.92318571,
+          "rain": 0.1714285714,
+          "swc": 0.4380803571,
+          "frac": 0.53125,
+          "lue": 0.03335824652
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.2341367274,
+          "reco": 2.002476132,
+          "nee": 1.768339405,
+          "ta": 17.38123512,
+          "light": 45.5004,
+          "rain": 0.1642857143,
+          "swc": 0.3734077381,
+          "frac": 0.5818452381,
+          "lue": 0.005293200355
+        }
+      },
+      "delta": {
+        "gpp": -0.9004517334,
+        "reco": 0.6531806208,
+        "nee": 1.553632354,
+        "ta": 9.486830357,
+        "light": 11.57721429,
+        "rain": -0.007142857143,
+        "swc": -0.06467261905,
+        "frac": 0.0505952381
+      },
+      "rain14": -0.1,
+      "lightPct": 34.12773312,
+      "observed": -0.9004517334,
+      "expected": 8.467707856,
+      "residual": -9.368159589,
+      "residualRank": 0.0,
+      "rawRank": 49.37238494,
+      "nControls": 239,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.03335824652,
+        "after": 0.005293200355,
+        "delta": -0.02806504617,
+        "pct": -84.13225842
+      },
+      "expectedSwc": 10.49642512,
+      "residualSwc": -11.39687686,
+      "residual10": -9.852899401,
+      "residualRank10": 0.0,
+      "relGppPct": -79.36373095,
+      "pooledResidualPct": -265.4491903,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "haltiala-2025-05-10",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "start": "2025-05-10",
+      "end": "2025-05-15",
+      "doy": 130,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "mineral",
+      "product": "Viljelijän Typpi 26-S4, 300 kg/ha (78 kg N/ha)",
+      "events": [
+        {
+          "date": "2025-05-10",
+          "type": "tillage",
+          "detail": "Disc harrowing (lautasäestys), 6 cm"
+        },
+        {
+          "date": "2025-05-13",
+          "type": "tillage",
+          "detail": "Harrowing, spring tine (joustopiikkiäestys), 6 cm"
+        },
+        {
+          "date": "2025-05-15",
+          "type": "fertilisation",
+          "detail": "Viljelijän Typpi 26-S4, 300 kg/ha (78 kg N/ha)"
+        }
+      ],
+      "coEvents": [
+        {
+          "date": "2025-05-15",
+          "type": "sowing",
+          "detail": "Oats (Jacky), 230 kg/ha"
+        }
+      ],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": 78.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 1.031683694,
+          "reco": 1.443970261,
+          "nee": 0.4122865669,
+          "ta": 5.75578869,
+          "light": 27.20327143,
+          "rain": 0.8571428571,
+          "swc": 0.4055803571,
+          "frac": 0.7514880952,
+          "lue": 0.03900531865
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.5171317328,
+          "reco": 2.919963988,
+          "nee": 2.402832255,
+          "ta": 12.35104167,
+          "light": 36.34097143,
+          "rain": 0.8928571429,
+          "swc": 0.3766369048,
+          "frac": 0.6964285714,
+          "lue": 0.01351649217
+        }
+      },
+      "delta": {
+        "gpp": -0.514551961,
+        "reco": 1.475993727,
+        "nee": 1.990545688,
+        "ta": 6.595252976,
+        "light": 9.1377,
+        "rain": 0.03571428571,
+        "swc": -0.02894345238,
+        "frac": -0.05505952381
+      },
+      "rain14": 0.5,
+      "lightPct": 33.59044527,
+      "observed": -0.514551961,
+      "expected": 5.592089422,
+      "residual": -6.106641383,
+      "residualRank": 2.092050209,
+      "rawRank": 51.46443515,
+      "nControls": 239,
+      "matched": {
+        "n": 5,
+        "controlDelta": 1.584180898,
+        "diff": -2.098732859
+      },
+      "lightNorm": {
+        "before": 0.03900531865,
+        "after": 0.01351649217,
+        "delta": -0.02548882647,
+        "pct": -65.34705358
+      },
+      "expectedSwc": 7.649012805,
+      "residualSwc": -8.163564766,
+      "residual10": -6.455957356,
+      "residualRank10": 0.0,
+      "relGppPct": -49.87497274,
+      "pooledResidualPct": -203.9033258,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "qvidja-2018-07-16",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2018-07-16",
+      "end": "2018-07-16",
+      "doy": 197,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "NK molasses, 2800 kg/ha (57 g C/m2), 66 kg N/ha",
+      "events": [
+        {
+          "date": "2018-07-16",
+          "type": "fertilisation",
+          "detail": "NK molasses, 2800 kg/ha (57 g C/m2), 66 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 66.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 5.918073962,
+          "reco": 5.077321391,
+          "nee": -0.840752571,
+          "ta": 18.31873512,
+          "light": 18.28687757,
+          "rain": 1.417142857,
+          "swc": 0.2409650027,
+          "frac": 0.0744047619,
+          "lue": 0.3229872609
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 6.284831477,
+          "reco": 6.249076051,
+          "nee": -0.03575542552,
+          "ta": 22.9468006,
+          "light": 20.68350686,
+          "rain": 0.8914285714,
+          "swc": 0.2067714647,
+          "frac": 0.212797619,
+          "lue": 0.3223480866
+        }
+      },
+      "delta": {
+        "gpp": 0.3667575151,
+        "reco": 1.171754661,
+        "nee": 0.8049971454,
+        "ta": 4.628065476,
+        "light": 2.396629286,
+        "rain": -0.5257142857,
+        "swc": -0.03419353795,
+        "frac": 0.1383928571
+      },
+      "rain14": -7.36,
+      "lightPct": 13.10573266,
+      "observed": 0.3667575151,
+      "expected": 2.244008097,
+      "residual": -1.877250582,
+      "residualRank": 6.910569106,
+      "rawRank": 19.10569106,
+      "nControls": 246,
+      "matched": {
+        "n": 17,
+        "controlDelta": 3.186396906,
+        "diff": -2.819639391
+      },
+      "lightNorm": {
+        "before": 0.3229872609,
+        "after": 0.3223480866,
+        "delta": -0.0006391743291,
+        "pct": -0.1978945942
+      },
+      "expectedSwc": 2.291196588,
+      "residualSwc": -1.924439073,
+      "residual10": -1.771785943,
+      "residualRank10": 9.189189189,
+      "relGppPct": 6.197244534,
+      "pooledResidualPct": -107.8650185,
+      "fluxUsed": false,
+      "fluxExclusion": "low-measured-fraction",
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "qvidja-2018-08-21",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2018-08-21",
+      "end": "2018-08-24",
+      "doy": 233,
+      "kind": "harvestCutFert",
+      "classes": [
+        "fertilisation",
+        "harvest-cut"
+      ],
+      "fert": "organic",
+      "product": "NK molasses, 1755 kg/ha (36 g C/m2)",
+      "events": [
+        {
+          "date": "2018-08-21",
+          "type": "cut",
+          "detail": "Cut at 15 cm, yield left on the field"
+        },
+        {
+          "date": "2018-08-24",
+          "type": "fertilisation",
+          "detail": "NK molasses, 1755 kg/ha (36 g C/m2)"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": true,
+      "withTillage": false,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 12,
+          "swc": 13,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 4.322902458,
+          "reco": 3.595429523,
+          "nee": -0.7274729347,
+          "ta": 18.02468345,
+          "light": 16.43810993,
+          "rain": 0.9041666667,
+          "swc": 0.2131878317,
+          "frac": 0.5,
+          "lue": 0.2732103129
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 5.991182945,
+          "reco": 6.498674797,
+          "nee": 0.5074918523,
+          "ta": 15.38571429,
+          "light": 11.60544086,
+          "rain": 1.646428571,
+          "swc": 0.2466711103,
+          "frac": 0.1726190476,
+          "lue": 0.5496076651
+        }
+      },
+      "delta": {
+        "gpp": 1.668280487,
+        "reco": 2.903245274,
+        "nee": 1.234964787,
+        "ta": -2.638969168,
+        "light": -4.832669075,
+        "rain": 0.7422619048,
+        "swc": 0.03348327857,
+        "frac": -0.3273809524
+      },
+      "rain14": 10.39166667,
+      "lightPct": -29.39917725,
+      "observed": 1.668280487,
+      "expected": 0.898230796,
+      "residual": 0.7700496907,
+      "residualRank": 77.64227642,
+      "rawRank": 54.47154472,
+      "nControls": 246,
+      "matched": {
+        "n": 4,
+        "controlDelta": -1.174470561,
+        "diff": 2.842751047
+      },
+      "lightNorm": {
+        "before": 0.2732103129,
+        "after": 0.5496076651,
+        "delta": 0.2763973522,
+        "pct": 101.166515
+      },
+      "expectedSwc": 0.8041356225,
+      "residualSwc": 0.8641448643,
+      "residual10": 0.6554720971,
+      "residualRank10": 70.81081081,
+      "relGppPct": 38.59167545,
+      "pooledResidualPct": 42.2355862,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "qvidja-2019-05-08",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2019-05-08",
+      "end": "2019-05-08",
+      "doy": 128,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "By-product fertiliser mix, about 4600 kg/ha (43 g C/m2), 60 kg N/ha",
+      "events": [
+        {
+          "date": "2019-05-08",
+          "type": "fertilisation",
+          "detail": "By-product fertiliser mix, about 4600 kg/ha (43 g C/m2), 60 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 60.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.742291694,
+          "reco": 0.7677258442,
+          "nee": -1.974565849,
+          "ta": 7.295357143,
+          "light": 16.20963514,
+          "rain": 0.9342857143,
+          "swc": 0.3118034675,
+          "frac": 0.25,
+          "lue": 0.1655492768
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 7.691466619,
+          "reco": 5.812469931,
+          "nee": -1.878996688,
+          "ta": 12.64785714,
+          "light": 20.63252957,
+          "rain": 0.2614285714,
+          "swc": 0.256600535,
+          "frac": 0.1770833333,
+          "lue": 0.3876185038
+        }
+      },
+      "delta": {
+        "gpp": 4.949174925,
+        "reco": 5.044744086,
+        "nee": 0.09556916139,
+        "ta": 5.3525,
+        "light": 4.422894429,
+        "rain": -0.6728571429,
+        "swc": -0.05520293254,
+        "frac": -0.07291666667
+      },
+      "rain14": -9.42,
+      "lightPct": 27.28558903,
+      "observed": 4.949174925,
+      "expected": 2.331416458,
+      "residual": 2.617758467,
+      "residualRank": 95.93495935,
+      "rawRank": 97.15447154,
+      "nControls": 246,
+      "matched": {
+        "n": 7,
+        "controlDelta": 4.072297424,
+        "diff": 0.8768775005
+      },
+      "lightNorm": {
+        "before": 0.1655492768,
+        "after": 0.3876185038,
+        "delta": 0.2220692269,
+        "pct": 134.140862
+      },
+      "expectedSwc": 2.522941432,
+      "residualSwc": 2.426233493,
+      "residual10": 2.646953394,
+      "residualRank10": 97.83783784,
+      "relGppPct": 180.4758749,
+      "pooledResidualPct": 45.70673867,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "qvidja-2019-06-20",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2019-06-20",
+      "end": "2019-06-20",
+      "doy": 171,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "Mineral fertiliser NPK 23-10-8, 220 kg/ha",
+      "events": [
+        {
+          "date": "2019-06-20",
+          "type": "fertilisation",
+          "detail": "Mineral fertiliser NPK 23-10-8, 220 kg/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 50.6,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 6.909669933,
+          "reco": 3.829734555,
+          "nee": -3.079935378,
+          "ta": 17.83584821,
+          "light": 23.51160514,
+          "rain": 0.1728571429,
+          "swc": 0.2128971884,
+          "frac": 0.5029761905,
+          "lue": 0.2826318499
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 4.385289674,
+          "reco": 3.191633865,
+          "nee": -1.193655809,
+          "ta": 16.1916369,
+          "light": 23.41645329,
+          "rain": 0.5964285714,
+          "swc": 0.1936625984,
+          "frac": 0.3392857143,
+          "lue": 0.1930470928
+        }
+      },
+      "delta": {
+        "gpp": -2.52438026,
+        "reco": -0.6381006899,
+        "nee": 1.88627957,
+        "ta": -1.64421131,
+        "light": -0.09515185714,
+        "rain": 0.4235714286,
+        "swc": -0.01923458995,
+        "frac": -0.1636904762
+      },
+      "rain14": 5.93,
+      "lightPct": -0.4047016636,
+      "observed": -2.52438026,
+      "expected": 0.9734777045,
+      "residual": -3.497857964,
+      "residualRank": 0.0,
+      "rawRank": 0.0,
+      "nControls": 246,
+      "matched": {
+        "n": 9,
+        "controlDelta": 1.303170099,
+        "diff": -3.827550359
+      },
+      "lightNorm": {
+        "before": 0.2826318499,
+        "after": 0.1930470928,
+        "delta": -0.08958475709,
+        "pct": -31.69662482
+      },
+      "expectedSwc": 1.234089463,
+      "residualSwc": -3.758469723,
+      "residual10": -3.811229675,
+      "residualRank10": 0.0,
+      "relGppPct": -36.53402093,
+      "pooledResidualPct": -69.91841962,
+      "fluxUsed": false,
+      "fluxExclusion": "overlap",
+      "overlapWith": [
+        "harvest-cut 2019-06-11"
+      ],
+      "inSummary": false
+    },
+    {
+      "id": "qvidja-2020-07-27",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2020-07-27",
+      "end": "2020-07-27",
+      "doy": 209,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Own NPK mix 2020 (oma NPK seos), 9380 kg/ha fresh, DM 0.13, 49 kg N/ha (Qvidja xlsx date 2020-05-25); Tube compost chips / silage (tuubikompostihake), 10000 kg/ha fresh, DM 0.283; 1010 kg C/ha (AG_XLSX)",
+      "events": [
+        {
+          "date": "2020-07-27",
+          "type": "fertilisation",
+          "detail": "Own NPK mix 2020 (oma NPK seos), 9380 kg/ha fresh, DM 0.13, 49 kg N/ha (Qvidja xlsx date 2020-05-25)"
+        },
+        {
+          "date": "2020-07-27",
+          "type": "fertilisation",
+          "detail": "Tube compost chips / silage (tuubikompostihake), 10000 kg/ha fresh, DM 0.283; 1010 kg C/ha (AG_XLSX)"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 49.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 9.832473843,
+          "reco": 7.529997758,
+          "nee": -2.302476085,
+          "ta": 16.26279762,
+          "light": 21.26490557,
+          "rain": 2.025714286,
+          "swc": 0.3079137678,
+          "frac": 0.3526785714,
+          "lue": 0.4836712809
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 5.980416267,
+          "reco": 3.649374542,
+          "nee": -2.331041725,
+          "ta": 17.52857143,
+          "light": 19.47588429,
+          "rain": 0.3464285714,
+          "swc": 0.2744259982,
+          "frac": 0.3675595238,
+          "lue": 0.324850438
+        }
+      },
+      "delta": {
+        "gpp": -3.852057576,
+        "reco": -3.880623216,
+        "nee": -0.0285656399,
+        "ta": 1.26577381,
+        "light": -1.789021286,
+        "rain": -1.679285714,
+        "swc": -0.03348776962,
+        "frac": 0.01488095238
+      },
+      "rain14": -23.51,
+      "lightPct": -8.413022478,
+      "observed": -3.852057576,
+      "expected": 1.630058737,
+      "residual": -5.482116312,
+      "residualRank": 0.0,
+      "rawRank": 0.0,
+      "nControls": 246,
+      "matched": {
+        "n": 6,
+        "controlDelta": 1.957040633,
+        "diff": -5.809098208
+      },
+      "lightNorm": {
+        "before": 0.4836712809,
+        "after": 0.324850438,
+        "delta": -0.158820843,
+        "pct": -32.83652539
+      },
+      "expectedSwc": 1.691080373,
+      "residualSwc": -5.543137949,
+      "residual10": -5.460160755,
+      "residualRank10": 0.0,
+      "relGppPct": -39.17689116,
+      "pooledResidualPct": -97.10716426,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "qvidja-2021-04-20",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2021-04-20",
+      "end": "2021-04-27",
+      "doy": 110,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "organic",
+      "product": "N fertilisation, 46 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2021-04-20",
+          "type": "tillage",
+          "detail": "Harrowing"
+        },
+        {
+          "date": "2021-04-27",
+          "type": "fertilisation",
+          "detail": "N fertilisation, 46 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": 46.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.8178537986,
+          "reco": 1.46999111,
+          "nee": 0.6521373109,
+          "ta": 4.815818452,
+          "light": 15.07728214,
+          "rain": 0.8985714286,
+          "swc": 0.4155658077,
+          "frac": 0.2886904762,
+          "lue": 0.05925285892
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.077820778,
+          "reco": 1.40431,
+          "nee": -0.673510778,
+          "ta": 5.650848214,
+          "light": 17.20522671,
+          "rain": 2.274285714,
+          "swc": 0.3880260773,
+          "frac": 0.2291666667,
+          "lue": 0.1279436828
+        }
+      },
+      "delta": {
+        "gpp": 1.259966979,
+        "reco": -0.06568110972,
+        "nee": -1.325648089,
+        "ta": 0.8350297619,
+        "light": 2.127944571,
+        "rain": 1.375714286,
+        "swc": -0.02753973034,
+        "frac": -0.05952380952
+      },
+      "rain14": 19.26,
+      "lightPct": 14.11358195,
+      "observed": 1.259966979,
+      "expected": 1.43252586,
+      "residual": -0.1725588807,
+      "residualRank": 47.96747967,
+      "rawRank": 41.8699187,
+      "nControls": 246,
+      "matched": {
+        "n": 23,
+        "controlDelta": 1.224200748,
+        "diff": 0.03576623151
+      },
+      "lightNorm": {
+        "before": 0.05925285892,
+        "after": 0.1279436828,
+        "delta": 0.06869082388,
+        "pct": 115.9282862
+      },
+      "expectedSwc": 1.695500592,
+      "residualSwc": -0.4355336129,
+      "residual10": -0.4110302234,
+      "residualRank10": 36.21621622,
+      "relGppPct": 154.0577278,
+      "pooledResidualPct": 80.50085705,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "qvidja-2021-05-12",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2021-05-12",
+      "end": "2021-05-12",
+      "doy": 132,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Broiler litter manure (kuivikelanta), 4000 kg/ha fresh, DM 0.66",
+      "events": [
+        {
+          "date": "2021-05-12",
+          "type": "fertilisation",
+          "detail": "Broiler litter manure (kuivikelanta), 4000 kg/ha fresh, DM 0.66"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.077820778,
+          "reco": 1.40431,
+          "nee": -0.673510778,
+          "ta": 5.650848214,
+          "light": 17.20522671,
+          "rain": 2.274285714,
+          "swc": 0.3880260773,
+          "frac": 0.2291666667,
+          "lue": 0.1279436828
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 8.108687228,
+          "reco": 4.444955992,
+          "nee": -3.663731236,
+          "ta": 11.54327381,
+          "light": 17.33220386,
+          "rain": 2.615714286,
+          "swc": 0.37545812,
+          "frac": 0.2202380952,
+          "lue": 0.4956581403
+        }
+      },
+      "delta": {
+        "gpp": 6.03086645,
+        "reco": 3.040645992,
+        "nee": -2.990220458,
+        "ta": 5.892425595,
+        "light": 0.1269771429,
+        "rain": 0.3414285714,
+        "swc": -0.01256795731,
+        "frac": -0.008928571429
+      },
+      "rain14": 4.78,
+      "lightPct": 0.7380149356,
+      "observed": 6.03086645,
+      "expected": 2.571077393,
+      "residual": 3.459789057,
+      "residualRank": 98.37398374,
+      "rawRank": 98.37398374,
+      "nControls": 246,
+      "matched": {
+        "n": 4,
+        "controlDelta": 3.063129619,
+        "diff": 2.967736831
+      },
+      "lightNorm": {
+        "before": 0.1279436828,
+        "after": 0.4956581403,
+        "delta": 0.3677144575,
+        "pct": 287.4033711
+      },
+      "expectedSwc": 2.368236,
+      "residualSwc": 3.66263045,
+      "residual10": 3.798740299,
+      "residualRank10": 100.0,
+      "relGppPct": 290.2495978,
+      "pooledResidualPct": 173.5437756,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "qvidja-2022-07-04",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2022-07-04",
+      "end": "2022-07-04",
+      "doy": 185,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Qvidja compost, 15330 kg/ha fresh, DM 0.354; 1495 kg C/ha and 87 kg N/ha (AG_XLSX, N source not stated)",
+      "events": [
+        {
+          "date": "2022-07-04",
+          "type": "fertilisation",
+          "detail": "Qvidja compost, 15330 kg/ha fresh, DM 0.354; 1495 kg C/ha and 87 kg N/ha (AG_XLSX, N source not stated)"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 87.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 5.262256878,
+          "reco": 3.886386158,
+          "nee": -1.37587072,
+          "ta": 20.88417411,
+          "light": 24.25869386,
+          "rain": 0.4428571429,
+          "swc": 0.1812475379,
+          "frac": 0.4523809524,
+          "lue": 0.2300070459
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 4.544059836,
+          "reco": 3.049370482,
+          "nee": -1.494689354,
+          "ta": 16.09406994,
+          "light": 17.896293,
+          "rain": 2.688571429,
+          "swc": 0.1745717053,
+          "frac": 0.34375,
+          "lue": 0.2745570604
+        }
+      },
+      "delta": {
+        "gpp": -0.7181970422,
+        "reco": -0.8370156763,
+        "nee": -0.1188186342,
+        "ta": -4.790104167,
+        "light": -6.362400857,
+        "rain": 2.245714286,
+        "swc": -0.006675832541,
+        "frac": -0.1086309524
+      },
+      "rain14": 31.44,
+      "lightPct": -26.22730183,
+      "observed": -0.7181970422,
+      "expected": 0.4257905664,
+      "residual": -1.143987609,
+      "residualRank": 17.4796748,
+      "rawRank": 2.43902439,
+      "nControls": 246,
+      "matched": {
+        "n": 2,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.2300070459,
+        "after": 0.2745570604,
+        "delta": 0.04455001452,
+        "pct": 19.36897818
+      },
+      "expectedSwc": 0.613193035,
+      "residualSwc": -1.331390077,
+      "residual10": -1.479304369,
+      "residualRank10": 12.97297297,
+      "relGppPct": -13.64808026,
+      "pooledResidualPct": 10.62084468,
+      "fluxUsed": false,
+      "fluxExclusion": "overlap",
+      "overlapWith": [
+        "harvest-cut 2022-06-21"
+      ],
+      "inSummary": false
+    },
+    {
+      "id": "qvidja-2023-08-30",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2023-08-30",
+      "end": "2023-08-30",
+      "doy": 242,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Soilfood compost fibre (Rav.kuitu II L), 34500 kg/ha fresh, DM 0.48",
+      "events": [
+        {
+          "date": "2023-08-30",
+          "type": "fertilisation",
+          "detail": "Soilfood compost fibre (Rav.kuitu II L), 34500 kg/ha fresh, DM 0.48"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.384590822,
+          "reco": 4.833997819,
+          "nee": 2.449406997,
+          "ta": 16.59040923,
+          "light": 12.06075086,
+          "rain": 5.875714286,
+          "swc": 0.2902964762,
+          "frac": 0.224702381,
+          "lue": 0.1358490013
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 4.984704252,
+          "reco": 9.284409208,
+          "nee": 4.299704956,
+          "ta": 15.7075,
+          "light": 9.320154429,
+          "rain": 0.7807142857,
+          "swc": 0.3430161416,
+          "frac": 0.4032738095,
+          "lue": 0.5269756622
+        }
+      },
+      "delta": {
+        "gpp": 2.60011343,
+        "reco": 4.450411389,
+        "nee": 1.850297959,
+        "ta": -0.8829092262,
+        "light": -2.740596429,
+        "rain": -5.095,
+        "swc": 0.0527196654,
+        "frac": 0.1785714286
+      },
+      "rain14": -71.33,
+      "lightPct": -22.72326542,
+      "observed": 2.60011343,
+      "expected": 1.240339018,
+      "residual": 1.359774412,
+      "residualRank": 87.39837398,
+      "rawRank": 78.45528455,
+      "nControls": 246,
+      "matched": {
+        "n": 5,
+        "controlDelta": -1.163246873,
+        "diff": 3.763360304
+      },
+      "lightNorm": {
+        "before": 0.1358490013,
+        "after": 0.5269756622,
+        "delta": 0.3911266609,
+        "pct": 287.9127981
+      },
+      "expectedSwc": 1.038620299,
+      "residualSwc": 1.561493131,
+      "residual10": 1.33388077,
+      "residualRank10": 85.94594595,
+      "relGppPct": 109.038138,
+      "pooledResidualPct": 87.48332661,
+      "fluxUsed": false,
+      "fluxExclusion": "overlap",
+      "overlapWith": [
+        "harvest-cut 2023-08-21",
+        "tillage 2023-09-07"
+      ],
+      "inSummary": false
+    },
+    {
+      "id": "sarkisuo-2022-05-30",
+      "site": "sarkisuo",
+      "siteName": "Särkisuo",
+      "start": "2022-05-30",
+      "end": "2022-05-30",
+      "doy": 150,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "Synthetic N fertiliser, 90 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2022-05-30",
+          "type": "fertilisation",
+          "detail": "Synthetic N fertiliser, 90 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 90.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 13,
+          "light": 11,
+          "rain": 14,
+          "swc": 11,
+          "frac": 14,
+          "lue": 11
+        },
+        "mean": {
+          "gpp": 2.066599488,
+          "reco": 2.71688162,
+          "nee": 0.6502821319,
+          "ta": 9.091561348,
+          "light": 38.54797164,
+          "rain": 0.35,
+          "swc": 0.4325923557,
+          "frac": 0.5461309524,
+          "lue": 0.04947300643
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 5.154619598,
+          "reco": 3.914175783,
+          "nee": -1.240443815,
+          "ta": 13.5458929,
+          "light": 35.30056235,
+          "rain": 1.921428571,
+          "swc": 0.3920682489,
+          "frac": 0.6294642857,
+          "lue": 0.1476971108
+        }
+      },
+      "delta": {
+        "gpp": 3.08802011,
+        "reco": 1.197294163,
+        "nee": -1.890725947,
+        "ta": 4.454331548,
+        "light": null,
+        "rain": 1.571428571,
+        "swc": null,
+        "frac": 0.08333333333
+      },
+      "rain14": 22.0,
+      "lightPct": null,
+      "observed": 3.08802011,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": 100.0,
+      "nControls": 1,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": null,
+        "after": 0.1476971108,
+        "delta": null,
+        "pct": null
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": 149.4251851,
+      "pooledResidualPct": null,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "sarkisuo-2022-06-30",
+      "site": "sarkisuo",
+      "siteName": "Särkisuo",
+      "start": "2022-06-30",
+      "end": "2022-07-04",
+      "doy": 181,
+      "kind": "harvestCutFert",
+      "classes": [
+        "fertilisation",
+        "harvest-cut"
+      ],
+      "fert": "mineral",
+      "product": "Synthetic N fertiliser, 69 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2022-06-30",
+          "type": "harvest",
+          "detail": "Timothy and meadow fescue, first cut, 2450 kg DW/ha"
+        },
+        {
+          "date": "2022-07-04",
+          "type": "fertilisation",
+          "detail": "Synthetic N fertiliser, 69 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": true,
+      "withTillage": false,
+      "nKgHa": 69.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 13,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 13
+        },
+        "mean": {
+          "gpp": 9.885318132,
+          "reco": 5.823799667,
+          "nee": -4.061518465,
+          "ta": 16.30084564,
+          "light": 39.03634066,
+          "rain": 3.242857143,
+          "swc": 0.5009962452,
+          "frac": 0.6205357143,
+          "lue": 0.3047526447
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 13,
+          "light": 11,
+          "rain": 14,
+          "swc": 11,
+          "frac": 14,
+          "lue": 11
+        },
+        "mean": {
+          "gpp": 8.313448032,
+          "reco": 6.512065166,
+          "nee": -1.801382866,
+          "ta": 16.02679603,
+          "light": 32.89318719,
+          "rain": 3.121428571,
+          "swc": 0.3981657197,
+          "frac": 0.4494047619,
+          "lue": 0.2551613086
+        }
+      },
+      "delta": {
+        "gpp": -1.571870101,
+        "reco": 0.6882654985,
+        "nee": 2.260135599,
+        "ta": -0.2740496138,
+        "light": null,
+        "rain": -0.1214285714,
+        "swc": null,
+        "frac": -0.1711309524
+      },
+      "rain14": -1.7,
+      "lightPct": null,
+      "observed": -1.571870101,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": 0.0,
+      "nControls": 1,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.3047526447,
+        "after": null,
+        "delta": null,
+        "pct": null
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": -15.9010573,
+      "pooledResidualPct": null,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "sarkisuo-2023-05-22",
+      "site": "sarkisuo",
+      "siteName": "Särkisuo",
+      "start": "2023-05-22",
+      "end": "2023-05-22",
+      "doy": 142,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "N fertiliser, 90 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2023-05-22",
+          "type": "fertilisation",
+          "detail": "N fertiliser, 90 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 90.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 9,
+          "light": 8,
+          "rain": 8,
+          "swc": 8,
+          "frac": 14,
+          "lue": 8
+        },
+        "mean": {
+          "gpp": 2.432613465,
+          "reco": 1.876652122,
+          "nee": -0.5559613428,
+          "ta": 12.06287778,
+          "light": 41.17444339,
+          "rain": 0.0875,
+          "swc": 0.5818992188,
+          "frac": 0.4449404762,
+          "lue": 0.02904825667
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 0,
+          "light": 0,
+          "rain": 0,
+          "swc": 0,
+          "frac": 14,
+          "lue": 0
+        },
+        "mean": {
+          "gpp": 7.772274864,
+          "reco": 2.743977871,
+          "nee": -5.028296994,
+          "ta": null,
+          "light": null,
+          "rain": null,
+          "swc": null,
+          "frac": 0.7261904762,
+          "lue": null
+        }
+      },
+      "delta": {
+        "gpp": 5.339661399,
+        "reco": 0.8673257484,
+        "nee": -4.472335651,
+        "ta": null,
+        "light": null,
+        "rain": null,
+        "swc": null,
+        "frac": 0.28125
+      },
+      "rain14": null,
+      "lightPct": null,
+      "observed": 5.339661399,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": 100.0,
+      "nControls": 1,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": null,
+        "after": null,
+        "delta": null,
+        "pct": null
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": 219.5030767,
+      "pooledResidualPct": null,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "sarkisuo-2023-06-29",
+      "site": "sarkisuo",
+      "siteName": "Särkisuo",
+      "start": "2023-06-29",
+      "end": "2023-07-03",
+      "doy": 180,
+      "kind": "harvestCutFert",
+      "classes": [
+        "fertilisation",
+        "harvest-cut"
+      ],
+      "fert": "organic",
+      "product": "N fertiliser, 73 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2023-06-29",
+          "type": "harvest",
+          "detail": "Timothy and meadow fescue, first cut, 4032 kg DW/ha"
+        },
+        {
+          "date": "2023-07-03",
+          "type": "fertilisation",
+          "detail": "N fertiliser, 73 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": true,
+      "withTillage": false,
+      "nKgHa": 73.0,
+      "before": {
+        "nDays": {
+          "gpp": 0,
+          "reco": 0,
+          "nee": 14,
+          "ta": 0,
+          "light": 0,
+          "rain": 0,
+          "swc": 0,
+          "frac": 14,
+          "lue": 0
+        },
+        "mean": {
+          "gpp": null,
+          "reco": null,
+          "nee": -3.404791868,
+          "ta": null,
+          "light": null,
+          "rain": null,
+          "swc": null,
+          "frac": 0.5580357143,
+          "lue": null
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 8,
+          "reco": 8,
+          "nee": 14,
+          "ta": 0,
+          "light": 0,
+          "rain": 0,
+          "swc": 0,
+          "frac": 14,
+          "lue": 0
+        },
+        "mean": {
+          "gpp": 8.226066987,
+          "reco": 6.057147944,
+          "nee": -0.5922383355,
+          "ta": null,
+          "light": null,
+          "rain": null,
+          "swc": null,
+          "frac": 0.59375,
+          "lue": null
+        }
+      },
+      "delta": {
+        "gpp": null,
+        "reco": null,
+        "nee": 2.812553533,
+        "ta": null,
+        "light": null,
+        "rain": null,
+        "swc": null,
+        "frac": 0.03571428571
+      },
+      "rain14": null,
+      "lightPct": null,
+      "observed": null,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": null,
+      "nControls": 1,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": null,
+        "after": null,
+        "delta": null,
+        "pct": null
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": null,
+      "pooledResidualPct": null,
+      "fluxUsed": false,
+      "fluxExclusion": "too-few-days",
+      "overlapWith": [],
+      "inSummary": false
+    },
+    {
+      "id": "viikki-2022-05-10",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2022-05-10",
+      "end": "2022-05-10",
+      "doy": 130,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "CAN mineral fertiliser, 108 kg N/ha",
+      "events": [
+        {
+          "date": "2022-05-10",
+          "type": "fertilisation",
+          "detail": "CAN mineral fertiliser, 108 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 108.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.9459291819,
+          "reco": 2.145605709,
+          "nee": 3.091534891,
+          "ta": 5.711678808,
+          "light": 36.15712843,
+          "rain": 0.2642857143,
+          "swc": 0.3541855261,
+          "frac": 0.2336309524,
+          "lue": -0.02728638413
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.176349557,
+          "reco": 4.034826194,
+          "nee": 1.858476637,
+          "ta": 10.24471791,
+          "light": 44.50750071,
+          "rain": 0.8,
+          "swc": 0.3111481558,
+          "frac": 0.1607142857,
+          "lue": 0.04586943198
+        }
+      },
+      "delta": {
+        "gpp": 3.122278738,
+        "reco": 1.889220485,
+        "nee": -1.233058253,
+        "ta": 4.533039101,
+        "light": 8.350372286,
+        "rain": 0.5357142857,
+        "swc": -0.04303737029,
+        "frac": -0.07291666667
+      },
+      "rain14": 7.5,
+      "lightPct": 23.09467773,
+      "observed": 3.122278738,
+      "expected": 1.899604659,
+      "residual": 1.222674079,
+      "residualRank": 85.29411765,
+      "rawRank": 88.23529412,
+      "nControls": 68,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": -0.02728638413,
+        "after": 0.04586943198,
+        "delta": 0.07315581611,
+        "pct": null
+      },
+      "expectedSwc": 3.666295176,
+      "residualSwc": -0.5440164377,
+      "residual10": 1.036374559,
+      "residualRank10": 100.0,
+      "relGppPct": null,
+      "pooledResidualPct": null,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "viikki-2023-04-27",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2023-04-27",
+      "end": "2023-04-28",
+      "doy": 117,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "organic",
+      "product": "Dry manure (separated solid fraction of cow manure, 43 m3/ha, 18.5 kg TAN/ha), 18.4 kg N/ha",
+      "events": [
+        {
+          "date": "2023-04-27",
+          "type": "fertilisation",
+          "detail": "Dry manure (separated solid fraction of cow manure, 43 m3/ha, 18.5 kg TAN/ha), 18.4 kg N/ha"
+        },
+        {
+          "date": "2023-04-28",
+          "type": "tillage",
+          "detail": "Levelling harrow, about 5 cm, manure worked in"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": 18.4,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.9050608773,
+          "reco": 4.17158213,
+          "nee": 3.266521253,
+          "ta": 7.851547619,
+          "light": 37.70773971,
+          "rain": 0.4642857143,
+          "swc": 0.1237641908,
+          "frac": 0.1651785714,
+          "lue": 0.02495491948
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.08687692722,
+          "reco": 3.034949315,
+          "nee": 3.121826242,
+          "ta": 6.946011127,
+          "light": 39.66809143,
+          "rain": 1.064285714,
+          "swc": 0.2623544536,
+          "frac": 0.2857142857,
+          "lue": -0.004396647656
+        }
+      },
+      "delta": {
+        "gpp": -0.9919378045,
+        "reco": -1.136632816,
+        "nee": -0.1446950112,
+        "ta": -0.9055364925,
+        "light": 1.960351714,
+        "rain": 0.6,
+        "swc": 0.1385902627,
+        "frac": 0.1205357143
+      },
+      "rain14": 8.4,
+      "lightPct": 5.19880462,
+      "observed": -0.9919378045,
+      "expected": 0.559089306,
+      "residual": -1.551027111,
+      "residualRank": 4.411764706,
+      "rawRank": 44.11764706,
+      "nControls": 68,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.02495491948,
+        "after": -0.004396647656,
+        "delta": -0.02935156713,
+        "pct": -117.6183604
+      },
+      "expectedSwc": 1.956671646,
+      "residualSwc": -2.94860945,
+      "residual10": -1.500646734,
+      "residualRank10": 0.0,
+      "relGppPct": -109.5990148,
+      "pooledResidualPct": -156.1058082,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "viikki-2023-05-25",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2023-05-25",
+      "end": "2023-05-25",
+      "doy": 145,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "mineral",
+      "product": "Mineral N, 250 kg/ha product, 67.5 kg N/ha",
+      "events": [
+        {
+          "date": "2023-05-25",
+          "type": "fertilisation",
+          "detail": "Mineral N, 250 kg/ha product, 67.5 kg N/ha"
+        },
+        {
+          "date": "2023-05-25",
+          "type": "tillage",
+          "detail": "Tillage"
+        }
+      ],
+      "coEvents": [
+        {
+          "date": "2023-05-25",
+          "type": "sowing",
+          "detail": "Barley, 200 kg/ha, undersown with mixed grass seed, 20 kg/ha"
+        }
+      ],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": 67.5,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.6583681347,
+          "reco": 5.015059946,
+          "nee": 4.356691812,
+          "ta": 13.16399314,
+          "light": 41.77910571,
+          "rain": 0.3714285714,
+          "swc": 0.3045168362,
+          "frac": 0.1830357143,
+          "lue": 0.01573957888
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.414142808,
+          "reco": 5.255117937,
+          "nee": 2.84097513,
+          "ta": 11.43412128,
+          "light": 42.62074714,
+          "rain": 0.2928571429,
+          "swc": 0.2090773406,
+          "frac": 0.1279761905,
+          "lue": 0.0575900491
+        }
+      },
+      "delta": {
+        "gpp": 1.755774673,
+        "reco": 0.2400579911,
+        "nee": -1.515716682,
+        "ta": -1.72987186,
+        "light": 0.8416414286,
+        "rain": -0.07857142857,
+        "swc": -0.09543949557,
+        "frac": -0.05505952381
+      },
+      "rain14": -1.1,
+      "lightPct": 2.014503217,
+      "observed": 1.755774673,
+      "expected": 0.3464597774,
+      "residual": 1.409314896,
+      "residualRank": 88.23529412,
+      "rawRank": 88.23529412,
+      "nControls": 68,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.01573957888,
+        "after": 0.0575900491,
+        "delta": 0.04185047022,
+        "pct": 265.8932018
+      },
+      "expectedSwc": 0.6129151331,
+      "residualSwc": 1.14285954,
+      "residual10": 1.499712238,
+      "residualRank10": 100.0,
+      "relGppPct": 266.6858526,
+      "pooledResidualPct": 232.0534761,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "viikki-2024-05-08",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2024-05-08",
+      "end": "2024-05-08",
+      "doy": 129,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "Mineral fertiliser BeFert CAN (N27-S4), 100 kg/ha, 27.0 kg N/ha",
+      "events": [
+        {
+          "date": "2024-05-08",
+          "type": "fertilisation",
+          "detail": "Mineral fertiliser BeFert CAN (N27-S4), 100 kg/ha, 27.0 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 27.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.4416664774,
+          "reco": 1.182434375,
+          "nee": 0.7407678981,
+          "ta": 7.74047619,
+          "light": 39.17972829,
+          "rain": 0.1714285714,
+          "swc": 0.4424179799,
+          "frac": 0.2633928571,
+          "lue": 0.01346942294
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 1.869379369,
+          "reco": 2.793195332,
+          "nee": 0.923815963,
+          "ta": 12.8610119,
+          "light": 45.04377471,
+          "rain": 0.05714285714,
+          "swc": 0.2651108333,
+          "frac": 0.2053571429,
+          "lue": 0.04317977052
+        }
+      },
+      "delta": {
+        "gpp": 1.427712891,
+        "reco": 1.610760956,
+        "nee": 0.183048065,
+        "ta": 5.120535714,
+        "light": 5.864046429,
+        "rain": -0.1142857143,
+        "swc": -0.1773071467,
+        "frac": -0.05803571429
+      },
+      "rain14": -1.6,
+      "lightPct": 14.9670421,
+      "observed": 1.427712891,
+      "expected": 1.842998885,
+      "residual": -0.4152859942,
+      "residualRank": 54.41176471,
+      "rawRank": 88.23529412,
+      "nControls": 68,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.01346942294,
+        "after": 0.04317977052,
+        "delta": 0.02971034758,
+        "pct": 220.5762468
+      },
+      "expectedSwc": 2.959030785,
+      "residualSwc": -1.531317893,
+      "residual10": -0.5388052707,
+      "residualRank10": 0.0,
+      "relGppPct": null,
+      "pooledResidualPct": null,
+      "fluxUsed": false,
+      "fluxExclusion": "overlap",
+      "overlapWith": [
+        "fertilisation 2024-05-22"
+      ],
+      "inSummary": false
+    },
+    {
+      "id": "viikki-2024-05-22",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2024-05-22",
+      "end": "2024-05-22",
+      "doy": 143,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Liquid manure, 25 t/ha, 57.5 kg N/ha",
+      "events": [
+        {
+          "date": "2024-05-22",
+          "type": "fertilisation",
+          "detail": "Liquid manure, 25 t/ha, 57.5 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 57.5,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 1.717318672,
+          "reco": 2.798893398,
+          "nee": 1.081574726,
+          "ta": 12.14985119,
+          "light": 44.868231,
+          "rain": 0.05714285714,
+          "swc": 0.2770190362,
+          "frac": 0.2157738095,
+          "lue": 0.04042763645
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 3.030573285,
+          "reco": 1.205522512,
+          "nee": -1.825050773,
+          "ta": 19.48690476,
+          "light": 50.31282986,
+          "rain": 0.2428571429,
+          "swc": 0.1294137542,
+          "frac": 0.1785714286,
+          "lue": 0.06021537382
+        }
+      },
+      "delta": {
+        "gpp": 1.313254613,
+        "reco": -1.593370885,
+        "nee": -2.906625499,
+        "ta": 7.337053571,
+        "light": 5.444598857,
+        "rain": 0.1857142857,
+        "swc": -0.1476052819,
+        "frac": -0.03720238095
+      },
+      "rain14": 2.6,
+      "lightPct": 12.13464123,
+      "observed": 1.313254613,
+      "expected": 2.186614925,
+      "residual": -0.8733603114,
+      "residualRank": 16.17647059,
+      "rawRank": 88.23529412,
+      "nControls": 68,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.04042763645,
+        "after": 0.06021537382,
+        "delta": 0.01978773737,
+        "pct": 48.94606538
+      },
+      "expectedSwc": 3.64999763,
+      "residualSwc": -2.336743016,
+      "residual10": -1.004420336,
+      "residualRank10": 0.0,
+      "relGppPct": 76.47122427,
+      "pooledResidualPct": -66.29323217,
+      "fluxUsed": false,
+      "fluxExclusion": "overlap",
+      "overlapWith": [
+        "fertilisation 2024-05-08"
+      ],
+      "inSummary": false
+    },
+    {
+      "id": "viikki-2024-10-09",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2024-10-09",
+      "end": "2024-10-09",
+      "doy": 283,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "organic",
+      "product": "Separated cow manure, dry fraction, 15 t/ha, 22.5 kg N/ha",
+      "events": [
+        {
+          "date": "2024-10-09",
+          "type": "fertilisation",
+          "detail": "Separated cow manure, dry fraction, 15 t/ha, 22.5 kg N/ha"
+        },
+        {
+          "date": "2024-10-09",
+          "type": "tillage",
+          "detail": "Tillage"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": 22.5,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.6514742087,
+          "reco": 4.164535228,
+          "nee": 3.51306102,
+          "ta": 8.862797619,
+          "light": 13.871358,
+          "rain": 4.335714286,
+          "swc": 0.3232977574,
+          "frac": 0.2410714286,
+          "lue": 0.05255178805
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.4831033973,
+          "reco": 4.702703679,
+          "nee": 4.219600282,
+          "ta": 8.839136905,
+          "light": 8.183439,
+          "rain": 0.3785714286,
+          "swc": 0.312863889,
+          "frac": 0.4895833333,
+          "lue": 0.06913644118
+        }
+      },
+      "delta": {
+        "gpp": -0.1683708115,
+        "reco": 0.5381684511,
+        "nee": 0.7065392626,
+        "ta": -0.02366071429,
+        "light": -5.687919,
+        "rain": -3.957142857,
+        "swc": -0.01043386835,
+        "frac": 0.2485119048
+      },
+      "rain14": -55.4,
+      "lightPct": -41.00477401,
+      "observed": -0.1683708115,
+      "expected": -0.2066145932,
+      "residual": 0.03824378172,
+      "residualRank": 75.0,
+      "rawRank": 70.58823529,
+      "nControls": 68,
+      "matched": {
+        "n": 1,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.05255178805,
+        "after": 0.06913644118,
+        "delta": 0.01658465313,
+        "pct": 31.55868477
+      },
+      "expectedSwc": -0.3284710798,
+      "residualSwc": 0.1601002683,
+      "residual10": 0.4814569145,
+      "residualRank10": 96.0,
+      "relGppPct": -25.8445859,
+      "pooledResidualPct": -40.28260767,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    {
+      "id": "viikki-2025-05-08",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2025-05-08",
+      "end": "2025-05-10",
+      "doy": 128,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "mineral",
+      "product": "Mineral fertiliser, 21.6 kg N/ha",
+      "events": [
+        {
+          "date": "2025-05-08",
+          "type": "tillage",
+          "detail": "Tillage"
+        },
+        {
+          "date": "2025-05-10",
+          "type": "fertilisation",
+          "detail": "Mineral fertiliser, 21.6 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": 21.6,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.04138950985,
+          "reco": 1.963800578,
+          "nee": 2.005190088,
+          "ta": 5.615061424,
+          "light": 31.69862871,
+          "rain": 0.8571428571,
+          "swc": 0.3385491926,
+          "frac": 0.2380952381,
+          "lue": -0.0004482000605
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 12,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 0.3675437127,
+          "reco": 2.57170724,
+          "nee": 2.204163527,
+          "ta": 10.87261277,
+          "light": 40.67983157,
+          "rain": 0.8214285714,
+          "swc": 0.3514268409,
+          "frac": 0.1636904762,
+          "lue": 0.009413624692
+        }
+      },
+      "delta": {
+        "gpp": 0.4089332225,
+        "reco": 0.6079066616,
+        "nee": 0.1989734391,
+        "ta": 5.257551349,
+        "light": 8.981202857,
+        "rain": -0.03571428571,
+        "swc": 0.01287764825,
+        "frac": -0.0744047619
+      },
+      "rain14": -0.5,
+      "lightPct": 28.33309585,
+      "observed": 0.4089332225,
+      "expected": 2.135327989,
+      "residual": -1.726394767,
+      "residualRank": 4.411764706,
+      "rawRank": 83.82352941,
+      "nControls": 68,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": -0.0004482000605,
+        "after": 0.009413624692,
+        "delta": 0.009861824753,
+        "pct": null
+      },
+      "expectedSwc": 4.340791783,
+      "residualSwc": -3.931858561,
+      "residual10": -1.969289373,
+      "residualRank10": 0.0,
+      "relGppPct": null,
+      "pooledResidualPct": null,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    }
+  ],
+  "highlights": {
+    "viikki-2022-05-10": {
+      "id": "viikki-2022-05-10",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "start": "2022-05-10",
+      "end": "2022-05-10",
+      "doy": 130,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "CAN mineral fertiliser, 108 kg N/ha",
+      "events": [
+        {
+          "date": "2022-05-10",
+          "type": "fertilisation",
+          "detail": "CAN mineral fertiliser, 108 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 108.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.9459291819,
+          "reco": 2.145605709,
+          "nee": 3.091534891,
+          "ta": 5.711678808,
+          "light": 36.15712843,
+          "rain": 0.2642857143,
+          "swc": 0.3541855261,
+          "frac": 0.2336309524,
+          "lue": -0.02728638413
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.176349557,
+          "reco": 4.034826194,
+          "nee": 1.858476637,
+          "ta": 10.24471791,
+          "light": 44.50750071,
+          "rain": 0.8,
+          "swc": 0.3111481558,
+          "frac": 0.1607142857,
+          "lue": 0.04586943198
+        }
+      },
+      "delta": {
+        "gpp": 3.122278738,
+        "reco": 1.889220485,
+        "nee": -1.233058253,
+        "ta": 4.533039101,
+        "light": 8.350372286,
+        "rain": 0.5357142857,
+        "swc": -0.04303737029,
+        "frac": -0.07291666667
+      },
+      "rain14": 7.5,
+      "lightPct": 23.09467773,
+      "observed": 3.122278738,
+      "expected": 1.899604659,
+      "residual": 1.222674079,
+      "residualRank": 85.29411765,
+      "rawRank": 88.23529412,
+      "nControls": 68,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": -0.02728638413,
+        "after": 0.04586943198,
+        "delta": 0.07315581611,
+        "pct": null
+      },
+      "expectedSwc": 3.666295176,
+      "residualSwc": -0.5440164377,
+      "residual10": 1.036374559,
+      "residualRank10": 100.0,
+      "relGppPct": null,
+      "pooledResidualPct": null,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    "anttila-2022-05-23": {
+      "id": "anttila-2022-05-23",
+      "site": "anttila",
+      "siteName": "Anttila",
+      "start": "2022-05-23",
+      "end": "2022-05-23",
+      "doy": 143,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "mineral",
+      "product": "Synthetic N fertiliser, 52 kg N/ha, product not given",
+      "events": [
+        {
+          "date": "2022-05-23",
+          "type": "fertilisation",
+          "detail": "Synthetic N fertiliser, 52 kg N/ha, product not given"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 52.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.532448331,
+          "reco": 2.387473774,
+          "nee": -0.1449745565,
+          "ta": 8.293912772,
+          "light": 31.87235764,
+          "rain": 1.192857143,
+          "swc": 0.3066008485,
+          "frac": 0.443452381,
+          "lue": 0.08278312985
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 13,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 13
+        },
+        "mean": {
+          "gpp": 10.53814836,
+          "reco": 6.883358498,
+          "nee": -3.654789863,
+          "ta": 12.46545749,
+          "light": 33.88943141,
+          "rain": 1.278571429,
+          "swc": 0.2553694086,
+          "frac": 0.4702380952,
+          "lue": 0.3501531126
+        }
+      },
+      "delta": {
+        "gpp": 8.00570003,
+        "reco": 4.495884724,
+        "nee": -3.509815307,
+        "ta": 4.171544716,
+        "light": 2.017073763,
+        "rain": 0.08571428571,
+        "swc": -0.05123143997,
+        "frac": 0.02678571429
+      },
+      "rain14": 1.2,
+      "lightPct": 6.328599176,
+      "observed": 8.00570003,
+      "expected": null,
+      "residual": null,
+      "residualRank": null,
+      "rawRank": null,
+      "nControls": 0,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.08278312985,
+        "after": 0.3501531126,
+        "delta": 0.2673699827,
+        "pct": 322.9764123
+      },
+      "expectedSwc": null,
+      "residualSwc": null,
+      "residual10": null,
+      "residualRank10": null,
+      "relGppPct": 316.124911,
+      "pooledResidualPct": 213.1634642,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": false
+    },
+    "haltiala-2023-08-01": {
+      "id": "haltiala-2023-08-01",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "start": "2023-08-01",
+      "end": "2023-08-15",
+      "doy": 213,
+      "kind": "tillageFert",
+      "classes": [
+        "fertilisation",
+        "tillage"
+      ],
+      "fert": "organic",
+      "product": "Manure, 10 m3/ha, south sector",
+      "events": [
+        {
+          "date": "2023-08-01",
+          "type": "fertilisation",
+          "detail": "Manure, 10 m3/ha, south sector"
+        },
+        {
+          "date": "2023-08-04",
+          "type": "tillage",
+          "detail": "Disc harrowing (lautasmuokkaus), 4-10 cm, to stop the grass and cover the manure"
+        },
+        {
+          "date": "2023-08-15",
+          "type": "tillage",
+          "detail": "Harrowing, whole field"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": true,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 11.33437396,
+          "reco": 6.600772669,
+          "nee": -4.733601289,
+          "ta": 16.5390625,
+          "light": 32.74367143,
+          "rain": 2.157142857,
+          "swc": 0.3017113095,
+          "frac": 0.7336309524,
+          "lue": 0.3553992803
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 13,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": -0.09649188638,
+          "reco": 5.731629986,
+          "nee": 5.828121872,
+          "ta": 16.57986607,
+          "light": 18.99707143,
+          "rain": 5.915384615,
+          "swc": 0.3226785714,
+          "frac": 0.6547619048,
+          "lue": -0.008035219825
+        }
+      },
+      "delta": {
+        "gpp": -11.43086584,
+        "reco": -0.8691426831,
+        "nee": 10.56172316,
+        "ta": 0.04080357143,
+        "light": -13.7466,
+        "rain": 3.758241758,
+        "swc": 0.0209672619,
+        "frac": -0.07886904762
+      },
+      "rain14": 52.61538462,
+      "lightPct": -41.98246379,
+      "observed": -11.43086584,
+      "expected": -0.2643505036,
+      "residual": -11.16651534,
+      "residualRank": 0.0,
+      "rawRank": 0.0,
+      "nControls": 239,
+      "matched": {
+        "n": 0,
+        "controlDelta": null,
+        "diff": null
+      },
+      "lightNorm": {
+        "before": 0.3553992803,
+        "after": -0.008035219825,
+        "delta": -0.3634345001,
+        "pct": -102.2608993
+      },
+      "expectedSwc": -0.3621135494,
+      "residualSwc": -11.06875229,
+      "residual10": -9.906980152,
+      "residualRank10": 0.0,
+      "relGppPct": -100.8513208,
+      "pooledResidualPct": -115.1108646,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    "qvidja-2019-05-08": {
+      "id": "qvidja-2019-05-08",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2019-05-08",
+      "end": "2019-05-08",
+      "doy": 128,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "By-product fertiliser mix, about 4600 kg/ha (43 g C/m2), 60 kg N/ha",
+      "events": [
+        {
+          "date": "2019-05-08",
+          "type": "fertilisation",
+          "detail": "By-product fertiliser mix, about 4600 kg/ha (43 g C/m2), 60 kg N/ha"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 60.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.742291694,
+          "reco": 0.7677258442,
+          "nee": -1.974565849,
+          "ta": 7.295357143,
+          "light": 16.20963514,
+          "rain": 0.9342857143,
+          "swc": 0.3118034675,
+          "frac": 0.25,
+          "lue": 0.1655492768
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 7.691466619,
+          "reco": 5.812469931,
+          "nee": -1.878996688,
+          "ta": 12.64785714,
+          "light": 20.63252957,
+          "rain": 0.2614285714,
+          "swc": 0.256600535,
+          "frac": 0.1770833333,
+          "lue": 0.3876185038
+        }
+      },
+      "delta": {
+        "gpp": 4.949174925,
+        "reco": 5.044744086,
+        "nee": 0.09556916139,
+        "ta": 5.3525,
+        "light": 4.422894429,
+        "rain": -0.6728571429,
+        "swc": -0.05520293254,
+        "frac": -0.07291666667
+      },
+      "rain14": -9.42,
+      "lightPct": 27.28558903,
+      "observed": 4.949174925,
+      "expected": 2.331416458,
+      "residual": 2.617758467,
+      "residualRank": 95.93495935,
+      "rawRank": 97.15447154,
+      "nControls": 246,
+      "matched": {
+        "n": 7,
+        "controlDelta": 4.072297424,
+        "diff": 0.8768775005
+      },
+      "lightNorm": {
+        "before": 0.1655492768,
+        "after": 0.3876185038,
+        "delta": 0.2220692269,
+        "pct": 134.140862
+      },
+      "expectedSwc": 2.522941432,
+      "residualSwc": 2.426233493,
+      "residual10": 2.646953394,
+      "residualRank10": 97.83783784,
+      "relGppPct": 180.4758749,
+      "pooledResidualPct": 45.70673867,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    "qvidja-2020-07-27": {
+      "id": "qvidja-2020-07-27",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2020-07-27",
+      "end": "2020-07-27",
+      "doy": 209,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Own NPK mix 2020 (oma NPK seos), 9380 kg/ha fresh, DM 0.13, 49 kg N/ha (Qvidja xlsx date 2020-05-25); Tube compost chips / silage (tuubikompostihake), 10000 kg/ha fresh, DM 0.283; 1010 kg C/ha (AG_XLSX)",
+      "events": [
+        {
+          "date": "2020-07-27",
+          "type": "fertilisation",
+          "detail": "Own NPK mix 2020 (oma NPK seos), 9380 kg/ha fresh, DM 0.13, 49 kg N/ha (Qvidja xlsx date 2020-05-25)"
+        },
+        {
+          "date": "2020-07-27",
+          "type": "fertilisation",
+          "detail": "Tube compost chips / silage (tuubikompostihake), 10000 kg/ha fresh, DM 0.283; 1010 kg C/ha (AG_XLSX)"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": 49.0,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 9.832473843,
+          "reco": 7.529997758,
+          "nee": -2.302476085,
+          "ta": 16.26279762,
+          "light": 21.26490557,
+          "rain": 2.025714286,
+          "swc": 0.3079137678,
+          "frac": 0.3526785714,
+          "lue": 0.4836712809
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 5.980416267,
+          "reco": 3.649374542,
+          "nee": -2.331041725,
+          "ta": 17.52857143,
+          "light": 19.47588429,
+          "rain": 0.3464285714,
+          "swc": 0.2744259982,
+          "frac": 0.3675595238,
+          "lue": 0.324850438
+        }
+      },
+      "delta": {
+        "gpp": -3.852057576,
+        "reco": -3.880623216,
+        "nee": -0.0285656399,
+        "ta": 1.26577381,
+        "light": -1.789021286,
+        "rain": -1.679285714,
+        "swc": -0.03348776962,
+        "frac": 0.01488095238
+      },
+      "rain14": -23.51,
+      "lightPct": -8.413022478,
+      "observed": -3.852057576,
+      "expected": 1.630058737,
+      "residual": -5.482116312,
+      "residualRank": 0.0,
+      "rawRank": 0.0,
+      "nControls": 246,
+      "matched": {
+        "n": 6,
+        "controlDelta": 1.957040633,
+        "diff": -5.809098208
+      },
+      "lightNorm": {
+        "before": 0.4836712809,
+        "after": 0.324850438,
+        "delta": -0.158820843,
+        "pct": -32.83652539
+      },
+      "expectedSwc": 1.691080373,
+      "residualSwc": -5.543137949,
+      "residual10": -5.460160755,
+      "residualRank10": 0.0,
+      "relGppPct": -39.17689116,
+      "pooledResidualPct": -97.10716426,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    },
+    "qvidja-2021-05-12": {
+      "id": "qvidja-2021-05-12",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "start": "2021-05-12",
+      "end": "2021-05-12",
+      "doy": 132,
+      "kind": "fertilisation",
+      "classes": [
+        "fertilisation"
+      ],
+      "fert": "organic",
+      "product": "Broiler litter manure (kuivikelanta), 4000 kg/ha fresh, DM 0.66",
+      "events": [
+        {
+          "date": "2021-05-12",
+          "type": "fertilisation",
+          "detail": "Broiler litter manure (kuivikelanta), 4000 kg/ha fresh, DM 0.66"
+        }
+      ],
+      "coEvents": [],
+      "withHarvest": false,
+      "withTillage": false,
+      "nKgHa": null,
+      "before": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 2.077820778,
+          "reco": 1.40431,
+          "nee": -0.673510778,
+          "ta": 5.650848214,
+          "light": 17.20522671,
+          "rain": 2.274285714,
+          "swc": 0.3880260773,
+          "frac": 0.2291666667,
+          "lue": 0.1279436828
+        }
+      },
+      "after": {
+        "nDays": {
+          "gpp": 14,
+          "reco": 14,
+          "nee": 14,
+          "ta": 14,
+          "light": 14,
+          "rain": 14,
+          "swc": 14,
+          "frac": 14,
+          "lue": 14
+        },
+        "mean": {
+          "gpp": 8.108687228,
+          "reco": 4.444955992,
+          "nee": -3.663731236,
+          "ta": 11.54327381,
+          "light": 17.33220386,
+          "rain": 2.615714286,
+          "swc": 0.37545812,
+          "frac": 0.2202380952,
+          "lue": 0.4956581403
+        }
+      },
+      "delta": {
+        "gpp": 6.03086645,
+        "reco": 3.040645992,
+        "nee": -2.990220458,
+        "ta": 5.892425595,
+        "light": 0.1269771429,
+        "rain": 0.3414285714,
+        "swc": -0.01256795731,
+        "frac": -0.008928571429
+      },
+      "rain14": 4.78,
+      "lightPct": 0.7380149356,
+      "observed": 6.03086645,
+      "expected": 2.571077393,
+      "residual": 3.459789057,
+      "residualRank": 98.37398374,
+      "rawRank": 98.37398374,
+      "nControls": 246,
+      "matched": {
+        "n": 4,
+        "controlDelta": 3.063129619,
+        "diff": 2.967736831
+      },
+      "lightNorm": {
+        "before": 0.1279436828,
+        "after": 0.4956581403,
+        "delta": 0.3677144575,
+        "pct": 287.4033711
+      },
+      "expectedSwc": 2.368236,
+      "residualSwc": 3.66263045,
+      "residual10": 3.798740299,
+      "residualRank10": 100.0,
+      "relGppPct": 290.2495978,
+      "pooledResidualPct": 173.5437756,
+      "fluxUsed": true,
+      "fluxExclusion": null,
+      "overlapWith": [],
+      "inSummary": true
+    }
+  },
+  "course": {
+    "days": [
+      -14,
+      -13,
+      -12,
+      -11,
+      -10,
+      -9,
+      -8,
+      -7,
+      -6,
+      -5,
+      -4,
+      -3,
+      -2,
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "minEpisodes": 2,
+    "minGppBefore": 0.5,
+    "lateFrom": 10,
+    "lateTo": 14,
+    "fertOnly": {
+      "episodes": 4,
+      "ids": [
+        "haltiala-2023-06-19",
+        "qvidja-2019-05-08",
+        "qvidja-2020-07-27",
+        "qvidja-2021-05-12"
+      ],
+      "mean": [
+        85.3874966,
+        81.58542279,
+        84.36449555,
+        90.7639616,
+        96.42739053,
+        105.2011601,
+        118.7029276,
+        93.72229798,
+        70.38730969,
+        84.899467,
+        111.5607235,
+        107.8025261,
+        114.1504589,
+        155.044362,
+        139.6895293,
+        157.0257667,
+        149.3483549,
+        173.2444938,
+        151.7705155,
+        170.3466741,
+        221.2152595,
+        218.8816169,
+        264.5390665,
+        231.1606314,
+        276.326548,
+        253.1984007,
+        248.967744,
+        230.521172,
+        131.3775468
+      ],
+      "sd": [
+        12.58841089,
+        22.98580077,
+        33.31337699,
+        14.18773529,
+        19.33368269,
+        17.95462505,
+        15.88854578,
+        35.79931071,
+        39.65230079,
+        20.80864527,
+        38.35362876,
+        35.85536347,
+        45.86012765,
+        55.27013759,
+        73.77596171,
+        94.23375046,
+        95.2151857,
+        134.9793101,
+        144.3960848,
+        118.5559918,
+        159.7820623,
+        154.6936707,
+        207.5690589,
+        185.2417522,
+        270.6531515,
+        217.916343,
+        256.1117764,
+        209.3970875,
+        118.2335677
+      ],
+      "n": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "lateMeanPct": 228.0782823,
+      "lateMeanSdPct": 214.4623852
+    },
+    "withTillage": {
+      "episodes": 7,
+      "ids": [
+        "haltiala-2023-08-01",
+        "haltiala-2024-05-08",
+        "haltiala-2025-05-10",
+        "qvidja-2021-04-20",
+        "viikki-2023-04-27",
+        "viikki-2023-05-25",
+        "viikki-2024-10-09"
+      ],
+      "mean": [
+        81.15257857,
+        64.24780698,
+        79.93614095,
+        58.66637815,
+        86.20428142,
+        108.6265429,
+        77.8947041,
+        116.3671159,
+        109.9239853,
+        115.6623583,
+        129.6651621,
+        137.0843367,
+        106.0850334,
+        128.4835753,
+        90.39715532,
+        58.60847381,
+        29.56006538,
+        53.99393016,
+        66.75022646,
+        62.92411111,
+        60.52582619,
+        49.26017502,
+        107.5638275,
+        89.95744855,
+        120.9658208,
+        131.1064012,
+        131.0481771,
+        149.6868763,
+        156.6640594
+      ],
+      "sd": [
+        23.28254165,
+        33.12789787,
+        33.46065539,
+        30.45665838,
+        28.21123976,
+        48.39693227,
+        69.28312443,
+        43.0959436,
+        49.74922943,
+        29.37298787,
+        39.05897378,
+        54.8462142,
+        55.03339574,
+        123.482294,
+        82.90579907,
+        86.63723898,
+        69.32496445,
+        103.2058744,
+        85.58444065,
+        69.02052817,
+        73.70038011,
+        97.33536344,
+        117.6232201,
+        160.9559514,
+        204.2091391,
+        267.0597503,
+        244.1045658,
+        253.4266315,
+        227.7650133
+      ],
+      "n": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "lateMeanPct": 137.894267,
+      "lateMeanSdPct": 239.31302
+    }
+  },
+  "literature": [
+    {
+      "key": "windowDays",
+      "text": "Mean fluxes 5 days before and after the management dates",
+      "value": 5,
+      "unit": "d",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": "Table C1"
+    },
+    {
+      "key": "parLowerPct",
+      "text": "Mean PAR after the fertilisations of July 2018, August 2018 and May 2019 was lower than the 5-day mean before",
+      "value": [
+        7,
+        29,
+        12
+      ],
+      "unit": "%",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": null
+    },
+    {
+      "key": "rainWithinDays",
+      "text": "Rain fell within 5 days after each fertilisation",
+      "value": 5,
+      "unit": "d",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": "Fig. 4, Table C1"
+    },
+    {
+      "key": "organicNeeIncrease",
+      "text": "The first and second organic fertilisations of 2018 increased NEE (smaller CO2 sink)",
+      "value": [
+        0.27,
+        0.08
+      ],
+      "unit": "mg CO2 m-2 s-1",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": "Fig. 3, Table C1"
+    },
+    {
+      "key": "organicRespiration",
+      "text": "Respiration increased after each organic fertilisation; mineral fertilisation had no immediate effect on the CO2 fluxes",
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 11 (journal p. 3477), Sect. 4.1",
+      "tableFigure": null
+    }
+  ],
+  "literatureByKey": {
+    "windowDays": {
+      "key": "windowDays",
+      "text": "Mean fluxes 5 days before and after the management dates",
+      "value": 5,
+      "unit": "d",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": "Table C1"
+    },
+    "parLowerPct": {
+      "key": "parLowerPct",
+      "text": "Mean PAR after the fertilisations of July 2018, August 2018 and May 2019 was lower than the 5-day mean before",
+      "value": [
+        7,
+        29,
+        12
+      ],
+      "unit": "%",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": null,
+      "valueMin": 7,
+      "valueMax": 29
+    },
+    "rainWithinDays": {
+      "key": "rainWithinDays",
+      "text": "Rain fell within 5 days after each fertilisation",
+      "value": 5,
+      "unit": "d",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": "Fig. 4, Table C1"
+    },
+    "organicNeeIncrease": {
+      "key": "organicNeeIncrease",
+      "text": "The first and second organic fertilisations of 2018 increased NEE (smaller CO2 sink)",
+      "value": [
+        0.27,
+        0.08
+      ],
+      "unit": "mg CO2 m-2 s-1",
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 7 (journal p. 3473), Sect. 3.2",
+      "tableFigure": "Fig. 3, Table C1",
+      "valueMin": 0.08,
+      "valueMax": 0.27
+    },
+    "organicRespiration": {
+      "key": "organicRespiration",
+      "text": "Respiration increased after each organic fertilisation; mineral fertilisation had no immediate effect on the CO2 fluxes",
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "heimsch2021",
+      "page": "PDF p. 11 (journal p. 3477), Sect. 4.1",
+      "tableFigure": null
+    }
+  },
+  "figures": [
+    {
+      "n": 1,
+      "file": "figures/1-gpp-change-vs-temperature.svg",
+      "title": "Change of daily GPP against the change of air temperature from the 14 days before to the 14 days after, for control pairs without management (grey) and for fertilisation episodes (colour), per site.",
+      "desc": "Three scatter panels with the same axes. X axis: change of the mean air temperature, after minus before (°C). Y axis: change of the mean daily GPP, after minus before (g C m-2 d-1). Haltiala: 239 control pairs from 5 years, slope of the temperature-only fit 0.95 g C m-2 d-1 per °C (r = 0.63), 5 fertilisation episodes. Qvidja: 246 control pairs from 7 years, slope of the temperature-only fit 0.20 g C m-2 d-1 per °C (r = 0.43), 4 fertilisation episodes. Viikki: 68 control pairs from 4 years, slope of the temperature-only fit 0.20 g C m-2 d-1 per °C (r = 0.40), 5 fertilisation episodes. Over all 14 fertilisation episodes, the observed GPP change has a mean of −0.07 (SD 4.14) and the change that the weather fit (temperature and light) gives has a mean of 2.24 g C m-2 d-1. In all panels, the GPP change of the control pairs increases with the temperature change. 10 of the 14 fertilisation episodes are below the temperature-only fit line of their site."
+    },
+    {
+      "n": 2,
+      "file": "figures/2-residuals.svg",
+      "title": "Residual GPP change (observed minus the change that the weather fit of the control pairs gives) of each fertilisation episode, per site, with the 10 to 90 % range of the control residuals of the site.",
+      "desc": "Dot plot. X axis: residual of the daily GPP change, observed minus expected (g C m-2 d-1). Y axis: episodes grouped by site, labelled with the start date. Haltiala 5 episodes, control residuals 10 to 90 % from −4.73 to 6.43; Qvidja 4 episodes, control residuals 10 to 90 % from −1.63 to 1.97; Viikki 5 episodes, control residuals 10 to 90 % from −1.10 to 3.54. Mean residual of all 14 episodes −2.30 (SD 4.37, 95 % CI −4.63 to −0.18); fertilisation only −0.14 (n = 5); with tillage or sowing −3.51 (n = 9). 2 episodes rank above 90 % and 6 below 10 % of the control residuals of their site. 6 of the 14 residuals are inside the 10 to 90 % range of the control residuals of their site; 7 of the 9 episodes with tillage or sowing have a residual of zero or less."
+    },
+    {
+      "n": 3,
+      "file": "figures/3-gpp-course.svg",
+      "title": "Mean course of daily GPP from 14 days before to 14 days after the start of the fertilisation episodes, in percent of the mean of the 14 days before, for episodes with fertilisation only and with tillage or sowing.",
+      "desc": "Two lines with a band of plus or minus one SD. X axis: day relative to the first day of the episode (-14 to +14, local days). Y axis: daily GPP in percent of the mean of days -14 to -1. Fertilisation only: 4 episodes; mean of days +10 to +14 228 % (mean of the daily SDs 214 %). With tillage or sowing: 7 episodes; mean of days +10 to +14 138 % (mean of the daily SDs 239 %). Days with fewer than 2 episodes are not shown. Episodes with a mean GPP before of less than 0.5 g C m-2 d-1 are not used. The spread between the episodes is large."
+    }
+  ],
+  "dataVersion": {
+    "generatedAt": "2026-10-23T19:31:01Z",
+    "git": {
+      "commit": "44ec98f",
+      "dirty": true
+    },
+    "script": {
+      "path": "analysis/fertilisation-weather/fertilisation-weather.py",
+      "sha256": "788c8ef7791fb79a76e31ed038d0d80c559a8548a071ec80e3342b2a19b2193a"
+    },
+    "lock": {
+      "path": "analysis/fertilisation-weather/fertilisation-weather.py.lock",
+      "sha256": "adba0c707a39fbd7563540c0642e2483f63c09fc764f552f411c0d3b273fe71e"
+    },
+    "python": "3.13.5",
+    "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+    "packages": {
+      "annotated-types": "0.8.0",
+      "contourpy": "1.4.0",
+      "cycler": "0.12.1",
+      "fonttools": "4.67.0",
+      "kiwisolver": "1.5.1",
+      "matplotlib": "3.11.2",
+      "mypy_extensions": "1.1.0",
+      "numpy": "2.5.4",
+      "packaging": "26.3",
+      "pandas": "3.1.0",
+      "pandera": "0.34.1",
+      "pillow": "13.0.0",
+      "pyarrow": "26.0.0",
+      "pydantic": "2.14.1",
+      "pydantic_core": "2.50.1",
+      "pyparsing": "3.3.3",
+      "python-dateutil": "3.0.0",
+      "scipy": "1.18.1",
+      "six": "1.17.0",
+      "typeguard": "4.6.0",
+      "typing-inspect": "0.9.0",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "tzdata": "2026.5"
+    },
+    "seeds": {
+      "controls.anttila.dGpp": 6000,
+      "controls.anttila.dLightPct": 6200,
+      "controls.anttila.dTa": 6100,
+      "controls.haltiala.dGpp": 6002,
+      "controls.haltiala.dLightPct": 6202,
+      "controls.haltiala.dTa": 6102,
+      "controls.qvidja.dGpp": 6003,
+      "controls.qvidja.dLightPct": 6203,
+      "controls.qvidja.dTa": 6103,
+      "controls.sarkisuo.dGpp": 6001,
+      "controls.sarkisuo.dLightPct": 6201,
+      "controls.sarkisuo.dTa": 6101,
+      "controls.viikki.dGpp": 6004,
+      "controls.viikki.dLightPct": 6204,
+      "controls.viikki.dTa": 6104,
+      "summary.all.expected": 7021,
+      "summary.all.lightNormPct": 7032,
+      "summary.all.lightPct": 7028,
+      "summary.all.matchedDiff": 7031,
+      "summary.all.nee": 7026,
+      "summary.all.observed": 7020,
+      "summary.all.pooledResidualPct": 7035,
+      "summary.all.rain": 7029,
+      "summary.all.reco": 7025,
+      "summary.all.relGppPct": 7024,
+      "summary.all.residual": 7022,
+      "summary.all.residual10": 7034,
+      "summary.all.residualRank": 7023,
+      "summary.all.residualSwc": 7033,
+      "summary.all.swc": 7030,
+      "summary.all.ta": 7027,
+      "summary.fertOnly.expected": 7041,
+      "summary.fertOnly.lightNormPct": 7052,
+      "summary.fertOnly.lightPct": 7048,
+      "summary.fertOnly.matchedDiff": 7051,
+      "summary.fertOnly.nee": 7046,
+      "summary.fertOnly.observed": 7040,
+      "summary.fertOnly.pooledResidualPct": 7055,
+      "summary.fertOnly.rain": 7049,
+      "summary.fertOnly.reco": 7045,
+      "summary.fertOnly.relGppPct": 7044,
+      "summary.fertOnly.residual": 7042,
+      "summary.fertOnly.residual10": 7054,
+      "summary.fertOnly.residualRank": 7043,
+      "summary.fertOnly.residualSwc": 7053,
+      "summary.fertOnly.swc": 7050,
+      "summary.fertOnly.ta": 7047,
+      "summary.mineral.expected": 7081,
+      "summary.mineral.lightNormPct": 7092,
+      "summary.mineral.lightPct": 7088,
+      "summary.mineral.matchedDiff": 7091,
+      "summary.mineral.nee": 7086,
+      "summary.mineral.observed": 7080,
+      "summary.mineral.pooledResidualPct": 7095,
+      "summary.mineral.rain": 7089,
+      "summary.mineral.reco": 7085,
+      "summary.mineral.relGppPct": 7084,
+      "summary.mineral.residual": 7082,
+      "summary.mineral.residual10": 7094,
+      "summary.mineral.residualRank": 7083,
+      "summary.mineral.residualSwc": 7093,
+      "summary.mineral.swc": 7090,
+      "summary.mineral.ta": 7087,
+      "summary.organic.expected": 7101,
+      "summary.organic.lightNormPct": 7112,
+      "summary.organic.lightPct": 7108,
+      "summary.organic.matchedDiff": 7111,
+      "summary.organic.nee": 7106,
+      "summary.organic.observed": 7100,
+      "summary.organic.pooledResidualPct": 7115,
+      "summary.organic.rain": 7109,
+      "summary.organic.reco": 7105,
+      "summary.organic.relGppPct": 7104,
+      "summary.organic.residual": 7102,
+      "summary.organic.residual10": 7114,
+      "summary.organic.residualRank": 7103,
+      "summary.organic.residualSwc": 7113,
+      "summary.organic.swc": 7110,
+      "summary.organic.ta": 7107,
+      "summary.withTillage.expected": 7061,
+      "summary.withTillage.lightNormPct": 7072,
+      "summary.withTillage.lightPct": 7068,
+      "summary.withTillage.matchedDiff": 7071,
+      "summary.withTillage.nee": 7066,
+      "summary.withTillage.observed": 7060,
+      "summary.withTillage.pooledResidualPct": 7075,
+      "summary.withTillage.rain": 7069,
+      "summary.withTillage.reco": 7065,
+      "summary.withTillage.relGppPct": 7064,
+      "summary.withTillage.residual": 7062,
+      "summary.withTillage.residual10": 7074,
+      "summary.withTillage.residualRank": 7063,
+      "summary.withTillage.residualSwc": 7073,
+      "summary.withTillage.swc": 7070,
+      "summary.withTillage.ta": 7067
+    },
+    "bootstrap": {
+      "resamples": 10000,
+      "level": 0.95,
+      "generator": "numpy.random.default_rng (PCG64)"
+    },
+    "args": {
+      "db": "db",
+      "calculated": "data/calculated",
+      "out": null,
+      "check": false
+    },
+    "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "snapshot": {
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+      "commit": "44ec98f",
+      "commitNote": "HEAD at build time; db/report.json does not record a commit",
+      "url": null,
+      "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+      "inputs": [
+        {
+          "path": "db/events.parquet",
+          "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+          "rows": 114
+        },
+        {
+          "path": "db/sites.parquet",
+          "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+          "rows": 6
+        },
+        {
+          "path": "db/observations.parquet",
+          "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+          "rows": 537980
+        },
+        {
+          "path": "db/variables.parquet",
+          "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+          "rows": 26
+        },
+        {
+          "path": "calculated/daily.parquet",
+          "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+          "rows": 11209
+        }
+      ]
+    },
+    "inputs": [
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "site_code",
+          "date",
+          "date_end",
+          "type",
+          "detail",
+          "n_kg_ha"
+        ]
+      },
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "site_id",
+          "code",
+          "name",
+          "utc_offset_min"
+        ]
+      },
+      {
+        "path": "db/observations.parquet",
+        "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+        "rows": 537980,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "site_id",
+          "ts_start",
+          "ppfd",
+          "sw_in",
+          "precip",
+          "swc",
+          "tsoil"
+        ]
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+        "rows": 26,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "column_name",
+          "unit"
+        ]
+      },
+      {
+        "path": "calculated/daily.parquet",
+        "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+        "rows": 11209,
+        "builtAt": "2026-10-23T19:03:09.003Z",
+        "columns": [
+          "site_code",
+          "date_local",
+          "gpp_gc",
+          "reco_gc",
+          "nee_f_gc",
+          "frac_measured",
+          "ta_mean"
+        ]
+      }
+    ],
+    "steps": {
+      "sites": {
+        "rowsRead": 6,
+        "rowsKept": 5,
+        "rule": "the five Finnish sites"
+      },
+      "events": {
+        "rowsRead": 111,
+        "rule": "site_code in the five Finnish sites (Parquet filter)"
+      },
+      "daily": {
+        "rowsRead": 7415,
+        "rule": "site_code in the five Finnish sites (Parquet filter)"
+      },
+      "observations": {
+        "rowsRead": 355916,
+        "rule": "site_id of the five Finnish sites (Parquet filter)"
+      },
+      "observationDays": {
+        "localDays": 7415,
+        "tsoilNullFewerThan36Rows": 57,
+        "swcNullFewerThan36Rows": 59,
+        "swcNullFrozenSoil": 792,
+        "rainNullFewerThan44Rows": 52,
+        "lightNullFewerThan44Rows": 164
+      }
+    }
+  }
+}

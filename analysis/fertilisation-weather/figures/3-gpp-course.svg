@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="208.8pt" viewBox="0 0 510.23622 208.8" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="fertilisation-weather-fig3-title fertilisation-weather-fig3-desc">
+ <title id="fertilisation-weather-fig3-title">Mean course of daily GPP from 14 days before to 14 days after the start of the fertilisation episodes, in percent of the mean of the 14 days before, for episodes with fertilisation only and with tillage or sowing.</title>
+ <desc id="fertilisation-weather-fig3-desc">Two lines with a band of plus or minus one SD. X axis: day relative to the first day of the episode (-14 to +14, local days). Y axis: daily GPP in percent of the mean of days -14 to -1. Fertilisation only: 4 episodes; mean of days +10 to +14 228 % (mean of the daily SDs 214 %). With tillage or sowing: 7 episodes; mean of days +10 to +14 138 % (mean of the daily SDs 239 %). Days with fewer than 2 episodes are not shown. Episodes with a mean GPP before of less than 0.5 g C m-2 d-1 are not used. The spread between the episodes is large.</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Mean course of daily GPP from 14 days before to 14 days after the start of the fertilisation episodes, in percent of the mean of the 14 days before, for episodes with fertilisation only and with tillage or sowing.</dc:title>
+    <dc:description>Two lines with a band of plus or minus one SD. X axis: day relative to the first day of the episode (-14 to +14, local days). Y axis: daily GPP in percent of the mean of days -14 to -1. Fertilisation only: 4 episodes; mean of days +10 to +14 228 % (mean of the daily SDs 214 %). With tillage or sowing: 7 episodes; mean of days +10 to +14 138 % (mean of the daily SDs 239 %). Days with fewer than 2 episodes are not shown. Episodes with a mean GPP before of less than 0.5 g C m-2 d-1 are not used. The spread between the episodes is large.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/observations.parquet sha256 922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9</dc:relation>
+    <dc:source>analysis/fertilisation-weather/fertilisation-weather.py (git 44ec98f, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="fw3-figure_1">
+  <g id="fw3-patch_1">
+   <path d="M 0 208.8 
+L 510.23622 208.8 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="fw3-axes_1">
+   <g id="fw3-patch_2">
+    <path d="M 45.92126 173.304 
+L 500.031496 173.304 
+L 500.031496 10.44 
+L 45.92126 10.44 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="fw3-line2d_1">
+    <path d="M 45.92126 114.746993 
+L 500.031496 114.746993 
+" clip-path="url(#fw3-pd8671ac2cb)" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="fw3-line2d_2">
+    <path d="M 272.976378 173.304 
+L 272.976378 10.44 
+" clip-path="url(#fw3-pd8671ac2cb)" style="fill: none; stroke-dasharray: 3.33,1.44; stroke-dashoffset: 0; stroke: #222222; stroke-width: 0.9"/>
+   </g>
+   <g id="fw3-matplotlib.axis_1">
+    <g id="fw3-xtick_1">
+     <g id="fw3-line2d_3">
+      <defs>
+       <path id="fw3-med367ffdf0" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="53.750747" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_1">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="53.750747" y="186.002242" transform="rotate(-0 53.750747 186.002242)">−14</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_2">
+     <g id="fw3-line2d_4">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="85.068694" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_2">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="85.068694" y="186.002242" transform="rotate(-0 85.068694 186.002242)">−12</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_3">
+     <g id="fw3-line2d_5">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="116.386641" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_3">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="116.386641" y="186.002242" transform="rotate(-0 116.386641 186.002242)">−10</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_4">
+     <g id="fw3-line2d_6">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="147.704589" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_4">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="147.704589" y="186.002242" transform="rotate(-0 147.704589 186.002242)">−8</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_5">
+     <g id="fw3-line2d_7">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="179.022536" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_5">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="179.022536" y="186.002242" transform="rotate(-0 179.022536 186.002242)">−6</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_6">
+     <g id="fw3-line2d_8">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="210.340483" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_6">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="210.340483" y="186.002242" transform="rotate(-0 210.340483 186.002242)">−4</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_7">
+     <g id="fw3-line2d_9">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="241.658431" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_7">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="241.658431" y="186.002242" transform="rotate(-0 241.658431 186.002242)">−2</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_8">
+     <g id="fw3-line2d_10">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="272.976378" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_8">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="272.976378" y="186.002242" transform="rotate(-0 272.976378 186.002242)">0</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_9">
+     <g id="fw3-line2d_11">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="304.294325" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_9">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="304.294325" y="186.002242" transform="rotate(-0 304.294325 186.002242)">2</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_10">
+     <g id="fw3-line2d_12">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="335.612273" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_10">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="335.612273" y="186.002242" transform="rotate(-0 335.612273 186.002242)">4</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_11">
+     <g id="fw3-line2d_13">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="366.93022" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_11">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="366.93022" y="186.002242" transform="rotate(-0 366.93022 186.002242)">6</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_12">
+     <g id="fw3-line2d_14">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="398.248167" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_12">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="398.248167" y="186.002242" transform="rotate(-0 398.248167 186.002242)">8</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_13">
+     <g id="fw3-line2d_15">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="429.566115" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_13">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="429.566115" y="186.002242" transform="rotate(-0 429.566115 186.002242)">10</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_14">
+     <g id="fw3-line2d_16">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="460.884062" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_14">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="460.884062" y="186.002242" transform="rotate(-0 460.884062 186.002242)">12</text>
+     </g>
+    </g>
+    <g id="fw3-xtick_15">
+     <g id="fw3-line2d_17">
+      <g>
+       <use xlink:href="#fw3-med367ffdf0" x="492.202009" y="173.304" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_15">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="492.202009" y="186.002242" transform="rotate(-0 492.202009 186.002242)">14</text>
+     </g>
+    </g>
+    <g id="fw3-text_16">
+     <text style="font-size: 8px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="272.976378" y="197.88275" transform="rotate(-0 272.976378 197.88275)">Day relative to the first day of the episode (local days, UTC+2)</text>
+    </g>
+   </g>
+   <g id="fw3-matplotlib.axis_2">
+    <g id="fw3-ytick_1">
+     <g id="fw3-line2d_18">
+      <defs>
+       <path id="fw3-m5944ced2a9" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#fw3-m5944ced2a9" x="45.92126" y="158.106494" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_17">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="38.92126" y="160.955616" transform="rotate(-0 38.92126 160.955616)">−100</text>
+     </g>
+    </g>
+    <g id="fw3-ytick_2">
+     <g id="fw3-line2d_19">
+      <g>
+       <use xlink:href="#fw3-m5944ced2a9" x="45.92126" y="136.426744" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_18">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="38.92126" y="139.275865" transform="rotate(-0 38.92126 139.275865)">0</text>
+     </g>
+    </g>
+    <g id="fw3-ytick_3">
+     <g id="fw3-line2d_20">
+      <g>
+       <use xlink:href="#fw3-m5944ced2a9" x="45.92126" y="114.746993" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_19">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="38.92126" y="117.596114" transform="rotate(-0 38.92126 117.596114)">100</text>
+     </g>
+    </g>
+    <g id="fw3-ytick_4">
+     <g id="fw3-line2d_21">
+      <g>
+       <use xlink:href="#fw3-m5944ced2a9" x="45.92126" y="93.067243" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_20">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="38.92126" y="95.916364" transform="rotate(-0 38.92126 95.916364)">200</text>
+     </g>
+    </g>
+    <g id="fw3-ytick_5">
+     <g id="fw3-line2d_22">
+      <g>
+       <use xlink:href="#fw3-m5944ced2a9" x="45.92126" y="71.387492" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_21">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="38.92126" y="74.236613" transform="rotate(-0 38.92126 74.236613)">300</text>
+     </g>
+    </g>
+    <g id="fw3-ytick_6">
+     <g id="fw3-line2d_23">
+      <g>
+       <use xlink:href="#fw3-m5944ced2a9" x="45.92126" y="49.707741" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_22">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="38.92126" y="52.556862" transform="rotate(-0 38.92126 52.556862)">400</text>
+     </g>
+    </g>
+    <g id="fw3-ytick_7">
+     <g id="fw3-line2d_24">
+      <g>
+       <use xlink:href="#fw3-m5944ced2a9" x="45.92126" y="28.027991" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw3-text_23">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="38.92126" y="30.877112" transform="rotate(-0 38.92126 30.877112)">500</text>
+     </g>
+    </g>
+    <g id="fw3-text_24">
+     <!-- Daily GPP (% of the mean of days $-$14 to $-$1) -->
+     <g style="fill: #222222" transform="translate(12.398994 182.992) rotate(-90)">
+      <text style="font-family: system-ui, sans-serif; font-variant-numeric: tabular-nums">
+       <tspan x="0" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">D</tspan>
+       <tspan x="6.160156" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="11.0625" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">i</tspan>
+       <tspan x="13.285156" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">l</tspan>
+       <tspan x="15.507812" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">y</tspan>
+       <tspan x="20.242188" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="22.785156" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">G</tspan>
+       <tspan x="28.984375" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="33.808594" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="38.632812" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="41.175781" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">(</tspan>
+       <tspan x="44.296875" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">%</tspan>
+       <tspan x="51.898438" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="54.441406" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="59.335938" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">f</tspan>
+       <tspan x="62.152344" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="64.695312" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="67.832031" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">h</tspan>
+       <tspan x="72.902344" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="77.824219" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="80.367188" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+       <tspan x="88.160156" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="93.082031" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="97.984375" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+       <tspan x="103.054688" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="105.597656" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="110.492188" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">f</tspan>
+       <tspan x="113.308594" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="115.851562" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+       <tspan x="120.929688" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="125.832031" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">y</tspan>
+       <tspan x="130.566406" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">s</tspan>
+       <tspan x="134.734375" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="137.277344" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="143.980469" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+       <tspan x="149.070312" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">4</tspan>
+       <tspan x="154.160156" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="156.703125" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="159.839844" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="164.734375" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="167.277344" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="173.980469" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+       <tspan x="179.070312" y="-0.921875" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">)</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+   <g id="fw3-FillBetweenPolyCollection_1">
+    <defs>
+     <path id="fw3-m48fe6e4c38" d="M 53.750747 -93.614189 
+L 53.750747 -88.155916 
+L 69.40972 -85.077508 
+L 85.068694 -83.441011 
+L 100.727668 -88.974791 
+L 116.386641 -89.08698 
+L 132.045615 -91.288087 
+L 147.704589 -94.663158 
+L 163.363562 -84.930815 
+L 179.022536 -79.036529 
+L 194.68151 -86.267986 
+L 210.340483 -88.244372 
+L 225.999457 -87.971222 
+L 241.658431 -87.17843 
+L 257.317404 -94.004059 
+L 272.976378 -86.663153 
+L 288.635352 -85.986409 
+L 304.294325 -84.109192 
+L 319.953299 -80.669053 
+L 335.612273 -73.972014 
+L 351.271246 -83.601347 
+L 366.93022 -85.69182 
+L 382.589194 -86.289043 
+L 398.248167 -84.724212 
+L 413.907141 -82.328355 
+L 429.566115 -73.603234 
+L 445.225088 -80.022318 
+L 460.884062 -70.824448 
+L 476.543036 -76.952905 
+L 492.202009 -75.222838 
+L 492.202009 -126.488323 
+L 492.202009 -126.488323 
+L 476.543036 -167.746438 
+L 460.884062 -181.873237 
+L 445.225088 -174.509758 
+L 429.566115 -190.957091 
+L 413.907141 -162.648254 
+L 398.248167 -174.72512 
+L 382.589194 -153.363447 
+L 366.93022 -154.972525 
+L 351.271246 -135.006634 
+L 335.612273 -136.581436 
+L 319.953299 -139.195408 
+L 304.294325 -125.394022 
+L 288.635352 -126.845693 
+L 272.976378 -118.652042 
+L 257.317404 -117.968915 
+L 241.658431 -107.063152 
+L 225.999457 -103.517928 
+L 210.340483 -104.874314 
+L 194.68151 -95.290511 
+L 179.022536 -96.229569 
+L 163.363562 -100.453218 
+L 147.704589 -101.552352 
+L 132.045615 -99.073123 
+L 116.386641 -97.469968 
+L 100.727668 -95.126522 
+L 85.068694 -97.885525 
+L 69.40972 -95.044037 
+L 53.750747 -93.614189 
+z
+"/>
+    </defs>
+    <g clip-path="url(#fw3-pd8671ac2cb)">
+     <use xlink:href="#fw3-m48fe6e4c38" x="0" y="208.8" style="fill: #0072b2; fill-opacity: 0.16"/>
+    </g>
+   </g>
+   <g id="fw3-FillBetweenPolyCollection_2">
+    <defs>
+     <path id="fw3-m8e588953ad" d="M 53.750747 -95.01453 
+L 53.750747 -84.919336 
+L 69.40972 -79.119975 
+L 85.068694 -82.449025 
+L 100.727668 -78.489053 
+L 116.386641 -84.946003 
+L 132.045615 -85.430886 
+L 147.704589 -74.240225 
+L 163.363562 -88.258264 
+L 179.022536 -85.418993 
+L 194.68151 -91.080576 
+L 210.340483 -92.016452 
+L 225.999457 -90.202276 
+L 241.658431 -83.441124 
+L 257.317404 -73.457521 
+L 272.976378 -73.997363 
+L 288.635352 -66.29669 
+L 304.294325 -63.752325 
+L 319.953299 -61.704229 
+L 335.612273 -68.290045 
+L 351.271246 -71.051568 
+L 366.93022 -69.517046 
+L 382.589194 -61.950675 
+L 398.248167 -70.192405 
+L 413.907141 -56.980958 
+L 429.566115 -54.326312 
+L 445.225088 -42.898909 
+L 460.884062 -47.862913 
+L 476.543036 -49.882736 
+L 492.202009 -56.958747 
+L 492.202009 -155.71652 
+L 492.202009 -155.71652 
+L 476.543036 -159.767259 
+L 460.884062 -153.705435 
+L 445.225088 -158.694685 
+L 429.566115 -142.870377 
+L 413.907141 -126.770655 
+L 398.248167 -121.193246 
+L 382.589194 -104.154803 
+L 366.93022 -101.473163 
+L 351.271246 -100.978525 
+L 335.612273 -105.399032 
+L 319.953299 -106.453782 
+L 304.294325 -93.811284 
+L 288.635352 -103.862164 
+L 272.976378 -109.944904 
+L 257.317404 -126.998828 
+L 241.658431 -107.30333 
+L 225.999457 -113.983321 
+L 210.340483 -108.952228 
+L 194.68151 -103.816557 
+L 179.022536 -106.990011 
+L 163.363562 -106.94445 
+L 147.704589 -104.281042 
+L 132.045615 -106.415554 
+L 116.386641 -97.178256 
+L 100.727668 -91.694908 
+L 85.068694 -96.957399 
+L 69.40972 -93.484066 
+L 53.750747 -95.01453 
+z
+"/>
+    </defs>
+    <g clip-path="url(#fw3-pd8671ac2cb)">
+     <use xlink:href="#fw3-m8e588953ad" x="0" y="208.8" style="fill: #d55e00; fill-opacity: 0.16"/>
+    </g>
+   </g>
+   <g id="fw3-patch_3">
+    <path d="M 45.92126 173.304 
+L 45.92126 10.44 
+" style="fill: none; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="fw3-patch_4">
+    <path d="M 45.92126 173.304 
+L 500.031496 173.304 
+" style="fill: none; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="fw3-line2d_25">
+    <path d="M 53.750747 117.914948 
+L 69.40972 118.739228 
+L 85.068694 118.136732 
+L 100.727668 116.749343 
+L 116.386641 115.521526 
+L 132.045615 113.619395 
+L 147.704589 110.692245 
+L 163.363562 116.107983 
+L 179.022536 121.166951 
+L 194.68151 118.020751 
+L 210.340483 112.240657 
+L 225.999457 113.055425 
+L 241.658431 111.679209 
+L 257.317404 102.813513 
+L 272.976378 106.142402 
+L 288.635352 102.383949 
+L 304.294325 104.048393 
+L 319.953299 98.86777 
+L 335.612273 103.523275 
+L 351.271246 99.49601 
+L 366.93022 88.467827 
+L 382.589194 88.973755 
+L 398.248167 79.075334 
+L 413.907141 86.311695 
+L 429.566115 76.519837 
+L 445.225088 81.533962 
+L 460.884062 82.451158 
+L 476.543036 86.450329 
+L 492.202009 107.944419 
+" clip-path="url(#fw3-pd8671ac2cb)" style="fill: none; stroke: #0072b2; stroke-width: 1.5; stroke-linecap: square"/>
+    <defs>
+     <path id="fw3-m4a7e64b6f0" d="M 0 1.6 
+C 0.424325 1.6 0.831328 1.431414 1.131371 1.131371 
+C 1.431414 0.831328 1.6 0.424325 1.6 0 
+C 1.6 -0.424325 1.431414 -0.831328 1.131371 -1.131371 
+C 0.831328 -1.431414 0.424325 -1.6 0 -1.6 
+C -0.424325 -1.6 -0.831328 -1.431414 -1.131371 -1.131371 
+C -1.431414 -0.831328 -1.6 -0.424325 -1.6 0 
+C -1.6 0.424325 -1.431414 0.831328 -1.131371 1.131371 
+C -0.831328 1.431414 -0.424325 1.6 0 1.6 
+z
+" style="stroke: #0072b2"/>
+    </defs>
+    <g clip-path="url(#fw3-pd8671ac2cb)">
+     <use xlink:href="#fw3-m4a7e64b6f0" x="53.750747" y="117.914948" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="69.40972" y="118.739228" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="85.068694" y="118.136732" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="100.727668" y="116.749343" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="116.386641" y="115.521526" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="132.045615" y="113.619395" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="147.704589" y="110.692245" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="163.363562" y="116.107983" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="179.022536" y="121.166951" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="194.68151" y="118.020751" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="210.340483" y="112.240657" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="225.999457" y="113.055425" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="241.658431" y="111.679209" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="257.317404" y="102.813513" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="272.976378" y="106.142402" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="288.635352" y="102.383949" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="304.294325" y="104.048393" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="319.953299" y="98.86777" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="335.612273" y="103.523275" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="351.271246" y="99.49601" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="366.93022" y="88.467827" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="382.589194" y="88.973755" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="398.248167" y="79.075334" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="413.907141" y="86.311695" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="429.566115" y="76.519837" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="445.225088" y="81.533962" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="460.884062" y="82.451158" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="476.543036" y="86.450329" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#fw3-m4a7e64b6f0" x="492.202009" y="107.944419" style="fill: #0072b2; stroke: #0072b2"/>
+    </g>
+   </g>
+   <g id="fw3-line2d_26">
+    <path d="M 53.750747 118.833067 
+L 69.40972 122.49798 
+L 85.068694 119.096788 
+L 100.727668 123.708019 
+L 116.386641 117.737871 
+L 132.045615 112.87678 
+L 147.704589 119.539366 
+L 163.363562 111.198643 
+L 179.022536 112.595498 
+L 194.68151 111.351433 
+L 210.340483 108.31566 
+L 225.999457 106.707202 
+L 241.658431 113.427773 
+L 257.317404 108.571825 
+L 272.976378 116.828866 
+L 288.635352 123.720573 
+L 304.294325 130.018195 
+L 319.953299 124.720994 
+L 335.612273 121.955461 
+L 351.271246 122.784954 
+L 366.93022 123.304896 
+L 382.589194 125.747261 
+L 398.248167 113.107174 
+L 413.907141 116.924193 
+L 429.566115 110.201656 
+L 445.225088 108.003203 
+L 460.884062 108.015826 
+L 476.543036 103.975002 
+L 492.202009 102.462366 
+" clip-path="url(#fw3-pd8671ac2cb)" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #d55e00; stroke-width: 1.5"/>
+    <defs>
+     <path id="fw3-m1dbf31b50d" d="M -0 2.262742 
+L 2.262742 0 
+L 0 -2.262742 
+L -2.262742 -0 
+z
+" style="stroke: #d55e00; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#fw3-pd8671ac2cb)">
+     <use xlink:href="#fw3-m1dbf31b50d" x="53.750747" y="118.833067" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="69.40972" y="122.49798" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="85.068694" y="119.096788" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="100.727668" y="123.708019" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="116.386641" y="117.737871" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="132.045615" y="112.87678" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="147.704589" y="119.539366" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="163.363562" y="111.198643" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="179.022536" y="112.595498" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="194.68151" y="111.351433" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="210.340483" y="108.31566" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="225.999457" y="106.707202" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="241.658431" y="113.427773" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="257.317404" y="108.571825" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="272.976378" y="116.828866" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="288.635352" y="123.720573" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="304.294325" y="130.018195" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="319.953299" y="124.720994" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="335.612273" y="121.955461" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="351.271246" y="122.784954" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="366.93022" y="123.304896" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="382.589194" y="125.747261" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="398.248167" y="113.107174" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="413.907141" y="116.924193" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="429.566115" y="110.201656" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="445.225088" y="108.003203" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="460.884062" y="108.015826" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="476.543036" y="103.975002" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#fw3-m1dbf31b50d" x="492.202009" y="102.462366" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="fw3-legend_1">
+    <g id="fw3-line2d_27">
+     <path d="M 52.67126 20.263828 
+L 60.17126 20.263828 
+L 67.67126 20.263828 
+" style="fill: none; stroke: #0072b2; stroke-width: 1.5; stroke-linecap: square"/>
+     <g>
+      <use xlink:href="#fw3-m4a7e64b6f0" x="60.17126" y="20.263828" style="fill: #0072b2; stroke: #0072b2"/>
+     </g>
+    </g>
+    <g id="fw3-text_25">
+     <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="73.67126" y="22.888828" transform="rotate(-0 73.67126 22.888828)">Fertilisation only (n = 4 episodes)</text>
+    </g>
+    <g id="fw3-line2d_28">
+     <path d="M 52.67126 31.514414 
+L 60.17126 31.514414 
+L 67.67126 31.514414 
+" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #d55e00; stroke-width: 1.5"/>
+     <g>
+      <use xlink:href="#fw3-m1dbf31b50d" x="60.17126" y="31.514414" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     </g>
+    </g>
+    <g id="fw3-text_26">
+     <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="73.67126" y="34.139414" transform="rotate(-0 73.67126 34.139414)">With tillage or sowing (n = 7 episodes)</text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="fw3-pd8671ac2cb">
+   <rect x="45.92126" y="10.44" width="454.110236" height="162.864"/>
+  </clipPath>
+ </defs>
+</svg>

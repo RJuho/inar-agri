@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="297.36pt" viewBox="0 0 510.23622 297.36" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="fertilisation-weather-fig2-title fertilisation-weather-fig2-desc">
+ <title id="fertilisation-weather-fig2-title">Residual GPP change (observed minus the change that the weather fit of the control pairs gives) of each fertilisation episode, per site, with the 10 to 90 % range of the control residuals of the site.</title>
+ <desc id="fertilisation-weather-fig2-desc">Dot plot. X axis: residual of the daily GPP change, observed minus expected (g C m-2 d-1). Y axis: episodes grouped by site, labelled with the start date. Haltiala 5 episodes, control residuals 10 to 90 % from −4.73 to 6.43; Qvidja 4 episodes, control residuals 10 to 90 % from −1.63 to 1.97; Viikki 5 episodes, control residuals 10 to 90 % from −1.10 to 3.54. Mean residual of all 14 episodes −2.30 (SD 4.37, 95 % CI −4.63 to −0.18); fertilisation only −0.14 (n = 5); with tillage or sowing −3.51 (n = 9). 2 episodes rank above 90 % and 6 below 10 % of the control residuals of their site. 6 of the 14 residuals are inside the 10 to 90 % range of the control residuals of their site; 7 of the 9 episodes with tillage or sowing have a residual of zero or less.</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Residual GPP change (observed minus the change that the weather fit of the control pairs gives) of each fertilisation episode, per site, with the 10 to 90 % range of the control residuals of the site.</dc:title>
+    <dc:description>Dot plot. X axis: residual of the daily GPP change, observed minus expected (g C m-2 d-1). Y axis: episodes grouped by site, labelled with the start date. Haltiala 5 episodes, control residuals 10 to 90 % from −4.73 to 6.43; Qvidja 4 episodes, control residuals 10 to 90 % from −1.63 to 1.97; Viikki 5 episodes, control residuals 10 to 90 % from −1.10 to 3.54. Mean residual of all 14 episodes −2.30 (SD 4.37, 95 % CI −4.63 to −0.18); fertilisation only −0.14 (n = 5); with tillage or sowing −3.51 (n = 9). 2 episodes rank above 90 % and 6 below 10 % of the control residuals of their site. 6 of the 14 residuals are inside the 10 to 90 % range of the control residuals of their site; 7 of the 9 episodes with tillage or sowing have a residual of zero or less.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/observations.parquet sha256 922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9</dc:relation>
+    <dc:source>analysis/fertilisation-weather/fertilisation-weather.py (git 44ec98f, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="fw2-figure_1">
+  <g id="fw2-patch_1">
+   <path d="M 0 297.36 
+L 510.23622 297.36 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="fw2-axes_1">
+   <g id="fw2-patch_2">
+    <path d="M 86.740157 228.96 
+L 494.929134 228.96 
+L 494.929134 8.64 
+L 86.740157 8.64 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="fw2-FillBetweenPolyCollection_1">
+    <defs>
+     <path id="fw2-m493ff8b38c" d="M 466.77817 -210.856909 
+L 243.689325 -210.856909 
+L 243.689325 -271.444909 
+L 466.77817 -271.444909 
+L 466.77817 -271.444909 
+L 466.77817 -210.856909 
+z
+"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m493ff8b38c" x="0" y="297.36" style="fill: #e4e4e4"/>
+    </g>
+   </g>
+   <g id="fw2-FillBetweenPolyCollection_2">
+    <defs>
+     <path id="fw2-m0b1f6ac291" d="M 377.602865 -148.266 
+L 305.485564 -148.266 
+L 305.485564 -196.335818 
+L 377.602865 -196.335818 
+L 377.602865 -196.335818 
+L 377.602865 -148.266 
+z
+"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m0b1f6ac291" x="0" y="297.36" style="fill: #e4e4e4"/>
+    </g>
+   </g>
+   <g id="fw2-FillBetweenPolyCollection_3">
+    <defs>
+     <path id="fw2-mddaa3274f7" d="M 409.026672 -73.156909 
+L 316.123659 -73.156909 
+L 316.123659 -133.744909 
+L 409.026672 -133.744909 
+L 409.026672 -133.744909 
+L 409.026672 -73.156909 
+z
+"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-mddaa3274f7" x="0" y="297.36" style="fill: #e4e4e4"/>
+    </g>
+   </g>
+   <g id="fw2-matplotlib.axis_1">
+    <g id="fw2-xtick_1">
+     <g id="fw2-line2d_1">
+      <path d="M 88.227493 228.96 
+L 88.227493 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_2">
+      <defs>
+       <path id="fw2-m23f600f238" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="88.227493" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_1">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="88.227493" y="241.658242" transform="rotate(-0 88.227493 241.658242)">−12.5</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_2">
+     <g id="fw2-line2d_3">
+      <path d="M 138.216123 228.96 
+L 138.216123 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_4">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="138.216123" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_2">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="138.216123" y="241.658242" transform="rotate(-0 138.216123 241.658242)">−10.0</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_3">
+     <g id="fw2-line2d_5">
+      <path d="M 188.204753 228.96 
+L 188.204753 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_6">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="188.204753" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_3">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="188.204753" y="241.658242" transform="rotate(-0 188.204753 241.658242)">−7.5</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_4">
+     <g id="fw2-line2d_7">
+      <path d="M 238.193383 228.96 
+L 238.193383 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_8">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="238.193383" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_4">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="238.193383" y="241.658242" transform="rotate(-0 238.193383 241.658242)">−5.0</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_5">
+     <g id="fw2-line2d_9">
+      <path d="M 288.182012 228.96 
+L 288.182012 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_10">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="288.182012" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_5">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="288.182012" y="241.658242" transform="rotate(-0 288.182012 241.658242)">−2.5</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_6">
+     <g id="fw2-line2d_11">
+      <path d="M 338.170642 228.96 
+L 338.170642 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_12">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="338.170642" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_6">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="338.170642" y="241.658242" transform="rotate(-0 338.170642 241.658242)">0.0</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_7">
+     <g id="fw2-line2d_13">
+      <path d="M 388.159272 228.96 
+L 388.159272 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_14">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="388.159272" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_7">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="388.159272" y="241.658242" transform="rotate(-0 388.159272 241.658242)">2.5</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_8">
+     <g id="fw2-line2d_15">
+      <path d="M 438.147902 228.96 
+L 438.147902 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_16">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="438.147902" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_8">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="438.147902" y="241.658242" transform="rotate(-0 438.147902 241.658242)">5.0</text>
+     </g>
+    </g>
+    <g id="fw2-xtick_9">
+     <g id="fw2-line2d_17">
+      <path d="M 488.136532 228.96 
+L 488.136532 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #eeeeee; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="fw2-line2d_18">
+      <g>
+       <use xlink:href="#fw2-m23f600f238" x="488.136532" y="228.96" style="fill: #222222; stroke: #222222; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="fw2-text_9">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="488.136532" y="241.658242" transform="rotate(-0 488.136532 241.658242)">7.5</text>
+     </g>
+    </g>
+    <g id="fw2-text_10">
+     <!-- Residual $\Delta$GPP = observed $-$ expected from the weather fit (g C m$^{-2}$ d$^{-1}$) -->
+     <g style="fill: #222222" transform="translate(143.154646 254.98)">
+      <text style="font-family: system-ui, sans-serif; font-variant-numeric: tabular-nums">
+       <tspan x="0" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">R</tspan>
+       <tspan x="5.558594" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="10.480469" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">s</tspan>
+       <tspan x="14.648438" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">i</tspan>
+       <tspan x="16.871094" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+       <tspan x="21.949219" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">u</tspan>
+       <tspan x="27.019531" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="31.921875" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">l</tspan>
+       <tspan x="34.144531" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="36.6875" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">Δ</tspan>
+       <tspan x="42.160156" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">G</tspan>
+       <tspan x="48.359375" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="53.183594" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="58.007812" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="60.550781" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">=</tspan>
+       <tspan x="67.253906" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="69.796875" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="74.691406" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">b</tspan>
+       <tspan x="79.769531" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">s</tspan>
+       <tspan x="83.9375" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="88.859375" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">r</tspan>
+       <tspan x="92.148438" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">v</tspan>
+       <tspan x="96.882812" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="101.804688" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+       <tspan x="106.882812" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="109.425781" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="116.128906" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="118.671875" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="123.59375" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">x</tspan>
+       <tspan x="128.328125" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">p</tspan>
+       <tspan x="133.40625" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="138.328125" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">c</tspan>
+       <tspan x="142.726562" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="145.863281" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="150.785156" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+       <tspan x="155.863281" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="158.40625" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">f</tspan>
+       <tspan x="161.222656" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">r</tspan>
+       <tspan x="164.511719" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="169.40625" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+       <tspan x="177.199219" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="179.742188" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="182.878906" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">h</tspan>
+       <tspan x="187.949219" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="192.871094" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="195.414062" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">w</tspan>
+       <tspan x="201.957031" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="206.878906" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="211.78125" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="214.917969" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">h</tspan>
+       <tspan x="219.988281" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+       <tspan x="224.910156" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">r</tspan>
+       <tspan x="228.199219" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="230.742188" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">f</tspan>
+       <tspan x="233.558594" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">i</tspan>
+       <tspan x="235.78125" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="238.917969" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="241.460938" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">(</tspan>
+       <tspan x="244.582031" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">g</tspan>
+       <tspan x="249.660156" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="252.203125" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+       <tspan x="257.789062" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="260.332031" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+       <tspan x="276.675391" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="279.218359" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+       <tspan x="292.846875" y="-0.53975" style="font-size: 8px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">)</tspan>
+       <tspan x="268.201563" y="-3.84375" style="font-size: 5.6px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="272.89375" y="-3.84375" style="font-size: 5.6px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">2</tspan>
+       <tspan x="284.373047" y="-3.84375" style="font-size: 5.6px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="289.065234" y="-3.84375" style="font-size: 5.6px; font-family: system-ui, sans-serif; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+   <g id="fw2-matplotlib.axis_2">
+    <g id="fw2-ytick_1">
+     <g id="fw2-line2d_19"/>
+     <g id="fw2-text_11">
+      <text style="font-weight: 700; font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="21.50396" transform="rotate(-0 83.240157 21.50396)">Haltiala (5)</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_2">
+     <g id="fw2-line2d_20"/>
+     <g id="fw2-text_12">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="34.021848" transform="rotate(-0 83.240157 34.021848)">2022-04-29</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_3">
+     <g id="fw2-line2d_21"/>
+     <g id="fw2-text_13">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="46.54003" transform="rotate(-0 83.240157 46.54003)">2023-06-19</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_4">
+     <g id="fw2-line2d_22"/>
+     <g id="fw2-text_14">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="59.058212" transform="rotate(-0 83.240157 59.058212)">2023-08-01</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_5">
+     <g id="fw2-line2d_23"/>
+     <g id="fw2-text_15">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="71.576394" transform="rotate(-0 83.240157 71.576394)">2024-05-08</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_6">
+     <g id="fw2-line2d_24"/>
+     <g id="fw2-text_16">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="84.094576" transform="rotate(-0 83.240157 84.094576)">2025-05-10</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_7">
+     <g id="fw2-line2d_25"/>
+     <g id="fw2-text_17">
+      <text style="font-weight: 700; font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="96.61305" transform="rotate(-0 83.240157 96.61305)">Qvidja (4)</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_8">
+     <g id="fw2-line2d_26"/>
+     <g id="fw2-text_18">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="109.130939" transform="rotate(-0 83.240157 109.130939)">2019-05-08</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_9">
+     <g id="fw2-line2d_27"/>
+     <g id="fw2-text_19">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="121.649121" transform="rotate(-0 83.240157 121.649121)">2020-07-27</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_10">
+     <g id="fw2-line2d_28"/>
+     <g id="fw2-text_20">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="134.167303" transform="rotate(-0 83.240157 134.167303)">2021-04-20</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_11">
+     <g id="fw2-line2d_29"/>
+     <g id="fw2-text_21">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="146.685485" transform="rotate(-0 83.240157 146.685485)">2021-05-12</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_12">
+     <g id="fw2-line2d_30"/>
+     <g id="fw2-text_22">
+      <text style="font-weight: 700; font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="159.20396" transform="rotate(-0 83.240157 159.20396)">Viikki (5)</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_13">
+     <g id="fw2-line2d_31"/>
+     <g id="fw2-text_23">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="171.721848" transform="rotate(-0 83.240157 171.721848)">2022-05-10</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_14">
+     <g id="fw2-line2d_32"/>
+     <g id="fw2-text_24">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="184.24003" transform="rotate(-0 83.240157 184.24003)">2023-04-27</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_15">
+     <g id="fw2-line2d_33"/>
+     <g id="fw2-text_25">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="196.758212" transform="rotate(-0 83.240157 196.758212)">2023-05-25</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_16">
+     <g id="fw2-line2d_34"/>
+     <g id="fw2-text_26">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="209.276394" transform="rotate(-0 83.240157 209.276394)">2024-10-09</text>
+     </g>
+    </g>
+    <g id="fw2-ytick_17">
+     <g id="fw2-line2d_35"/>
+     <g id="fw2-text_27">
+      <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="83.240157" y="221.794576" transform="rotate(-0 83.240157 221.794576)">2025-05-08</text>
+     </g>
+    </g>
+   </g>
+   <g id="fw2-line2d_36">
+    <path d="M 338.170642 228.96 
+L 338.170642 8.64 
+" clip-path="url(#fw2-p060690a7a5)" style="fill: none; stroke: #222222; stroke-width: 0.7; stroke-linecap: square"/>
+   </g>
+   <g id="fw2-patch_3">
+    <path d="M 86.740157 228.96 
+L 86.740157 8.64 
+" style="fill: none; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="fw2-patch_4">
+    <path d="M 86.740157 228.96 
+L 494.929134 228.96 
+" style="fill: none; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="fw2-PathCollection_1">
+    <defs>
+     <path id="fw2-mbad118f8ea" d="M -0 4.358899 
+L 4.358899 0 
+L 0 -4.358899 
+L -4.358899 -0 
+z
+" style="stroke: #56b4e9; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-mbad118f8ea" x="280.147705" y="31.172727" style="fill: #56b4e9; stroke: #56b4e9; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_2">
+    <defs>
+     <path id="fw2-mb6f6c32302" d="M 0 3.082207 
+C 0.817411 3.082207 1.601453 2.757446 2.179449 2.179449 
+C 2.757446 1.601453 3.082207 0.817411 3.082207 0 
+C 3.082207 -0.817411 2.757446 -1.601453 2.179449 -2.179449 
+C 1.601453 -2.757446 0.817411 -3.082207 0 -3.082207 
+C -0.817411 -3.082207 -1.601453 -2.757446 -2.179449 -2.179449 
+C -2.757446 -1.601453 -3.082207 -0.817411 -3.082207 0 
+C -3.082207 0.817411 -2.757446 1.601453 -2.179449 2.179449 
+C -1.601453 2.757446 -0.817411 3.082207 0 3.082207 
+z
+" style="stroke: #56b4e9; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-mb6f6c32302" x="287.797671" y="43.690909" style="fill: #ffffff; stroke: #56b4e9; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_3">
+    <defs>
+     <path id="fw2-m0ceaef2d9e" d="M -0 4.358899 
+L 4.358899 0 
+L 0 -4.358899 
+L -4.358899 -0 
+z
+" style="stroke: #56b4e9; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m0ceaef2d9e" x="114.891121" y="56.209091" style="fill: #ffffff; stroke: #56b4e9; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_4">
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-mbad118f8ea" x="150.850057" y="68.727273" style="fill: #56b4e9; stroke: #56b4e9; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_5">
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-mbad118f8ea" x="216.065588" y="81.245455" style="fill: #56b4e9; stroke: #56b4e9; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_6">
+    <defs>
+     <path id="fw2-m37dda1d339" d="M 0 3.082207 
+C 0.817411 3.082207 1.601453 2.757446 2.179449 2.179449 
+C 2.757446 1.601453 3.082207 0.817411 3.082207 0 
+C 3.082207 -0.817411 2.757446 -1.601453 2.179449 -2.179449 
+C 1.601453 -2.757446 0.817411 -3.082207 0 -3.082207 
+C -0.817411 -3.082207 -1.601453 -2.757446 -2.179449 -2.179449 
+C -2.757446 -1.601453 -3.082207 -0.817411 -3.082207 0 
+C -3.082207 0.817411 -2.757446 1.601453 -2.179449 2.179449 
+C -1.601453 2.757446 -0.817411 3.082207 0 3.082207 
+z
+" style="stroke: #cc79a7; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m37dda1d339" x="390.513906" y="106.281818" style="fill: #ffffff; stroke: #cc79a7; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_7">
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m37dda1d339" x="228.553249" y="118.8" style="fill: #ffffff; stroke: #cc79a7; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_8">
+    <defs>
+     <path id="fw2-m95e10a8b0d" d="M -0 4.358899 
+L 4.358899 0 
+L 0 -4.358899 
+L -4.358899 -0 
+z
+" style="stroke: #cc79a7; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m95e10a8b0d" x="334.72025" y="131.318182" style="fill: #ffffff; stroke: #cc79a7; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_9">
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m37dda1d339" x="407.350688" y="143.836364" style="fill: #ffffff; stroke: #cc79a7; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_10">
+    <defs>
+     <path id="fw2-m9285c737e2" d="M 0 3.082207 
+C 0.817411 3.082207 1.601453 2.757446 2.179449 2.179449 
+C 2.757446 1.601453 3.082207 0.817411 3.082207 0 
+C 3.082207 -0.817411 2.757446 -1.601453 2.179449 -2.179449 
+C 1.601453 -2.757446 0.817411 -3.082207 0 -3.082207 
+C -0.817411 -3.082207 -1.601453 -2.757446 -2.179449 -2.179449 
+C -2.757446 -1.601453 -3.082207 -0.817411 -3.082207 0 
+C -3.082207 0.817411 -2.757446 1.601453 -2.179449 2.179449 
+C -1.601453 2.757446 -0.817411 3.082207 0 3.082207 
+z
+" style="stroke: #000000; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m9285c737e2" x="362.618563" y="168.872727" style="stroke: #000000; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_11">
+    <defs>
+     <path id="fw2-m2a66e22f36" d="M -0 4.358899 
+L 4.358899 0 
+L 0 -4.358899 
+L -4.358899 -0 
+z
+" style="stroke: #000000; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m2a66e22f36" x="307.157154" y="181.390909" style="fill: #ffffff; stroke: #000000; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_12">
+    <defs>
+     <path id="fw2-m34397f637f" d="M -0 4.358899 
+L 4.358899 0 
+L 0 -4.358899 
+L -4.358899 -0 
+z
+" style="stroke: #000000; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m34397f637f" x="366.350531" y="193.909091" style="stroke: #000000; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_13">
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m2a66e22f36" x="338.935344" y="206.427273" style="fill: #ffffff; stroke: #000000; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="fw2-PathCollection_14">
+    <g clip-path="url(#fw2-p060690a7a5)">
+     <use xlink:href="#fw2-m34397f637f" x="303.650599" y="218.945455" style="stroke: #000000; stroke-width: 1.5"/>
+    </g>
+   </g>
+  </g>
+  <g id="fw2-legend_1">
+   <g id="fw2-line2d_37">
+    <defs>
+     <path id="fw2-m02b79fc487" d="M -4 4 
+L 4 4 
+L 4 -4 
+L -4 -4 
+z
+" style="stroke: #e4e4e4; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#fw2-m02b79fc487" x="64.274165" y="281.863242" style="fill: #e4e4e4; stroke: #e4e4e4; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="fw2-text_28">
+    <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="77.774165" y="284.488242" transform="rotate(-0 77.774165 284.488242)">10 to 90 % of the control residuals</text>
+   </g>
+   <g id="fw2-line2d_38">
+    <defs>
+     <path id="fw2-m03155a6026" d="M 0 3 
+C 0.795609 3 1.55874 2.683901 2.12132 2.12132 
+C 2.683901 1.55874 3 0.795609 3 0 
+C 3 -0.795609 2.683901 -1.55874 2.12132 -2.12132 
+C 1.55874 -2.683901 0.795609 -3 0 -3 
+C -0.795609 -3 -1.55874 -2.683901 -2.12132 -2.12132 
+C -2.683901 -1.55874 -3 -0.795609 -3 0 
+C -3 0.795609 -2.683901 1.55874 -2.12132 2.12132 
+C -1.55874 2.683901 -0.795609 3 0 3 
+z
+" style="stroke: #555555; stroke-width: 1.4"/>
+    </defs>
+    <g>
+     <use xlink:href="#fw2-m03155a6026" x="229.861274" y="281.863242" style="fill: #555555; stroke: #555555; stroke-width: 1.4"/>
+    </g>
+   </g>
+   <g id="fw2-text_29">
+    <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="243.361274" y="284.488242" transform="rotate(-0 243.361274 284.488242)">Mineral</text>
+   </g>
+   <g id="fw2-line2d_39">
+    <defs>
+     <path id="fw2-madb1ab3c7a" d="M 0 3 
+C 0.795609 3 1.55874 2.683901 2.12132 2.12132 
+C 2.683901 1.55874 3 0.795609 3 0 
+C 3 -0.795609 2.683901 -1.55874 2.12132 -2.12132 
+C 1.55874 -2.683901 0.795609 -3 0 -3 
+C -0.795609 -3 -1.55874 -2.683901 -2.12132 -2.12132 
+C -2.683901 -1.55874 -3 -0.795609 -3 0 
+C -3 0.795609 -2.683901 1.55874 -2.12132 2.12132 
+C -1.55874 2.683901 -0.795609 3 0 3 
+z
+" style="stroke: #555555; stroke-width: 1.4"/>
+    </defs>
+    <g>
+     <use xlink:href="#fw2-madb1ab3c7a" x="293.546821" y="281.863242" style="fill: #ffffff; stroke: #555555; stroke-width: 1.4"/>
+    </g>
+   </g>
+   <g id="fw2-text_30">
+    <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="307.046821" y="284.488242" transform="rotate(-0 307.046821 284.488242)">Organic</text>
+   </g>
+   <g id="fw2-line2d_40">
+    <defs>
+     <path id="fw2-m7e3f30aaf3" d="M -0 3.889087 
+L 3.889087 0 
+L 0 -3.889087 
+L -3.889087 -0 
+z
+" style="stroke: #555555; stroke-width: 1.4; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#fw2-m7e3f30aaf3" x="358.720649" y="281.863242" style="fill: #ffffff; stroke: #555555; stroke-width: 1.4; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="fw2-text_31">
+    <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="372.220649" y="284.488242" transform="rotate(-0 372.220649 284.488242)">With tillage or sowing</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="fw2-p060690a7a5">
+   <rect x="86.740157" y="8.64" width="408.188976" height="220.32"/>
+  </clipPath>
+ </defs>
+</svg>
