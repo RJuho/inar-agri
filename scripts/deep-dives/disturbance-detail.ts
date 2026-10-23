@@ -159,9 +159,9 @@ const OVERRIDES: EpisodeOverride[] = [
  * same `id` as a harvest episode, its key is `<id>-fert` (see `highlightKey()`).
  */
 const HIGHLIGHTS: readonly { id: string; source: 'harvest' | 'fertilisation' }[] = [
-  { id: 'qvidja-2019-06-10', source: 'harvest' },
+  { id: 'qvidja-2019-06-11', source: 'harvest' },
+  { id: 'anttila-2023-06-21', source: 'harvest' },
   { id: 'haltiala-2021-09-08', source: 'harvest' },
-  { id: 'qvidja-2020-05-25', source: 'fertilisation' },
   { id: 'viikki-2022-05-10', source: 'fertilisation' },
   { id: 'qvidja-2018-06-12', source: 'harvest' },
   { id: 'qvidja-2018-08-21', source: 'harvest' },

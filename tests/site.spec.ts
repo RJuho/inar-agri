@@ -1620,8 +1620,8 @@ test.describe('events page', () => {
     await expect(page.locator('h1')).toHaveText('Events');
     const sites = await page.locator('table.events-table').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.site));
     expect(sites).toEqual(['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau']);
-    // Anttila 2022: yield of the year 7500 kg DM/ha on the second cut (Shurpali et al. 2025).
-    await expect(page.locator('table[data-site="anttila"] tr[data-type="harvest"] td[data-col="yield"]', { hasText: '7500' })).toHaveCount(1);
+    // Anttila 2022: second cut 4140 kg DW/ha (2018-2025 events file).
+    await expect(page.locator('table[data-site="anttila"] tr[data-type="harvest"] td[data-col="yield"]', { hasText: '4140' })).toHaveCount(1);
     // Viikki 2022: yield of the year 3673 kg DW/ha on the second cut.
     await expect(page.locator('table[data-site="viikki"] tr[data-type="harvest"] td[data-col="yield"]', { hasText: '3673' })).toHaveCount(1);
     await expect(page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Events' })).toHaveAttribute('aria-current', 'page');
@@ -1744,7 +1744,7 @@ test.describe('deep dive pages', () => {
     expect(await page.locator('.dd-num').count()).toBeGreaterThan(60);
     // The season table, the episode table and the dry-month table.
     expect(await page.locator('tr[id^="season-"]').count()).toBeGreaterThan(20);
-    expect(await page.locator('tr[id^="episode-"]').count()).toBe(23);
+    expect(await page.locator('tr[id^="episode-"]').count()).toBe(24);
     expect(await page.locator('tr[id^="dry-"]').count()).toBeGreaterThan(10);
     const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
     expect(hrefs.length).toBeGreaterThan(0);
@@ -1949,14 +1949,14 @@ test.describe('month range and events', () => {
     const codes = await info.locator('li[data-site]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.site));
     expect(codes.sort()).toEqual(['anttila', 'haltiala', 'maktau', 'qvidja', 'sarkisuo', 'viikki']);
     await expect(info.locator('li[data-site="qvidja"]')).toContainText('yield');
-    await expect(info.locator('li[data-site="anttila"]')).toContainText('2021–2022, 6 events');
+    await expect(info.locator('li[data-site="anttila"]')).toContainText('2021–2023, 10 events');
     await expect(info.getByRole('link', { name: 'All events' })).toHaveAttribute('href', /\/events\/$/);
     // The button does not change the checkbox.
     await expect(page.locator('input[name="events"]')).not.toBeChecked();
   });
 
   test('a harvest marker label shows the yield', async ({ page }) => {
-    // Qvidja 2022: silage harvest on 2022-06-21, 868 kg DW/ha.
+    // Qvidja 2022: silage harvest on 2022-06-21, 1045 kg DW/ha (439 kg C/ha / 0.42).
     await page.goto('/' + viewHash(periodView('p10', { sites: [4], events: true })));
     await waitReady(page);
     const labels = await page.locator('.diagram-chart').first().evaluate((el) => {
@@ -1964,7 +1964,7 @@ test.describe('month range and events', () => {
       const c = (el as unknown as { __chart: { getOption(): { series: Array<{ markLine?: { data?: Mark[] } }> } } }).__chart;
       return c.getOption().series.flatMap((s) => (s.markLine?.data ?? []).map((d) => d.label?.formatter ?? ''));
     });
-    expect(labels).toContain('H 0.9 t');
+    expect(labels).toContain('H 1.0 t');
   });
 
   test('data file name has the months only when they are set', async ({ page }) => {
@@ -2072,13 +2072,13 @@ test.describe('events', () => {
       const alt = await altOf(page, i);
       expect(alt).toContain('Management events at Qvidja');
       expect(alt).toContain('harvest 2022-06-21');
-      expect(alt).toContain('grazing 2022-06-01 to 2022-06-15');
+      expect(alt).toContain('grazing 2022-08-05 to 2022-08-19');
     }
     await expect(page.locator('.diagram-sub').first()).toContainText('Event markers');
   });
 
-  test('events on for Anttila 2023 only: alt text says no events', async ({ page }) => {
-    await page.goto('/' + viewHash(eventsView('ev2', [1], true, undefined, 2023)));
+  test('events on for Maktau 2023 only: alt text says no events', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev2', [6], true, undefined, 2023)));
     await waitReady(page);
     expect(await markLineXs(page, 0)).toEqual([]);
     expect(await altOf(page, 0)).toContain('No management events for the selected sites in this period.');
@@ -2087,13 +2087,21 @@ test.describe('events', () => {
   test('events on for Anttila 2022: markers of the article events', async ({ page }) => {
     await page.goto('/' + viewHash(eventsView('ev2b', [1], true)));
     await waitReady(page);
-    // Shurpali et al. 2025: 2 fertilisations and 2 cuts in 2022.
+    // Shurpali et al. 2025 and the 2018-2025 events file: 2 fertilisations and 2 cuts in 2022.
     const ts = (await markLineXs(page, 0)).filter((x) => x !== undefined);
-    expect(new Set(ts)).toEqual(new Set([Date.UTC(2022, 4, 23), Date.UTC(2022, 5, 21), Date.UTC(2022, 5, 22), Date.UTC(2022, 8, 8)]));
+    expect(new Set(ts)).toEqual(new Set([Date.UTC(2022, 4, 23), Date.UTC(2022, 5, 21), Date.UTC(2022, 5, 22), Date.UTC(2022, 7, 8)]));
     const alt = await altOf(page, 0);
     expect(alt).toContain('Management events at Anttila');
-    expect(alt).toContain('harvest 2022-09-08');
-    expect(alt).toContain('7500');
+    expect(alt).toContain('harvest 2022-08-08');
+    expect(alt).toContain('4140');
+  });
+
+  test('events on for Anttila 2023: markers of the 2018-2025 events file', async ({ page }) => {
+    await page.goto('/' + viewHash(eventsView('ev2c', [1], true, undefined, 2023)));
+    await waitReady(page);
+    const ts = (await markLineXs(page, 0)).filter((x) => x !== undefined);
+    expect(new Set(ts)).toEqual(new Set([Date.UTC(2023, 4, 16), Date.UTC(2023, 5, 21), Date.UTC(2023, 5, 28), Date.UTC(2023, 6, 19)]));
+    expect(await altOf(page, 0)).toContain('harvest 2023-07-19');
   });
 
   test('events on: types without markers still get the alt text sentence', async ({ page }) => {

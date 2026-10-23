@@ -83,8 +83,9 @@ before the episode over <Num k="method.excessDays" digits={0} /> days.
   NEE over <Num k="method.excessDays" digits={0} /> days was <Num k="kinds.harvestCut.nee.excess.mean" sign digits={0} unit={UE} />
   (n = <Num k="kinds.harvestCut.nee.excess.n" digits={0} />).
 - **Grazing** (n = <Num k="kinds.grazing.nFlux" digits={0} />, Qvidja only): NEE <Num k="kinds.grazing.nee.delta.mean" sign unit={U} />,
-  GPP <Num k="kinds.grazing.gpp.delta.mean" sign unit={U} />. The direction is the same as for a harvest.
-  <Num k="kinds.grazing.nFlux" digits={0} /> episodes are too few for an interval.
+  GPP <Num k="kinds.grazing.gpp.delta.mean" sign unit={U} />. The direction is the same as for a harvest. NEE increased in
+  <Num k="kinds.grazing.nee.delta.nPositive" digits={0} /> of the <Num k="kinds.grazing.nFlux" digits={0} /> episodes. With so few
+  episodes the interval is not reliable.
 - **Fertilisation** (n = <Num k="kinds.fertilisation.nFlux" digits={0} />): the interval of the change of NEE includes zero
   (<Num k="kinds.fertilisation.nee.delta.mean" sign unit={U} />, <Num k="kinds.fertilisation.nee.delta.ciLo" sign /> to
   <Num k="kinds.fertilisation.nee.delta.ciHi" sign />). The mean changes of GPP and Reco are positive, but their
@@ -92,7 +93,7 @@ before the episode over <Num k="method.excessDays" digits={0} /> days.
   <Num k="kinds.fertilisation.reco.deltaAdj.mean" sign unit={U} /> (n = <Num k="kinds.fertilisation.reco.deltaAdj.n" digits={0} />).
 - **Tillage** (n = <Num k="kinds.tillage.nFlux" digits={0} />, autumn, bare soil): NEE <Num k="kinds.tillage.nee.delta.mean" sign unit={U} />.
   The interval includes zero (n = <Num k="kinds.tillage.nFlux" digits={0} />, <Num k="kinds.tillage.nee.delta.ciLo" sign /> to
-  <Num k="kinds.tillage.nee.delta.ciHi" sign />). **Tillage with fertilisation** (spring field work, n = <Num k="kinds.tillageFert.nFlux" digits={0} />):
+  <Num k="kinds.tillage.nee.delta.ciHi" sign />). **Tillage with fertilisation** (mostly spring field work, n = <Num k="kinds.tillageFert.nFlux" digits={0} />):
   NEE <Num k="kinds.tillageFert.nee.delta.mean" sign unit={U} /> (<Num k="kinds.tillageFert.nee.delta.ciLo" sign /> to
   <Num k="kinds.tillageFert.nee.delta.ciHi" sign />). One Haltiala episode, where the failed grass was crushed and the
   field was harrowed, gives most of this mean.
@@ -109,8 +110,7 @@ before the episode over <Num k="method.excessDays" digits={0} /> days.
 **Events.** We used the dated events of Haltiala, Qvidja and Viikki, from their management files
 <Cite ids={['qvidja-management', 'viikki-management', 'haltiala-management']} /> (one Viikki sowing comes from an
 article, see the Events page). The build stores them in `db/events.parquet`: <Num k="counts.events" digits={0} /> events
-of these three sites. The events of Anttila, Särkisuo and Maktau from the articles were added to the database after
-this dive was computed and are not analysed. We analysed four classes:
+of these three sites. The events of Anttila, Särkisuo and Maktau are not analysed. We analysed four classes:
 *harvest or cut* (<Num k="counts.perType.harvest" digits={0} /> harvests and <Num k="counts.perType.cut" digits={0} /> cuts),
 *grazing* (<Num k="counts.perType.grazing" digits={0} />, all at Qvidja), *fertilisation* (<Num k="counts.perType.fertilisation" digits={0} />)
 and *tillage* (<Num k="counts.perType.tillage" digits={0} />). Sowing (<Num k="counts.perType.sowing" digits={0} />),
@@ -123,8 +123,7 @@ than <Num k="method.mergeDays" digits={0} /> days after the end of that episode,
 episode is the last day of its events (`date_end` where the file gives it, for example the grazing periods). The class
 set of the episode gives its *kind*: harvest or cut; grazing; fertilisation; tillage; tillage with fertilisation
 (spring field work: tillage, sowing and fertilisation within a few days); harvest or cut with fertilisation; or other.
-*Other* is any other combination of classes. There is one such episode: a grazing period followed by a cut within
-<Num k="method.mergeDays" digits={0} /> days at Qvidja in June 2022. Sowing, spraying and other events do not make an
+*Other* is any other combination of classes. The current events give no such episode. Sowing, spraying and other events do not make an
 episode and do not join one. They are listed as events near the episode.
 This gives <Num k="counts.episodes" digits={0} /> episodes from <Num k="counts.classEvents" digits={0} /> events of the four classes.
 
@@ -242,7 +241,8 @@ to <Num k="kinds.harvestCut.reco.after" unit={U} />. The change of NEE was still
 in the late window (days <Num k="method.lateFrom" digits={0} /> to <Num k="method.lateTo" digits={0} />,
 n = <Num k="kinds.harvestCut.nee.deltaLate.n" digits={0} />). The adjusted change (seasonal baseline removed) was
 <Num k="kinds.harvestCut.nee.deltaAdj.mean" sign unit={U} /> (n = <Num k="kinds.harvestCut.nee.deltaAdj.n" digits={0} />,
-interval <Num k="kinds.harvestCut.nee.deltaAdj.ciLo" sign /> to <Num k="kinds.harvestCut.nee.deltaAdj.ciHi" sign />). The
+interval <Num k="kinds.harvestCut.nee.deltaAdj.ciLo" sign /> to <Num k="kinds.harvestCut.nee.deltaAdj.ciHi" sign />). This
+interval includes zero. The
 baseline is available mostly for the late-season harvests, where GPP also decreases without a harvest. The excess
 of GPP over <Num k="method.excessDays" digits={0} /> days was <Num k="kinds.harvestCut.gpp.excess.mean" sign digits={0} unit={UE} />
 (n = <Num k="kinds.harvestCut.gpp.excess.n" digits={0} />). Per site: Qvidja <Num k="kinds.harvestCut.bySite.qvidja.nee.delta.mean" sign unit={U} />
@@ -262,9 +262,11 @@ GPP <Num k="highlights.qvidja-2025-07-30.delta.gpp" sign unit={U} /> and Reco <N
 GPP <Num k="kinds.fertilisation.gpp.delta.mean" sign unit={U} /> and Reco <Num k="kinds.fertilisation.reco.delta.mean" sign unit={U} />
 (interval <Num k="kinds.fertilisation.reco.delta.ciLo" sign /> to <Num k="kinds.fertilisation.reco.delta.ciHi" sign />). The air
 was warmer after the episodes than before (<Num k="kinds.fertilisation.ta.mean" sign digits={1} unit="°C" />): most
-fertilisations are in May, during the green-up. The adjusted changes are smaller: GPP
-<Num k="kinds.fertilisation.gpp.deltaAdj.mean" sign unit={U} />, Reco <Num k="kinds.fertilisation.reco.deltaAdj.mean" sign unit={U} />,
-NEE <Num k="kinds.fertilisation.nee.deltaAdj.mean" sign unit={U} /> (n = <Num k="kinds.fertilisation.nee.deltaAdj.n" digits={0} />).
+fertilisations are in May, during the green-up. After the seasonal baseline is removed, the changes of GPP and Reco are
+smaller: GPP <Num k="kinds.fertilisation.gpp.deltaAdj.mean" sign unit={U} />, Reco <Num k="kinds.fertilisation.reco.deltaAdj.mean" sign unit={U} />,
+NEE <Num k="kinds.fertilisation.nee.deltaAdj.mean" sign unit={U} /> (n = <Num k="kinds.fertilisation.nee.deltaAdj.n" digits={0} />,
+interval of NEE <Num k="kinds.fertilisation.nee.deltaAdj.ciLo" sign /> to <Num k="kinds.fertilisation.nee.deltaAdj.ciHi" sign />).
+The three adjusted intervals include zero.
 We also grouped all episodes with a fertilisation (also with a harvest or tillage) by product. For mineral products,
 the change of Reco was <Num k="anyFertKinds.mineral.reco.delta.mean" sign unit={U} /> (n = <Num k="anyFertKinds.mineral.nFlux" digits={0} />,
 interval <Num k="anyFertKinds.mineral.reco.delta.ciLo" sign /> to <Num k="anyFertKinds.mineral.reco.delta.ciHi" sign />). For
@@ -277,7 +279,8 @@ not separate the two groups.
 harvest. GPP was already low before (<Num k="kinds.tillage.gpp.before" unit={U} />). NEE changed by
 <Num k="kinds.tillage.nee.delta.mean" sign unit={U} /> and Reco by <Num k="kinds.tillage.reco.delta.mean" sign unit={U} />.
 The data show no pulse of respiration in the daily sums. The <Num k="kinds.tillageFert.nFlux" digits={0} /> episodes of
-tillage with fertilisation are spring field work at Haltiala and Viikki, and one summer episode. At Viikki the change
+tillage with fertilisation are mostly spring field work at Haltiala, Qvidja and Viikki. One episode is in summer
+(Haltiala, August 2023) and one in autumn (Viikki, October 2024). At Viikki the change
 of NEE was <Num k="kinds.tillageFert.bySite.viikki.nee.delta.mean" sign unit={U} /> (n = <Num k="kinds.tillageFert.bySite.viikki.nFlux" digits={0} />).
 At Haltiala it was <Num k="kinds.tillageFert.bySite.haltiala.nee.delta.mean" sign unit={U} /> (n = <Num k="kinds.tillageFert.bySite.haltiala.nFlux" digits={0} />).
 The Haltiala episode of August 2023 (manure, then the failed grass was crushed and the field was disc-harrowed) had
@@ -423,9 +426,9 @@ soil water result after fertilisation agrees with their observation.
 
 Heimsch et al. 2024 describe rotational grazing at Qvidja in August 2021 (eight cows, six days) and August 2022 (nine
 cows, nine days). In 2022, the leaf area index fell from 2.0 to 1.1 within six days after the grazing
-<Cite ids={['heimsch2024']} note="PDF p. 2 and p. 7" />. The management file gives grazing periods in June 2021 and June
-2022 (see Limits). The mean drop of GPP after our grazing episodes is of a similar size as after a harvest.
-With n = <Num k="kinds.grazing.nFlux" digits={0} /> the interval includes zero.
+<Cite ids={['heimsch2024']} note="PDF p. 2 and p. 7" />. The event dates that we used are also in August 2021 and
+August 2022 (see Limits). The mean drop of GPP after our grazing episodes is of a similar size as after a harvest.
+With n = <Num k="kinds.grazing.nFlux" digits={0} /> the interval of GPP includes zero.
 
 Shurpali et al. measured three Finnish grassland fields. After each cut, the fields changed from net uptake to a short
 net release <Cite ids={['shurpali2025']} note="PDF p. 4" />. Summer ploughing increased the release of CO₂ for a few
@@ -471,9 +474,11 @@ with a measured fraction of <Num k="highlights.viikki-2023-04-27.before.mean.fra
   windows of <Num k="method.rrefWindowDays" digits={0} /> days, every <Num k="method.rrefStepDays" digits={0} /> days
   <Cite ids={['calculated-doc']} />. A short pulse of respiration can be absorbed into this reference.
 - **Grazing dates.** The Qvidja management file gives grazing from 1 June 2021 (four horses, seven days) and from
-  1 June 2022 (nine cows, fifteen days) <Cite ids={['qvidja-management']} />. Heimsch et al. 2024 describe grazing
-  in August 2021 and August 2022 <Cite ids={['heimsch2024']} note="PDF p. 2" />. We used the file. The June 2021
-  episode is not used (a harvest follows). If the August periods were also grazed, they are not in our events.
+  1 June 2022 (nine cows, fifteen days) <Cite ids={['qvidja-management']} />. The newer site event file of the project
+  gives the same periods from 23 August 2021 and from 5 August 2022, and we used these dates. Heimsch et al. 2024
+  describe grazing in August 2021 (eight cows, six days) and August 2022 (nine cows, nine days)
+  <Cite ids={['heimsch2024']} note="PDF p. 2" />. The months now agree, but the number of animals in 2021 and the
+  durations differ.
 - **Soil water.** Haltiala `swc` is a gap-filled column at a resolution of <Num k="method.haltialaSwcResolution" digits={2} unit={US} /> with long flat periods
   (<a href={`${base}data-report/#finding-HAL-01`}>finding HAL-01</a>). Haltiala has no rain; the Viikki rain is a
   proxy. The Qvidja value is a conversion from sensor volts (<a href={`${base}data-report/#finding-QVI-01`}>finding QVI-01</a>);

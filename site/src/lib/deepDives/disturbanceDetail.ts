@@ -406,14 +406,14 @@ export function recoveryFigure(d: DetailData): FigureOut {
 
 // ---------- Figure 3: yield and canopy ----------
 
-/** Two scatter panels: ΔGPP against the per-event yield (Qvidja), and the relative ΔGPP against the GPP before (all silage harvests). */
+/** Two scatter panels: ΔGPP against the per-event yield (Anttila, Qvidja, Särkisuo), and the relative ΔGPP against the GPP before (all silage harvests). */
 export function yieldFigure(d: DetailData): FigureOut {
   const width = 1100;
   const height = 420;
   const margin = { left: 64, right: 20, top: 84, bottom: 58 };
   const grids = panelGrid(2, 2, width, margin, { x: 76, y: 0 }, height - margin.top - margin.bottom);
   const panels = [
-    { fit: d.yield.vsYield, xScale: 1 / 1000, xName: 'Yield of the harvest (t DW/ha)', yName: `ΔGPP (${UNIT_DAY})`, title: 'ΔGPP against the yield (Qvidja)' },
+    { fit: d.yield.vsYield, xScale: 1 / 1000, xName: 'Yield of the harvest (t DW/ha)', yName: `ΔGPP (${UNIT_DAY})`, title: 'ΔGPP against the yield of the harvest' },
     { fit: d.yield.relVsGppBefore, xScale: 1, xName: `Mean GPP before (${UNIT_DAY})`, yName: 'ΔGPP (% of the GPP before)', title: 'Relative ΔGPP against the GPP before (silage harvests)' },
   ];
   const series: Record<string, unknown>[] = [];
@@ -451,7 +451,7 @@ export function yieldFigure(d: DetailData): FigureOut {
     series,
   };
   const ry = d.yield.relVsYield;
-  const alt = `Scatter chart in two panels. Left: change of the mean daily GPP (after − before, ${UNIT_DAY}) against the dry-matter yield of the same harvest (t DW/ha), Qvidja harvests with a yield per event, ${fitText(d.yield.vsYield)}, slope ${f2s(d.yield.vsYield.slope === null ? null : d.yield.vsYield.slope * 1000)} ${UNIT_DAY} per t DW/ha. The relative change against the yield gives ${fitText(ry)}. Right: relative change of GPP (% of the mean before) against the mean GPP before, all used silage harvests of ${sitesShown.length} sites, ${fitText(d.yield.relVsGppBefore)}. Symbol and colour give the site; dashed lines are least-squares fits.`;
+  const alt = `Scatter chart in two panels. Left: change of the mean daily GPP (after − before, ${UNIT_DAY}) against the dry-matter yield of the same harvest (t DW/ha), silage harvests with a yield per harvest (${SITES.filter((s) => d.yield.vsYield.points.some((q) => q.site === s)).map((s) => SITE_NAMES[s]).join(', ')}), ${fitText(d.yield.vsYield)}, slope ${f2s(d.yield.vsYield.slope === null ? null : d.yield.vsYield.slope * 1000)} ${UNIT_DAY} per t DW/ha. The relative change against the yield gives ${fitText(ry)}. Right: relative change of GPP (% of the mean before) against the mean GPP before, all used silage harvests of ${sitesShown.length} sites, ${fitText(d.yield.relVsGppBefore)}. Symbol and colour give the site; dashed lines are least-squares fits.`;
   return { svg: renderSvg(option as never, width, height, alt), alt };
 }
 
@@ -720,7 +720,7 @@ export function fertWeatherFigure(d: DetailData): FigureOut {
     return `${SITE_NAMES[s]}: ${c.nPairs} control pairs from ${c.nYears} ${c.nYears === 1 ? 'year' : 'years'}, r(Δta, Δlight) = ${f2(c.rTaLight)}, dashed line ΔGPP = ${f2(c.fitTa.intercept)} ${f3s(c.fitTa.slope)} × Δta (slope ${f3s(c.fitTa.slope)} ${UNIT_DAY} per °C, r = ${f2(c.fitTa.r)}, n = ${c.fitTa.n}); fit for the expected values ΔGPP = ${f2(coef[0])} ${f3s(coef[1])} × Δta ${f3s(coef[2])} × Δlight %, R² = ${f2(c.fit!.r2)}; ${eps.length ? eps.join('; ') : 'no fertilisation episode in the summary'}`;
   });
   const noFit = SITES.filter((s) => !sites.includes(s) && d.fertilisation.episodes.some((e) => e.site === s));
-  const alt = `Scatter chart with ${sites.length} panels, one per site with a control fit: change of the mean daily GPP (${d.method.afterDays} days after − ${d.method.beforeDays} days before, ${UNIT_DAY}) against the change of the mean air temperature (°C). Grey dots are control pairs of the same season without management events; the dashed line is the least-squares fit of ΔGPP against Δta alone over the control pairs of the site; the coloured symbols are the fertilisation episodes of the summary (filled mineral, hollow organic, diamond with tillage or sowing). ${parts.join('. ')}.${noFit.length ? ` ${noFit.map((s) => SITE_NAMES[s]).join(' and ')}: no control pairs, no fit and no panel.` : ''}`;
+  const alt = `Scatter chart with ${sites.length} panels, one per site with a control fit: change of the mean daily GPP (${d.method.afterDays} days after − ${d.method.beforeDays} days before, ${UNIT_DAY}) against the change of the mean air temperature (°C). Grey dots are control pairs of the same season without management events; the dashed line is the least-squares fit of ΔGPP against Δta alone over the control pairs of the site; the coloured symbols are the fertilisation episodes of the summary (filled mineral, hollow organic, diamond with tillage or sowing). ${parts.join('. ')}.${noFit.length ? ` ${noFit.map((s) => SITE_NAMES[s]).join(' and ')}: too few control pairs for a fit, no panel.` : ''}`;
   return { svg: renderSvg(option as never, width, height, alt), alt };
 }
 

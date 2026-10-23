@@ -1,6 +1,6 @@
 # Build report: harmonised core database
 
-Built 2026-10-23T06:46:55.036Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
+Built 2026-10-23T15:58:35.911Z with DuckDB v1.5.6 and Node v26.10.0. Generator: scripts/build-db.ts. Design: docs/harmonised-database.md.
 
 ## Output files
 
@@ -10,7 +10,7 @@ Built 2026-10-23T06:46:55.036Z with DuckDB v1.5.6 and Node v26.10.0. Generator: 
 | db/sites.parquet | 6 | 4133 |
 | db/variables.parquet | 26 | 2137 |
 | db/site_variables.parquet | 185 | 7734 |
-| db/events.parquet | 101 | 7583 |
+| db/events.parquet | 114 | 8474 |
 
 ## Management events
 
@@ -18,11 +18,11 @@ Rows of events.parquet per site and type, and the rows with a yield (kg DW/ha), 
 
 | Site | Type | Events | With yield | With C | With N |
 |---|---|---|---|---|---|
-| anttila | fertilisation | 2 | 0 | 0 | 2 |
-| anttila | harvest | 3 | 1 | 1 | 0 |
+| anttila | fertilisation | 4 | 0 | 0 | 4 |
+| anttila | harvest | 5 | 4 | 4 | 0 |
 | anttila | sowing | 1 | 0 | 0 | 0 |
-| sarkisuo | fertilisation | 2 | 0 | 0 | 2 |
-| sarkisuo | harvest | 2 | 1 | 1 | 0 |
+| sarkisuo | fertilisation | 4 | 0 | 0 | 4 |
+| sarkisuo | harvest | 4 | 4 | 4 | 0 |
 | sarkisuo | other | 2 | 0 | 0 | 0 |
 | sarkisuo | sowing | 1 | 0 | 0 | 0 |
 | sarkisuo | spraying | 1 | 0 | 0 | 0 |
@@ -33,14 +33,15 @@ Rows of events.parquet per site and type, and the rows with a yield (kg DW/ha), 
 | haltiala | spraying | 4 | 0 | 0 | 0 |
 | haltiala | tillage | 11 | 0 | 0 | 0 |
 | qvidja | cut | 6 | 0 | 0 | 0 |
-| qvidja | fertilisation | 9 | 0 | 3 | 1 |
-| qvidja | grazing | 5 | 0 | 0 | 0 |
+| qvidja | fertilisation | 10 | 0 | 6 | 6 |
+| qvidja | grazing | 5 | 0 | 3 | 0 |
 | qvidja | harvest | 11 | 11 | 11 | 0 |
 | qvidja | sowing | 1 | 0 | 0 | 0 |
-| qvidja | tillage | 1 | 0 | 0 | 0 |
+| qvidja | tillage | 2 | 0 | 0 | 0 |
 | viikki | fertilisation | 7 | 0 | 0 | 7 |
-| viikki | harvest | 6 | 4 | 4 | 0 |
+| viikki | harvest | 7 | 4 | 4 | 0 |
 | viikki | sowing | 1 | 0 | 0 | 0 |
+| viikki | spraying | 2 | 0 | 0 | 0 |
 | viikki | tillage | 5 | 0 | 0 | 0 |
 | maktau | harvest | 2 | 0 | 0 | 0 |
 | maktau | sowing | 1 | 0 | 0 | 0 |

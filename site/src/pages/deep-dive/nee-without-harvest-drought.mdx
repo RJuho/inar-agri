@@ -80,7 +80,7 @@ and drought is NEE − H − D.
 - **Dry months** (SPI-1 ≤ <Num k="method.dryThreshold" digits={0} />) gave no consistent loss. At Qvidja the mean anomaly
   of the dry months was <Num k="dry.summary.qvidja.anomaly.mean" digits={1} sign unit={U} />
   (n = <Num k="dry.summary.qvidja.anomaly.n" digits={0} />, SD <Num k="dry.summary.qvidja.anomaly.sd" digits={1} />). These
-  months had a little more uptake. At Haltiala it was <Num k="dry.summary.haltiala.anomaly.mean" digits={1} sign unit={U} />
+  months had a little more uptake on average, but the 95 % CI includes zero. At Haltiala it was <Num k="dry.summary.haltiala.anomaly.mean" digits={1} sign unit={U} />
   (n = <Num k="dry.summary.haltiala.anomaly.n" digits={0} />, SD <Num k="dry.summary.haltiala.anomaly.sd" digits={1} />). At
   Viikki it was <Num k="dry.summary.viikki.anomaly.mean" digits={1} sign unit={U} />
   (n = <Num k="dry.summary.viikki.anomaly.n" digits={0} />, SD <Num k="dry.summary.viikki.anomaly.sd" digits={1} />). The
@@ -262,7 +262,7 @@ follows the weather after the cut, for example darker or colder days in late sum
 season <Cite ids={['ke2025']} note="p. 5" />. The light-saturated GPP of the model before the harvests was
 <Num k="episodes.haltiala-2021-09-10.fit.beta" digits={1} />, <Num k="episodes.haltiala-2022-08-15.fit.beta" digits={1} /> and
 <Num k="episodes.haltiala-2025-10-03.fit.beta" digits={1} unit="µmol m⁻² s⁻¹" />, against
-<Num k="episodes.qvidja-2019-06-10.fit.beta" digits={1} unit="µmol m⁻² s⁻¹" /> before the June 2019 cut at Qvidja. Thus the
+<Num k="episodes.qvidja-2019-06-11.fit.beta" digits={1} unit="µmol m⁻² s⁻¹" /> before the June 2019 cut at Qvidja. Thus the
 model expects little uptake after a cereal harvest. The carbon in the
 harvested grain and straw is not in this number; [Deep Dive #0](../harvest-carbon/) discusses the export.
 
@@ -291,7 +291,7 @@ and D to <Num k="allSites.totals.haltiala.droughtAnomaly" digits={0} sign unit={
 **Harvest.** The mean deficit was <Num k="harvest.bySite.qvidja.d28.mean" digits={1} sign unit={U} />
 (SD <Num k="harvest.bySite.qvidja.d28.sd" digits={1} />, n = <Num k="harvest.bySite.qvidja.d28.n" digits={0} />). The first
 cut of the year in June had the largest deficits. For example, the deficit was
-<Num k="episodes.qvidja-2019-06-10.d28" digits={1} sign unit={U} /> in 2019. In 2023 it was
+<Num k="episodes.qvidja-2019-06-11.d28" digits={1} sign unit={U} /> in 2019. In 2023 it was
 <Num k="episodes.qvidja-2023-06-19.d28" digits={1} sign unit={U} />. Heimsch et al. report the mean NEE of the five days
 before and after each harvest. After the June cut of 2018 the field became a net source. After the June cut of 2019 it
 stayed a small net sink <Cite ids={['heimsch2021']} note="p. 7; Table C1, p. 13" />. The deficit of the first
@@ -310,9 +310,12 @@ n = <Num k="harvest.qvidjaCuts.later.d28.n" digits={0} />). The deficit was nega
 **Drought.** Kaarina Yltöinen had <Num k="dry.summary.qvidja.nDry" digits={0} /> dry months in the Qvidja years;
 <Num k="dry.summary.qvidja.nWithAnomaly" digits={0} /> have an anomaly (March 2018 has too few days of data). The mean
 anomaly was <Num k="dry.summary.qvidja.anomaly.mean" digits={1} sign unit={U} /> (95 % CI
-<Num k="dry.summary.qvidja.anomaly.ciLo" digits={1} /> to <Num k="dry.summary.qvidja.anomaly.ciHi" digits={1} />), thus
-the dry months had a little more uptake than the non-dry years after the harvest was removed. The largest anomaly was
-June 2019 (<Num k="dry.months.qvidja.2019-06.anomaly" digits={1} sign unit={U} />). In that month H was
+<Num k="dry.summary.qvidja.anomaly.ciLo" digits={1} /> to <Num k="dry.summary.qvidja.anomaly.ciHi" digits={1} />). Thus
+the dry months had a little more uptake on average than the non-dry years after the harvest was removed, but the interval
+includes zero. The most negative anomalies were June 2021
+(<Num k="dry.months.qvidja.2021-06.anomaly" digits={1} sign unit={U} />) and June 2019
+(<Num k="dry.months.qvidja.2019-06.anomaly" digits={1} sign unit={U} />). In these months H was
+<Num k="dry.months.qvidja.2021-06.harvestDeficit" digits={1} sign unit={U} /> and
 <Num k="dry.months.qvidja.2019-06.harvestDeficit" digits={1} sign unit={U} />, thus D depends strongly on the harvest model.
 
 *Worked example: June 2022.* The month was dry (SPI-1 <Num k="example.qvidja2022June.spi1" digits={2} />) and the field
@@ -352,16 +355,16 @@ and D to <Num k="allSites.totals.qvidja.droughtAnomaly" digits={0} sign unit={U}
 <Num k="harvest.bySite.viikki.d28.mean" digits={1} sign unit={U} /> (SD <Num k="harvest.bySite.viikki.d28.sd" digits={1} />).
 The grass cuts alone had a mean deficit of <Num k="harvest.bySiteCrop.viikki.grass.d28.mean" digits={1} sign unit={U} />
 (SD <Num k="harvest.bySiteCrop.viikki.grass.d28.sd" digits={1} />, n = <Num k="harvest.bySiteCrop.viikki.grass.d28.n" digits={0} />).
-The grass cuts (n = <Num k="harvest.bySiteCrop.viikki.grass.d28.n" digits={0} />) had deficits from <Num k="episodes.viikki-2024-07-31.d28" digits={1} sign /> to
+The grass cuts (n = <Num k="harvest.bySiteCrop.viikki.grass.d28.n" digits={0} />) had deficits from <Num k="episodes.viikki-2024-06-14.d28" digits={1} sign /> to
 <Num k="episodes.viikki-2022-07-01.d28" digits={1} sign unit={U} />. The 2022 grass cuts were on 1 July and 27 August
-<Cite ids={['gao2026']} note="p. 13, Table A2" />. The barley mixture of 2023 (harvested on 17 August
+<Cite ids={['gao2026']} note="p. 13, Table A2" />. The management events (`db/events.parquet`) give the 2024 grass cuts on 14 June and 31 July. The barley mixture of 2023 (harvested on 17 August
 <Cite ids={['gao2026']} note="p. 3" />) gave <Num k="episodes.viikki-2023-08-17.d28" digits={1} sign unit={U} /> and the faba
 bean of 2025 <Num k="episodes.viikki-2025-09-10.d28" digits={1} sign unit={U} />.
 
 **Drought.** Vantaa had <Num k="dry.summary.viikki.nDry" digits={0} /> dry months in the Viikki years. No calendar month
 had <Num k="method.minRefYears" digits={0} /> non-dry years of the same crop class, thus all anomalies use all non-dry
 years. The anomalies were from <Num k="dry.summary.viikki.anomaly.min" digits={1} sign /> (May 2024) to
-<Num k="dry.summary.viikki.anomaly.max" digits={1} sign unit={U} /> (April 2023, the barley year). The regression slope was
+<Num k="dry.summary.viikki.anomaly.max" digits={1} sign unit={U} /> (June 2023, the barley year). The regression slope was
 <Num k="regression.viikki.monthly.slope" digits={1} sign /> g C m⁻² per SPI unit (95 % CI
 <Num k="regression.viikki.monthly.ciLo" digits={1} /> to <Num k="regression.viikki.monthly.ciHi" digits={1} />,
 n = <Num k="regression.viikki.monthly.n" digits={0} />, p = <Num k="regression.viikki.monthly.p" digits={2} />).

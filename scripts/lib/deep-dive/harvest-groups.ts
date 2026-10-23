@@ -37,10 +37,14 @@ export function harvestGroup(type: string, crop: string | null, detail: string):
 /**
  * True when the dry mass of the event is the yield of this event only. The management files of
  * Viikki and the articles of Anttila and Särkisuo give the yield of the year on the last harvest of
- * the year ("yield of the year"); that value is not the yield of one harvest.
+ * the year ("yield of the year"); that value is not the yield of one harvest. When the text also gives
+ * a per-cut value in kg DW/ha (for example "second cut, 4140 kg DW/ha; yield of the year 7500 kg DM/ha
+ * in the paper"), the dry mass is the yield of this cut.
  */
 export function yieldPerEvent(detail: string): boolean {
-  return !/yield of the year/i.test(detail);
+  if (!/yield of the year/i.test(detail)) return true;
+  const rest = detail.replace(/yield of the year\s+[\d.]+\s*kg\s*D[WM]\/ha/gi, '');
+  return /\d\s*kg\s*DW\/ha/i.test(rest);
 }
 
 /** One harvest or cut event of db/events.parquet. */

@@ -463,7 +463,7 @@ async function main(): Promise<void> {
     -- known: the management of the site and year is known. Haltiala, Qvidja and Viikki have
     -- a management file for all years (a year without a harvest row is a year without a
     -- harvest). Anttila and Särkisuo have harvest data only for the years with a row
-    -- (2022, Shurpali et al. 2025). Maktau has none.
+    -- (2022 and 2023, 2018-2025 events file). Maktau has none.
     LEFT JOIN (SELECT a.site_code, a.year,
                       a.site_code IN ('qvidja', 'haltiala', 'viikki') OR (a.site_code IN ('anttila', 'sarkisuo') AND COALESCE(m.n_harvest, 0) > 0) AS known
                FROM annual a LEFT JOIN m USING (site_code, year)) k USING (site_code, year)

@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-10-23T06:46:55.036Z",
+  "builtAt": "2026-10-23T15:58:35.911Z",
   "duckdb": "v1.5.6",
   "node": "v26.10.0",
   "outputs": [
@@ -25,25 +25,25 @@
     },
     {
       "file": "db/events.parquet",
-      "rows": 101,
-      "bytes": 7583
+      "rows": 114,
+      "bytes": 8474
     }
   ],
   "events": [
     {
       "site": "anttila",
       "type": "fertilisation",
-      "n": 2,
+      "n": 4,
       "withYield": 0,
       "withC": 0,
-      "withN": 2
+      "withN": 4
     },
     {
       "site": "anttila",
       "type": "harvest",
-      "n": 3,
-      "withYield": 1,
-      "withC": 1,
+      "n": 5,
+      "withYield": 4,
+      "withC": 4,
       "withN": 0
     },
     {
@@ -57,17 +57,17 @@
     {
       "site": "sarkisuo",
       "type": "fertilisation",
-      "n": 2,
+      "n": 4,
       "withYield": 0,
       "withC": 0,
-      "withN": 2
+      "withN": 4
     },
     {
       "site": "sarkisuo",
       "type": "harvest",
-      "n": 2,
-      "withYield": 1,
-      "withC": 1,
+      "n": 4,
+      "withYield": 4,
+      "withC": 4,
       "withN": 0
     },
     {
@@ -153,17 +153,17 @@
     {
       "site": "qvidja",
       "type": "fertilisation",
-      "n": 9,
+      "n": 10,
       "withYield": 0,
-      "withC": 3,
-      "withN": 1
+      "withC": 6,
+      "withN": 6
     },
     {
       "site": "qvidja",
       "type": "grazing",
       "n": 5,
       "withYield": 0,
-      "withC": 0,
+      "withC": 3,
       "withN": 0
     },
     {
@@ -185,7 +185,7 @@
     {
       "site": "qvidja",
       "type": "tillage",
-      "n": 1,
+      "n": 2,
       "withYield": 0,
       "withC": 0,
       "withN": 0
@@ -201,7 +201,7 @@
     {
       "site": "viikki",
       "type": "harvest",
-      "n": 6,
+      "n": 7,
       "withYield": 4,
       "withC": 4,
       "withN": 0
@@ -210,6 +210,14 @@
       "site": "viikki",
       "type": "sowing",
       "n": 1,
+      "withYield": 0,
+      "withC": 0,
+      "withN": 0
+    },
+    {
+      "site": "viikki",
+      "type": "spraying",
+      "n": 2,
       "withYield": 0,
       "withC": 0,
       "withN": 0

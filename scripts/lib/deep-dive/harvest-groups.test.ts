@@ -28,6 +28,9 @@ test('harvestGroup separates silage, cleaning cut and grain', () => {
 test('yieldPerEvent is false for the yield of the year', () => {
   assert.equal(yieldPerEvent('Timothy, second cut; yield of the year 3673 kg DW/ha'), false);
   assert.equal(yieldPerEvent('Silage, whole crop, 7652 kg/ha fresh, DM 0.406'), true);
+  assert.equal(yieldPerEvent('Faba beans; yield of the year 1973.7 kg DW/ha (AG_XLSX: 2294.71 kg/ha, basis not given)'), false);
+  assert.equal(yieldPerEvent('Timothy and red clover, second cut, 4140 kg DW/ha; yield of the year 7500 kg DM/ha in the paper'), true);
+  assert.equal(yieldPerEvent('Timothy and meadow fescue, second cut, 2220 kg DW/ha (paper: yield of the year 4700 kg DM/ha)'), true);
 });
 
 test('mergeHarvestEpisodes merges within 7 days, sets the group and the co-events', () => {

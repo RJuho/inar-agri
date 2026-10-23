@@ -91,7 +91,7 @@ An NEE below zero is a net uptake of CO₂. A positive difference means less upt
   (SD <Num k="classes.coldSpell.qvidja.reference.sd" />, n = <Num k="classes.coldSpell.qvidja.reference.n" digits={0} />).
 - Daily NEE decreased with the air temperature at the five Finnish sites. Pearson r was from
   <Num k="anscombe.ta.viikki.r" /> at Viikki (n = <Num k="anscombe.ta.viikki.n" digits={0} /> days) to
-  <Num k="anscombe.ta.qvidja.r" /> at Qvidja (n = <Num k="anscombe.ta.qvidja.n" digits={0} />). At Maktau daily NEE
+  <Num k="anscombe.ta.sarkisuo.r" /> at Särkisuo (n = <Num k="anscombe.ta.sarkisuo.n" digits={0} />). At Maktau daily NEE
   increased a little with it (r = <Num k="anscombe.ta.maktau.r" />, n = <Num k="anscombe.ta.maktau.n" digits={0} />).
 
 ## Data and method
@@ -177,7 +177,7 @@ For each period and year we added the used days over all sites.
 
 At the Finnish sites, daily NEE was lower (more uptake) on warmer days. The correlation is weak to moderate
 (r from <Num k="anscombe.ta.viikki.r" /> at Viikki, n = <Num k="anscombe.ta.viikki.n" digits={0} />, to
-<Num k="anscombe.ta.qvidja.r" /> at Qvidja, n = <Num k="anscombe.ta.qvidja.n" digits={0} />). The uptake also depends on
+<Num k="anscombe.ta.sarkisuo.r" /> at Särkisuo, n = <Num k="anscombe.ta.sarkisuo.n" digits={0} />). The uptake also depends on
 the light, the crop and the management. At Maktau the daily mean air temperature has a small range
 (variance <Num k="anscombe.ta.maktau.varX" digits={1} />, n = <Num k="anscombe.ta.maktau.n" digits={0} />) and the
 correlation is weak and positive (r = <Num k="anscombe.ta.maktau.r" />).
@@ -379,8 +379,10 @@ or the rain sum of a failed season). NEE = mean ± SD of the used days of the ep
   <Num k="classes.heat.qvidja.event.n" digits={0} /> event days and <Num k="classes.heat.qvidja.reference.sd" /> on
   <Num k="classes.heat.qvidja.reference.n" digits={0} /> reference days.
 - **Small n.** Heavy rain at Anttila and Särkisuo (n = <Num k="classes.heavyRain.anttila.event.n" digits={0} /> and
-  <Num k="classes.heavyRain.sarkisuo.event.n" digits={0} />) and frost at Viikki (n = <Num k="classes.frost.viikki.event.n" digits={0} />)
-  have few days. Their results are not reliable.
+  <Num k="classes.heavyRain.sarkisuo.event.n" digits={0} />) has few days. Their results are not reliable. Frost at Viikki
+  has only <Num k="counts.viikki.frost.days" digits={0} /> used event days of
+  <Num k="counts.viikki.frost.allDays" digits={0} />, because the human-disturbance window removes most of them. This is
+  fewer than <Num k="method.minDays" digits={0} />, thus frost at Viikki has no result.
 - **Human-disturbance window.** The weather classes are detected on all days. The removed days (<Num k="method.humanWindow.before" digits={0} />
   days before to <Num k="method.humanWindow.after" digits={0} /> days after each event) apply to the NEE and soil
   analysis only. The mask uses the events of Haltiala, Qvidja and Viikki. The events of Anttila, Särkisuo and Maktau

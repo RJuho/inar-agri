@@ -8,7 +8,7 @@ sites: [haltiala, qvidja, viikki]
 variables: [nee_f, gpp, reco]
 period: { from: 2018, to: 2025 }
 date: '2026-10-22'
-status: checked
+status: draft
 models:
   - model: Claude Opus 5.5
     role: question, analysis script, text, figures and the fixes of the review
@@ -74,12 +74,16 @@ The change of Reco was <Num k="all.reco.mean" sign unit={U} />, and its interval
   (n = <Num k="sites.haltiala.n" digits={0} />, interval <Num k="sites.haltiala.nee.ciLo" sign /> to
   <Num k="sites.haltiala.nee.ciHi" sign />). The interval includes zero.
 
-The data show no significant relation between the yield of a harvest and the change of NEE.
+At Qvidja, a larger yield was associated with a larger change of NEE
+(r = <Num k="yield.sites.qvidja.r" />, n = <Num k="yield.sites.qvidja.n" digits={0} />, p = <Num k="yield.sites.qvidja.p" />).
+At Haltiala and Viikki, the data show no significant relation.
 
 ## Data and method
 
 **Events.** We used the harvest and cut events of the management files
-<Cite ids={['qvidja-management', 'viikki-management', 'haltiala-management']} />. The build stores them in
+<Cite ids={['qvidja-management', 'viikki-management', 'haltiala-management']} />. The dates, yields and amounts come
+from the shared management events file of the project (`data/Agri_site_management_events 2018-2025.xlsx`) where it
+gives them. The build stores them in
 `db/events.parquet`. There are <Num k="counts.harvests" digits={0} /> harvests and <Num k="counts.cuts" digits={0} /> cuts.
 A harvest removes the biomass. At Qvidja, a cut is a cleaning cut, and the grass stays on the field
 <Cite ids={['qvidja-management']} />.
@@ -144,7 +148,7 @@ the change, not a daily sum.
 
 **Yield.** We used the dry-matter yield of the episode in t DW ha⁻¹. Qvidja and Haltiala give a yield per harvest.
 Viikki gives one yield per year on the last harvest of the year. We used the Viikki value only when the year has one
-episode. We calculated the Pearson correlation r, its two-sided p-value (t-test, n − 2 degrees of freedom) and the
+episode. The first Viikki cut of 2024 (14 June) has an amount for about one hectare only and no yield of the field. We calculated the Pearson correlation r, its two-sided p-value (t-test, n − 2 degrees of freedom) and the
 least-squares slope. The slope has the same p-value as r.
 
 ## Results
@@ -255,8 +259,10 @@ pass rule 3 (n = <Num k="sensitivity.all.n" digits={0} />). The mean change of N
 (n = <Num k="yield.sites.qvidja.n" digits={0} />, p = <Num k="yield.sites.qvidja.p" />). The slope was
 <Num k="yield.sites.qvidja.slope" sign /> g C m⁻² d⁻¹ per t DW ha⁻¹ (same p-value). At Haltiala, r was
 <Num k="yield.sites.haltiala.r" /> (n = <Num k="yield.sites.haltiala.n" digits={0} />, p = <Num k="yield.sites.haltiala.p" />).
-Viikki has <Num k="yield.sites.viikki.n" digits={0} /> episodes with a yield. These correlations are not significant at
-p &lt; <Num k="method.alpha" />. We did not combine the sites. Grain, silage and whole-year yields are different quantities.
+Viikki has <Num k="yield.sites.viikki.n" digits={0} /> episodes with a yield. At p &lt; <Num k="method.alpha" />, the
+Qvidja correlation is significant, and the Haltiala correlation is not. The Qvidja result comes from one test with a small
+n. It is an association, not a proof that a larger harvest causes a larger loss of uptake. Most of the large Qvidja
+yields are June harvests (Table), thus the season can also be part of the relation. We did not combine the sites. Grain, silage and whole-year yields are different quantities.
 
 **Comparison with the articles.** Heimsch et al. compared five-day means of NEE before and after each harvest at
 Qvidja. The harvest of June 2018 changed the mean CO₂ flux from a net sink to a small source
@@ -318,10 +324,11 @@ of the CO₂ exchange.
 - **Qvidja annual NEE.** The annual NEE of Qvidja in our data is more negative than in Heimsch et al. 2024
   (<a href={`${base}data-report/#finding-QVI-11`}>finding QVI-11</a>). We did not test the effect of this difference
   on the change around an event.
-- **Event dates.** We used the dates of the management files. Heimsch et al. 2021 give some dates that are one or two
-  days different: 23 September 2018 (file: 2018-09-25), 11 June 2019 (file: 2019-06-10) and 20 August 2019 (file:
-  2019-08-21) <Cite ids={['heimsch2021']} note="PDF p. 3" />. A harvest can take more than one day. We used the first
-  and the last day where the file gives them.
+- **Event dates.** We used the dates of the management events file. For three Qvidja harvests, these dates agree
+  with Heimsch et al. 2021: 23 September 2018, 11 June 2019 and 20 August 2019
+  <Cite ids={['heimsch2021']} note="PDF p. 3" />. An earlier version of the Qvidja management file gave dates that were
+  one or two days different. A harvest can take more than one day. We used the first and the last day where the file
+  gives them.
 
 ## References
 

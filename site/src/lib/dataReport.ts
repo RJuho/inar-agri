@@ -168,6 +168,37 @@ export interface ChangeLogEntry {
 /** Newest entry first. */
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    id: 'change-2026-10-23-events-file',
+    date: '2026-10-23',
+    title: 'Management events from the 2018-2025 events file',
+    site: 'Anttila, Särkisuo, Qvidja, Viikki',
+    variable: 'events',
+    findings: [],
+    summary: [
+      'The project team gave a new file, `data/Agri_site_management_events 2018-2025.xlsx`, with the events of 8 sites. Only our sites and only the events in the period with flux data are in the event table: Anttila and Särkisuo 2022 to 2023, Qvidja 2018 to 2025, Viikki 2022 to 2025.',
+      'Anttila and Särkisuo get the yield of each cut in 2022 and all events of 2023. Their NECB of 2023 now has a harvest term. Qvidja gets N inputs, a harrowing and an N fertilisation in April 2021, the carbon of two composts, of the grazing (grass eaten and excreta returned) and of the 2021 and 2022 harvests. With these values the Qvidja management carbon agrees with Table 1 of Heimsch et al. 2024 in all five years. Viikki gets two spraying events, the first cut of 2024 and the product amounts.',
+      'Where the file date differs from an older source, the file date is used. For three dates the flux data show the cut on the file date (Anttila 2022-08-08, Qvidja 2020-06-23 and 2021-06-14). The Qvidja NPK mix of 2020 moves to 2020-07-27, but Heimsch et al. 2024 give about 26 May 2020. The full list of conflicts is in the documentation.',
+      'The Deep Dives that use the events or the NECB were run again and their texts were corrected. Deep Dive #0 (harvest and carbon balance) and Deep Dive #4 (disturbances in detail) are drafts again, because a main conclusion changed: at Qvidja the yield now correlates with the change of NEE, and fewer drops come before the recorded date. Deep Dives #1 to #3 keep the status checked.',
+    ],
+    facts: [
+      { term: 'Anttila', value: '4 new events (2023), second cut of 2022 moved from 2022-09-08 to 2022-08-08' },
+      { term: 'Särkisuo', value: '4 new events (2023), yields per cut in 2022' },
+      { term: 'Qvidja', value: '2 new events, 9 dates changed, carbon of 2 composts, 3 grazings and 2 harvests' },
+      { term: 'Viikki', value: '3 new events, 1 date changed, product amounts on 4 fertilisations' },
+      { term: 'Not used', value: 'Jokioinen, Pappilansuo, Ruukki (no data); Anttila and Särkisuo events outside 2022 to 2023' },
+      { term: 'Code', value: '`scripts/lib/events.ts`, `scripts/lib/calc/management.ts`' },
+    ],
+    formulas: [],
+    tables: [],
+    openPoints: [],
+    openQuestions: [
+      'Qvidja 2020 fertilisation: 2020-05-25 (Qvidja xlsx, about 26 May in Heimsch et al. 2024) or 2020-07-27 (new file)?',
+      'Anttila and Särkisuo carbon content: 0.47 (Shurpali et al. 2025) or 0.417 ("Maaninka" in the new file)? The C column of the new file is yield × 0.583.',
+      'Viikki 2025 faba bean yield: 1973.7 kg DW/ha (docx) or 2294.71 kg/ha (new file)?',
+    ],
+    doc: 'docs/harmonised-database.md',
+  },
+  {
     id: 'change-2026-10-23-hal-03',
     date: '2026-10-23',
     title: 'Haltiala soil water 2021 confirmed by the provider',

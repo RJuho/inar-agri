@@ -19,8 +19,13 @@
 //   name (Yara AXAN 27-0-1, NPK 23-10-8). Finnish saltpetre has no grade in
 //   the file, thus no N value. c_g_m2 comes from MANAGEMENT_CARBON
 //   (calc/management.ts) through withCarbon(), not from this table.
-// - Viikki, Anttila and Särkisuo give one yield per year. It is on the last
-//   harvest of the year.
+// - Viikki gives one yield per year. It is on the last harvest of the year.
+//   Anttila and Särkisuo have one yield per cut (AG_XLSX, 2022 and 2023).
+// - AG_XLSX (data/Agri_site_management_events 2018-2025.xlsx, added
+//   2026-10-23) covers 8 sites. Only our sites and only events inside the
+//   flux data period of the site are rows. Where its date differs from an
+//   older source, the AG_XLSX date is used (user decision 2026-10-23); the
+//   old date is in the detail and in docs/harmonised-database.md.
 // - Excel serial dates: 1899-12-30 + n days.
 // - Anttila, Särkisuo and Maktau have no management file. Their rows come
 //   from the articles in data/articles/ (Shurpali et al. 2025, Räsänen et
@@ -79,6 +84,8 @@ const SH_2025 = 'data/articles/Shurpali_2025.pdf (Shurpali et al. 2025, p. 2, Ta
 const RA_2026 = 'data/articles/Räsänen_2026_kenia.pdf (Räsänen et al. 2026, p. 3)';
 const GAO_2026 = 'data/articles/Gao_2026_Cfootprint_milk-DNDC.pdf (Gao et al. 2026, Table A2)';
 const VE_2026 = 'data/articles/Vettikkat_2026_NH3-flux_SMEAR-Agri_mass-spec_EC.pdf (Vettikkat et al. 2026, Table 1)';
+const AG_XLSX = 'data/Agri_site_management_events 2018-2025.xlsx';
+const QV_AG = `${QV_XLSX}; ${AG_XLSX}`;
 
 type Facts = EventFacts & { end?: string };
 type Short = [date: string, type: EventType, detail: string, facts?: Facts];
@@ -104,11 +111,14 @@ const qvFert = (date: string, detail: string, crop: string, fresh: number, dm: n
 ];
 
 /** Qvidja grazing: the xlsx gives the start date, the number of animals and the duration in days. */
-function qvGrazing(date: string, n: number, animal: string, days: number, area: number): Short {
+function qvGrazing(date: string, n: number, animal: string, days: number, area: number, extra = ''): Short {
   const end = new Date(`${date}T00:00:00Z`);
   end.setUTCDate(end.getUTCDate() + days - 1);
-  return [date, 'grazing', `${n} ${animal}, ${days} days`, { end: end.toISOString().slice(0, 10), crop: animal, amount: n, amount_unit: 'animals', area_ha: area }];
+  return [date, 'grazing', `${n} ${animal}, ${days} days${extra}`, { end: end.toISOString().slice(0, 10), crop: animal, amount: n, amount_unit: 'animals', area_ha: area }];
 }
+
+/** Add facts and a detail suffix to a row. */
+const plus = ([date, type, detail, facts = {}]: Short, more: Facts, extra = ''): Short => [date, type, `${detail}${extra}`, { ...facts, ...more }];
 
 /** Viikki N input of one application, from the docx. */
 const viN = (crop: string, n: number): Facts => ({ crop, n_kg_ha: n });
@@ -162,32 +172,23 @@ export const EVENTS: EventRow[] = [
 
   // ---- Qvidja 2018-2019 events that are only in Heimsch et al. 2021
   ...rowsOf('qvidja', QV_2021, [
-    ['2018-07-16', 'fertilisation', 'NK molasses, 2800 kg/ha (57 g C/m2)', kgHa('NK molasses', 2800)],
     ['2018-08-21', 'cut', 'Cut at 15 cm, yield left on the field'],
     ['2018-08-24', 'fertilisation', 'NK molasses, 1755 kg/ha (36 g C/m2)', kgHa('NK molasses', 1755)],
     ['2018-09-03', 'sowing', 'Oversowing after drought damage (timothy, ryegrasses, meadow grass, red fescue)', { crop: 'Grass mix' }],
-    ['2019-05-08', 'fertilisation', 'By-product fertiliser mix, about 4600 kg/ha (43 g C/m2)', kgHa('NK molasses mix', 4600)],
-    // N = 23 % of the product (grade 23-10-8).
+    // N = 23 % of the product (grade 23-10-8). AG_XLSX gives 51 kg N/ha.
     ['2019-06-20', 'fertilisation', 'Mineral fertiliser NPK 23-10-8, 220 kg/ha', kgHa('NPK 23-10-8', 220, { n_kg_ha: 50.6 })],
+  ]),
+  // The N values of the two molasses applications are only in AG_XLSX.
+  ...rowsOf('qvidja', `${QV_2021}; ${AG_XLSX}`, [
+    ['2018-07-16', 'fertilisation', 'NK molasses, 2800 kg/ha (57 g C/m2), 66 kg N/ha', kgHa('NK molasses', 2800, { n_kg_ha: 66 })],
+    ['2019-05-08', 'fertilisation', 'By-product fertiliser mix, about 4600 kg/ha (43 g C/m2), 60 kg N/ha', kgHa('NK molasses mix', 4600, { n_kg_ha: 60 })],
   ]),
   // ---- Qvidja: xlsx (sheet Taul1). Harvest dates differ by 1-2 days from the paper; the xlsx date is used.
   // Area = "Area of kasvulohko" (ha) of the row.
   ...rowsOf('qvidja', QV_XLSX, [
     // The xlsx gives 615 kg/ha x 0.30 = 185 kg DM/ha. The paper gives 1985 kg DW/ha; the paper value is used.
     qvSilage('2018-06-12', 615, 0.3, 16.25, ' (paper: 1985 kg DW/ha)', 1985),
-    qvSilage('2018-09-25', 1439, 0.241, 11.75),
-    qvSilage('2019-06-10', 7652, 0.406, 9.58),
-    qvSilage('2019-08-21', 2707, 0.38, 4.02),
-    qvFert('2020-05-25', 'Own NPK mix 2020 (oma NPK seos)', 'Own NPK mix', 9380, 0.13, 3.23),
-    qvSilage('2020-06-11', 5027.86, 0.439, 3.23),
-    qvFert('2020-07-27', 'Tube compost chips / silage (tuubikompostihake)', 'Tube compost chips', 10000, 0.283, 3.23),
-    qvSilage('2020-08-27', 1857.58, 0.701, 3.23),
     qvFert('2021-05-12', 'Broiler litter manure (kuivikelanta)', 'Broiler litter manure', 4000, 0.66, 5.18),
-    qvGrazing('2021-06-01', 4, 'horses', 7, 5.18),
-    qvSilage('2021-06-21', 3526, 0.786, 5.18),
-    qvGrazing('2022-06-01', 9, 'cows', 15, 4.75),
-    qvSilage('2022-06-21', 2638.9, 0.329, 4.75),
-    qvFert('2022-07-04', 'Qvidja compost', 'Qvidja compost', 15330, 0.354, 4.75),
     qvCleaningCut('2022-09-09', 4.75),
     qvCleaningCut('2023-06-19', 4.75),
     qvSilage('2023-06-20', 752.1, 0.404, 4.75),
@@ -195,12 +196,38 @@ export const EVENTS: EventRow[] = [
     qvSilage('2023-08-22', 1088.86, 0.404, 4.75),
     qvFert('2023-08-30', 'Soilfood compost fibre (Rav.kuitu II L)', 'Soilfood compost fibre', 34500, 0.48, 4.75),
     ['2023-09-07', 'tillage', 'Subsoiling and cultivation (jankkurointi ja kultivointi)', { area_ha: 4.75 }],
+    // AG_XLSX: 717.6 kg C/ha with DM 0.434; the Qvidja xlsx DM 0.423 is kept.
     qvSilage('2024-06-15', 3936.65, 0.423, 4.42),
     qvCleaningCut('2024-07-18', 4.42),
     qvCleaningCut('2024-08-09', 4.42),
-    qvGrazing('2024-10-04', 14, 'highland cows', 8, 4.42),
+  ]),
+  ...rowsOf('qvidja', QV_AG, [
+    qvGrazing('2024-10-04', 14, 'highland cows', 8, 4.42, '; grass eaten 94.57 kg C/ha, excreta returned 39 kg C/ha (AG_XLSX)'),
+  ]),
+  ...rowsOf('qvidja', QV_XLSX, [
     qvGrazing('2025-06-14', 4, 'horses', 5, 4.42),
     qvGrazing('2025-07-30', 20, 'highland cows', 12, 4.42),
+  ]),
+
+  // ---- Qvidja: rows with a date or numbers from AG_XLSX. AG_XLSX gives the harvests as kg C/ha
+  // (Heimsch et al. 2024); the sums per year agree with Table 1 of the paper. Old dates from the Qvidja xlsx in the detail.
+  ...rowsOf('qvidja', QV_AG, [
+    qvSilage('2018-09-23', 1439, 0.241, 11.75, ' (Qvidja xlsx date 2018-09-25)'),
+    qvSilage('2019-06-11', 7652, 0.406, 9.58, ' (Qvidja xlsx date 2019-06-10)'),
+    qvSilage('2019-08-20', 2707, 0.38, 4.02, ' (Qvidja xlsx date 2019-08-21)'),
+    qvSilage('2020-06-23', 5027.86, 0.439, 3.23, ' (Qvidja xlsx date 2020-06-11)'),
+    plus(qvFert('2020-07-27', 'Own NPK mix 2020 (oma NPK seos)', 'Own NPK mix', 9380, 0.13, 3.23), { n_kg_ha: 49 }, ', 49 kg N/ha (Qvidja xlsx date 2020-05-25)'),
+    plus(qvFert('2020-07-27', 'Tube compost chips / silage (tuubikompostihake)', 'Tube compost chips', 10000, 0.283, 3.23), {}, '; 1010 kg C/ha (AG_XLSX)'),
+    qvSilage('2020-08-28', 1857.58, 0.701, 3.23, ' (Qvidja xlsx date 2020-08-27)'),
+    ['2021-04-20', 'tillage', 'Harrowing', { area_ha: 5.18 }],
+    ['2021-04-27', 'fertilisation', 'N fertilisation, 46 kg N/ha, product not given', { n_kg_ha: 46, area_ha: 5.18 }],
+    // AG_XLSX: 1968 kg C/ha = 4686 kg DW/ha at C 0.42. The Qvidja xlsx gives 3526 kg/ha x DM 0.786 = 2771.
+    qvSilage('2021-06-14', 3526, 0.786, 5.18, '; AG_XLSX 1968 kg C/ha (Qvidja xlsx date 2021-06-21)', 1968 / 0.42),
+    qvGrazing('2021-08-23', 4, 'horses', 7, 5.18, '; grass eaten 57 kg C/ha, excreta returned 24 kg C/ha (Qvidja xlsx date 2021-06-01; Heimsch et al. 2024: 8 cows in August)'),
+    // AG_XLSX: 439 kg C/ha (DM 0.786) = 1045 kg DW/ha at C 0.42. The Qvidja xlsx gives 2638.9 kg/ha x DM 0.329 = 868.
+    qvSilage('2022-06-21', 2638.9, 0.329, 4.75, '; AG_XLSX 439 kg C/ha', 439 / 0.42),
+    plus(qvFert('2022-07-04', 'Qvidja compost', 'Qvidja compost', 15330, 0.354, 4.75), { n_kg_ha: 87 }, '; 1495 kg C/ha and 87 kg N/ha (AG_XLSX, N source not stated)'),
+    qvGrazing('2022-08-05', 9, 'cows', 15, 4.75, '; grass eaten 114 kg C/ha, excreta returned 48 kg C/ha (Qvidja xlsx date 2022-06-01)'),
   ]),
 
   // ---- Viikki: docx table (day and month, year from the row). The N sources
@@ -209,7 +236,6 @@ export const EVENTS: EventRow[] = [
     ['2022-05-10', 'fertilisation', 'CAN mineral fertiliser, 108 kg N/ha', viN('CAN mineral fertiliser', 108)],
     ['2022-07-01', 'harvest', 'Timothy, first cut', { crop: 'Timothy' }],
     ['2022-08-27', 'harvest', 'Timothy, second cut; yield of the year 3673 kg DW/ha', { crop: 'Timothy', dry_mass_kg_ha: 3673 }],
-    ['2022-11-02', 'tillage', 'Tillage'],
     // Vettikkat et al. 2026 give the product and the amount of the same day (field Alaniitty 1, 6.86 ha); the N value is from the docx.
     [
       '2023-04-27',
@@ -218,32 +244,50 @@ export const EVENTS: EventRow[] = [
       { ...viN('Dry manure', 18.4), amount: 43, amount_unit: 'm3/ha' },
     ],
     ['2023-04-28', 'tillage', 'Levelling harrow, about 5 cm, manure worked in'],
-    ['2023-05-25', 'fertilisation', 'Mineral N, 67.5 kg N/ha', viN('Mineral N', 67.5)],
     ['2023-05-25', 'tillage', 'Tillage'],
     ['2023-08-17', 'harvest', 'Barley, clover and grasses, first cut', { crop: 'Barley, clover and grasses' }],
     ['2023-08-24', 'harvest', 'Barley, clover and grasses, second cut; yield of the year 6773 kg DW/ha', { crop: 'Barley, clover and grasses', dry_mass_kg_ha: 6773 }],
-    ['2024-05-08', 'fertilisation', 'Mineral N, 27.0 kg N/ha', viN('Mineral N', 27)],
-    ['2024-05-22', 'fertilisation', 'Liquid manure, 57.5 kg N/ha', viN('Liquid manure', 57.5)],
-    ['2024-07-31', 'harvest', 'Silage; yield of the year 2336 kg DW/ha', { crop: 'Silage', dry_mass_kg_ha: 2336 }],
-    ['2024-10-09', 'fertilisation', 'Dry manure, 22.5 kg N/ha', viN('Dry manure', 22.5)],
     ['2024-10-09', 'tillage', 'Tillage'],
     ['2025-05-08', 'tillage', 'Tillage', { end: '2025-05-09' }],
     ['2025-05-10', 'fertilisation', 'Mineral fertiliser, 21.6 kg N/ha', viN('Mineral fertiliser', 21.6)],
-    ['2025-09-10', 'harvest', 'Faba beans; yield of the year 1973.7 kg DW/ha', { crop: 'Faba beans', dry_mass_kg_ha: 1973.7 }],
+    ['2025-09-10', 'harvest', 'Faba beans; yield of the year 1973.7 kg DW/ha (AG_XLSX: 2294.71 kg/ha, basis not given; straw left on the field)', { crop: 'Faba beans', dry_mass_kg_ha: 1973.7 }],
+  ]),
+  // Rows with a date, an amount or an event from AG_XLSX (its comment column repeats the docx text).
+  ...rowsOf('viikki', `${VI_DOCX}; ${AG_XLSX}`, [
+    ['2022-11-01', 'tillage', 'Tillage (docx date 2022-11-02)'],
+    ['2023-05-25', 'fertilisation', 'Mineral N, 250 kg/ha product, 67.5 kg N/ha', { ...viN('Mineral N', 67.5), amount: 250, amount_unit: 'kg/ha' }],
+    ['2024-05-08', 'fertilisation', 'Mineral fertiliser BeFert CAN (N27-S4), 100 kg/ha, 27.0 kg N/ha', { ...viN('BeFert CAN (N27-S4)', 27), amount: 100, amount_unit: 'kg/ha' }],
+    ['2024-05-22', 'fertilisation', 'Liquid manure, 25 t/ha, 57.5 kg N/ha', { ...viN('Liquid manure', 57.5), amount: 25000, amount_unit: 'kg/ha fresh' }],
+    ['2024-07-31', 'harvest', 'Grass hay (kuivaheinä), second cut, 676.45 kg/ha for the whole field; yield of the year 2336 kg DW/ha', { crop: 'Grass hay', dry_mass_kg_ha: 2336 }],
+    ['2024-10-09', 'fertilisation', 'Separated cow manure, dry fraction, 15 t/ha, 22.5 kg N/ha', { ...viN('Dry manure', 22.5), amount: 15000, amount_unit: 'kg/ha fresh' }],
+  ]),
+  ...rowsOf('viikki', AG_XLSX, [
+    ['2023-06-21', 'spraying', 'Micronutrient fertiliser, no N', { crop: 'Micronutrients' }],
+    ['2024-06-14', 'harvest', 'Grass hay (kuivaheinä), first cut, 1660 kg/ha; only about one hectare harvested (poor growth)', { crop: 'Grass hay' }],
+    ['2024-09-16', 'spraying', 'Herbicide, product not given'],
   ]),
   // The 2023 sowing is only in Gao et al. 2026 (Table A2).
   ...rowsOf('viikki', GAO_2026, [['2023-05-25', 'sowing', 'Barley, 200 kg/ha, undersown with mixed grass seed, 20 kg/ha', kgHa('Barley', 200)]]),
 
   // ---- Anttila: Shurpali et al. 2025. Field parcel 6.4 ha (Table 2). The fertiliser
-  // products are not named; the paper gives kg N/ha only. The yield of 2022 is an
-  // annual value (Table 4, dry biomass, grass C content 0.47).
+  // products are not named; the paper gives kg N/ha only. Grass C content 0.47 (Table 4).
   ...rowsOf('anttila', SH_2025, [
     ['2021-06-03', 'sowing', 'Harrowed, sown and fertilised: red clover and timothy with barley as cover crop; fertiliser amount not given', { crop: 'Legume grass', area_ha: 6.4 }],
     ['2021-08-02', 'harvest', 'Whole crop harvest; no yield given', { crop: 'Legume grass', area_ha: 6.4 }],
     ['2022-05-23', 'fertilisation', 'Synthetic N fertiliser, 52 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 52, area_ha: 6.4 }],
-    ['2022-06-21', 'harvest', 'Grass, first cut (red clover and timothy, sown 2021-06-03)', { crop: 'Legume grass', area_ha: 6.4 }],
     ['2022-06-22', 'fertilisation', 'Synthetic N fertiliser, 44 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 44, area_ha: 6.4 }],
-    ['2022-09-08', 'harvest', 'Grass, second cut; yield of the year 7500 kg DM/ha (grass C content 0.47)', { crop: 'Legume grass', dry_mass_kg_ha: 7500, area_ha: 6.4 }],
+  ]),
+  // Yields per cut from AG_XLSX (kg DW/ha). 2022: sum 7500 = Shurpali et al. 2025. The paper gives
+  // the second cut on 8 September; AG_XLSX and the flux data give 8 August.
+  ...rowsOf('anttila', `${SH_2025}; ${AG_XLSX}`, [
+    ['2022-06-21', 'harvest', 'Timothy and red clover, first cut, 3360 kg DW/ha', { crop: 'Legume grass', dry_mass_kg_ha: 3360, area_ha: 6.4 }],
+    ['2022-08-08', 'harvest', 'Timothy and red clover, second cut, 4140 kg DW/ha; yield of the year 7500 kg DM/ha in the paper (paper date 2022-09-08)', { crop: 'Legume grass', dry_mass_kg_ha: 4140, area_ha: 6.4 }],
+  ]),
+  ...rowsOf('anttila', AG_XLSX, [
+    ['2023-05-16', 'fertilisation', 'N fertiliser, 48 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 48, area_ha: 6.4 }],
+    ['2023-06-21', 'harvest', 'Timothy and red clover, first cut, 5138 kg DW/ha', { crop: 'Legume grass', dry_mass_kg_ha: 5138, area_ha: 6.4 }],
+    ['2023-06-28', 'fertilisation', 'N fertiliser, 48 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 48, area_ha: 6.4 }],
+    ['2023-07-19', 'harvest', 'Timothy and red clover, second cut, 2576 kg DW/ha', { crop: 'Legume grass', dry_mass_kg_ha: 2576, area_ha: 6.4 }],
   ]),
 
   // ---- Särkisuo: Shurpali et al. 2025. Field parcel 7.1 ha (Table 2), drained peat soil.
@@ -252,10 +296,19 @@ export const EVENTS: EventRow[] = [
     ['2022-03-10', 'other', 'Ditch preparation', { end: '2022-03-17', area_ha: 7.1 }],
     ['2022-05-30', 'fertilisation', 'Synthetic N fertiliser, 90 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 90, area_ha: 7.1 }],
     ['2022-06-08', 'spraying', 'Herbicide against weeds, product not given', { area_ha: 7.1 }],
-    ['2022-06-30', 'harvest', 'Mixed grasses, first cut', { crop: 'Mixed grasses', area_ha: 7.1 }],
     ['2022-07-04', 'fertilisation', 'Synthetic N fertiliser, 69 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 69, area_ha: 7.1 }],
     ['2022-08-03', 'other', 'Ditch preparation', { end: '2022-08-15', area_ha: 7.1 }],
-    ['2022-08-15', 'harvest', 'Mixed grasses, second cut; yield of the year 4700 kg DM/ha (grass C content 0.47)', { crop: 'Mixed grasses', dry_mass_kg_ha: 4700, area_ha: 7.1 }],
+  ]),
+  // Yields per cut from AG_XLSX (kg DW/ha). 2022: sum 4670; Shurpali et al. 2025 give 4700 kg DM/ha.
+  ...rowsOf('sarkisuo', `${SH_2025}; ${AG_XLSX}`, [
+    ['2022-06-30', 'harvest', 'Timothy and meadow fescue, first cut, 2450 kg DW/ha', { crop: 'Mixed grasses', dry_mass_kg_ha: 2450, area_ha: 7.1 }],
+    ['2022-08-15', 'harvest', 'Timothy and meadow fescue, second cut, 2220 kg DW/ha (paper: yield of the year 4700 kg DM/ha)', { crop: 'Mixed grasses', dry_mass_kg_ha: 2220, area_ha: 7.1 }],
+  ]),
+  ...rowsOf('sarkisuo', AG_XLSX, [
+    ['2023-05-22', 'fertilisation', 'N fertiliser, 90 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 90, area_ha: 7.1 }],
+    ['2023-06-29', 'harvest', 'Timothy and meadow fescue, first cut, 4032 kg DW/ha', { crop: 'Mixed grasses', dry_mass_kg_ha: 4032, area_ha: 7.1 }],
+    ['2023-07-03', 'fertilisation', 'N fertiliser, 73 kg N/ha, product not given', { crop: 'Synthetic N', n_kg_ha: 73, area_ha: 7.1 }],
+    ['2023-08-15', 'harvest', 'Timothy and meadow fescue, second cut, 2440 kg DW/ha', { crop: 'Mixed grasses', dry_mass_kg_ha: 2440, area_ha: 7.1 }],
   ]),
 
   // ---- Maktau: Räsänen et al. 2026 (site description). Only the long rains of 2019
@@ -267,30 +320,42 @@ export const EVENTS: EventRow[] = [
   ]),
 ];
 
-/** Event types that can take the carbon of a management row of each action. */
+/**
+ * Event types that can take the carbon of a management row of each action. A grazing
+ * event takes two rows: the grass eaten (action harvest) and the excreta returned
+ * (action fertilisation).
+ */
 const CARBON_TYPES: Record<ManagementRow['action'], EventType[]> = {
-  harvest: ['harvest', 'cut'],
-  fertilisation: ['fertilisation'],
+  harvest: ['harvest', 'cut', 'grazing'],
+  fertilisation: ['fertilisation', 'grazing'],
   grazing: ['grazing'],
 };
 
 /**
  * Copy the carbon of the management table (g C m-2, cGm2()) to the event with the same
- * site, date and a matching type. Returns the events and the carbon rows that match no event.
+ * site, date and a matching type. When the row has event_crop, the event crop must be
+ * equal. A grazing event gets the net export: grass eaten - excreta returned.
+ * Returns the events and the carbon rows that match no event or more than one.
  */
 export function withCarbon(events: EventRow[], management: ManagementRow[]): { events: EventRow[]; unmatched: ManagementRow[] } {
   const out = events.map((e) => ({ ...e }));
   const unmatched: ManagementRow[] = [];
+  const net = new Map<EventRow, number>();
   for (const m of management) {
     const c = cGm2(m);
     if (c === null) continue;
-    const hits = out.filter((e) => e.site === m.site && e.date === m.date && CARBON_TYPES[m.action].includes(e.type));
+    const hits = out.filter(
+      (e) => e.site === m.site && e.date === m.date && CARBON_TYPES[m.action].includes(e.type) && (m.event_crop === undefined || e.crop === m.event_crop),
+    );
     if (hits.length !== 1) {
       unmatched.push(m);
       continue;
     }
-    hits[0]!.c_g_m2 = Math.round(c * 10) / 10;
+    const e = hits[0]!;
+    if (e.type === 'grazing') net.set(e, (net.get(e) ?? 0) + (m.action === 'fertilisation' ? -c : c));
+    else e.c_g_m2 = Math.round(c * 10) / 10;
   }
+  for (const [e, c] of net) e.c_g_m2 = Math.round(c * 10) / 10;
   return { events: out, unmatched };
 }
 

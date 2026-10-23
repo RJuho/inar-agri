@@ -31,6 +31,7 @@ export const ManagementRowSchema = v.pipe(
     c_fraction: v.nullable(v.pipe(v.number(), v.minValue(0), v.maxValue(0.6))),
     c_fraction_source: v.picklist(['site', 'assumed', 'none']),
     c_g_m2: v.nullable(v.pipe(v.number(), v.minValue(0))),
+    event_crop: v.optional(nonEmpty),
     source: nonEmpty,
     note: v.string(),
   }),
