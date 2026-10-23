@@ -168,63 +168,11 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
   - Exit codes: 0 = done, 1 = error in the page or a diagram, 2 = bad option or no server (the script prints how to start the server).
 - Tests: `isolate()` in `tests/site.spec.ts` blocks all requests to other origins (`page.route`) and fails the test if the page makes one, at page load and during the data export.
 
-## Deep Dive
-
-A Deep Dive is a short article that an AI assistant writes from our data. Each dive answers one question that the data can answer. The list page `/deep-dive/` shows all dives, newest first (number, title, question, short answer, sites, date, status), and a note that "Checked" means a check by two other AI models, not by a person (`CHECKED_NOTE` in `site/src/lib/deepDive.ts`; the article facts box shows the same note).
-
-### Work with subagents
-
-- Use subagents to keep the context window of the main agent small. Give them the tasks that read much text: read PDFs and long files, explore the data, run builds and tests, and draft long parts. The main agent keeps the decisions and the final text.
-- Give each subagent a clear and short brief: the goal, the files to read, the limits, and the output that you want back (a short summary, not file dumps).
-- Use the model that fits the task. The models are Fable, Opus, Sonnet and Haiku. Examples: Fable for difficult method decisions and as a further independent reviewer; Opus for the question, the method, the script and the article; Sonnet for an independent recompute and for code or test runs; Haiku for searches, simple checks and the language review. The verification steps below must use different models.
-- Run independent subagents in parallel. Do not do the same work again in the main agent.
-
-### Files
-
-- Article: `site/src/pages/deep-dive/<slug>.mdx` (MDX, `@astrojs/mdx` 8.1.0, frontmatter `layout: ../../layouts/DeepDive.astro`). The list page `site/src/pages/deep-dive/index.astro` finds all MDX files of the folder with `import.meta.glob('./*.mdx', { eager: true })`.
-- Script: `scripts/deep-dives/<slug>.ts` (Node, `@duckdb/node-api`, helpers from `scripts/lib/duck.ts` and `scripts/lib/deep-dive/`). It exports `slug`, `title`, `inputs` and `run(conn)`. It reads only `db/*.parquet`, `data/calculated/*` and `data/SPI/*.csv` (`ALLOWED_INPUT` in `scripts/deep-dives.ts`). Pure helpers go in `scripts/lib/deep-dive/` with a `*.test.ts` file (`npm run test:unit` runs them).
-- Result: `site/src/deep-dives/<slug>.json`. `npm run deep-dives` (`scripts/deep-dives.ts`) writes it: the results, the figure data and `dataVersion` (time of the run, git commit and dirty flag, `builtAt` of `db/report.json` and `data/calculated/report.json`, size and SHA-256 of each input). Numbers have 10 significant digits. Commit the JSON: the article is a fixed snapshot.
-- Shared code: `site/src/lib/deepDive.ts` (frontmatter schema, `diveNumber()`, `fmtNum()`, references, `dataPageHref()`, `checkBody()`), `site/src/lib/deepDiveChart.ts` (`renderSvg()`, colours), `site/src/lib/deepDives/<slug>.ts` (figures and tables of one dive), components in `site/src/components/deep-dive/` (`Num`, `Figure`, `Cite`, `References`), styles `site/src/styles/deep-dive.css`.
-
-### Rules
-
-- Language: ASD-STE100 Simplified Technical English, as in the rest of the project. Careful claims: write "associated with", not "causes". Give n and the uncertainty (SD, interval) with each result.
-- No typed numbers. Each number in the text comes from the JSON through `<Num k="path.in.json" digits={n} unit="…" />` (options `sign`, `abs`, `percent`). A missing key or a value that is not a number stops the build. Tables and alt texts get their numbers from the JSON in code. The frontmatter `question` and `shortAnswer` must not contain digits.
-- References: cite with `<Cite ids={[...]} note="p. 5" />` and list them with `<References ids={frontmatter.references} />`. Prefer the articles and documents in `data/` (the list shows the file path). Articles of `REFERENCES` in `site/src/scripts/glossary.ts` use their id; other sources (Hu et al. 2024 = `hu2024`, the management files, `docs/calculated.md`, `docs/anomaly-data-report.md`) are in `EXTRA_REFERENCES` of `site/src/lib/deepDive.ts`. Read the PDFs (Read tool with `pages`) to cite a claim correctly. The layout stops the build when a citation link has no entry in the list.
-- Figures: build-time SVG with ECharts SSR (`renderSvg()`, as `site/src/lib/budgetFigure.ts`); no client script. Use `<Figure id title svg alt view>` with the caption as the slot: it gives `role="img"`, the `aria-label` (alt text, also shown below the caption) and the link "Open in the data page" (a `#view=` hash from `viewToHash()` for the same sites, variables and period). Use the site colours and the Okabe-Ito palette (`SERIES`, `siteColor()`, `siteSymbol()`); add a dash, a symbol or a fill pattern so that colour is not the only cue. Use the sentinel `INK` (`#7a7974`) for marks in the text colour; `deep-dive.css` maps it and all text to the page tokens (light and dark).
-- Frontmatter (Valibot, `FrontmatterSchema`; a bad frontmatter stops the build): `index` (order of creation, 0 = first dive; the list page stops the build when the numbers are not 0 to n − 1 without gaps, `checkIndexes()`; the page shows "Deep Dive #<index>", `diveLabel()`), `title`, `question`, `shortAnswer` (one line), `sites` (site codes), `variables`, `period` (`{ from, to }` years), `date` (ISO, quoted), `status` (`draft` | `checked`), `models` (list of `{ model, role }`: which LLM did what), `script` (`scripts/deep-dives/<slug>.ts`), `references` (ids), `checks` (list of `{ kind: recompute | review, by, date, result: pass | fail | partial, note }`).
-- Fixed structure: the layout writes the h1, the AI notice, a facts box and "Question". The MDX body has these h2 headings, in this order: "Short answer", "Data and method", "Results", "Limits and uncertainty", "References", "Reproduce". `checkBody()` stops the build on another order. "Limits and uncertainty" gives n and the spread, and links the open findings of `/data-report/` that apply (for example the 2-hour UTC offset of Anttila, Särkisuo and Viikki: say if a daily or weekly scale makes it unimportant). "Reproduce" gives the commands and the script path.
-- Before a commit: `npm run deep-dives -- --check` must pass. It runs all dive scripts again and compares the results with the committed JSON (relative tolerance 1e-6, `dataVersion` is not compared). When the inputs change (`npm run build:db`, `npm run calc`), run `npm run deep-dives`, read the article again and correct the text if a statement is no longer true.
-
-### Verification with different models
-
-A dive is `draft` until two independent checks pass. Record each check in `checks` of the frontmatter. `status: checked` needs a passed `recompute` and a passed `review` (the schema checks this).
-
-1. Opus writes: the question, the script, the article and the figures. Status `draft`, `checks: []`.
-2. Sonnet recomputes: a new agent with the question and the method text of the article, but without the dive script and without the JSON. It writes its own SQL on `db/*.parquet` and `data/calculated/*` and compares its main numbers with the article. Result `pass` when the numbers agree (or the differences are explained).
-3. Haiku reviews: the language (STE, careful claims, n and uncertainty given) and each citation against the article in `data/` (page, claim).
-4. When both pass, set `status: checked`, run `npm run site:build` and commit.
-
-### Add a new dive
-
-1. Choose a question that the data can answer. Choose a slug (`a-z`, `0-9`, `-`). The `index` is the highest index + 1.
-2. Write `scripts/deep-dives/<slug>.ts` (export `slug`, `title`, `inputs`, `run`). Put pure helpers in `scripts/lib/deep-dive/` and add unit tests.
-3. Run `npm run deep-dives -- <slug>`. Check the JSON.
-4. Write the figures in `site/src/lib/deepDives/<slug>.ts` (check the JSON parts with Valibot).
-5. Write `site/src/pages/deep-dive/<slug>.mdx` with the frontmatter and the fixed structure. Use `<Num>` for each number.
-6. Run `npm run deep-dives -- --check`, `npm run typecheck`, `npm run test:unit`, `npm run site:build` and the Deep Dive tests of `tests/site.spec.ts` (`npx playwright test -g "deep dive"`).
-7. Ask for the independent checks (see above).
-
 ### Python analysis scripts
 
 New Deep Dives use Python, not TypeScript. Other researchers must read and run the code on their own computers without the Node tool chain of this repository. The TypeScript dive scripts in `scripts/deep-dives/` stay as they are. Do not port them unless the user asks.
 
-#### Two phases
-
-1. Development: the script reads `db/*.parquet` and `data/calculated/*` with DuckDB. Use this phase to find the method and the numbers quickly.
-2. Release: the script reads only the raw files in `data/` with its own parser. It does not read `db/`, `data/calculated/` or any Parquet file. Other researchers need only the dive folder and the raw data.
-
-A dive cannot be `checked` until the release script exists and the parity test passes.
+A Python dive reads only the harmonised database (`db/*.parquet`) and, when necessary, `data/calculated/*.parquet` and `data/SPI/*.csv`. It does not parse the raw files of the sites. The harmonised build (`npm run build:db`, `db/report.md`, `npm run scan:anomalies`) is the check of the harmonisation against the raw files.
 
 #### Folder
 
@@ -232,17 +180,22 @@ All files of one dive are in `analysis/<slug>/`:
 
 | File | In git | Content |
 |---|---|---|
-| `<slug>.py` | yes | The script. One file holds all parsing, calculation and figures. It does not import project modules. |
+| `<slug>.py` | yes | The script. One file holds all reading, calculation and figures. It does not import project modules. |
 | `<slug>.py.lock` | yes | Lock file from `uv lock --script <slug>.py`. |
-| `test_<slug>.py` | yes | Unit tests of the pure functions, plus a test that the docstring `INPUTS` and the `INPUTS` constant agree. |
-| `test_parity.py` | yes | Parity test (development only; it can read Parquet). |
+| `test_<slug>.py` | yes | Unit tests of the pure functions, the SVG text, and a test that the docstring `INPUTS` and the `INPUTS` constant agree. |
 | `results.json` | yes | All result numbers (10 significant digits) and `dataVersion`. The article reads its numbers from this file. |
 | `manifest.json` | yes | Provenance of the run that made the committed results and figures. |
 | `figures/<n>-<name>.svg` | yes | The figures. These are the same files that the site shows and that others get. |
-| `README.md` | yes | The question, the run command, and the article URL. Three to five lines. |
+| `README.md` | yes | The question, where to get the database snapshot, the run command, and the article URL. |
 | `output/` | no | Run log and temporary files. `.gitignore` has `analysis/*/output/`. |
 
 The article stays in `site/src/pages/deep-dive/<slug>.mdx`. The frontmatter `script` is `analysis/<slug>/<slug>.py`.
+
+#### Database snapshot
+
+- A dive uses one fixed snapshot of the harmonised database. The snapshot is identified by its build date (`builtAt` of `db/report.json`, also in the Parquet key/value metadata `built_at`) and the SHA-256 of each file.
+- The Parquet files are not in git. Publish each snapshot that a dive uses as a release asset (`db-<yyyy-mm-dd>.zip`, with `report.md` and `report.json`), so that others can get the same files. The script gives the URL.
+- `npm run build:db` writes the rows in a fixed order (`ORDER BY site_id, ts_start`) and writes `built_at` into the key/value metadata of each Parquet file.
 
 #### Script header
 
@@ -251,30 +204,28 @@ The file starts with these parts, in this order:
 1. PEP 723 block: `requires-python = "==3.13.*"`, with each dependency pinned with `==` (see "Python libraries").
 2. Module docstring:
    - The title, the question, and a method summary that agrees with "Data and method" in the article.
-   - `INPUTS`: one line per raw file. Each line gives the path relative to the repository root, the SHA-256, the row count and the read rule (delimiter, encoding, missing-value string, timestamp format, UTC offset).
+   - `DATABASE`: the snapshot build date (`builtAt`, ISO 8601, UTC), the git commit of the build, and the URL of the snapshot.
+   - `INPUTS`: one line per file: the path relative to the database folder, the SHA-256, the row count, and the columns that the script reads.
    - `OUTPUTS`: the files that the script writes.
-   - `RUN`: `uv run analysis/<slug>/<slug>.py --data-dir data`.
-3. One `INPUTS` constant in the code, with the same paths and hashes.
+   - `RUN`: `uv run analysis/<slug>/<slug>.py --db db`.
+3. The constants `DATABASE` and `INPUTS` in the code, with the same values.
 
 #### Run rules
 
-- Before the script reads data, it computes the SHA-256 of each input. If a file is missing or a hash does not agree, the script prints the expected and the actual value and stops with exit code 3. No option can skip this check.
-- Arguments: `--data-dir` (default `data`), `--out` (default: the folder of the script) and `--check`. `--check` runs the full analysis and writes to `output/`, not to the committed files. It compares the numbers with `results.json` (relative tolerance 1e-6) and gives exit code 1 on a difference. It also compares the SHA-256 of each new SVG with `manifest.json` and prints a warning on a difference.
-- Set the matplotlib backend to `Agg`. Make all random numbers with `numpy.random.default_rng(<seed>)`. Write each seed in the manifest.
-- Use the rules in "Read rules for `data/`". Give `dtype`, `na_values`, `encoding`, `sep`, `decimal` and the timestamp format explicitly, so that pandas does not guess. Convert all timestamps to UTC in one function.
-- Each step that removes rows or changes values (filter, range check, gap fill, unit conversion) logs how many rows it changed and why. The manifest gets these counts.
-- Use the same unit conversions as the build, for example the Qvidja ML3 polynomial (`scripts/lib/ml3.ts`, `docs/qvidja-soil-moisture.md`). Copy each constant into the script with a comment that names the source file. Do not use a different formula.
+- Before the script reads data, it checks each input:
+  - The file exists, and its SHA-256 agrees with `INPUTS`.
+  - The Parquet metadata `built_at` agrees with `DATABASE`. Read it with `pyarrow.parquet.read_metadata()`, without reading the data.
+  - The row count agrees with `INPUTS`.
+  If a check fails, the script prints the expected and the actual value and stops with exit code 3. No option can skip this check.
+- Arguments: `--db` (default `db`), `--calculated` (default `data/calculated`, only when the dive uses it), `--out` (default: the folder of the script) and `--check`. `--check` runs the full analysis and writes to `output/`, not to the committed files. It compares the numbers with `results.json` (relative tolerance 1e-6) and gives exit code 1 on a difference. It also compares the SHA-256 of each new SVG with `manifest.json` and prints a warning on a difference.
+- Read with `pandas.read_parquet(path, columns=[...], filters=[...], engine="pyarrow")`. Read only the columns and rows that the dive uses. Write the column list once, in `INPUTS`.
+- After the read, check that `ts_start` is in UTC. If the column has no time zone, use `tz_localize("UTC")`. Local time is `ts_start` + `sites.utc_offset_min`. Make it in one function, and give the time base in each axis name.
+- Use the harmonised column names and units (`docs/harmonised-database.md`, `db/variables.parquet`). Do not convert a unit again. Read the unit from `variables.parquet`, and check that it is the expected unit.
+- Each step that removes rows or changes values (filter, QC flag, period, gap rule) logs how many rows it changed and why. The manifest gets these counts.
+- Use DuckDB only when a query is clearer in SQL than in pandas. Then put the SQL in the script as a named constant.
 - Put the reference values from articles in one table, `LITERATURE`, in the script. Each row gives the value, unit, uncertainty, reference id, page, and table or figure number. Do not type a value from memory. Do not use a value that has no page.
-
-#### Parity test
-
-The parity test compares the release parser with the harmonised database for each site and variable that the dive uses:
-
-- the row count per site and year, and the first and last timestamp in UTC;
-- the values, with `numpy.testing.assert_allclose` (relative tolerance 1e-9, or 1e-6 for FLOAT columns; NaN is equal to NaN);
-- the main results of the dive, compared with the development (Parquet) path.
-
-Write each known difference explicitly in the test, with a comment that names the finding. One example is the 2-hour UTC offset of Anttila, Särkisuo and Viikki in `docs/anomaly-data-report.md`. Do not change a tolerance only to make a test pass. If a tolerance must change, give the reason in "Limits and uncertainty" in the article.
+- Read the open findings in `docs/anomaly-data-report.md`. For each finding that affects the dive (for example the 2-hour UTC offset of Anttila, Särkisuo and Viikki), the script prints a note, and the article gives the effect in "Limits and uncertainty".
+- When a new `npm run build:db` changes a hash, the old snapshot stays the reference of the dive. To move a dive to a new snapshot, change `DATABASE` and `INPUTS`, run the script, read the article again, and commit the new results, figures and manifest.
 
 #### Manifest
 
@@ -283,7 +234,8 @@ Write each known difference explicitly in the test, with a comment that names th
 - the run time (UTC), the git commit and the dirty flag, and the SHA-256 of the script and the lock file;
 - the Python version, the platform, and all package versions (from `importlib.metadata`);
 - the seeds and the arguments;
-- the SHA-256 and row count of each input, and the row counts of each filter step;
+- the snapshot date, and the SHA-256 and row count of each input;
+- the row counts of each filter step;
 - the SHA-256 of `results.json` and of each SVG.
 
 `dataVersion` in `results.json` gets the same data, but without the output hashes.
@@ -295,18 +247,16 @@ Write each known difference explicitly in the test, with a comment that names th
   - `rcParams['svg.fonttype'] = 'none'`;
   - `rcParams['font.family'] = 'sans-serif'` and `rcParams['font.sans-serif'] = ['DejaVu Sans']`. matplotlib calculates the layout with DejaVu Sans, because it is in matplotlib and gives the same layout on each computer;
   - `rcParams['svg.hashsalt'] = '<slug>-<n>'` and `metadata={'Date': None, ...}`, so that the same run gives the same bytes.
-- In the SVG, `add_svg_text()` gives each text element this font stack (the Tailwind `font-sans` stack):
-  `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
-  and `font-variant-numeric: tabular-nums`, so that the digits of tick labels align.
-  matplotlib calculates the layout with DejaVu Sans. DejaVu Sans is wider than most system fonts, so the text in the viewer is usually a little narrower than the layout. The text width can change a little; the content does not change. Correct data is more important than exact layout.
-- If the site body font in `site/src/styles/global.css` is a different stack, use the site stack, so that the figures and the page look the same. Keep the stack in one constant, `FONT_STACK`, in the script.
-- Keep a margin around the text, because the text width can change. Do not put labels near a panel edge or near other labels.
+- In the SVG, `add_svg_text()` gives each text element the font stack in the constant `FONT_STACK` and `font-variant-numeric: tabular-nums`. The default is the Tailwind `font-sans` stack:
+  `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`.
+  If the body font in `site/src/styles/global.css` is a different stack, use the site stack.
+  DejaVu Sans is wider than most system fonts, so the text in the viewer is usually a little narrower than the layout. The content does not change. Correct data is more important than exact layout.
+- Keep a margin around the text. Do not put labels near a panel edge or near other labels.
 - Write units with mathtext, for example `r'NEE ($\mu$mol CO$_2$ m$^{-2}$ s$^{-1}$)'`, not with Unicode superscripts (`⁻²`). Some common fonts do not have all superscript characters.
-- A unit test checks that each SVG has `<text>` elements, no glyph paths for text, and the correct font stack.
 - Size: 180 mm wide (two columns) or 88 mm wide (one column). Keep each SVG below 1 MB. For many points (for example raw 30-min data), aggregate the data or use `rasterized=True` on the dense layer only. The axes and the text stay vector.
-- The background is white and not transparent. The site shows the SVG on a white panel, also in dark mode, so that the figure is the same everywhere.
+- The background is white and not transparent. The site shows the SVG on a white panel, also in dark mode.
 - Use the palette and order of the site: Okabe-Ito, with the same site colour, line dash and marker as `siteColors()`, `siteDash()` and `siteSymbol()` in `site/src/scripts/diagrams/common.ts`. Colour must not be the only cue.
-- Give each axis a name and a unit, for example `NEE (µmol CO₂ m⁻² s⁻¹)`. The time axis gives the time base (UTC, or local time with the offset). Flux panels get a zero line and the sign note.
+- Give each axis a name and a unit. The time axis gives the time base (UTC, or local time with the offset). Flux panels get a zero line and the sign note.
 
 ##### Text in the SVG
 
@@ -315,18 +265,20 @@ Each SVG holds its own caption and alt text, so that the text stays with the fig
 - The root element is `<svg role="img" aria-labelledby="<slug>-fig<n>-title <slug>-fig<n>-desc">`.
 - The first child is `<title id="<slug>-fig<n>-title">`, with the caption: one or two sentences that say what the figure shows.
 - The second child is `<desc id="<slug>-fig<n>-desc">`, with the alt text: the data, the axes, the main values with n and spread, and the main pattern. The script makes this text from the result numbers. Do not write numbers by hand.
-- The matplotlib `metadata` also gets `Title` (caption), `Description` (alt text), `Source` (script path and git commit), `Creator` (matplotlib version) and the input hashes.
-- matplotlib does not write `<title>`, `<desc>` or `role`. Add them with one function in the script (`add_svg_text()`) after `savefig`. A unit test reads each SVG and checks the three items and the unique ids.
+- The matplotlib `metadata` also gets `Title` (caption), `Description` (alt text), `Source` (script path and git commit), `Creator` (matplotlib version) and the snapshot date and input hashes.
+- matplotlib does not write `<title>`, `<desc>` or `role`. Add them with `add_svg_text()` after `savefig`.
 - `results.json` also holds the caption and the alt text of each figure (`figures[n].title`, `figures[n].desc`). They must be equal to the SVG text.
+- A unit test reads each SVG. It checks `<title>`, `<desc>`, `role`, the unique ids, that the text is in `<text>` elements, and the font stack.
 
 #### Site integration
 
 - `<Num k="…">` reads from `analysis/<slug>/results.json` for a Python dive (the loader in `site/src/lib/deepDive.ts` finds the file by the frontmatter `script`). TypeScript dives keep `site/src/deep-dives/<slug>.json`.
-- `<Figure svgFile="analysis/<slug>/figures/1-<name>.svg" view={…} />` reads the file at build time. The component puts the SVG in the page without changes. It reads `<title>` and `<desc>` from the file, then shows `<title>` as the caption and `<desc>` below it. It does not add a second `role="img"` or `aria-label`. If the SVG has no `<title>` or `<desc>`, or an id is not unique on the page, the build stops. The MDX does not repeat the caption or the alt text. The "Open in the data page" link stays.
+- `<Figure svgFile="analysis/<slug>/figures/1-<name>.svg" view={…} />` reads the file at build time. The component puts the SVG in the page without changes, in a `.figure-mpl` container. It reads `<title>` and `<desc>` from the file, then shows `<title>` as the caption and `<desc>` below it. It does not add a second `role="img"` or `aria-label`. If the SVG has no `<title>` or `<desc>`, or an id is not unique on the page, the build stops. The MDX does not repeat the caption or the alt text. The "Open in the data page" link stays.
+- The CSS rules of `deep-dive.css` that change the text colour and the `INK` colour of the ECharts figures must not apply in `.figure-mpl`. The SVG keeps its own colours on the white panel.
 - Each figure has a download link to the SVG file. Copy the figures to `site/public/deep-dive/<slug>/` in `site:sync`, or import them with `?url`.
+- The facts box of the article gives the snapshot date and a link to the snapshot.
 - `npm run deep-dives -- --check` also runs `uv run analysis/<slug>/<slug>.py --check` for each Python dive, so that one command checks all dives. The devcontainer must have `uv`.
 - `FrontmatterSchema` accepts `script` paths of the form `analysis/<slug>/<slug>.py`.
-- The CSS rules of `deep-dive.css` that change the text colour and the `INK` colour of the ECharts figures must not apply to a matplotlib SVG. Put the matplotlib SVG in a `.figure-mpl` container and exclude it from these rules. The SVG keeps its own colours on the white panel.
 
 #### Python libraries
 
@@ -334,28 +286,27 @@ Use these versions (checked 2026-10-23). Add a new library only if these cannot 
 
 | Library | Version | Use |
 |---|---|---|
+| pandas | 3.1.0 | read Parquet, time series, tables |
+| pyarrow | 26.0.0 | Parquet engine of pandas, Parquet metadata |
 | numpy | 2.5.4 | arrays, random numbers |
-| pandas | 3.1.0 | CSV parsing, time series |
 | scipy | 1.18.1 | curve fits (Lloyd–Taylor, light response), statistical tests |
 | statsmodels | 0.15.0 | regression, trend tests, confidence intervals |
 | matplotlib | 3.11.2 | all figures |
-| pandera | 0.34.1 | schema checks of the parsed tables |
+| pandera | 0.34.1 | schema checks of the tables after the read |
+| duckdb | 2.0.0 | only when a query is clearer in SQL |
 | xarray | 2026.9.0 | only for gridded or multi-dimensional data |
-| duckdb | 2.0.0 | development phase and parity test only |
-| pyarrow | 26.0.0 | development phase and parity test only |
 | seaborn | 0.13.2 | exploration only |
 
-- Put in the release script header only the libraries that the script imports. Do not put duckdb or pyarrow there.
+- Put in the script header only the libraries that the script imports.
 - Development tools are not in the script header: `ruff` (format and lint), `pyright` (types) and `pytest`. Run them after each change.
-- Change a version only on purpose. Change the header, run `uv lock --script`, then run `--check` and the parity test. Give the change in the commit message. A new matplotlib version can change the SVG bytes. In that case, run the script again and commit the new figures and manifest.
+- Change a version only on purpose. Change the header, run `uv lock --script`, then run `--check`. Give the change in the commit message. A new matplotlib version can change the SVG bytes. In that case, run the script again and commit the new figures and manifest.
 
 #### Add a Python dive
 
-1. Make `analysis/<slug>/`. Develop on Parquet and make the results and figures.
-2. Write the CSV parser in the same file and add the SHA-256 lines.
-3. Write the parity test and make it pass.
-4. Remove the Parquet path from the script. Run `uv run analysis/<slug>/<slug>.py`, then the same command with `--check`.
-5. Run `ruff`, `pyright` and `pytest analysis/<slug>/`.
-6. Write the article with `<Num>` and `<Figure svgFile>`. "Reproduce" gives the `uv run` command, the input list with the hashes, and the link to the folder.
-7. Run `npm run deep-dives -- --check`, `npm run typecheck`, `npm run site:build` and the Deep Dive tests.
-8. Ask for the independent checks. The Sonnet recompute does not get the Python script.
+1. Make `analysis/<slug>/`. Write `DATABASE` and `INPUTS` for the current snapshot. If the snapshot is not published, publish it.
+2. Write the analysis and the figures.
+3. Run `uv run analysis/<slug>/<slug>.py`, then the same command with `--check`.
+4. Run `ruff`, `pyright` and `pytest analysis/<slug>/`.
+5. Write the article with `<Num>` and `<Figure svgFile>`. "Reproduce" gives the snapshot date and URL, the `uv run` command, and the link to the folder.
+6. Run `npm run deep-dives -- --check`, `npm run typecheck`, `npm run site:build` and the Deep Dive tests.
+7. Ask for the independent checks. The Sonnet recompute gets the snapshot, the question and the method text, but not the Python script.
