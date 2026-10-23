@@ -6,7 +6,7 @@
 import '../styles/deep-dive.css';
 import Base from './Base.astro';
 import AiNotice from '../components/AiNotice.astro';
-import { baseUrl, checkBody, diveData, parseFrontmatter, SITE_NAMES, slugFromFile } from '../lib/deepDive';
+import { baseUrl, CHECKED_NOTE, checkBody, diveData, diveLabel, parseFrontmatter, SITE_NAMES, slugFromFile } from '../lib/deepDive';
 import { REPO_URL } from '../lib/dataReport';
 import { VARIABLE_LABELS } from '../scripts/state';
 
@@ -31,7 +31,7 @@ const statusText = fm.status === 'checked' ? 'Checked' : 'Draft';
 <Base title={`${fm.title} – Deep Dive – INAR agri`} description={fm.question}>
   <main class="prose deep-dive">
     <header>
-      <p class="dd-kicker"><a href={`${base}deep-dive/`}>Deep Dives</a></p>
+      <p class="dd-kicker"><a href={`${base}deep-dive/`}>Deep Dives</a> · <span class="dd-index">{diveLabel(fm.index)}</span></p>
       <h1>{fm.title}</h1>
       <AiNotice subject="the question, the analysis script, the text and the figures" />
       <dl class="dd-facts">
@@ -40,12 +40,15 @@ const statusText = fm.status === 'checked' ? 'Checked' : 'Draft';
           <dd>
             <span class={`dd-status dd-status-${fm.status}`}>{statusText}</span>
             {
-              fm.status === 'draft' && (
+              fm.status === 'draft' ? (
                 <span class="dd-status-note">No independent check yet. Do not use the numbers without a check.</span>
+              ) : (
+                <span class="dd-status-note">{CHECKED_NOTE}</span>
               )
             }
           </dd>
         </div>
+        <div><dt>Number</dt><dd>{fm.index} (order of creation, 0 = first dive)</dd></div>
         <div><dt>Sites</dt><dd>{fm.sites.map((s) => SITE_NAMES[s]).join(', ')}</dd></div>
         <div><dt>Variables</dt><dd>{fm.variables.map((v) => VARIABLE_LABELS[v]).join('; ')}</dd></div>
         <div><dt>Period</dt><dd>{fm.period.from} to {fm.period.to}</dd></div>

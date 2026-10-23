@@ -154,7 +154,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 
 ## Deep Dive
 
-A Deep Dive is a short article that an AI assistant writes from our data. Each dive answers one question that the data can answer. The list page `/deep-dive/` shows all dives (title, question, short answer, sites, date, status).
+A Deep Dive is a short article that an AI assistant writes from our data. Each dive answers one question that the data can answer. The list page `/deep-dive/` shows all dives, newest first (number, title, question, short answer, sites, date, status), and a note that "Checked" means a check by two other AI models, not by a person (`CHECKED_NOTE` in `site/src/lib/deepDive.ts`; the article facts box shows the same note).
 
 ### Files
 
@@ -169,7 +169,7 @@ A Deep Dive is a short article that an AI assistant writes from our data. Each d
 - No typed numbers. Each number in the text comes from the JSON through `<Num k="path.in.json" digits={n} unit="…" />` (options `sign`, `abs`, `percent`). A missing key or a value that is not a number stops the build. Tables and alt texts get their numbers from the JSON in code. The frontmatter `question` and `shortAnswer` must not contain digits.
 - References: cite with `<Cite ids={[...]} note="p. 5" />` and list them with `<References ids={frontmatter.references} />`. Prefer the articles and documents in `data/` (the list shows the file path). Articles of `REFERENCES` in `site/src/scripts/glossary.ts` use their id; other sources (Hu et al. 2024 = `hu2024`, the management files, `docs/calculated.md`, `docs/anomaly-data-report.md`) are in `EXTRA_REFERENCES` of `site/src/lib/deepDive.ts`. Read the PDFs (Read tool with `pages`) to cite a claim correctly. The layout stops the build when a citation link has no entry in the list.
 - Figures: build-time SVG with ECharts SSR (`renderSvg()`, as `site/src/lib/budgetFigure.ts`); no client script. Use `<Figure id title svg alt view>` with the caption as the slot: it gives `role="img"`, the `aria-label` (alt text, also shown below the caption) and the link "Open in the data page" (a `#view=` hash from `viewToHash()` for the same sites, variables and period). Use the site colours and the Okabe-Ito palette (`SERIES`, `siteColor()`, `siteSymbol()`); add a dash, a symbol or a fill pattern so that colour is not the only cue. Use the sentinel `INK` (`#7a7974`) for marks in the text colour; `deep-dive.css` maps it and all text to the page tokens (light and dark).
-- Frontmatter (Valibot, `FrontmatterSchema`; a bad frontmatter stops the build): `title`, `question`, `shortAnswer` (one line), `sites` (site codes), `variables`, `period` (`{ from, to }` years), `date` (ISO, quoted), `status` (`draft` | `checked`), `models` (list of `{ model, role }`: which LLM did what), `script` (`scripts/deep-dives/<slug>.ts`), `references` (ids), `checks` (list of `{ kind: recompute | review, by, date, result: pass | fail | partial, note }`).
+- Frontmatter (Valibot, `FrontmatterSchema`; a bad frontmatter stops the build): `index` (order of creation, 0 = first dive; the list page stops the build when the numbers are not 0 to n − 1 without gaps, `checkIndexes()`; the page shows "Deep Dive #<index>", `diveLabel()`), `title`, `question`, `shortAnswer` (one line), `sites` (site codes), `variables`, `period` (`{ from, to }` years), `date` (ISO, quoted), `status` (`draft` | `checked`), `models` (list of `{ model, role }`: which LLM did what), `script` (`scripts/deep-dives/<slug>.ts`), `references` (ids), `checks` (list of `{ kind: recompute | review, by, date, result: pass | fail | partial, note }`).
 - Fixed structure: the layout writes the h1, the AI notice, a facts box and "Question". The MDX body has these h2 headings, in this order: "Short answer", "Data and method", "Results", "Limits and uncertainty", "References", "Reproduce". `checkBody()` stops the build on another order. "Limits and uncertainty" gives n and the spread, and links the open findings of `/data-report/` that apply (for example the 2-hour UTC offset of Anttila, Särkisuo and Viikki: say if a daily or weekly scale makes it unimportant). "Reproduce" gives the commands and the script path.
 - Before a commit: `npm run deep-dives -- --check` must pass. It runs all dive scripts again and compares the results with the committed JSON (relative tolerance 1e-6, `dataVersion` is not compared). When the inputs change (`npm run build:db`, `npm run calc`), run `npm run deep-dives`, read the article again and correct the text if a statement is no longer true.
 
@@ -184,7 +184,7 @@ A dive is `draft` until two independent checks pass. Record each check in `check
 
 ### Add a new dive
 
-1. Choose a question that the data can answer. Choose a slug (`a-z`, `0-9`, `-`).
+1. Choose a question that the data can answer. Choose a slug (`a-z`, `0-9`, `-`). The `index` is the highest index + 1.
 2. Write `scripts/deep-dives/<slug>.ts` (export `slug`, `title`, `inputs`, `run`). Put pure helpers in `scripts/lib/deep-dive/` and add unit tests.
 3. Run `npm run deep-dives -- <slug>`. Check the JSON.
 4. Write the figures in `site/src/lib/deepDives/<slug>.ts` (check the JSON parts with Valibot).

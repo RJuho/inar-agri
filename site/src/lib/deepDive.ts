@@ -123,6 +123,8 @@ const CheckSchema = v.strictObject({
 export const FrontmatterSchema = v.pipe(
   v.strictObject({
     layout: v.optional(v.string()),
+    /** Order of creation: 0 = first dive. Each dive has a different number, without gaps. */
+    index: v.pipe(v.number(), v.integer(), v.minValue(0)),
     title: v.pipe(v.string(), v.nonEmpty(), v.maxLength(80)),
     question: v.pipe(v.string(), v.nonEmpty(), v.endsWith('?'), noDigits),
     shortAnswer: v.pipe(v.string(), v.nonEmpty(), v.maxLength(200), noDigits),
@@ -172,6 +174,30 @@ export function parseFrontmatter(raw: unknown, slug: string): Frontmatter {
   if (data.script !== r.output.script) throw new Error(`Deep Dive ${slug}: the JSON was made by ${String(data.script)}, not ${r.output.script}`);
   return r.output;
 }
+
+/** Label of the creation number, for example "Deep Dive #0". */
+export function diveLabel(index: number): string {
+  return `Deep Dive #${index}`;
+}
+
+/** Check that the dives have the numbers 0 to n − 1, each one time. A bad set stops the build. */
+export function checkIndexes(dives: readonly { slug: string; fm: Pick<Frontmatter, 'index'> }[]): void {
+  const sorted = [...dives].sort((a, b) => a.fm.index - b.fm.index);
+  sorted.forEach((d, i) => {
+    if (d.fm.index !== i) {
+      const same = sorted.filter((o) => o.fm.index === d.fm.index).map((o) => o.slug);
+      throw new Error(
+        same.length > 1
+          ? `Deep Dive: index ${d.fm.index} is used by ${same.join(', ')}`
+          : `Deep Dive ${d.slug}: index ${d.fm.index}, but the next free index is ${i} (no gaps)`,
+      );
+    }
+  });
+}
+
+/** Explanation of the status "Checked": only AI models did the checks. */
+export const CHECKED_NOTE =
+  'Two other AI models checked this dive: one calculated the numbers again with its own SQL, one reviewed the language and the references. No person checked it.';
 
 // ---------- Result data ----------
 

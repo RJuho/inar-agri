@@ -1599,6 +1599,12 @@ test.describe('deep dive pages', () => {
     await expect(card).toHaveCount(1);
     await expect(card.locator('.dd-card-question')).toContainText('harvest');
     await expect(card.locator('.dd-status')).toHaveText(/Draft|Checked/);
+    await expect(card.locator('.dd-card-index')).toHaveText('Deep Dive #0');
+    // Newest first: the first card has the highest number.
+    const labels = await page.locator('.dd-card-index').allInnerTexts();
+    const nums = labels.map((t) => Number(t.replace(/\D/g, '')));
+    expect(nums).toEqual([...nums].sort((a, b) => b - a));
+    expect(Math.min(...nums)).toBe(0);
     await expectOnlyUpdateScript(page);
     await card.getByRole('link', { name: 'Harvest and cutting vs carbon balance' }).click();
     await expect(page).toHaveURL(/\/deep-dive\/harvest-carbon\/?$/);
@@ -1608,6 +1614,8 @@ test.describe('deep dive pages', () => {
   test('the harvest dive has the fixed sections, figures with alt text and numbers from the JSON', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     await expect(page.locator('h1')).toHaveText('Harvest and cutting vs carbon balance');
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #0');
+    await expect(page.locator('.dd-facts .dd-status-note')).toContainText(/AI models|No independent check/);
     expect(await page.locator('h1 + .ai-notice[role="note"]').count()).toBe(1);
     const h2 = await page.locator('main h2').allInnerTexts();
     expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);

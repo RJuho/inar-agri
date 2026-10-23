@@ -1,10 +1,10 @@
 ---
-// List page of the Deep Dives: all MDX pages in this folder, newest first.
+// List page of the Deep Dives: all MDX pages in this folder, newest first (highest `index`).
 // Each frontmatter is checked with Valibot (lib/deepDive.ts); a bad frontmatter stops the build.
 import '../../styles/deep-dive.css';
 import Base from '../../layouts/Base.astro';
 import AiNotice from '../../components/AiNotice.astro';
-import { baseUrl, parseFrontmatter, SITE_NAMES } from '../../lib/deepDive';
+import { baseUrl, CHECKED_NOTE, checkIndexes, diveLabel, parseFrontmatter, SITE_NAMES } from '../../lib/deepDive';
 
 const modules = import.meta.glob<{ frontmatter: unknown }>('./*.mdx', { eager: true });
 const base = baseUrl();
@@ -13,7 +13,8 @@ const dives = Object.entries(modules)
     const slug = path.replace(/^\.\//, '').replace(/\.mdx$/, '');
     return { slug, fm: parseFrontmatter(mod.frontmatter, slug) };
   })
-  .sort((a, b) => b.fm.date.localeCompare(a.fm.date) || a.fm.title.localeCompare(b.fm.title));
+  .sort((a, b) => b.fm.index - a.fm.index);
+checkIndexes(dives);
 ---
 
 <Base
@@ -29,12 +30,17 @@ const dives = Object.entries(modules)
         article shows them with the method, the limits and the references. A dive is a draft until another model
         calculates the numbers again and a review checks the language and the references.
       </p>
+      <p class="dd-status-legend">
+        <span class="dd-status dd-status-checked">Checked</span> {CHECKED_NOTE} The number (#0 = first) gives the
+        order in which the dives were written.
+      </p>
     </header>
 
     <ul class="dd-list">
       {
         dives.map(({ slug, fm }) => (
           <li class="dd-card" data-slug={slug}>
+            <p class="dd-card-index">{diveLabel(fm.index)}</p>
             <h2>
               <a href={`${base}deep-dive/${slug}/`}>{fm.title}</a>
             </h2>
@@ -43,7 +49,12 @@ const dives = Object.entries(modules)
               <strong>Short answer:</strong> {fm.shortAnswer}
             </p>
             <p class="dd-card-meta">
-              <span class={`dd-status dd-status-${fm.status}`}>{fm.status === 'checked' ? 'Checked' : 'Draft'}</span>
+              <span
+                class={`dd-status dd-status-${fm.status}`}
+                title={fm.status === 'checked' ? CHECKED_NOTE : 'No independent check yet.'}
+              >
+                {fm.status === 'checked' ? 'Checked' : 'Draft'}
+              </span>
               <span>{fm.sites.map((s) => SITE_NAMES[s]).join(', ')}</span>
               <time datetime={fm.date}>{fm.date}</time>
             </p>
