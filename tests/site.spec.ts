@@ -1120,6 +1120,37 @@ async function readParquet(bytes: Buffer, name: string) {
   }
 }
 
+/**
+ * Read an XLSX file with DuckDB (Node, excel extension): rows, column names, rows per site,
+ * the type of ts_local and the times of the first row as ISO text.
+ */
+async function readXlsx(bytes: Buffer, name: string) {
+  const path = join('test-results', 'data-export', name);
+  await mkdir(dirname(path), { recursive: true });
+  await writeFile(path, bytes);
+  const instance = await DuckDBInstance.create(':memory:');
+  const conn = await instance.connect();
+  try {
+    await conn.run('INSTALL excel; LOAD excel');
+    const get = async (sql: string) => (await conn.runAndReadAll(sql)).getRowObjects();
+    const from = `read_xlsx('${path}', sheet = 'data')`;
+    const n = Number((await get(`SELECT count(*)::INTEGER AS n FROM ${from}`))[0]?.n);
+    const described = await get(`DESCRIBE SELECT * FROM ${from}`);
+    const columns = described.map((r) => String(r.column_name));
+    const timeType = String(described.find((r) => r.column_name === 'ts_local')?.column_type);
+    const perSite = Object.fromEntries(
+      (await get(`SELECT site_code, count(*)::INTEGER AS n FROM ${from} GROUP BY ALL`)).map((r) => [String(r.site_code), Number(r.n)]),
+    );
+    const times = (
+      await get(`SELECT strftime(ts_start_utc, '%Y-%m-%dT%H:%M:%S') AS utc, strftime(ts_local, '%Y-%m-%dT%H:%M:%S') AS local FROM ${from}`)
+    ).map((r) => ({ utc: String(r.utc), local: String(r.local) }));
+    return { n, columns, perSite, timeType, times };
+  } finally {
+    conn.closeSync();
+    instance.closeSync();
+  }
+}
+
 const DATA_VIEW = {
   id: 'data1',
   name: 'Data view',
@@ -1153,12 +1184,12 @@ test.describe('data export', () => {
     await button.click();
     await expect(menu).toBeVisible();
     await expect(button).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.getByRole('menuitem')).toHaveCount(4);
+    await expect(page.getByRole('menuitem')).toHaveCount(6);
     await expect(page.locator('[data-export="one-parquet"]')).toBeFocused();
     await page.keyboard.press('ArrowDown');
     await expect(page.locator('[data-export="one-csv"]')).toBeFocused();
     await page.keyboard.press('End');
-    await expect(page.locator('[data-export="sites-csv"]')).toBeFocused();
+    await expect(page.locator('[data-export="sites-xlsx"]')).toBeFocused();
     await page.keyboard.press('ArrowDown');
     await expect(page.locator('[data-export="one-parquet"]')).toBeFocused();
     await page.keyboard.press('Escape');
@@ -1168,7 +1199,7 @@ test.describe('data export', () => {
 
     // Arrow Up opens the menu on the last item. A click outside closes it.
     await page.keyboard.press('ArrowUp');
-    await expect(page.locator('[data-export="sites-csv"]')).toBeFocused();
+    await expect(page.locator('[data-export="sites-xlsx"]')).toBeFocused();
     await page.locator('h1').click();
     await expect(menu).toBeHidden();
 
@@ -1185,7 +1216,7 @@ test.describe('data export', () => {
     await expect(button).toBeDisabled();
   });
 
-  test('default view: all four options give the full data', async ({ page }) => {
+  test('default view: all six options give the full data', async ({ page }) => {
     await page.goto('/');
     await waitReady(page);
     const expected = await parquetRowCount(OBS_FILE);
@@ -1219,7 +1250,17 @@ test.describe('data export', () => {
     for (const r of table.rows) csvPerSite[r[0] as string] = (csvPerSite[r[0] as string] ?? 0) + 1;
     expect(info.perSite).toEqual(csvPerSite);
 
-    for (const format of ['csv', 'parquet'] as const) {
+    const xl = await downloadData(page, 'one-xlsx');
+    expect(xl.name).toBe(csv.name.replace(/\.csv$/, '.xlsx'));
+    sizes[xl.name] = xl.bytes.length;
+    const xlInfo = await readXlsx(xl.bytes, xl.name);
+    expect(xlInfo.n).toBe(expected);
+    expect(xlInfo.columns).toEqual(columns);
+    expect(xlInfo.perSite).toEqual(csvPerSite);
+    expect(xlInfo.timeType).toBe('TIMESTAMP'); // Excel date and time, not text
+    expect(xlInfo.times[0]).toEqual({ utc: first[2]?.replace(/Z$/, ''), local: first[3] });
+
+    for (const format of ['csv', 'parquet', 'xlsx'] as const) {
       const zip = await downloadData(page, `sites-${format}`);
       expect(zip.name).toBe(csv.name.replace(/\.csv$/, `_${format}.zip`));
       sizes[zip.name] = zip.bytes.length;
@@ -1234,6 +1275,11 @@ test.describe('data export', () => {
           expect(t.rows.every((r) => r[0] === code)).toBe(true);
           expect(t.rows.length).toBe(csvPerSite[code]);
           total += t.rows.length;
+        } else if (format === 'xlsx') {
+          const x = await readXlsx(e.data, e.name);
+          expect(x.columns).toEqual(columns);
+          expect(x.perSite).toEqual({ [code]: csvPerSite[code] });
+          total += x.n;
         } else {
           const p = await readParquet(e.data, e.name);
           expect(p.columns).toEqual(columns);
@@ -1272,13 +1318,22 @@ test.describe('data export', () => {
     expect(info.columns).toEqual(columns);
     expect(info.kv['step']).toBe('Daily mean');
 
-    for (const format of ['csv', 'parquet'] as const) {
+    const xl = await downloadData(page, 'one-xlsx');
+    expect(xl.name).toBe(`${base}.xlsx`);
+    const xlInfo = await readXlsx(xl.bytes, xl.name);
+    expect(xlInfo.n).toBe(shown);
+    expect(xlInfo.columns).toEqual(columns);
+    expect(xlInfo.times.every((t) => t.local.endsWith('T00:00:00') && t.utc.endsWith('T22:00:00'))).toBe(true);
+
+    for (const format of ['csv', 'parquet', 'xlsx'] as const) {
       const zip = await downloadData(page, `sites-${format}`);
       expect(zip.name).toBe(`${base}_${format}.zip`);
       const entries = readZip(zip.bytes);
       expect(entries.map((e) => e.name)).toEqual([`${base}_haltiala.${format}`, `${base}_qvidja.${format}`]);
       let total = 0;
-      for (const e of entries) total += format === 'csv' ? parseCsv(e.data).rows.length : (await readParquet(e.data, e.name)).n;
+      for (const e of entries) {
+        total += format === 'csv' ? parseCsv(e.data).rows.length : format === 'xlsx' ? (await readXlsx(e.data, e.name)).n : (await readParquet(e.data, e.name)).n;
+      }
       expect(total).toBe(shown);
     }
   });

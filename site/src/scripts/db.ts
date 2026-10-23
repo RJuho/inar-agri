@@ -13,7 +13,8 @@
 //   Thus the files are gzip-compressed. The page decompresses them.
 // - extensions/<DuckDB version>/<platform>/parquet.duckdb_extension.wasm:
 //   the official signed parquet extension. DuckDB-WASM loads it from
-//   `custom_extension_repository`.
+//   `custom_extension_repository`. The excel extension (XLSX export) is in the
+//   same folder. The page loads it on the first XLSX export (loadExtension()).
 import * as duckdb from '@duckdb/duckdb-wasm';
 import type { Table, Vector } from 'apache-arrow';
 
@@ -362,6 +363,29 @@ export async function loadMeta(): Promise<Meta> {
     rowCount: Number(range.getChild('n')?.get(0)),
     events,
   };
+}
+
+const extensions = new Map<string, Promise<void>>();
+
+/**
+ * Load a DuckDB extension from our own origin (`custom_extension_repository`), one time.
+ * Use it for extensions that only some actions need, for example `excel` for the XLSX export.
+ */
+export function loadExtension(name: 'excel'): Promise<void> {
+  let p = extensions.get(name);
+  if (!p) {
+    p = (async () => {
+      const conn = await (await getDB()).connect();
+      try {
+        await conn.query(`LOAD ${name}`);
+      } finally {
+        await conn.close();
+      }
+    })();
+    p.catch(() => extensions.delete(name));
+    extensions.set(name, p);
+  }
+  return p;
 }
 
 let copySeq = 0;

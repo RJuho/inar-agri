@@ -1,6 +1,6 @@
 // "Download data" button and its menu (WAI-ARIA menu button pattern).
-// The menu has four items: all sites in one file or one file per site (ZIP),
-// each as Parquet or CSV.
+// The menu has six items: all sites in one file or one file per site (ZIP),
+// each as Parquet, CSV or Excel (XLSX).
 // Keys: Enter, Space or Arrow Down open the menu on the first item, Arrow Up on the last item.
 // In the menu, Arrow Up and Arrow Down move (with wrap), Home and End go to the ends,
 // Escape closes the menu and puts the focus on the button, Tab closes the menu.
@@ -22,6 +22,7 @@ const GROUPS: Array<{ label: string; items: ItemDef[] }> = [
     items: [
       { scope: 'one', format: 'parquet', text: 'Parquet', ext: '.parquet' },
       { scope: 'one', format: 'csv', text: 'CSV', ext: '.csv' },
+      { scope: 'one', format: 'xlsx', text: 'Excel', ext: '.xlsx' },
     ],
   },
   {
@@ -29,6 +30,7 @@ const GROUPS: Array<{ label: string; items: ItemDef[] }> = [
     items: [
       { scope: 'sites', format: 'parquet', text: 'Parquet', ext: '.zip' },
       { scope: 'sites', format: 'csv', text: 'CSV', ext: '.zip' },
+      { scope: 'sites', format: 'xlsx', text: 'Excel', ext: '.zip' },
     ],
   },
 ];
@@ -54,7 +56,7 @@ export class DataMenu {
     this.button.dataset.action = 'data';
     this.button.id = `${id}-button`;
     this.button.textContent = 'Download data';
-    this.button.title = 'Download the data of the selected view as Parquet or CSV';
+    this.button.title = 'Download the data of the selected view as Parquet, CSV or Excel';
     this.button.setAttribute('aria-haspopup', 'menu');
     this.button.setAttribute('aria-expanded', 'false');
     this.button.setAttribute('aria-controls', id);

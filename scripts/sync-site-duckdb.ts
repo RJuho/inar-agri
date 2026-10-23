@@ -6,14 +6,14 @@
 // Output (not in git):
 //   site/public/duckdb/<npm version>/duckdb-browser-{eh,mvp}.worker.js
 //   site/public/duckdb/<npm version>/duckdb-{eh,mvp}.wasm.gz
-//   site/public/duckdb/extensions/<DuckDB version>/wasm_{eh,mvp}/parquet.duckdb_extension.wasm
+//   site/public/duckdb/extensions/<DuckDB version>/wasm_{eh,mvp}/{parquet,excel}.duckdb_extension.wasm
 //
 // Cloudflare Workers static assets accept files up to 25 MiB. The DuckDB WASM
 // files are 34 to 40 MB. Thus we compress them with gzip (level 9). The page
 // decompresses them with DecompressionStream.
 //
-// The parquet extension is not in the npm package. DuckDB-WASM downloads it
-// from <repository>/<DuckDB version>/<platform>/parquet.duckdb_extension.wasm.
+// The extensions (parquet, excel) are not in the npm package. DuckDB-WASM downloads
+// them from <repository>/<DuckDB version>/<platform>/<name>.duckdb_extension.wasm.
 // We download the official signed files one time into a cache in
 // node_modules/.cache/ and copy them to the output. The DuckDB version comes
 // from the WASM build in the npm package (SELECT version()), so it changes
@@ -34,8 +34,11 @@ const DIST = join(PKG_DIR, 'dist');
 const OUT_DIR = 'site/public/duckdb';
 const CACHE_DIR = 'node_modules/.cache/inar-duckdb-ext';
 const EXT_HOST = 'https://extensions.duckdb.org';
-/** Extensions that our queries load. Only parquet: the page reads and writes Parquet; CSV is built in. */
-const EXTENSIONS = ['parquet'];
+/**
+ * Extensions that our queries load: parquet (the page reads and writes Parquet) and
+ * excel (the data export writes XLSX). CSV is built in.
+ */
+const EXTENSIONS = ['parquet', 'excel'];
 /** DuckDB-WASM bundles. selectBundle() in the page picks one of them. */
 const BUNDLES = [
   { platform: 'wasm_eh', worker: 'duckdb-browser-eh.worker.js', wasm: 'duckdb-eh.wasm' },

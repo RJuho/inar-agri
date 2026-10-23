@@ -1,4 +1,4 @@
-// Data export: the data that the active view shows, as Parquet or CSV.
+// Data export: the data that the active view shows, as Parquet, CSV or Excel (XLSX).
 // DuckDB-WASM writes the files in its virtual file system (COPY TO), and the page
 // saves them through a Blob link. All work is in the browser; there are no server calls.
 //
@@ -11,14 +11,18 @@
 //   site_code     text   Site code from sites.parquet, for example "qvidja".
 //   site_name     text   Site name, for example "Qvidja".
 //   ts_start_utc  time   Start of the period in UTC. CSV: ISO 8601 with "Z".
+//                        XLSX: Excel date and time (no time zone in the cell).
 //   ts_local      time   Start of the period in site local time (UTC+2 in Finland,
-//                        UTC+3 in Maktau). CSV: ISO 8601 without offset.
+//                        UTC+3 in Maktau). CSV: ISO 8601 without offset. XLSX: as above.
 //   <variables>   number The selected variables, in the order of the form.
 //   nee_qc        number Only for step "raw" when "nee" is selected: 0 = measured,
 //                        1 = gap-filled.
 // Units are in variables.parquet. The Parquet file also has them as key/value
 // metadata (keys "unit:<column>"). The CSV file has a header row only, no units row.
-import { copyToBuffer, query, type Meta } from './db';
+// The XLSX file has one sheet "data" with a header row, no units row; an empty cell is
+// NULL. DuckDB's excel extension writes it (loaded on the first XLSX export). One sheet
+// holds max. 1 048 575 data rows; a larger export stops with an error.
+import { copyToBuffer, loadExtension, query, type Meta } from './db';
 import { CIRCULAR_VARS, SUM_VARS, col, stepExpr, whereClause } from './diagrams/sql';
 import { AGGREGATION_LABELS, VARIABLE_LABELS, type Aggregation, type Variable, type View, type ViewParams } from './state';
 import { yearsText } from './diagrams/common';
@@ -26,7 +30,7 @@ import { slug, sourceFiles } from './export';
 import { zipStore } from './zip';
 
 export type DataScope = 'one' | 'sites';
-export type DataFormat = 'parquet' | 'csv';
+export type DataFormat = 'parquet' | 'csv' | 'xlsx';
 
 export interface DataFile {
   fileName: string;
@@ -38,13 +42,20 @@ export interface DataFile {
   files: number;
 }
 
+/** Name of the format in the status line. */
+export const FORMAT_LABELS: Record<DataFormat, string> = { parquet: 'Parquet', csv: 'CSV', xlsx: 'Excel (XLSX)' };
+
 const MIME: Record<DataFormat | 'zip', string> = {
   parquet: 'application/vnd.apache.parquet',
   csv: 'text/csv;charset=utf-8',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
 };
 
 /** Description text of the period of each step. */
+/** Max. number of data rows in one XLSX sheet (Excel: 1 048 576 rows with the header row). */
+export const XLSX_MAX_ROWS = 1_048_575;
+
 const PERIOD_TEXT: Record<Exclude<Aggregation, 'raw'>, string> = {
   day: 'local day',
   week: 'local ISO week (start Monday 00:00 local time)',
@@ -123,6 +134,7 @@ function kvMetadata(view: View, meta: Meta): string {
 
 function copyOptions(format: DataFormat, view: View, meta: Meta): string {
   if (format === 'csv') return `FORMAT csv, HEADER true, DELIMITER ','`;
+  if (format === 'xlsx') return `FORMAT xlsx, HEADER true, SHEET 'data'`;
   return `FORMAT parquet, COMPRESSION zstd, KV_METADATA ${kvMetadata(view, meta)}`;
 }
 
@@ -148,12 +160,21 @@ export async function exportData(view: View, meta: Meta, scope: DataScope, forma
   const p = view.params;
   const base = baseName(view, meta);
   const options = copyOptions(format, view, meta);
+  if (format === 'xlsx') await loadExtension('excel');
   const toFile = (select: string) => copyToBuffer(format === 'csv' ? csvSql(select) : select, options, format);
+  /** Count the rows first. An XLSX sheet has a row limit. */
+  const countAndCopy = async (select: string, what: string): Promise<[Uint8Array<ArrayBuffer>, number]> => {
+    const n = await rowCount(select);
+    if (format === 'xlsx' && n > XLSX_MAX_ROWS) {
+      throw new Error(`${what} has ${n.toLocaleString('en')} rows, but one Excel sheet holds max. ${XLSX_MAX_ROWS.toLocaleString('en')}. Use a longer step, a shorter period or one file per site.`);
+    }
+    return [await toFile(select), n];
+  };
 
   if (scope === 'one') {
     const select = exportSql(p);
     if (select === null) throw new Error('Select one or more sites and variables.');
-    const [bytes, rows] = await Promise.all([toFile(select), rowCount(select)]);
+    const [bytes, rows] = await countAndCopy(select, 'The file');
     return { fileName: `${base}.${format}`, mime: MIME[format], bytes, rows, files: 1 };
   }
 
@@ -163,7 +184,7 @@ export async function exportData(view: View, meta: Meta, scope: DataScope, forma
   let rows = 0;
   for (const s of sites) {
     const select = exportSql(p, s.siteId) as string;
-    const [data, n] = await Promise.all([toFile(select), rowCount(select)]);
+    const [data, n] = await countAndCopy(select, `The file of ${s.name}`);
     entries.push({ name: `${base}_${s.code}.${format}`, data });
     rows += n;
   }

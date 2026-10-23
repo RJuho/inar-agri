@@ -26,7 +26,7 @@ import {
 import { DiagramList } from './ui/diagrams';
 import { showRecovery } from './recover';
 import { compositePng, DEFAULT_SCALE, diagramPng, download, downloadBlob, slug, type PngResult } from './export';
-import { exportData, sizeText, type DataFormat, type DataScope } from './dataexport';
+import { FORMAT_LABELS, exportData, sizeText, type DataFormat, type DataScope } from './dataexport';
 import { ParamsForm } from './ui/params';
 import { Tabs } from './ui/tabs';
 
@@ -196,7 +196,7 @@ export async function start(): Promise<void> {
   /** Make the data file of the active view in the browser and save it. */
   const saveData = async (scope: DataScope, format: DataFormat) => {
     const view = activeView(store);
-    const what = `${format === 'csv' ? 'CSV' : 'Parquet'} ${scope === 'one' ? 'file' : 'files (one per site, ZIP)'}`;
+    const what = `${FORMAT_LABELS[format]} ${scope === 'one' ? 'file' : 'files (one per site, ZIP)'}`;
     flash(`Making the ${what} for view ${view.name}…`, false, 0);
     try {
       const file = await exportData(view, meta, scope, format);
