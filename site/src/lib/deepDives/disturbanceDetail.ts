@@ -50,9 +50,8 @@ const TimingSummary = v.object({
 const Means = v.record(v.string(), N);
 const Fit = v.object({ n: v.number(), slope: N, intercept: N, r: N, p: N });
 const FitPoints = v.object({ ...Fit.entries, points: v.array(v.object({ id: v.string(), site: SITE, x: v.number(), y: v.number() })) });
-const MultiFit = v.nullable(v.object({ coef: v.array(v.number()), residSd: v.number(), r2: v.number(), n: v.number() }));
 
-const SiteInfo = v.object({ name: v.string(), slot: v.number(), lightVar: v.string(), lightUnit: v.string(), rainSource: v.string() });
+const SiteInfo = v.object({ name: v.string(), slot: v.number() });
 
 const DataSchema = v.object({
   method: v.object({
@@ -66,8 +65,6 @@ const DataSchema = v.object({
     compositeTo: v.number(),
     timingRefFrom: v.number(),
     timingRefTo: v.number(),
-    rankHigh: v.number(),
-    lightUnit: v.record(v.string(), v.string()),
   }),
   sites: v.object({ anttila: SiteInfo, sarkisuo: SiteInfo, haltiala: SiteInfo, qvidja: SiteInfo, viikki: SiteInfo }),
   groups: v.object({ silageHarvest: GroupSummary, cleaningCut: GroupSummary, grainHarvest: GroupSummary }),
@@ -119,46 +116,6 @@ const DataSchema = v.object({
       ),
     }),
   }),
-  fertilisation: v.object({
-    controls: v.record(
-      v.string(),
-      v.object({
-        nPairs: v.number(),
-        nYears: v.number(),
-        fewYears: v.boolean(),
-        rTaLight: N,
-        collinear: v.boolean(),
-        fit: MultiFit,
-        fitTa: Fit,
-        fitLight: Fit,
-        dLightPct: Summary,
-        pairs: v.array(v.object({ anchor: v.string(), dGpp: N, dTa: N, dLightPct: N })),
-      }),
-    ),
-    episodes: v.array(
-      v.object({
-        id: v.string(),
-        site: SITE,
-        kind: v.string(),
-        fert: S,
-        withTillage: v.boolean(),
-        withHarvest: v.boolean(),
-        inSummary: v.boolean(),
-        nKgHa: N,
-        start: v.string(),
-        end: v.string(),
-        fluxUse: v.string(),
-        delta: v.object({ gpp: v.optional(N, null) }),
-        weather: v.object({ ta: N, lightPct: N, rain: N, swc: N }),
-        expectedGpp: v.optional(N, null),
-        residualGpp: v.optional(N, null),
-        residualRank: v.optional(N, null),
-        rawRank: v.optional(N, null),
-        matched: v.object({ n: v.number(), controlDelta: N, diff: N }),
-        lightNorm: v.optional(v.object({ pct: N }), { pct: null }),
-      }),
-    ),
-  }),
   composite: v.object({
     offsets: v.array(v.number()),
     groups: v.record(v.string(), v.object({ episodes: v.number(), gppSharePct: Curve })),
@@ -169,7 +126,6 @@ type Group = v.InferOutput<typeof GROUP>;
 type Site = v.InferOutput<typeof SITE>;
 type SummaryOut = v.InferOutput<typeof Summary>;
 type HarvestEpisode = DetailData['harvestEpisodes'][number];
-type FertEpisode = DetailData['fertilisation']['episodes'][number];
 type Flux = 'nee' | 'gpp' | 'reco';
 
 export function disturbanceDetailData(raw: unknown): DetailData {
@@ -184,7 +140,6 @@ const GROUP_SYMBOL: Record<Group, string> = { silageHarvest: 'circle', cleaningC
 const FLUXES: Flux[] = ['nee', 'gpp', 'reco'];
 const FLUX_LABEL: Record<Flux, string> = { nee: 'NEE', gpp: 'GPP', reco: 'Reco' };
 const UNIT_DAY = 'g C m⁻² d⁻¹';
-const FERT_KIND: Record<string, string> = { fertilisation: 'Fertilisation', tillageFert: 'Tillage + fertilisation', harvestCutFert: 'Harvest or cut + fertilisation' };
 const EXCLUSION_TEXT: Record<string, string> = { overlap: 'other event near', 'too-few-days': 'too few days', 'low-measured-fraction': 'low measured fraction' };
 const REASON_TEXT: Record<string, string> = { 'drop-too-small': 'drop too small', 'flux-too-small': 'GPP too small', 'too-few-days': 'too few days' };
 
@@ -194,7 +149,6 @@ const f2 = (x: number | null | undefined) => (x === null || x === undefined ? '�
 const f0s = (x: number | null | undefined) => (x === null || x === undefined ? '–' : fmtNum(x, 0, { sign: true }));
 const f1s = (x: number | null | undefined) => (x === null || x === undefined ? '–' : fmtNum(x, 1, { sign: true }));
 const f2s = (x: number | null | undefined) => (x === null || x === undefined ? '–' : fmtNum(x, 2, { sign: true }));
-const f3s = (x: number | null | undefined) => (x === null || x === undefined ? '–' : fmtNum(x, 3, { sign: true }));
 
 /** "+3.71 ± 2.01 [2.68, 4.74]"; the interval only with three or more values, the SD only with two or more. */
 function meanText(s: SummaryOut, fmt: (x: number | null) => string, withCi = true): string {
@@ -614,116 +568,6 @@ export function offsetFigure(d: DetailData): FigureOut {
   return { svg: renderSvg(option as never, width, height, alt), alt };
 }
 
-// ---------- Figure 6: fertilisation against the weather ----------
-
-/** Sites with a control fit, in site order. */
-function fitSites(d: DetailData): Site[] {
-  return SITES.filter((s) => d.fertilisation.controls[s]?.fit);
-}
-
-/** Control pairs (ΔGPP against Δta), the site fit at the mean Δlight and the fertilisation episodes, one panel per site with a fit. */
-export function fertWeatherFigure(d: DetailData): FigureOut {
-  const sites = fitSites(d);
-  const width = 1100;
-  const cols = 2;
-  const margin = { left: 64, right: 20, top: 84, bottom: 56 };
-  const gap = { x: 56, y: 76 };
-  const panelH = 280;
-  const grids = panelGrid(sites.length, cols, width, margin, gap, panelH);
-  const height = gridHeight(sites.length, cols, margin, gap.y, panelH);
-  const fert = d.fertilisation.episodes.filter((e) => e.inSummary && e.delta.gpp !== null && e.weather.ta !== null);
-  const xv: number[] = [];
-  const yv: number[] = [];
-  for (const s of sites) {
-    for (const p of d.fertilisation.controls[s]!.pairs) if (p.dTa !== null && p.dGpp !== null) {
-      xv.push(p.dTa);
-      yv.push(p.dGpp);
-    }
-  }
-  for (const e of fert) {
-    xv.push(e.weather.ta!);
-    yv.push(e.delta.gpp!);
-  }
-  const xr = niceRange(xv, 6);
-  const yr = niceRange(yv, 6);
-  const series: Record<string, unknown>[] = [];
-  sites.forEach((s, gi) => {
-    const c = d.fertilisation.controls[s]!;
-    const base = { xAxisIndex: gi, yAxisIndex: gi, emphasis: { disabled: true } };
-    const color = siteColor(siteSlot(d, s));
-    series.push({ ...base, type: 'scatter', name: 'Control pairs', symbol: 'circle', symbolSize: 5, silent: true, data: c.pairs.filter((p) => p.dTa !== null && p.dGpp !== null).map((p) => [p.dTa, p.dGpp]), itemStyle: { color: AXIS, opacity: 0.45 } });
-    // Single-predictor fit ΔGPP ~ Δta: the x axis shows Δta only, and Δta and Δlight are collinear at some sites,
-    // so the two-predictor fit at the mean Δlight would not follow the cloud of control pairs.
-    const { slope, intercept } = c.fitTa;
-    const tas = c.pairs.filter((p) => p.dTa !== null && p.dGpp !== null).map((p) => p.dTa!);
-    if (slope !== null && intercept !== null && tas.length) {
-      const x0 = Math.min(...tas);
-      const x1 = Math.max(...tas);
-      const line = (x: number) => intercept + slope * x;
-      series.push({ ...base, type: 'line', name: 'Fit against Δta alone', silent: true, symbol: 'none', data: [[x0, line(x0)], [x1, line(x1)]], lineStyle: { color: INK, type: [6, 4], width: 2 }, itemStyle: { color: INK } });
-    }
-    for (const e of fert.filter((x) => x.site === s)) {
-      const style = e.fert === 'organic' ? hollow(color, 2.5) : { color, borderColor: '#ffffff', borderWidth: 0.5 };
-      series.push({ ...base, type: 'scatter', symbol: e.withTillage ? 'diamond' : 'circle', symbolSize: e.withTillage ? 16 : 13, data: [[e.weather.ta, e.delta.gpp]], itemStyle: style, z: 6 });
-    }
-    series.push(zeroLine(base, [{ yAxis: 0 }, { xAxis: 0 }]));
-  });
-  const legendItems = [
-    { name: 'Control pairs', icon: 'circle', itemStyle: { color: AXIS, opacity: 0.6 } },
-    { name: 'Fit against Δta alone', icon: 'path://M0,4 L10,4 L10,7 L0,7 Z M14,4 L24,4 L24,7 L14,7 Z', itemStyle: { color: INK } },
-    { name: 'Mineral (filled)', icon: 'circle', itemStyle: { color: INK } },
-    { name: 'Organic (hollow)', icon: 'circle', itemStyle: hollow(INK, 2) },
-    { name: 'With tillage or sowing (diamond)', icon: 'diamond', itemStyle: { color: INK } },
-  ];
-  for (const it of legendItems.slice(2)) series.push({ type: 'scatter', name: it.name, symbol: it.icon, data: [], xAxisIndex: 0, yAxisIndex: 0, itemStyle: it.itemStyle });
-  const lastRowStart = Math.floor((sites.length - 1) / cols) * cols;
-  const option = {
-    legend: { top: 4, left: margin.left, itemGap: 18, textStyle: { fontSize: 12, color: INK }, data: legendItems },
-    title: sites.map((s, i) => {
-      const c = d.fertilisation.controls[s]!;
-      return panelTitle(`${SITE_NAMES[s]} (${c.nPairs} control pairs, ${c.nYears} ${c.nYears === 1 ? 'year' : 'years'})`, grids[i]!.left + grids[i]!.width / 2, grids[i]!.top - 32);
-    }),
-    grid: grids.map((g) => ({ left: g.left, top: g.top, width: g.width, height: g.height, containLabel: false })),
-    xAxis: grids.map((_, i) => ({
-      type: 'value',
-      gridIndex: i,
-      min: xr.min,
-      max: xr.max,
-      interval: xr.interval,
-      name: i >= lastRowStart ? 'Δ air temperature, after − before (°C)' : '',
-      nameLocation: 'middle',
-      nameGap: 30,
-      nameTextStyle: nameStyle,
-      axisLine: { onZero: false, lineStyle: { color: AXIS } },
-      axisLabel: { ...axisLabel, formatter: (x: number) => minus(x) },
-      splitLine,
-    })),
-    yAxis: grids.map((_, i) => ({
-      type: 'value',
-      gridIndex: i,
-      min: yr.min,
-      max: yr.max,
-      interval: yr.interval,
-      name: i % cols === 0 ? `ΔGPP (${UNIT_DAY})` : '',
-      nameLocation: 'middle',
-      nameGap: 40,
-      nameTextStyle: nameStyle,
-      axisLabel: { ...axisLabel, show: i % cols === 0, formatter: (x: number) => minus(x) },
-      splitLine,
-    })),
-    series,
-  };
-  const parts = sites.map((s) => {
-    const c = d.fertilisation.controls[s]!;
-    const coef = c.fit!.coef;
-    const eps = fert.filter((e) => e.site === s).map((e) => `${e.id} (${e.fert ?? 'unknown'}${e.withTillage ? ', with tillage or sowing' : ''}): ΔGPP ${f2s(e.delta.gpp)}, expected ${f2s(e.expectedGpp)}, residual ${f2s(e.residualGpp)}, rank ${f0(e.residualRank)}`);
-    return `${SITE_NAMES[s]}: ${c.nPairs} control pairs from ${c.nYears} ${c.nYears === 1 ? 'year' : 'years'}, r(Δta, Δlight) = ${f2(c.rTaLight)}, dashed line ΔGPP = ${f2(c.fitTa.intercept)} ${f3s(c.fitTa.slope)} × Δta (slope ${f3s(c.fitTa.slope)} ${UNIT_DAY} per °C, r = ${f2(c.fitTa.r)}, n = ${c.fitTa.n}); fit for the expected values ΔGPP = ${f2(coef[0])} ${f3s(coef[1])} × Δta ${f3s(coef[2])} × Δlight %, R² = ${f2(c.fit!.r2)}; ${eps.length ? eps.join('; ') : 'no fertilisation episode in the summary'}`;
-  });
-  const noFit = SITES.filter((s) => !sites.includes(s) && d.fertilisation.episodes.some((e) => e.site === s));
-  const alt = `Scatter chart with ${sites.length} panels, one per site with a control fit: change of the mean daily GPP (${d.method.afterDays} days after − ${d.method.beforeDays} days before, ${UNIT_DAY}) against the change of the mean air temperature (°C). Grey dots are control pairs of the same season without management events; the dashed line is the least-squares fit of ΔGPP against Δta alone over the control pairs of the site; the coloured symbols are the fertilisation episodes of the summary (filled mineral, hollow organic, diamond with tillage or sowing). ${parts.join('. ')}.${noFit.length ? ` ${noFit.map((s) => SITE_NAMES[s]).join(' and ')}: too few control pairs for a fit, no panel.` : ''}`;
-  return { svg: renderSvg(option as never, width, height, alt), alt };
-}
-
 // ---------- Tables ----------
 
 export interface GroupRow {
@@ -823,59 +667,6 @@ export function episodeRows(d: DetailData): EpisodeRow[] {
       lowFrac: t.lowFracDays.length ? String(t.lowFracDays.length) : '0',
       fluxUse: e.fluxUsed ? (e.fertInWindow ? 'used (fertilisation in a window)' : 'used') : (EXCLUSION_TEXT[e.fluxExclusion ?? ''] ?? e.fluxUse),
       timingUse: t.used ? 'used' : (t.exclusion ?? 'not used'),
-    };
-  });
-}
-
-export interface FertRow {
-  id: string;
-  site: string;
-  dates: string;
-  kind: string;
-  product: string;
-  with: string;
-  n: string;
-  dTa: string;
-  dLight: string;
-  dRain: string;
-  dSwc: string;
-  observed: string;
-  expected: string;
-  residual: string;
-  residualRank: string;
-  rawRank: string;
-  matched: string;
-  lightNorm: string;
-  fluxUse: string;
-  inSummary: string;
-}
-
-/** All fertilisation episodes with the weather change, the expected and the observed ΔGPP and the control ranks. */
-export function fertRows(d: DetailData): FertRow[] {
-  return d.fertilisation.episodes.map((e: FertEpisode) => {
-    const w = e.weather;
-    const rain = w.rain === null ? '–' : `${f0s(w.rain)}${d.sites[e.site].rainSource === 'viikki-proxy' ? ' *' : ''}`;
-    return {
-      id: e.id,
-      site: SITE_NAMES[e.site],
-      dates: e.start === e.end ? e.start : `${e.start} to ${e.end}`,
-      kind: FERT_KIND[e.kind] ?? e.kind,
-      product: e.fert ?? '–',
-      with: [e.withTillage ? 'tillage or sowing' : null, e.withHarvest ? 'harvest or cut' : null].filter(Boolean).join(', ') || '–',
-      n: e.nKgHa === null ? '–' : fmtNum(e.nKgHa, 0),
-      dTa: f1s(w.ta),
-      dLight: w.lightPct === null ? '–' : `${f0s(w.lightPct)} %`,
-      dRain: rain,
-      dSwc: f3s(w.swc),
-      observed: f2s(e.delta.gpp),
-      expected: f2s(e.expectedGpp),
-      residual: f2s(e.residualGpp),
-      residualRank: f0(e.residualRank),
-      rawRank: f0(e.rawRank),
-      matched: e.matched.n === 0 ? '0' : e.matched.diff === null ? `${e.matched.n} (too few)` : `${e.matched.n}: ${f2s(e.matched.diff)}`,
-      lightNorm: e.lightNorm.pct === null ? '–' : `${f0s(e.lightNorm.pct)} %`,
-      fluxUse: e.fluxUse.startsWith('excluded: ') ? e.fluxUse.slice('excluded: '.length) : e.fluxUse,
-      inSummary: e.inSummary ? 'yes' : 'no',
     };
   });
 }

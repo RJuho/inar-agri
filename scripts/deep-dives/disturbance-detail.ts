@@ -1,16 +1,16 @@
-// Deep Dive "Management disturbances in detail: cut, harvest, timing and weather"
+// Deep Dive "Management disturbances in detail: cut, harvest and timing"
 // (site/src/pages/deep-dive/disturbance-detail.mdx). An iteration of the dive "Size of management
-// disturbances" (disturbance-size.ts) with five Finnish sites and three new questions:
+// disturbances" (disturbance-size.ts) with five Finnish sites and two new questions:
 //
 // A. Cut or harvest: how large is the change of NEE, GPP and Reco after a silage harvest (grass
 //    removed), a cleaning cut (grass left on the field) and a grain or bean harvest, and how fast
 //    does GPP recover?
 // B. Timing: does the drop of GPP start before the recorded harvest day? A change-point search on
 //    daily GPP, with a check on the measured day-time NEE.
-// C. Fertilisation or weather: is the change of GPP after a fertilisation larger than the change in
-//    control windows without management that have the same weather change (air temperature, light)?
 //
-// Inputs (read only): db/events.parquet, db/sites.parquet, db/observations.parquet,
+// The fertilisation question moved to the dive "fertilisation-weather" (Deep Dive #5).
+//
+// Inputs (read only): db/events.parquet, db/sites.parquet,
 // data/calculated/daily.parquet and data/calculated/fluxes_30min.parquet. Output: the result object;
 // scripts/deep-dives.ts writes it to site/src/deep-dives/disturbance-detail.json.
 // Run: npm run deep-dives -- disturbance-detail.
@@ -23,29 +23,21 @@
 // - Timing: an episode is used when no grazing, tillage or other harvest episode touches the days of
 //   the search (start − 10 − 5 to end + 5 + 4). Offsets are to the first recorded event date.
 // - Change point on measured NEE: minimum mean −NEE before the drop = 1 µmol m-2 s-1.
-// - Fertilisation episodes with a harvest or cut (kind harvestCutFert) are listed, but not in the
-//   summaries: the harvest makes the GPP change.
-// - Rain change in control and episode windows = (mean after − mean before) × 14 days (mm per 14 days).
-// - The daily light sum is the mean of max(light, 0) over the half hours of the local day × 86 400 s:
-//   PPFD in mol m-2 d-1, SW_IN in MJ m-2 d-1 (44 of 48 half hours needed).
 
 import type { DuckDBConnection } from '@duckdb/node-api';
 import { num, numOrNull, rows, str } from '../lib/duck.ts';
 import { daysToRecover, detectDrop, preDrop, rangeMean, type Drop } from '../lib/deep-dive/change-point.ts';
-import { controlAnchors, controlPairs, dayOfYear, nearestControls, rankAmong } from '../lib/deep-dive/control-windows.ts';
-import { changes, mergeClassEpisodes, toClassEvent, windowMeans, type ClassEvent, type VarRow, type WindowMeans } from '../lib/deep-dive/disturbance.ts';
+import { changes, toClassEvent, windowMeans, type ClassEvent, type VarRow, type WindowMeans } from '../lib/deep-dive/disturbance.ts';
 import { HARVEST_GROUP_LABELS, HARVEST_GROUPS, harvestGroup, mergeHarvestEpisodes, yieldPerEvent, type EpisodeOverride, type HarvestEpisode, type HarvestGroup } from '../lib/deep-dive/harvest-groups.ts';
 import { dayNumber, isoDay, type Window } from '../lib/deep-dive/harvest.ts';
-import { eventDayMask } from '../lib/deep-dive/natural-events.ts';
-import { finite, mean, median, ols, olsMulti, pearson, pearsonP, predictMulti, sd, summarise, type OlsMultiFit, type Summary } from '../lib/deep-dive/stats.ts';
+import { finite, mean, median, ols, pearson, pearsonP, sd, summarise, type Summary } from '../lib/deep-dive/stats.ts';
 
 export const slug = 'disturbance-detail';
-export const title = 'Management disturbances in detail: cut, harvest, timing and weather';
+export const title = 'Management disturbances in detail: cut, harvest and timing';
 
 export const inputs = [
   'db/events.parquet',
   'db/sites.parquet',
-  'db/observations.parquet',
   'data/calculated/daily.parquet',
   'data/calculated/fluxes_30min.parquet',
 ] as const;
@@ -53,14 +45,6 @@ export const inputs = [
 /** The five Finnish sites (order of db/sites.parquet). */
 const SITES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki'] as const;
 type SiteCode = (typeof SITES)[number];
-
-/** Light variable per site: Haltiala has PPFD only, Qvidja SW_IN only; Särkisuo SW_IN is sparse. */
-const LIGHT_VAR: Record<SiteCode, 'ppfd' | 'sw_in'> = { anttila: 'ppfd', sarkisuo: 'ppfd', haltiala: 'ppfd', qvidja: 'sw_in', viikki: 'ppfd' };
-const LIGHT_UNIT = { ppfd: 'mol m-2 d-1', sw_in: 'MJ m-2 d-1' } as const;
-/** Minimum daily light sum for a light-normalised GPP (PPFD mol m-2 d-1; SW_IN MJ m-2 d-1). */
-const MIN_LIGHT_FOR_LUE = { ppfd: 1, sw_in: 0.5 } as const;
-/** Haltiala has no rain gauge: the Viikki rain of the same day is the proxy (as dive #1). */
-const RAIN_SOURCE: Record<SiteCode, 'own' | 'viikki-proxy'> = { anttila: 'own', sarkisuo: 'own', haltiala: 'viikki-proxy', qvidja: 'own', viikki: 'own' };
 
 // ---------- Windows and rules of dive #1 ----------
 const BEFORE: Window = { from: -14, to: -1 };
@@ -76,10 +60,6 @@ const MERGE_DAYS = 7;
 const BOOTSTRAP_RESAMPLES = 10_000;
 /** Minimum measured day-time half hours in a 14-day window (check without gap filling, as dive #1). */
 const MIN_MEASURED_WINDOW = 20;
-/** Minimum half hours per local day for daily means of swc and tsoil, and for a daily rain sum (dive #1). */
-const MIN_SWC_ROWS = 36;
-const MIN_RAIN_ROWS = 44;
-const MIN_LIGHT_ROWS = 44;
 
 // ---------- Recovery ----------
 const RECOVERY: Window = { from: 15, to: 28 };
@@ -112,19 +92,6 @@ const MIN_TIMING_REF_DAYS = 3;
 // ---------- Composite curves ----------
 const COMPOSITE: Window = { from: -14, to: 42 };
 
-// ---------- Fertilisation controls ----------
-const CONTROL_HALF_WIDTH = 21;
-const CONTROL_HALF_WIDTH_SENS = 10;
-const MASK_BEFORE = 14;
-const MASK_AFTER = 14;
-const TOL_TA = 1;
-const TOL_LIGHT_PCT = 10;
-const MIN_MATCHED = 3;
-const COLLINEAR_R = 0.7;
-const MIN_CONTROL_YEARS = 3;
-const RANK_HIGH = 90;
-const RANK_LOW = 10;
-
 /**
  * Manual corrections of harvest episodes (the plan, "Method decisions"). Each text goes to the
  * `override` list of the episode in the result.
@@ -153,39 +120,26 @@ const OVERRIDES: EpisodeOverride[] = [
 
 /**
  * Episodes that the article discusses one by one. The MDX cites them as
- * `highlights.<key>.episode...`, never by an array index, so that a rerun
+ * `highlights.<id>.episode...`, never by an array index, so that a rerun
  * cannot shift a cited value to another episode.
- * Key rule: the key is the episode `id`. When a fertilisation episode has the
- * same `id` as a harvest episode, its key is `<id>-fert` (see `highlightKey()`).
  */
-const HIGHLIGHTS: readonly { id: string; source: 'harvest' | 'fertilisation' }[] = [
+const HIGHLIGHTS: readonly { id: string; source: 'harvest' }[] = [
   { id: 'qvidja-2019-06-11', source: 'harvest' },
   { id: 'anttila-2023-06-21', source: 'harvest' },
   { id: 'haltiala-2021-09-08', source: 'harvest' },
-  { id: 'viikki-2022-05-10', source: 'fertilisation' },
   { id: 'qvidja-2018-06-12', source: 'harvest' },
   { id: 'qvidja-2018-08-21', source: 'harvest' },
   { id: 'haltiala-2022-08-15', source: 'harvest' },
   { id: 'haltiala-2025-10-03', source: 'harvest' },
   { id: 'viikki-2025-09-10', source: 'harvest' },
-  { id: 'anttila-2022-05-23', source: 'fertilisation' },
-  { id: 'haltiala-2023-08-01', source: 'fertilisation' },
-  { id: 'qvidja-2019-05-08', source: 'fertilisation' },
-  { id: 'qvidja-2020-07-27', source: 'fertilisation' },
-  { id: 'qvidja-2021-05-12', source: 'fertilisation' },
 ];
-
-/** Heimsch et al. 2021 (PDF p. 7–8): 5-day windows; after fertilisation 7 to 29 % lower PAR and rain within 5 days. */
-const HEIMSCH_2021 = { windowDays: 5, parLowerPctFrom: 7, parLowerPctTo: 29, rainWithinDays: 5 };
 
 type Flux = 'nee' | 'gpp' | 'reco';
 const FLUXES: readonly Flux[] = ['nee', 'gpp', 'reco'];
-const MEAN_VARS = ['nee', 'gpp', 'reco', 'frac', 'ta', 'swc', 'rain', 'light', 'lue'] as const;
+const MEAN_VARS = ['nee', 'gpp', 'reco', 'frac'] as const;
 
 const dayOf = (iso: string): number => dayNumber(iso.slice(0, 10));
 const overlaps = (aLo: number, aHi: number, bLo: number, bHi: number): boolean => aLo <= bHi && bLo <= aHi;
-const pct = (a: number | null | undefined, b: number | null | undefined, minRef = 0): number | null =>
-  a === null || a === undefined || b === null || b === undefined || !(b > minRef) ? null : (100 * (a - b)) / b;
 
 interface WindowJson {
   nDays: Record<string, number>;
@@ -245,53 +199,6 @@ interface HarvestResult {
   timing: TimingJson;
 }
 
-interface FertResult {
-  id: string;
-  site: SiteCode;
-  kind: string;
-  classes: string[];
-  fert: string | null;
-  withTillage: boolean;
-  withHarvest: boolean;
-  /** In the summaries: flux used, no harvest or cut in the episode, and a control fit. */
-  inSummary: boolean;
-  nKgHa: number | null;
-  start: string;
-  end: string;
-  doy: number;
-  events: { date: string; type: string; detail: string }[];
-  coEvents: { date: string; type: string; detail: string }[];
-  fluxUsed: boolean;
-  fluxExclusion: FluxExclusion;
-  fluxUse: string;
-  before: WindowJson;
-  after: WindowJson;
-  delta: { gpp: number | null; reco: number | null; nee: number | null; relGppPct: number | null };
-  weather: { ta: number | null; lightPct: number | null; rain: number | null; swc: number | null };
-  expectedGpp: number | null;
-  residualGpp: number | null;
-  residualRank: number | null;
-  rawRank: number | null;
-  nControls: number;
-  check: { expectedSwc: number | null; residualSwc: number | null; residual10: number | null; residualRank10: number | null; pooledResidualPct: number | null };
-  matched: { n: number; controlDelta: number | null; diff: number | null };
-  lightNorm: { before: number | null; after: number | null; delta: number | null; pct: number | null };
-}
-
-interface PairJson {
-  anchor: string;
-  dGpp: number;
-  dReco: number;
-  dNee: number;
-  dTa: number;
-  dLightPct: number;
-  dRain: number | null;
-  dSwc: number | null;
-  relGppPct: number | null;
-}
-
-const fitJson = (f: OlsMultiFit | null) => (f ? { coef: f.coef, residSd: f.residSd, r2: f.r2, n: f.n } : null);
-
 function line(xs: number[], ys: number[]) {
   const f = ols(xs, ys);
   const r = xs.length >= 3 ? pearson(xs, ys) : null;
@@ -340,18 +247,16 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
   );
   const harvestEvents = allEvents.filter((e) => e.type === 'harvest' || e.type === 'cut');
   const harvestEps = mergeHarvestEpisodes(harvestEvents, OVERRIDES, MERGE_DAYS);
-  const classEvents = allEvents.filter((e) => e.cls !== null);
-  const classEps = mergeClassEpisodes(classEvents, MERGE_DAYS);
   const evLo = (e: ClassEvent) => dayOf(e.date);
   const evHi = (e: ClassEvent) => dayOf(e.dateEnd ?? e.date);
 
   // ---------- Daily fluxes ----------
   const daily = new Map<string, Map<number, VarRow>>(SITES.map((s) => [s, new Map()]));
   const years = new Map<string, Set<number>>(SITES.map((s) => [s, new Set()]));
-  const empty = (): VarRow => ({ nee: null, gpp: null, reco: null, frac: null, ta: null, tsoil: null, swc: null, rain: null, light: null, lue: null, mneg: null });
+  const empty = (): VarRow => ({ nee: null, gpp: null, reco: null, frac: null, mneg: null });
   const dRows = await rows(
     conn,
-    `SELECT site_code, CAST(date_local AS VARCHAR) AS d, nee_f_gc, gpp_gc, reco_gc, frac_measured, ta_mean
+    `SELECT site_code, CAST(date_local AS VARCHAR) AS d, nee_f_gc, gpp_gc, reco_gc, frac_measured
      FROM 'data/calculated/daily.parquet' WHERE site_code IN (${siteList})`,
   );
   for (const r of dRows) {
@@ -363,53 +268,7 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       gpp: numOrNull(r.gpp_gc),
       reco: numOrNull(r.reco_gc),
       frac: numOrNull(r.frac_measured),
-      ta: numOrNull(r.ta_mean),
     });
-  }
-
-  // ---------- Daily soil water, rain and light (local day of the site) ----------
-  // Haltiala 2021 soil water is used: finding HAL-03 is resolved (provider confirmed 2026-10-23).
-  const oRows = await rows(
-    conn,
-    `SELECT s.code AS site_code, CAST(CAST(o.ts_start + to_minutes(s.utc_offset_min) AS DATE) AS VARCHAR) AS d,
-            avg(o.swc) AS swc, count(o.swc) AS n_swc, avg(o.tsoil) AS tsoil, count(o.tsoil) AS n_tsoil,
-            sum(o.precip) AS rain, count(o.precip) AS n_rain,
-            avg(greatest(o.ppfd, 0)) AS ppfd, count(o.ppfd) AS n_ppfd,
-            avg(greatest(o.sw_in, 0)) AS sw_in, count(o.sw_in) AS n_sw_in
-     FROM 'db/observations.parquet' o JOIN 'db/sites.parquet' s USING (site_id)
-     WHERE s.code IN (${siteList}) GROUP BY ALL`,
-  );
-  const rainByDay = new Map<string, Map<number, number>>(SITES.map((s) => [s, new Map()]));
-  let frozenDays = 0;
-  for (const r of oRows) {
-    const site = str(r.site_code) as SiteCode;
-    const day = dayOf(str(r.d));
-    const row = daily.get(site)!.get(day) ?? empty();
-    const tsoil = num(r.n_tsoil) >= MIN_SWC_ROWS ? numOrNull(r.tsoil) : null;
-    let swc = num(r.n_swc) >= MIN_SWC_ROWS ? numOrNull(r.swc) : null;
-    // Frozen soil: the sensors do not give the liquid water content (finding QVI-16).
-    if (swc !== null && tsoil !== null && tsoil <= 0) {
-      swc = null;
-      frozenDays++;
-    }
-    const rain = num(r.n_rain) >= MIN_RAIN_ROWS ? numOrNull(r.rain) : null;
-    if (rain !== null) rainByDay.get(site)!.set(day, rain);
-    const lv = LIGHT_VAR[site];
-    const lightMean = num(r[`n_${lv}`]) >= MIN_LIGHT_ROWS ? numOrNull(r[lv]) : null;
-    // µmol m-2 s-1 × 86 400 s / 1e6 = mol m-2 d-1; W m-2 × 86 400 s / 1e6 = MJ m-2 d-1.
-    const light = lightMean === null ? null : (lightMean * 86_400) / 1e6;
-    daily.get(site)!.set(day, { ...row, tsoil, swc, rain, light });
-  }
-  const viikkiRain = rainByDay.get('viikki')!;
-  for (const [day, row] of daily.get('haltiala')!) daily.get('haltiala')!.set(day, { ...row, rain: viikkiRain.get(day) ?? null });
-  // Light-normalised GPP (g C per mol photons, or per MJ).
-  for (const site of SITES) {
-    const minL = MIN_LIGHT_FOR_LUE[LIGHT_VAR[site]];
-    for (const [day, row] of daily.get(site)!) {
-      const g = row.gpp ?? null;
-      const l = row.light ?? null;
-      daily.get(site)!.set(day, { ...row, lue: g === null || l === null || l < minL ? null : g / l });
-    }
   }
 
   // ---------- Measured day-time NEE per local day ----------
@@ -612,7 +471,6 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       nee: fluxVar('nee', seed),
       gpp: fluxVar('gpp', seed + 10),
       reco: fluxVar('reco', seed + 20),
-      ta: pick(flux, (e) => e.delta.ta, seed + 30),
       recoveryShare: pick(flux, (e) => e.recovery.sharePct, seed + 31),
       daysToRecover: pick(flux, (e) => e.recovery.days, seed + 32),
       nRecovered: flux.filter((e) => e.recovery.days !== null).length,
@@ -754,236 +612,9 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
     composite[g] = { episodes: eps.length, nee: curve('nee', false), gpp: curve('gpp', false), reco: curve('reco', false), gppSharePct: curve('gpp', true) };
   }
 
-  // ======================= C: fertilisation and weather =======================
-  const sowing = allEvents.filter((e) => e.type === 'sowing');
-  const fertEps = classEps.filter((ep) => ep.classes.includes('fertilisation') && (SITES as readonly string[]).includes(ep.site));
-  const PAIR_VARS = ['gpp', 'reco', 'nee', 'ta', 'light', 'frac'];
-  const EXTRA_VARS = ['rain', 'swc', 'lue'];
-
-  interface Pair {
-    anchor: number;
-    dGpp: number;
-    dReco: number;
-    dNee: number;
-    dTa: number;
-    dLightPct: number;
-    dRain: number | null;
-    dSwc: number | null;
-    relGppPct: number | null;
-  }
-  const buildPairs = (site: SiteCode, halfWidth: number): Pair[] => {
-    const blocked = eventDayMask(allEvents.filter((e) => e.site === site), MASK_BEFORE, MASK_AFTER).get(site) ?? new Set<number>();
-    const anchors = new Set<number>();
-    for (const ep of fertEps.filter((x) => x.site === site)) for (const a of controlAnchors([...years.get(site)!], dayOfYear(ep.start), halfWidth)) anchors.add(a);
-    const pairs = controlPairs(daily.get(site)!, blocked, [...anchors].sort((a, b) => a - b), BEFORE, AFTER, PAIR_VARS, MIN_DAYS, EXTRA_VARS);
-    return pairs
-      .filter((p) => (p.before.frac ?? 0) >= MIN_FRAC && (p.after.frac ?? 0) >= MIN_FRAC && (p.before.light ?? 0) > 0)
-      .map((p) => ({
-        anchor: p.anchor,
-        dGpp: p.delta.gpp!,
-        dReco: p.delta.reco!,
-        dNee: p.delta.nee!,
-        dTa: p.delta.ta!,
-        dLightPct: pct(p.after.light, p.before.light)!,
-        dRain: p.delta.rain === null || p.delta.rain === undefined ? null : p.delta.rain * (AFTER.to - AFTER.from + 1),
-        dSwc: p.delta.swc ?? null,
-        relGppPct: pct(p.after.gpp, p.before.gpp, MIN_GPP_BEFORE - 1e-12),
-      }));
-  };
-  interface SiteFit {
-    pairs: Pair[];
-    fit: OlsMultiFit | null;
-    fitSwc: OlsMultiFit | null;
-    swcPairs: Pair[];
-    sortedResid: number[];
-    sortedGpp: number[];
-    pairs10: Pair[];
-    fit10: OlsMultiFit | null;
-    sortedResid10: number[];
-  }
-  const siteFits = new Map<SiteCode, SiteFit>();
-  const controlsJson: Record<string, unknown> = {};
-  for (const site of SITES) {
-    if (!fertEps.some((e) => e.site === site)) continue;
-    const pairs = buildPairs(site, CONTROL_HALF_WIDTH);
-    const fit = olsMulti(pairs.map((p) => [p.dTa, p.dLightPct]), pairs.map((p) => p.dGpp));
-    const swcPairs = pairs.filter((p) => p.dSwc !== null);
-    const fitSwc = olsMulti(swcPairs.map((p) => [p.dTa, p.dLightPct, p.dSwc!]), swcPairs.map((p) => p.dGpp));
-    const pairs10 = buildPairs(site, CONTROL_HALF_WIDTH_SENS);
-    const fit10 = olsMulti(pairs10.map((p) => [p.dTa, p.dLightPct]), pairs10.map((p) => p.dGpp));
-    siteFits.set(site, {
-      pairs,
-      fit,
-      fitSwc,
-      swcPairs,
-      sortedResid: fit ? [...fit.residuals].sort((a, b) => a - b) : [],
-      sortedGpp: pairs.map((p) => p.dGpp).sort((a, b) => a - b),
-      pairs10,
-      fit10,
-      sortedResid10: fit10 ? [...fit10.residuals].sort((a, b) => a - b) : [],
-    });
-    const yrs = [...new Set(pairs.map((p) => Number(isoDay(p.anchor).slice(0, 4))))].sort();
-    const r = pearson(pairs.map((p) => p.dTa), pairs.map((p) => p.dLightPct));
-    controlsJson[site] = {
-      nPairs: pairs.length,
-      nYears: yrs.length,
-      years: yrs,
-      fewYears: yrs.length < MIN_CONTROL_YEARS,
-      rTaLight: r,
-      collinear: r !== null && Math.abs(r) > COLLINEAR_R,
-      /** ΔGPP = coef[0] + coef[1]·Δta + coef[2]·Δlight%. */
-      fit: fitJson(fit),
-      /** ΔGPP = coef[0] + coef[1]·Δta + coef[2]·Δlight% + coef[3]·Δswc. */
-      fitSwc: fitJson(fitSwc),
-      fitTa: line(pairs.map((p) => p.dTa), pairs.map((p) => p.dGpp)),
-      fitLight: line(pairs.map((p) => p.dLightPct), pairs.map((p) => p.dGpp)),
-      sensitivity10: { nPairs: pairs10.length, fit: fitJson(fit10) },
-      dGpp: summarise(pairs.map((p) => p.dGpp), 6000 + siteSlot.get(site)!),
-      dTa: summarise(pairs.map((p) => p.dTa), 6100 + siteSlot.get(site)!),
-      dLightPct: summarise(pairs.map((p) => p.dLightPct), 6200 + siteSlot.get(site)!),
-      pairs: pairs.map(
-        (p): PairJson => ({ anchor: isoDay(p.anchor), dGpp: p.dGpp, dReco: p.dReco, dNee: p.dNee, dTa: p.dTa, dLightPct: p.dLightPct, dRain: p.dRain, dSwc: p.dSwc, relGppPct: p.relGppPct }),
-      ),
-    };
-  }
-  // Pooled fit of the relative GPP change over all sites (second check).
-  const pooled = [...siteFits.values()].flatMap((f) => f.pairs).filter((p) => p.relGppPct !== null);
-  const pooledFit = olsMulti(pooled.map((p) => [p.dTa, p.dLightPct]), pooled.map((p) => p.relGppPct!));
-
-  const fertResults: FertResult[] = [];
-  for (const ep of fertEps) {
-    const site = ep.site as SiteCode;
-    const byDay = daily.get(site)!;
-    const before = windowMeans(byDay, ep.start, BEFORE, MEAN_VARS);
-    const after = windowMeans(byDay, ep.end, AFTER, MEAN_VARS);
-    const delta = changes(after, before, MEAN_VARS, MIN_DAYS);
-    // Flux rules of dive #1: no other class episode starts in the windows, enough days, measured fraction.
-    const lo = ep.start + BEFORE.from;
-    const hi = ep.end + AFTER.to;
-    const others = classEps.filter((o) => o !== ep && o.site === site && o.start >= lo && o.start <= hi);
-    const fluxDays = FLUXES.every((f) => before.n[f]! >= MIN_DAYS && after.n[f]! >= MIN_DAYS);
-    const fracOk = (before.mean.frac ?? 0) >= MIN_FRAC && (after.mean.frac ?? 0) >= MIN_FRAC;
-    const fluxExclusion: FluxExclusion = others.length ? 'overlap' : !fluxDays ? 'too-few-days' : !fracOk ? 'low-measured-fraction' : null;
-    const fluxUse =
-      fluxExclusion === null
-        ? 'used'
-        : fluxExclusion === 'overlap'
-          ? `excluded: ${others.map((o) => `${o.classes.join(' + ')} ${isoDay(o.start)}`).join(', ')} in the windows`
-          : fluxExclusion === 'too-few-days'
-            ? `excluded: fewer than ${MIN_DAYS} days with flux data in a window (before ${before.n.gpp}, after ${after.n.gpp})`
-            : `excluded: measured fraction of NEE below ${MIN_FRAC * 100} % in a window`;
-    const coSowing = sowing.filter((e) => e.site === site && overlaps(evLo(e), evHi(e), ep.start, ep.end));
-    const withTillage = ep.classes.includes('tillage') || coSowing.length > 0;
-    const withHarvest = ep.classes.includes('harvest-cut');
-    const nIn = finite(ep.events.filter((e) => e.cls === 'fertilisation').map((e) => e.nKgHa));
-    const weather = {
-      ta: delta.ta ?? null,
-      lightPct: before.n.light! >= MIN_DAYS && after.n.light! >= MIN_DAYS ? pct(after.mean.light, before.mean.light) : null,
-      rain: delta.rain === null || delta.rain === undefined ? null : delta.rain * (AFTER.to - AFTER.from + 1),
-      swc: delta.swc ?? null,
-    };
-    const sf = siteFits.get(site)!;
-    const obs = delta.gpp ?? null;
-    const canFit = obs !== null && weather.ta !== null && weather.lightPct !== null;
-    const expectedGpp = canFit && sf.fit ? predictMulti(sf.fit.coef, [weather.ta!, weather.lightPct!]) : null;
-    const residualGpp = expectedGpp === null ? null : obs! - expectedGpp;
-    const expectedSwc = canFit && sf.fitSwc && weather.swc !== null ? predictMulti(sf.fitSwc.coef, [weather.ta!, weather.lightPct!, weather.swc]) : null;
-    const expected10 = canFit && sf.fit10 ? predictMulti(sf.fit10.coef, [weather.ta!, weather.lightPct!]) : null;
-    const relGppPct = obs !== null && (before.mean.gpp ?? 0) >= MIN_GPP_BEFORE ? (100 * obs) / before.mean.gpp! : null;
-    const pooledPred = relGppPct !== null && canFit && pooledFit ? predictMulti(pooledFit.coef, [weather.ta!, weather.lightPct!]) : null;
-    const matches = canFit ? nearestControls(sf.pairs, { ta: weather.ta!, lightPct: weather.lightPct! }, TOL_TA, TOL_LIGHT_PCT) : [];
-    const controlDelta = matches.length >= MIN_MATCHED ? mean(matches.map((p) => p.dGpp)) : null;
-    const lb = before.n.lue! >= MIN_DAYS ? (before.mean.lue ?? null) : null;
-    const la = after.n.lue! >= MIN_DAYS ? (after.mean.lue ?? null) : null;
-    const fluxUsed = fluxExclusion === null;
-    fertResults.push({
-      id: `${site}-${isoDay(ep.start)}`,
-      site,
-      kind: ep.kind,
-      classes: ep.classes,
-      fert: ep.fert,
-      withTillage,
-      withHarvest,
-      inSummary: fluxUsed && !withHarvest && residualGpp !== null,
-      nKgHa: nIn.length ? nIn.reduce((a, b) => a + b, 0) : null,
-      start: isoDay(ep.start),
-      end: isoDay(ep.end),
-      doy: dayOfYear(ep.start),
-      events: ep.events.map((e) => ({ date: e.date, type: e.type, detail: e.detail })),
-      coEvents: coSowing.map((e) => ({ date: e.date, type: e.type, detail: e.detail })),
-      fluxUsed,
-      fluxExclusion,
-      fluxUse,
-      before: windowJson(before),
-      after: windowJson(after),
-      delta: { gpp: obs, reco: delta.reco ?? null, nee: delta.nee ?? null, relGppPct },
-      weather,
-      expectedGpp,
-      residualGpp,
-      residualRank: residualGpp === null || sf.sortedResid.length === 0 ? null : rankAmong(sf.sortedResid, residualGpp),
-      rawRank: obs === null || sf.sortedGpp.length === 0 ? null : rankAmong(sf.sortedGpp, obs),
-      nControls: sf.pairs.length,
-      check: {
-        expectedSwc,
-        residualSwc: expectedSwc === null ? null : obs! - expectedSwc,
-        residual10: expected10 === null ? null : obs! - expected10,
-        residualRank10: expected10 === null || sf.sortedResid10.length === 0 ? null : rankAmong(sf.sortedResid10, obs! - expected10),
-        pooledResidualPct: pooledPred === null ? null : relGppPct! - pooledPred,
-      },
-      matched: { n: matches.length, controlDelta, diff: controlDelta === null || obs === null ? null : obs - controlDelta },
-      lightNorm: { before: lb, after: la, delta: lb === null || la === null ? null : la - lb, pct: pct(la, lb) },
-    });
-  }
-
-  let fertSeed = 7000;
-  function fertSummary(list: readonly FertResult[]) {
-    const s = (fertSeed += 20);
-    const ranks = list.map((e) => e.residualRank).filter((x): x is number => x !== null);
-    const raw = list.map((e) => e.rawRank).filter((x): x is number => x !== null);
-    return {
-      n: list.length,
-      sites: Object.fromEntries(SITES.map((x) => [x, list.filter((e) => e.site === x).length])),
-      observed: summarise(list.map((e) => e.delta.gpp), s),
-      expected: summarise(list.map((e) => e.expectedGpp), s + 1),
-      residual: summarise(list.map((e) => e.residualGpp), s + 2),
-      residualRank: summarise(ranks, s + 3),
-      nResidualAbove90: ranks.filter((r) => r > RANK_HIGH).length,
-      nResidualBelow10: ranks.filter((r) => r < RANK_LOW).length,
-      nRawAbove90: raw.filter((r) => r > RANK_HIGH).length,
-      relGppPct: summarise(list.map((e) => e.delta.relGppPct), s + 4),
-      reco: summarise(list.map((e) => e.delta.reco), s + 5),
-      nee: summarise(list.map((e) => e.delta.nee), s + 6),
-      ta: summarise(list.map((e) => e.weather.ta), s + 7),
-      lightPct: summarise(list.map((e) => e.weather.lightPct), s + 8),
-      rain: summarise(list.map((e) => e.weather.rain), s + 9),
-      swc: summarise(list.map((e) => e.weather.swc), s + 10),
-      nMatched: list.filter((e) => e.matched.diff !== null).length,
-      matchedDiff: summarise(list.map((e) => e.matched.diff), s + 11),
-      lightNormPct: summarise(list.map((e) => e.lightNorm.pct), s + 12),
-      residualSwc: summarise(list.map((e) => e.check.residualSwc), s + 13),
-      residual10: summarise(list.map((e) => e.check.residual10), s + 14),
-      pooledResidualPct: summarise(list.map((e) => e.check.pooledResidualPct), s + 15),
-    };
-  }
-  const fs = fertResults.filter((e) => e.inSummary);
-  const fertilisation = {
-    controls: controlsJson,
-    pooledRelative: { nPairs: pooled.length, fit: fitJson(pooledFit) },
-    summary: {
-      all: fertSummary(fs),
-      fertOnly: fertSummary(fs.filter((e) => !e.withTillage)),
-      withTillage: fertSummary(fs.filter((e) => e.withTillage)),
-      mineral: fertSummary(fs.filter((e) => e.fert === 'mineral')),
-      organic: fertSummary(fs.filter((e) => e.fert === 'organic')),
-    },
-    episodes: fertResults,
-  };
-
   // ---------- Counts ----------
   const fluxExclusions: Record<string, number> = { overlap: 0, 'too-few-days': 0, 'low-measured-fraction': 0 };
   for (const e of harvests) if (e.fluxExclusion) fluxExclusions[e.fluxExclusion]! += 1;
-  const fertExclusions: Record<string, number> = { overlap: 0, 'too-few-days': 0, 'low-measured-fraction': 0 };
-  for (const e of fertResults) if (e.fluxExclusion) fertExclusions[e.fluxExclusion]! += 1;
   const timingUsed = harvests.filter((e) => e.timing.used);
   const counts = {
     events: allEvents.length,
@@ -999,34 +630,21 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
     timingClear: timingUsed.filter((e) => e.timing.gpp.clear).length,
     timingNoDrop: timingUsed.filter((e) => !e.timing.gpp.clear).length,
     timingNeeClear: timingUsed.filter((e) => e.timing.nee.clear).length,
-    fertEpisodes: fertResults.length,
-    fertFluxUsed: fertResults.filter((e) => e.fluxUsed).length,
-    fertWithHarvest: fertResults.filter((e) => e.withHarvest).length,
-    fertInSummary: fs.length,
-    fertExclusions,
-    controlPairs: [...siteFits.values()].reduce((a, f) => a + f.pairs.length, 0),
-    frozenSwcDays: frozenDays,
   };
 
-  const harvestIds = new Set(harvests.map((e) => e.id));
-  const highlightKey = (id: string, source: 'harvest' | 'fertilisation') =>
-    source === 'fertilisation' && harvestIds.has(id) ? `${id}-fert` : id;
   const highlights = Object.fromEntries(
     HIGHLIGHTS.map(({ id, source }) => {
-      const episode = source === 'harvest' ? harvests.find((e) => e.id === id) : fertResults.find((e) => e.id === id);
+      const episode = harvests.find((e) => e.id === id);
       if (!episode) throw new Error(`highlight ${source} episode ${id} not found`);
-      return [highlightKey(id, source), { source, episode }];
+      return [id, { source, episode }];
     }),
   );
 
   const result = {
     question:
-      'How do cuts, silage harvests and grain harvests change NEE, GPP and Reco at five Finnish sites, does the GPP drop start before the recorded harvest day, and is the GPP change after a fertilisation larger than the change that the weather of the same days gives?',
+      'How do cuts, silage harvests and grain harvests change NEE, GPP and Reco at five Finnish sites, and does the GPP drop start before the recorded harvest day?',
     method: {
       sites: [...SITES],
-      lightVar: LIGHT_VAR,
-      lightUnit: LIGHT_UNIT,
-      minLightForLue: MIN_LIGHT_FOR_LUE,
       groups: HARVEST_GROUPS.map((g) => ({ id: g, label: HARVEST_GROUP_LABELS[g] })),
       mergeDays: MERGE_DAYS,
       overrides: OVERRIDES,
@@ -1040,9 +658,6 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       minFracPct: MIN_FRAC * 100,
       minGppBefore: MIN_GPP_BEFORE,
       minMeasuredWindow: MIN_MEASURED_WINDOW,
-      minSwcRows: MIN_SWC_ROWS,
-      minRainRows: MIN_RAIN_ROWS,
-      minLightRows: MIN_LIGHT_ROWS,
       bootstrapResamples: BOOTSTRAP_RESAMPLES,
       ciLevelPct: 95,
       alpha: 0.05,
@@ -1073,30 +688,13 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       minTimingRefDays: MIN_TIMING_REF_DAYS,
       compositeFrom: COMPOSITE.from,
       compositeTo: COMPOSITE.to,
-      controlHalfWidth: CONTROL_HALF_WIDTH,
-      controlHalfWidthSens: CONTROL_HALF_WIDTH_SENS,
-      maskBefore: MASK_BEFORE,
-      maskAfter: MASK_AFTER,
-      tolTa: TOL_TA,
-      tolLightPct: TOL_LIGHT_PCT,
-      minMatched: MIN_MATCHED,
-      collinearR: COLLINEAR_R,
-      minControlYears: MIN_CONTROL_YEARS,
-      rankHigh: RANK_HIGH,
-      rankLow: RANK_LOW,
       halfHoursPerDay: 48,
       utcShiftHours: 2,
       utcShiftHalfHours: 4,
-      haltialaSwc2021Used: true,
       units: {
         daily: 'g C m-2 d-1',
         measured: 'µmol CO2 m-2 s-1',
-        swc: 'm3 m-3',
-        rain: 'mm per 14 days',
-        ta: '°C',
-        lightPct: '%',
         yield: 'kg DW/ha',
-        lue: 'g C mol-1 (PPFD sites) or g C MJ-1 (Qvidja)',
         recoveryShare: '% of the mean GPP before',
         offsets: 'days',
       },
@@ -1108,13 +706,6 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
         'Days to recover: censored when the next harvest, cut or grazing starts before the running mean reaches it, when the data end, or after 60 days.',
         'Timing: used when no grazing, tillage or other harvest episode touches the search span (start − 15 to end + 9) and GPP has enough days for at least one candidate day. Offsets to the first recorded event date (before the overrides). Days with a measured fraction below 10 % are listed, not removed.',
         'Change point on measured day-time NEE: daily mean of measured day-time half hours (at least 8), search on −NEE, at least 3 of 5 days per side, minimum mean before 1 µmol m-2 s-1.',
-        'Fertilisation episodes with a harvest or cut (kind harvestCutFert) are listed, but not in the summaries.',
-        'Control pairs: anchors in all years with data within ±21 days of the day of year of each fertilisation episode of the site (union); a pair is dropped when a day of the windows is within 14 days of any management event of the site, when a flux, ta or light side has fewer than 12 days, when the measured fraction is below 10 %, or when the light before is 0.',
-        'Rain change = (mean after − mean before) × 14 days. Δrain is descriptive only (Haltiala uses the Viikki rain; Qvidja 2022 has gaps).',
-        'Daily light sum = mean of max(light, 0) over the half hours of the local day × 86 400 s / 1e6 (at least 44 half hours).',
-        'Light-normalised GPP = daily GPP / daily light sum, days with a light sum of at least 1 mol m-2 d-1 (PPFD) or 0.5 MJ m-2 d-1 (SW_IN).',
-        'Fertiliser kind: "Synthetic N" (Anttila, Särkisuo) is mineral.',
-        'residualRank and rawRank = percent of the control values (residuals or ΔGPP) of the site below the value of the episode (rankAmong; 0 to 100).',
       ],
     },
     counts,
@@ -1125,15 +716,10 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
           name: siteName.get(s),
           siteId: siteId.get(s),
           slot: siteSlot.get(s),
-          lightVar: LIGHT_VAR[s],
-          lightUnit: LIGHT_UNIT[LIGHT_VAR[s]],
-          rainSource: RAIN_SOURCE[s],
           years: [...years.get(s)!].sort(),
           events: allEvents.filter((e) => e.site === s).length,
           episodes: harvests.filter((e) => e.site === s).length,
           fluxUsed: harvestUsed.filter((e) => e.site === s).length,
-          fertEpisodes: fertResults.filter((e) => e.site === s).length,
-          fertInSummary: fs.filter((e) => e.site === s).length,
         },
       ]),
     ),
@@ -1141,10 +727,8 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
     harvestEpisodes: harvests,
     yield: yieldFits,
     timing,
-    fertilisation,
     composite: { offsets: compOffsets, groups: composite },
     highlights,
-    literature: { heimsch2021: HEIMSCH_2021 },
   };
   assertFinite(result);
   return result;

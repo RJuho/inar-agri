@@ -1,14 +1,14 @@
 ---
 layout: ../../layouts/DeepDive.astro
 index: 4
-title: 'Management disturbances in detail: cut, harvest, timing and weather'
-question: How do cleaning cuts, silage harvests and grain harvests differ in the change and recovery of the CO₂ fluxes, on which day does the flux drop around the recorded harvest date, and does GPP change more after a fertilisation than the weather explains?
-shortAnswer: 'Silage harvests halve GPP; most recover in about two weeks. Cleaning cuts did not lower GPP. Most drops came on or before the recorded date. Fertilisation: no clear change beyond the weather.'
+title: 'Management disturbances in detail: cut, harvest and timing'
+question: How do cleaning cuts, silage harvests and grain harvests differ in the change and recovery of the CO₂ fluxes, and on which day does the flux drop around the recorded harvest date?
+shortAnswer: 'Silage harvests halve GPP; most recover in about two weeks. Cleaning cuts did not lower GPP. Most drops came on or before the recorded date.'
 sites: [anttila, sarkisuo, haltiala, qvidja, viikki]
-variables: [nee_f, gpp, reco, ta, ppfd, sw_in, precip, swc]
+variables: [nee_f, nee, gpp, reco]
 period: { from: 2018, to: 2025 }
 date: '2026-10-23'
-status: draft
+status: checked
 models:
   - model: Claude Fable 5.1
     role: question, plan, final text
@@ -19,18 +19,18 @@ models:
   - model: Claude Haiku 5.5
     role: language (STE) and reference review
 script: scripts/deep-dives/disturbance-detail.ts
-references: [heimsch2021, heimsch2024, shurpali2025, gao2026, vettikkat2026, vira2025, ke2025, qvidja-management, viikki-management, haltiala-management, calculated-doc, anomaly-report]
+references: [heimsch2021, heimsch2024, shurpali2025, gao2026, vettikkat2026, vira2025, ke2025, qvidja-management, viikki-management, haltiala-management, calculated-doc]
 checks:
   - kind: recompute
     by: Claude Sonnet 5.5
     date: '2026-10-23'
     result: pass
-    note: Recomputed without the script and the JSON. Episode groups, flux changes, recovery, change-point timing, the control pairs per site and the fertilisation residuals all agree. Five rules of the script were not in the method text (how a harvest blocks a fertilisation episode, the control-pair day and measured-fraction rules, the window layout, the offset reference, tillage and recovery); the text was made explicit.
+    note: Recomputed without the script and the JSON. Episode groups, flux changes, recovery and change-point timing all agree. Some rules of the script were not in the method text (the window layout, the offset reference, tillage and recovery); the text was made explicit. The fertilisation part moved to Deep Dive #5 on 2026-10-23.
   - kind: review
     by: Claude Haiku 5.5
     date: '2026-10-23'
     result: pass
-    note: Two passes. Pass one found short-answer overclaims, a wrong organic episode count, a mineral claim that contradicted the table, source pages of Shurpali, an uncited seasonal statement, means without spread and long sentences. Pass two found the Table 4 page, one Heimsch page, the Haltiala 2023 description, the cleaning-cut wording and the Särkisuo July 2021 harvest without a day. All fixes were applied by Claude Fable 5.1, who checked the pages in the PDFs and the events file.
+    note: Two passes. Pass one found short-answer overclaims, source pages of Shurpali, an uncited seasonal statement, means without spread and long sentences. Pass two found the Table 4 page, the cleaning-cut wording and the Särkisuo July 2021 harvest without a day. All fixes were applied by Claude Fable 5.1, who checked the pages in the PDFs and the events file. The fertilisation part moved to Deep Dive #5 on 2026-10-23.
 ---
 
 import raw from '../../deep-dives/disturbance-detail.json';
@@ -39,7 +39,7 @@ import Cite from '../../components/deep-dive/Cite.astro';
 import Figure from '../../components/deep-dive/Figure.astro';
 import References from '../../components/deep-dive/References.astro';
 import { baseUrl } from '../../lib/deepDive';
-import { disturbanceDetailData, episodeRows, fertRows, fertWeatherFigure, groupChangeFigure, groupRows, offsetFigure, recoveryFigure, timingFigure, yieldFigure } from '../../lib/deepDives/disturbanceDetail';
+import { disturbanceDetailData, episodeRows, groupChangeFigure, groupRows, offsetFigure, recoveryFigure, timingFigure, yieldFigure } from '../../lib/deepDives/disturbanceDetail';
 
 export const d = disturbanceDetailData(raw);
 export const fig1 = groupChangeFigure(d);
@@ -47,10 +47,8 @@ export const fig2 = recoveryFigure(d);
 export const fig3 = yieldFigure(d);
 export const fig4 = timingFigure(d);
 export const fig5 = offsetFigure(d);
-export const fig6 = fertWeatherFigure(d);
 export const groups = groupRows(d);
 export const episodes = episodeRows(d);
-export const ferts = fertRows(d);
 export const base = baseUrl();
 export const U = 'g C m⁻² d⁻¹';
 export const UM = 'µmol m⁻² s⁻¹';
@@ -59,9 +57,9 @@ export const SITES5 = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki'];
 ## Short answer
 
 This dive is an iteration of <a href={`${base}deep-dive/disturbance-size/`}>Deep Dive #1, *Size of management disturbances*</a>.
-It uses the same windows and rules. It adds Anttila and Särkisuo to the sites. It asks new questions: how do cleaning
-cuts, silage harvests and grain harvests differ? On which day does the flux drop? Is the change after a fertilisation
-larger than the weather explains? A higher NEE means less net uptake of CO₂.
+It uses the same windows and rules. It adds Anttila and Särkisuo to the sites. It asks two new questions: how do cleaning
+cuts, silage harvests and grain harvests differ? On which day does the flux drop? A higher NEE means less net uptake of CO₂.
+The question about fertilisation is now in <a href={`${base}deep-dive/fertilisation-weather/`}>Deep Dive #5, *Fertilisation and GPP: more change than the weather explains?*</a>.
 
 - **Cut or harvest.** After a **silage harvest** (n = <Num k="groups.silageHarvest.nFlux" digits={0} /> used of
   <Num k="groups.silageHarvest.n" digits={0} />), NEE increased by <Num k="groups.silageHarvest.nee.delta.mean" sign unit={U} />
@@ -88,23 +86,12 @@ larger than the weather explains? A higher NEE means less net uptake of CO₂.
   the recorded date in <Num k="timing.all.nBefore" digits={0} /> of the <Num k="timing.all.nClear" digits={0} /> clear episodes. For the silage
   harvests, the measured NEE gives the same day within <Num k="method.agreeDays" digits={0} /> day in <Num k="timing.groups.silageHarvest.nAgree" digits={0} />
   of <Num k="timing.groups.silageHarvest.nBoth" digits={0} /> episodes. The cleaning cuts have no clear drop.
-- **Fertilisation or weather.** After the fertilisation-only episodes (n = <Num k="fertilisation.summary.fertOnly.n" digits={0} />),
-  GPP changed by <Num k="fertilisation.summary.fertOnly.observed.mean" sign unit={U} />. The interval of this change includes zero
-  (<Num k="fertilisation.summary.fertOnly.observed.ciLo" sign /> to <Num k="fertilisation.summary.fertOnly.observed.ciHi" sign />).
-  The change of the weather in control windows of the same season gives an expected value of
-  <Num k="fertilisation.summary.fertOnly.expected.mean" sign unit={U} /> (SD <Num k="fertilisation.summary.fertOnly.expected.sd" />). The difference, <Num k="fertilisation.summary.fertOnly.residual.mean" sign unit={U} />,
-  has an interval that includes zero (<Num k="fertilisation.summary.fertOnly.residual.ciLo" sign /> to <Num k="fertilisation.summary.fertOnly.residual.ciHi" sign />).
-  Controls with the same temperature and light change show no difference (<Num k="fertilisation.summary.fertOnly.matchedDiff.mean" sign unit={U} />,
-  n = <Num k="fertilisation.summary.fertOnly.matchedDiff.n" digits={0} />, SD <Num k="fertilisation.summary.fertOnly.matchedDiff.sd" />).
-  The organic fertilisations of May 2019 and May 2021 at Qvidja have high residuals, and the organic fertilisation of July 2020
-  at Qvidja has a low residual (see Results).
-  The data do not show a general GPP effect of fertilisation beyond the weather.
 
 ## Data and method
 
 **Events.** The events come from `db/events.parquet`: <Num k="counts.events" digits={0} /> events of the five sites, of these
 <Num k="counts.harvestCutEvents" digits={0} /> harvests or cuts. The events of Haltiala, Qvidja and Viikki come from their management
-files <Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} />. The harvest, cut and fertilisation events of
+files <Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} />. The harvest and cut events of
 Anttila and Särkisuo of 2021 and 2022 come from Shurpali et al.: Table 2 and the text, PDF p. 2 and p. 3; the annual yields come from Table 4
 <Cite ids={['shurpali2025']} note="PDF p. 2 and p. 3, Table 2; yields in Table 4, PDF p. 8" />. The events of 2023 and the yields per cut
 of these two sites come from the project file `data/Agri_site_management_events 2018-2025.xlsx`. This file also gives some
@@ -124,11 +111,8 @@ file, and at Qvidja in 2023 a cleaning cut and a silage harvest on the next day 
 <Num k="counts.perGroup.cleaningCut" digits={0} /> cleaning cuts and <Num k="counts.perGroup.grainHarvest" digits={0} /> grain or bean harvests.
 
 **Daily values.** NEE, GPP and Reco are the daily sums of the gap-filled, partitioned fluxes in {U} from
-`data/calculated/daily.parquet` <Cite ids={['calculated-doc']} />. Air temperature, light, rain and soil water come from
-`db/observations.parquet` as the mean or sum per local day. The light is PPFD (daily sum in mol m⁻² d⁻¹), at Qvidja the
-incoming short-wave radiation (MJ m⁻² d⁻¹), because Qvidja has no PPFD. A daily light sum or rain sum needs
-<Num k="method.minLightRows" digits={0} /> of the <Num k="method.halfHoursPerDay" digits={0} /> half hours. Haltiala has no rain
-sensor: we used the rain of Viikki. The Haltiala soil water of 2021 is used in this dive.
+`data/calculated/daily.parquet` <Cite ids={['calculated-doc']} />. The measured day-time NEE comes from
+`data/calculated/fluxes_30min.parquet` (no gap filling).
 
 **Windows and rules.** These are the same as in Deep Dive #1, so that the dives are comparable. The *before* window is the
 <Num k="method.beforeDays" digits={0} /> days before the first day of the episode. The *after* window is the
@@ -172,38 +156,9 @@ to <Num k="method.preNearTo" sign digits={0} /> against days <Num k="method.preF
 <Num k="method.preFarTo" sign digits={0} />, in percent. An episode is not used for the timing when grazing, tillage or another
 harvest episode is near: <Num k="counts.timingUsed" digits={0} /> episodes are used.
 
-**Fertilisation and weather.** The fertilisation episodes are the episodes of Deep Dive #1 with a fertilisation
-(<Num k="counts.fertEpisodes" digits={0} /> episodes), with the same flux rules. Rule 1 for a fertilisation episode is the rule of Deep Dive #1: no other episode of the four classes (harvest or cut, grazing, fertilisation, tillage) of the site *starts* in the before or the after window. An episode that started earlier and continues into a window does not exclude it. For a harvest episode (above), any grazing, tillage, harvest or cut whose days touch a window excludes it. The summaries do not use the
-<Num k="counts.fertWithHarvest" digits={0} /> episodes with a harvest or cut, the episodes that fail a rule and the episodes of
-Anttila and Särkisuo, which have too few control windows: <Num k="counts.fertInSummary" digits={0} /> episodes are in the summaries.
-For each site, a *control pair* is a before and after window pair of the same length at an anchor day. The anchor day can
-be in any year of the site. It is not more than <Num k="method.controlHalfWidth" digits={0} /> days from the day of year of a
-fertilisation episode of the site. No management event of any type may be within <Num k="method.maskBefore" digits={0} /> days of the windows. The before window of a pair is the <Num k="method.beforeDays" digits={0} /> days before the anchor day. The after window is the <Num k="method.afterDays" digits={0} /> days after it. The anchor day is in no window. A pair is used only when:
-
-- each window has at least <Num k="method.minDays" digits={0} /> days with NEE, GPP and Reco;
-- each window has at least <Num k="method.minDays" digits={0} /> days with air temperature and with light;
-- the mean measured fraction of NEE is at least <Num k="method.minFracPct" digits={0} /> %;
-- the light sum before is above zero.
-
-Anttila has <Num k="fertilisation.controls.anttila.nPairs" digits={0} /> pairs and Särkisuo <Num k="fertilisation.controls.sarkisuo.nPairs" digits={0} /> pair
-that pass these rules: their flux data cover only 2022 and 2023, and the events of these years leave few windows without
-management. These two sites have no fit. Each pair gives
-the change of GPP, of the air temperature (Δta), of the light (Δlight, in percent of the light before), of the rain and of the
-soil water. There are <Num k="counts.controlPairs" digits={0} /> control pairs. For each site we fitted
-ΔGPP = a + b × Δta + c × Δlight (least squares) on its control pairs. The *expected* ΔGPP of an episode is this fit at the
-weather of the episode. The *residual* is the observed minus the expected ΔGPP. The *residual rank* is the percent of the
-control residuals of the site below the residual of the episode. The *raw rank* does the same with the observed
-ΔGPP. Model-free checks: (a) *matched controls*, the control pairs of the site with |Δta| within
-<Num k="method.tolTa" digits={0} unit="°C" /> and |Δlight| within <Num k="method.tolLightPct" digits={0} unit="%" /> of the episode
-(at least <Num k="method.minMatched" digits={0} />); (b) the *light-normalised GPP*, daily GPP divided by the daily light sum,
-change in percent. Further checks: the fit with the change of soil water as a third predictor, and anchors within
-<Num k="method.controlHalfWidthSens" digits={0} /> days instead of <Num k="method.controlHalfWidth" digits={0} />. We split the
-episodes into *fertilisation only* and *with tillage or sowing*, and into *mineral* and *organic* products.
-
-**Statistics.** Per group, per site and per split: n, mean, SD and a <Num k="method.ciLevelPct" digits={0} /> % percentile
+**Statistics.** Per group and per site: n, mean, SD and a <Num k="method.ciLevelPct" digits={0} /> % percentile
 bootstrap interval of the mean (<Num k="method.bootstrapResamples" digits={0} /> resamples, fixed seed). An interval needs at
-least three episodes. With fewer than about ten episodes it is not reliable. The control pairs overlap in time and are not
-independent. Thus we give ranks and no p-values for the control fits.
+least three episodes. With fewer than about ten episodes it is not reliable.
 
 ## Results
 
@@ -423,97 +378,6 @@ An offset of one or two days in the dates can thus move the gap-filled values ar
 </table>
 </div>
 
-### Fertilisation or weather
-
-<Figure
-  id="figure-6"
-  title="Figure 6. Change of GPP after fertilisation and in control windows, against the change of air temperature"
-  svg={fig6.svg}
-  alt={fig6.alt}
-  view={{ name: 'Fertilisation and weather', sites: SITES5, variables: ['gpp', 'ta', 'ppfd', 'sw_in'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
->
-  <p>
-    Grey dots: control pairs of the same season without management events. Dashed line: the least-squares fit of
-    ΔGPP against Δta alone over the control pairs of the site. The expected value of an episode in the text and the
-    table comes from the fit with Δta and Δlight, so an episode can lie above or below the line for this reason. Coloured symbols:
-    fertilisation episodes of the summaries. Filled = mineral, hollow = organic, diamond = with tillage or sowing.
-    Anttila and Särkisuo have too few control pairs for a fit and have no panel.
-  </p>
-</Figure>
-
-The control fits explain a part of the weather-related change of GPP: R² = <Num k="fertilisation.controls.haltiala.fit.r2" /> at Haltiala
-(<Num k="fertilisation.controls.haltiala.nPairs" digits={0} /> pairs, <Num k="fertilisation.controls.haltiala.nYears" digits={0} /> years),
-<Num k="fertilisation.controls.qvidja.fit.r2" /> at Qvidja (<Num k="fertilisation.controls.qvidja.nPairs" digits={0} /> pairs,
-<Num k="fertilisation.controls.qvidja.nYears" digits={0} /> years), and <Num k="fertilisation.controls.viikki.fit.r2" /> at Viikki
-(<Num k="fertilisation.controls.viikki.nPairs" digits={0} /> pairs, <Num k="fertilisation.controls.viikki.nYears" digits={0} /> years).
-Anttila and Särkisuo have no fit. The residual SD of the fits is
-<Num k="fertilisation.controls.qvidja.fit.residSd" unit={U} /> (Qvidja) to <Num k="fertilisation.controls.haltiala.fit.residSd" unit={U} /> (Haltiala).
-
-- **Fertilisation only** (n = <Num k="fertilisation.summary.fertOnly.n" digits={0} />: Qvidja <Num k="fertilisation.summary.fertOnly.sites.qvidja" digits={0} />,
-  Haltiala and Viikki <Num k="fertilisation.summary.fertOnly.sites.viikki" digits={0} /> each). Observed ΔGPP
-  <Num k="fertilisation.summary.fertOnly.observed.mean" sign unit={U} /> (SD <Num k="fertilisation.summary.fertOnly.observed.sd" />), expected
-  <Num k="fertilisation.summary.fertOnly.expected.mean" sign unit={U} /> (SD <Num k="fertilisation.summary.fertOnly.expected.sd" />), residual
-  <Num k="fertilisation.summary.fertOnly.residual.mean" sign unit={U} /> (SD <Num k="fertilisation.summary.fertOnly.residual.sd" />,
-  <Num k="fertilisation.summary.fertOnly.residual.ciLo" sign /> to <Num k="fertilisation.summary.fertOnly.residual.ciHi" sign />).
-  <Num k="fertilisation.summary.fertOnly.nResidualAbove90" digits={0} /> of the <Num k="fertilisation.summary.fertOnly.n" digits={0} /> episodes
-  have a residual rank above <Num k="method.rankHigh" digits={0} /> and <Num k="fertilisation.summary.fertOnly.nResidualBelow10" digits={0} />
-  below <Num k="method.rankLow" digits={0} />. The <Num k="fertilisation.summary.fertOnly.nMatched" digits={0} /> episodes with matched
-  controls differ from them by <Num k="fertilisation.summary.fertOnly.matchedDiff.mean" sign unit={U} />
-  (SD <Num k="fertilisation.summary.fertOnly.matchedDiff.sd" />). With the soil water in the fit, the residual is
-  <Num k="fertilisation.summary.fertOnly.residualSwc.mean" sign unit={U} /> (<Num k="fertilisation.summary.fertOnly.residualSwc.ciLo" sign /> to
-  <Num k="fertilisation.summary.fertOnly.residualSwc.ciHi" sign />). With anchors within <Num k="method.controlHalfWidthSens" digits={0} /> days it is
-  <Num k="fertilisation.summary.fertOnly.residual10.mean" sign unit={U} /> (<Num k="fertilisation.summary.fertOnly.residual10.ciLo" sign /> to
-  <Num k="fertilisation.summary.fertOnly.residual10.ciHi" sign />).
-- **Organic fertilisation at Qvidja.** The episodes of May 2019 and May 2021 have residual ranks of
-  <Num k="highlights.qvidja-2019-05-08.episode.residualRank" digits={0} /> and
-  <Num k="highlights.qvidja-2021-05-12.episode.residualRank" digits={0} /> (residuals <Num k="highlights.qvidja-2019-05-08.episode.residualGpp" sign /> and
-  <Num k="highlights.qvidja-2021-05-12.episode.residualGpp" sign unit={U} />). These are the highest residuals of the fertilisation-only
-  episodes. The organic episode of July 2020 at Qvidja (tube compost and the own NPK mix on the same day) has a rank of
-  <Num k="highlights.qvidja-2020-07-27.episode.residualRank" digits={0} /> (residual <Num k="highlights.qvidja-2020-07-27.episode.residualGpp" sign unit={U} />).
-  The project file gives the own NPK mix of 2020 on 27 July; the Qvidja management file gave 25 May. Thus there is no
-  episode in May 2020. Over all organic episodes the residual is
-  <Num k="fertilisation.summary.organic.residual.mean" sign unit={U} /> (n = <Num k="fertilisation.summary.organic.n" digits={0} />,
-  <Num k="fertilisation.summary.organic.residual.ciLo" sign /> to <Num k="fertilisation.summary.organic.residual.ciHi" sign />), and over all mineral
-  episodes <Num k="fertilisation.summary.mineral.residual.mean" sign unit={U} /> (n = <Num k="fertilisation.summary.mineral.n" digits={0} />,
-  <Num k="fertilisation.summary.mineral.residual.ciLo" sign /> to <Num k="fertilisation.summary.mineral.residual.ciHi" sign />).
-- **Anttila, May 2022** (mineral, <Num k="highlights.anttila-2022-05-23.episode.nKgHa" digits={0} unit="kg N/ha" />): ΔGPP
-  <Num k="highlights.anttila-2022-05-23.episode.delta.gpp" sign unit={U} />. Anttila has no control pairs (see above). Thus this
-  episode has no expected value and no rank, and it is not in the summaries.
-- **Viikki, May 2022** (mineral, <Num k="highlights.viikki-2022-05-10.episode.nKgHa" digits={0} unit="kg N/ha" />; Gao et al. give the same date and
-  quantity <Cite ids={['gao2026']} note="PDF p. 3" />): residual <Num k="highlights.viikki-2022-05-10.episode.residualGpp" sign unit={U} />, rank
-  <Num k="highlights.viikki-2022-05-10.episode.residualRank" digits={0} />.
-- **With tillage or sowing** (n = <Num k="fertilisation.summary.withTillage.n" digits={0} />, Haltiala and Viikki): residual
-  <Num k="fertilisation.summary.withTillage.residual.mean" sign unit={U} /> (<Num k="fertilisation.summary.withTillage.residual.ciLo" sign /> to
-  <Num k="fertilisation.summary.withTillage.residual.ciHi" sign />). These episodes start on bare or newly tilled soil. The control
-  windows of the same season can have a growing crop. Thus the weather fit does not suit them, and these residuals do not
-  show an effect of the fertiliser. The Haltiala episode of August 2023 (manure on 1 August 2023, disc harrowing from 4 August to stop the grass and cover the manure, then harrowing on 15 August <Cite ids={['haltiala-management']} />) has a residual of <Num k="highlights.haltiala-2023-08-01.episode.residualGpp" sign unit={U} />.
-
-Heimsch et al. compared <Num k="literature.heimsch2021.windowDays" digits={0} />-day means at Qvidja. They report that the
-organic fertilisations increased NEE <Cite ids={['heimsch2021']} note="PDF p. 7" />. They also report that the air was warmer
-after the fertilisations of July 2018 and May 2019, and that PAR was <Num k="literature.heimsch2021.parLowerPctFrom" digits={0} /> to
-<Num k="literature.heimsch2021.parLowerPctTo" digits={0} /> % lower, which complicates the interpretation
-<Cite ids={['heimsch2021']} note="PDF p. 7" />. Rain followed each fertilisation within
-<Num k="literature.heimsch2021.rainWithinDays" digits={0} /> days <Cite ids={['heimsch2021']} note="PDF p. 7" />. They found that
-respiration increased after the organic fertilisation and that the mineral fertilisation had no immediate effect
-<Cite ids={['heimsch2021']} note="PDF p. 11" />. Our control fits try to remove the weather part of the change. The organic May
-episodes at Qvidja remain above most controls. On average, the mineral episodes do not (residual
-<Num k="fertilisation.summary.mineral.residual.mean" sign unit={U} />, n = <Num k="fertilisation.summary.mineral.n" digits={0} />).
-The mineral episode of Viikki in May 2022 has rank <Num k="highlights.viikki-2022-05-10.episode.residualRank" digits={0} />.
-<Num k="fertilisation.summary.organic.sites.qvidja" digits={0} /> of the <Num k="fertilisation.summary.organic.n" digits={0} /> organic
-episodes are at Qvidja. This is an observation and not a general result.
-
-<div class="table-wrap">
-<table>
-<caption>All fertilisation episodes. Weather changes: after − before (Δta in °C, Δlight in % of the light before, Δrain in mm per {d.method.afterDays} days, * = Viikki rain used for Haltiala, Δswc in m³ m⁻³). ΔGPP observed, expected (site fit) and residual in g C m⁻² d⁻¹. Ranks: percent of the control values of the site below the episode. Matched = number of matched controls and the difference to their mean ΔGPP (needs {d.method.minMatched}). Light-norm. = change of GPP per unit of light, in %.</caption>
-<thead>
-<tr><th scope="col">Site</th><th scope="col">Dates</th><th scope="col">Kind</th><th scope="col">Product</th><th scope="col">With</th><th scope="col" class="num">N (kg/ha)</th><th scope="col" class="num">Δta</th><th scope="col" class="num">Δlight</th><th scope="col" class="num">Δrain</th><th scope="col" class="num">Δswc</th><th scope="col" class="num">ΔGPP observed</th><th scope="col" class="num">Expected</th><th scope="col" class="num">Residual</th><th scope="col" class="num">Residual rank</th><th scope="col" class="num">Raw rank</th><th scope="col" class="num">Matched</th><th scope="col" class="num">Light-norm.</th><th scope="col">Flux use</th><th scope="col">In summary</th></tr>
-</thead>
-<tbody>
-{ferts.map((r) => (<tr id={`fert-${r.id}`}><td>{r.site}</td><td>{r.dates}</td><td>{r.kind}</td><td>{r.product}</td><td>{r.with}</td><td class="num">{r.n}</td><td class="num">{r.dTa}</td><td class="num">{r.dLight}</td><td class="num">{r.dRain}</td><td class="num">{r.dSwc}</td><td class="num">{r.observed}</td><td class="num">{r.expected}</td><td class="num">{r.residual}</td><td class="num">{r.residualRank}</td><td class="num">{r.rawRank}</td><td class="num">{r.matched}</td><td class="num">{r.lightNorm}</td><td class="wrap">{r.fluxUse}</td><td>{r.inSummary}</td></tr>))}
-</tbody>
-</table>
-</div>
-
 ## Limits and uncertainty
 
 - **Small n.** There are <Num k="groups.cleaningCut.nFlux" digits={0} /> used cleaning cuts (all at Qvidja) and
@@ -527,19 +391,6 @@ episodes are at Qvidja. This is an observation and not a general result.
   smoother or earlier than the real drop. The measured-NEE offset is the check, but it is available for few episodes at Viikki and for none at Haltiala.
 - **Negative daily GPP.** GPP is Reco − NEE and is not limited to positive values <Cite ids={['calculated-doc']} />. Days with a
   negative GPP occur after the grain harvests (Figure 4) and make the percent values of low-GPP episodes unstable.
-- **Weather fit.** The fit does not suit sowing on bare soil. The residuals of the episodes with tillage or sowing do not show a
-  fertiliser effect. Δta and Δlight are correlated in spring: r = <Num k="fertilisation.controls.haltiala.rTaLight" /> at Haltiala,
-  <Num k="fertilisation.controls.qvidja.rTaLight" /> at Qvidja and
-  <Num k="fertilisation.controls.viikki.rTaLight" /> at Viikki. Above <Num k="method.collinearR" digits={1} /> the single coefficients
-  are not reliable. At Haltiala, the fit with Δta only has r = <Num k="fertilisation.controls.haltiala.fitTa.r" /> and the fit with
-  Δlight only r = <Num k="fertilisation.controls.haltiala.fitLight.r" />.
-- **Control pairs.** The anchors step by one day, so the pairs overlap and are not independent. We give ranks and no p-values.
-  Anttila has <Num k="fertilisation.controls.anttila.nPairs" digits={0} /> and Särkisuo <Num k="fertilisation.controls.sarkisuo.nPairs" digits={0} />
-  control pairs: their fertilisation episodes are not in the summaries.
-- **Rain and soil water.** Haltiala has no rain sensor; we used the Viikki rain as a proxy. The Qvidja rain of 2022 has gaps
-  (<a href={`${base}data-report/#finding-QVI-08`}>finding QVI-08</a>). Δrain is thus descriptive only. The Haltiala `swc` has a coarse
-  resolution with flat periods (<a href={`${base}data-report/#finding-HAL-01`}>finding HAL-01</a>). Finding HAL-03 is resolved and the
-  Haltiala soil water of 2021 is used (<a href={`${base}data-report/#finding-HAL-03`}>finding HAL-03</a>) <Cite ids={['anomaly-report']} />.
 - **Time stamps.** The raw time stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as local time. These
   values are <Num k="method.utcShiftHours" digits={0} /> hours early (<a href={`${base}data-report/#finding-ANT-01`}>ANT-01</a>,
   <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a>, <a href={`${base}data-report/#finding-VII-01`}>VII-01</a>). On a daily scale
@@ -556,7 +407,7 @@ episodes are at Qvidja. This is an observation and not a general result.
   2023 and the yields per cut come from the project file. For the second cut of 2022 at Anttila, the project file gives
   8 August and the article 8 September; we used the project file.
 - **Unrecorded events.** Anttila and Särkisuo have no own management file. Their events come from one article (2021 and 2022)
-  and from the project file (2022 and 2023). Only events with an exact day are rows. The Särkisuo whole-crop harvest of July 2021 has no day in the article and is not an event <Cite ids={['shurpali2025']} note="PDF p. 2" />. Särkisuo has no flux data in 2021. Events not in the two sources can be in the control windows of all sites.
+  and from the project file (2022 and 2023). Only events with an exact day are rows. The Särkisuo whole-crop harvest of July 2021 has no day in the article and is not an event <Cite ids={['shurpali2025']} note="PDF p. 2" />. Särkisuo has no flux data in 2021. Events not in the two sources can be in the windows of all sites.
 - **Search window.** The Haltiala 2022 drop is at the edge of the search span. The decrease of GPP over the weeks before is
   consistent with the senescence of the oats, not with the harvest day.
 - **Association.** The changes are *associated with* the events. The weather, the season and the crop stage also change in
@@ -570,9 +421,9 @@ episodes are at Qvidja. This is an observation and not a general result.
 
 The numbers on this page come from `site/src/deep-dives/disturbance-detail.json`. The script
 [`scripts/deep-dives/disturbance-detail.ts`](https://github.com/RJuho/inar-agri/blob/main/scripts/deep-dives/disturbance-detail.ts)
-writes this file. It reads only `db/events.parquet`, `db/sites.parquet`, `db/observations.parquet`,
+writes this file. It reads only `db/events.parquet`, `db/sites.parquet`,
 `data/calculated/daily.parquet` and `data/calculated/fluxes_30min.parquet`. The pure helpers are in
-`scripts/lib/deep-dive/harvest-groups.ts`, `change-point.ts`, `control-windows.ts`, `disturbance.ts` and `stats.ts`
+`scripts/lib/deep-dive/harvest-groups.ts`, `change-point.ts`, `disturbance.ts` and `stats.ts`
 (unit tests `*.test.ts`).
 
 ```sh
