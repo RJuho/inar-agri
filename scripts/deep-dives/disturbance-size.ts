@@ -19,6 +19,8 @@
 //    Change = mean after − mean before. Seasonal baseline: the same change in the other years of
 //    the site without an episode in the shifted period; adjusted change = change − baseline.
 //    Excess = sum over the 28 days after the episode of (daily flux − mean before), in g C m-2.
+//    Relative change in percent for after windows of 7, 14 and 21 days: GPP and Reco as percent of
+//    their own mean before, NEE as percent of the mean GPP of the 30 days before the first day.
 // 4. Rules: no other episode starts in the windows; enough days with a value; for the fluxes a
 //    minimum measured fraction of NEE. The soil water result has its own day rule and a rain check.
 // 5. Per kind (and per kind and site): n, mean, SD, bootstrap 95 % CI.
@@ -87,6 +89,16 @@ const RAIN_BALANCE_MM = 20;
 const MIN_BASELINE_YEARS = 2;
 /** Minimum GPP before the episode for a relative change of GPP (g C m-2 d-1). */
 const MIN_GPP_BEFORE = 0.5;
+/** After windows of the relative change (days 1 to n after the last day of the episode). */
+const RELATIVE_AFTER_DAYS = [7, 14, 21] as const;
+/** Reference of the relative change of NEE: mean GPP of the 30 days before the first day of the episode. */
+const GPP_REF: Window = { from: -30, to: -1 };
+const MIN_GPP_REF_DAYS = 24;
+/** Minimum reference flux of a relative change (g C m-2 d-1). */
+const MIN_REF_FLUX = MIN_GPP_BEFORE;
+/** Minimum days with a value in an after window of `n` days: the same share as MIN_DAYS of the 14-day window. */
+const minRelativeDays = (n: number): number => Math.ceil((n * MIN_DAYS) / (AFTER.to - AFTER.from + 1));
+const relativeKey = (n: number): string => `d${n}`;
 /** Minimum measured half hours in each window for the check without gap filling (day-time). */
 const MIN_MEASURED_DAY = 20;
 const BOOTSTRAP_RESAMPLES = 10_000;
@@ -151,6 +163,14 @@ interface EpisodeResult {
   delta7: Record<string, number | null>;
   /** Relative change of GPP (fraction of the mean before). */
   relGpp: number | null;
+  /** Mean GPP of the GPP_REF window before the first day (reference of the relative change of NEE). */
+  gppRef: { mean: number | null; nDays: number };
+  /**
+   * Relative change in percent per after window (key d7, d14, d21): GPP and Reco as percent of their
+   * own mean before, NEE as percent of `gppRef`. Null when a rule fails (reference too small or with too
+   * few days, too few days in the after window, or another episode starts in the after window).
+   */
+  relative: Record<string, Record<Flux, number | null>>;
   /** Seasonal baseline (other years of the site without an episode) and the adjusted change. */
   baseline: { years: number[]; n: Record<string, number>; mean: Record<string, number | null> };
   deltaAdj: Record<string, number | null>;
@@ -198,6 +218,12 @@ function groupSummary(eps: readonly EpisodeResult[], seed: number) {
     gpp: fluxVar('gpp', seed + 10),
     reco: fluxVar('reco', seed + 20),
     relGppPct: summarise(flux.map((e) => (e.relGpp === null ? null : e.relGpp * 100)), seed + 30),
+    relative: Object.fromEntries(
+      RELATIVE_AFTER_DAYS.map((n, i) => [
+        relativeKey(n),
+        Object.fromEntries(FLUXES.map((f, j) => [f, pick(flux, (e) => e.relative[relativeKey(n)]?.[f], seed + 50 + 3 * i + j)])) as Record<Flux, Summary>,
+      ]),
+    ),
     ta: pick(flux, (e) => e.delta.ta, seed + 31),
     tsoil: pick(flux, (e) => e.delta.tsoil, seed + 32),
     measuredDay: pick(flux, (e) => e.measuredDay.delta, seed + 33),
@@ -356,6 +382,29 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
     const gppBefore = before.mean.gpp ?? null;
     const gppDelta = delta.gpp ?? null;
     const relGpp = gppDelta !== null && gppBefore !== null && gppBefore >= MIN_GPP_BEFORE ? gppDelta / gppBefore : null;
+    // Relative change per after window. GPP and Reco: percent of the own mean before. NEE: percent of
+    // the mean GPP of the 30 days before the first day (the NEE before can be near zero or negative).
+    const gppRefMeans = windowMeans(byDay, ep.start, GPP_REF, ['gpp']);
+    const gppRef = { mean: gppRefMeans.mean.gpp ?? null, nDays: gppRefMeans.n.gpp! };
+    const relative: Record<string, Record<Flux, number | null>> = {};
+    for (const n of RELATIVE_AFTER_DAYS) {
+      const w: Window = { from: 1, to: n };
+      const free = startsFree(ep, episodes, w);
+      const aft = windowMeans(byDay, ep.end, w, FLUXES);
+      const minN = minRelativeDays(n);
+      const rel = (f: Flux, ref: number | null, refOk: boolean): number | null => {
+        const a = aft.mean[f] ?? null;
+        const b = before.mean[f] ?? null;
+        if (!free || a === null || b === null || ref === null || !refOk || ref < MIN_REF_FLUX) return null;
+        if (aft.n[f]! < minN || before.n[f]! < MIN_DAYS) return null;
+        return ((a - b) / ref) * 100;
+      };
+      relative[relativeKey(n)] = {
+        nee: rel('nee', gppRef.mean, gppRef.nDays >= MIN_GPP_REF_DAYS),
+        gpp: rel('gpp', before.mean.gpp ?? null, true),
+        reco: rel('reco', before.mean.reco ?? null, true),
+      };
+    }
     const base = seasonalBaseline(byDay, episodes, ep, [...years.get(site)!].sort(), BASELINE_VARS, BEFORE, AFTER, MIN_DAYS, MIN_BASELINE_YEARS);
     const deltaAdj: Record<string, number | null> = {};
     for (const v of BASELINE_VARS) deltaAdj[v] = delta[v] === null || base.mean[v] === null ? null : delta[v]! - base.mean[v]!;
@@ -407,6 +456,8 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       deltaLate,
       delta7,
       relGpp,
+      gppRef,
+      relative,
       baseline: base,
       deltaAdj,
       excess,
@@ -530,6 +581,10 @@ export async function run(conn: DuckDBConnection): Promise<Record<string, unknow
       rainBalanceMm: RAIN_BALANCE_MM,
       minBaselineYears: MIN_BASELINE_YEARS,
       minGppBefore: MIN_GPP_BEFORE,
+      relativeAfterDays: [...RELATIVE_AFTER_DAYS],
+      gppRefDays: GPP_REF.to - GPP_REF.from + 1,
+      minGppRefDays: MIN_GPP_REF_DAYS,
+      minRefFlux: MIN_REF_FLUX,
       minMeasuredDay: MIN_MEASURED_DAY,
       bootstrapResamples: BOOTSTRAP_RESAMPLES,
       ciLevelPct: 95,

@@ -9,6 +9,9 @@ const N = v.nullable(v.number());
 const Curve = v.object({ mean: v.array(N), sd: v.array(N), n: v.array(v.number()) });
 const Summary = v.object({ n: v.number(), mean: N, sd: N, min: N, max: N, ciLo: N, ciHi: N, nPositive: v.number() });
 const FluxVar = v.object({ delta: Summary, deltaAdj: Summary, excess: Summary, before: N, after: N });
+/** Relative change (percent) per after window (key d7, d14, d21), per episode and as the kind summary. */
+const RelativeValues = v.record(v.string(), v.object({ nee: N, gpp: N, reco: N }));
+const RelativeSummaries = v.record(v.string(), v.object({ nee: Summary, gpp: Summary, reco: Summary }));
 const SITE = v.picklist(['haltiala', 'qvidja', 'viikki']);
 const KIND = v.picklist(['harvestCut', 'harvestCutFert', 'grazing', 'fertilisation', 'tillage', 'tillageFert', 'other']);
 const Means = v.record(v.string(), N);
@@ -24,6 +27,7 @@ const KindSummary = v.object({
   gpp: FluxVar,
   reco: FluxVar,
   relGppPct: Summary,
+  relative: RelativeSummaries,
   swc: v.object({
     delta: Summary,
     deltaAdj: Summary,
@@ -34,7 +38,17 @@ const KindSummary = v.object({
 });
 
 const DataSchema = v.object({
-  method: v.object({ beforeDays: v.number(), afterDays: v.number(), excessDays: v.number(), compositeFrom: v.number(), compositeTo: v.number(), ciLevelPct: v.number(), rainBalanceMm: v.number() }),
+  method: v.object({
+    beforeDays: v.number(),
+    afterDays: v.number(),
+    excessDays: v.number(),
+    compositeFrom: v.number(),
+    compositeTo: v.number(),
+    ciLevelPct: v.number(),
+    rainBalanceMm: v.number(),
+    relativeAfterDays: v.array(v.number()),
+    gppRefDays: v.number(),
+  }),
   sites: bySite(v.object({ name: v.string(), slot: v.number() })),
   kinds: v.record(v.string(), KindSummary),
   composite: v.object({
@@ -58,6 +72,7 @@ const DataSchema = v.object({
       delta: Means,
       deltaAdj: Means,
       excess: v.object({ nee: N, gpp: N, reco: N }),
+      relative: RelativeValues,
       rainDiff: N,
       rainBalanced: v.boolean(),
       rainSource: v.string(),
@@ -71,6 +86,8 @@ const DataSchema = v.object({
   ),
 });
 export type DisturbanceData = v.InferOutput<typeof DataSchema>;
+type Episode = DisturbanceData['episodes'][number];
+type SummaryOut = v.InferOutput<typeof Summary>;
 type Kind = v.InferOutput<typeof KIND>;
 type Flux = 'nee' | 'gpp' | 'reco';
 
@@ -114,6 +131,8 @@ const f3s = (x: number | null) => (x === null ? '–' : fmtNum(x, 3, { sign: tru
 export interface FigureOut {
   svg: string;
   alt: string;
+  /** Points drawn at the edge of a panel because they lie outside the fixed y range, per panel (Figure 3 only). */
+  clipped?: number[];
 }
 
 const axisLabel = { fontSize: 11, color: INK, fontFamily: FONT };
@@ -215,51 +234,184 @@ export function compositeFigure(d: DisturbanceData): FigureOut {
   return { svg: renderSvg(option as never, width, height, alt), alt };
 }
 
-// ---------- Figure 2: change per episode and kind ----------
+// ---------- Figures 2 and 3: change per episode and kind ----------
 
-/** Change (after − before) of NEE, GPP and Reco per used episode, grouped by kind, with the kind mean and its bootstrap CI. */
-export function changeFigure(d: DisturbanceData): FigureOut {
+/** One row of three panels (NEE, GPP, Reco) of a dot figure: the value per episode and the summary per kind. */
+interface DotRow {
+  /** Title above the row, left-aligned; empty = no title. */
+  title: string;
+  value: (e: Episode, f: Flux) => number | null | undefined;
+  summary: (k: Kind, f: Flux) => SummaryOut;
+}
+
+interface DotLayout {
+  /** Height of one panel. */
+  panelH: number;
+  /** Gap between the rows (room for the row title). */
+  rowGap: number;
+  /** Top margin above the first row (legend and panel titles). */
+  top: number;
+  /** Name of the y axis of the left panels. */
+  yName: string;
+  /** About this many y ticks (`niceRange`); default 6. */
+  yTicks?: number;
+  /** Fixed y range. A value outside it is drawn at the edge with an arrow and a label (`clipLabel`). */
+  yRange?: { min: number; max: number; interval: number };
+  /** Label text of a clipped value; default `fmtNum(x, 1)`. */
+  clipLabel?: (x: number) => string;
+}
+
+/** Fixed y range of Figure 3 (percent). A few episodes lie far outside; they are drawn at the edge with an arrow. */
+export const RELATIVE_Y_CAP = { min: -150, max: 350, interval: 50 } as const;
+/** Height of one label row of the clipped values (px); a second label that would touch goes one row further. */
+const CLIP_LABEL_ROW = 12;
+const CLIP_LABEL_FONT = 10;
+
+interface ClipPoint {
+  x: number;
+  value: number;
+  side: 'min' | 'max';
+  color: string;
+}
+
+/** Arrow at the edge of the panel for a value outside the y range (points up at the top, down at the bottom). */
+function clipArrow(base: Record<string, unknown>, c: ClipPoint, y: { min: number; max: number }, label?: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...base,
+    type: 'scatter',
+    symbol: 'arrow',
+    symbolSize: 10,
+    symbolRotate: c.side === 'min' ? 180 : 0,
+    data: [[c.x, c.side === 'max' ? y.max : y.min]],
+    itemStyle: { color: c.color },
+    label: label ?? { show: false },
+    z: 6,
+  };
+}
+
+/**
+ * Label rows of the clipped points of one panel: points of the same side are sorted by x; when a label
+ * would touch the label before it, it goes one row further (0, 1, 0, ...). `unitPx` = pixels per x unit.
+ */
+function clipLabelRows(clips: readonly ClipPoint[], unitPx: number, text: (x: number) => string): number[] {
+  const rows = clips.map(() => 0);
+  for (const side of ['min', 'max'] as const) {
+    const idx = clips.map((c, i) => i).filter((i) => clips[i]!.side === side).sort((a, b) => clips[a]!.x - clips[b]!.x);
+    let prevEnd = -Infinity;
+    let prevRow = 0;
+    for (const i of idx) {
+      const c = clips[i]!;
+      const halfWidth = (text(c.value).length * CLIP_LABEL_FONT * 0.6) / 2 / unitPx;
+      const start = c.x - halfWidth;
+      rows[i] = start < prevEnd ? (prevRow + 1) % 2 : 0;
+      prevRow = rows[i]!;
+      prevEnd = c.x + halfWidth;
+    }
+  }
+  return rows;
+}
+
+const EMPTY_SUMMARY: SummaryOut = { n: 0, mean: null, sd: null, min: null, max: null, ciLo: null, ciHi: null, nPositive: 0 };
+const rowTitle = (text: string, left: number, top: number) => ({ text, left, top, textAlign: 'left', textStyle: { fontSize: 12, fontWeight: 600, color: INK, fontFamily: FONT } });
+/** "n = 15", or "n = 1 to 3" when the counts differ. */
+const nText = (ns: readonly number[]): string => {
+  const lo = Math.min(...ns);
+  const hi = Math.max(...ns);
+  return lo === hi ? `n = ${lo}` : `n = ${lo} to ${hi}`;
+};
+/** "7, 14 and 21". */
+const listText = (xs: readonly (string | number)[]): string => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
+
+/**
+ * Dot panels of the used episodes grouped by kind: one row of three panels (NEE, GPP, Reco) per entry
+ * of `rows`, one shared y range over all rows, points by site (jitter by the position of the episode in
+ * its kind), a diamond with the bootstrap interval per kind, a zero line, x labels on the bottom row.
+ * Figure 2 (one row, absolute change) and Figure 3 (three rows, relative change) use it.
+ */
+function dotPanels(d: DisturbanceData, rows: readonly DotRow[], layout: DotLayout): { option: Record<string, unknown>; width: number; height: number; kinds: Kind[]; clipped: number[] } {
   const kinds = panelKinds(d, 'fluxEpisodes', 1);
   const width = 1100;
-  const height = 428;
-  const margin = { left: 58, right: 16, top: 70, bottom: 78 };
-  const grids = panelGrid(FLUXES.length, FLUXES.length, width, margin, { x: 28, y: 0 }, height - margin.top - margin.bottom);
+  const cols = FLUXES.length;
+  const count = rows.length * cols;
+  const margin = { left: 58, right: 16, top: layout.top, bottom: 78 };
+  const grids = panelGrid(count, cols, width, margin, { x: 28, y: layout.rowGap }, layout.panelH);
+  const height = gridHeight(count, cols, margin, layout.rowGap, layout.panelH);
   const used = d.episodes.filter((e) => e.fluxUsed && kinds.includes(e.kind));
   const vals: number[] = [];
-  for (const e of used) for (const f of FLUXES) if (e.delta[f] !== null && e.delta[f] !== undefined) vals.push(e.delta[f]!);
-  for (const k of kinds) for (const f of FLUXES) {
-    const sm = d.kinds[k]![f].delta;
-    if (sm.ciLo !== null) vals.push(sm.ciLo);
-    if (sm.ciHi !== null) vals.push(sm.ciHi);
-  }
-  const y = niceRange(vals);
-  const series: Record<string, unknown>[] = [];
-  FLUXES.forEach((f, gi) => {
-    const base = { xAxisIndex: gi, yAxisIndex: gi, silent: true, emphasis: { disabled: true } };
-    for (const s of SITES) {
-      const slot = d.sites[s].slot;
-      const pts: unknown[] = [];
-      kinds.forEach((k, ki) => {
-        const eps = used.filter((e) => e.kind === k && e.site === s);
-        const all = used.filter((e) => e.kind === k);
-        eps.forEach((e) => {
-          const idx = all.indexOf(e);
-          const spread = all.length > 1 ? -0.22 + (0.44 * idx) / (all.length - 1) : 0;
-          if (e.delta[f] !== null && e.delta[f] !== undefined) pts.push([ki + spread, e.delta[f]]);
-        });
-      });
-      series.push({ ...base, type: 'scatter', name: SITE_NAMES[s], symbol: siteSymbol(slot), symbolSize: 8, data: pts, itemStyle: { color: siteColor(slot), opacity: 0.85 } });
+  for (const row of rows) {
+    for (const e of used) for (const f of FLUXES) {
+      const x = row.value(e, f);
+      if (x !== null && x !== undefined) vals.push(x);
     }
-    kinds.forEach((k, ki) => {
-      const sm = d.kinds[k]![f].delta;
-      if (sm.ciLo !== null && sm.ciHi !== null) series.push({ ...base, type: 'line', symbol: 'none', data: [[ki + 0.34, sm.ciLo], [ki + 0.34, sm.ciHi]], lineStyle: { color: INK, width: 2 } });
-      if (sm.mean !== null) series.push({ ...base, type: 'scatter', symbol: 'diamond', symbolSize: 12, data: [[ki + 0.34, sm.mean]], itemStyle: { color: INK }, z: 5 });
+    for (const k of kinds) for (const f of FLUXES) {
+      const sm = row.summary(k, f);
+      if (sm.ciLo !== null) vals.push(sm.ciLo);
+      if (sm.ciHi !== null) vals.push(sm.ciHi);
+    }
+  }
+  const y = layout.yRange ?? niceRange(vals, layout.yTicks ?? 6);
+  const clipText = layout.clipLabel ?? ((x: number) => fmtNum(x, 1));
+  const clipped: number[] = grids.map(() => 0);
+  const series: Record<string, unknown>[] = [];
+  rows.forEach((row, ri) => {
+    FLUXES.forEach((f, fi) => {
+      const gi = ri * cols + fi;
+      const base = { xAxisIndex: gi, yAxisIndex: gi, silent: true, emphasis: { disabled: true } };
+      const clips: ClipPoint[] = [];
+      for (const s of SITES) {
+        const slot = d.sites[s].slot;
+        const pts: unknown[] = [];
+        kinds.forEach((k, ki) => {
+          const eps = used.filter((e) => e.kind === k && e.site === s);
+          const all = used.filter((e) => e.kind === k);
+          eps.forEach((e) => {
+            const idx = all.indexOf(e);
+            const spread = all.length > 1 ? -0.22 + (0.44 * idx) / (all.length - 1) : 0;
+            const x = row.value(e, f);
+            if (x === null || x === undefined) return;
+            if (x < y.min || x > y.max) clips.push({ x: ki + spread, value: x, side: x < y.min ? 'min' : 'max', color: siteColor(slot) });
+            else pts.push([ki + spread, x]);
+          });
+        });
+        series.push({ ...base, type: 'scatter', name: SITE_NAMES[s], symbol: siteSymbol(slot), symbolSize: 8, data: pts, itemStyle: { color: siteColor(slot), opacity: 0.85 } });
+      }
+      // Clipped episode values: an arrow at the edge in the site colour and the value as a label inside the panel.
+      const labelRows = clipLabelRows(clips, grids[gi]!.width / kinds.length, clipText);
+      clips.forEach((c, i) => {
+        const label = {
+          show: true,
+          position: c.side === 'max' ? 'bottom' : 'top',
+          offset: [0, (c.side === 'max' ? 1 : -1) * CLIP_LABEL_ROW * labelRows[i]!],
+          fontSize: CLIP_LABEL_FONT,
+          color: INK,
+          fontFamily: FONT,
+          formatter: () => clipText(c.value),
+        };
+        series.push(clipArrow(base, c, y, label));
+      });
+      clipped[gi] = clips.length;
+      kinds.forEach((k, ki) => {
+        const sm = row.summary(k, f);
+        const xk = ki + 0.34;
+        if (sm.ciLo !== null && sm.ciHi !== null) {
+          // The interval line ends at the edge of the panel; an arrow without a label marks a bound outside the range.
+          series.push({ ...base, type: 'line', symbol: 'none', data: [[xk, Math.max(sm.ciLo, y.min)], [xk, Math.min(sm.ciHi, y.max)]], lineStyle: { color: INK, width: 2 } });
+          if (sm.ciHi > y.max) series.push(clipArrow(base, { x: xk, value: sm.ciHi, side: 'max', color: INK }, y));
+          if (sm.ciLo < y.min) series.push(clipArrow(base, { x: xk, value: sm.ciLo, side: 'min', color: INK }, y));
+        }
+        if (sm.mean !== null && sm.mean >= y.min && sm.mean <= y.max) series.push({ ...base, type: 'scatter', symbol: 'diamond', symbolSize: 12, data: [[xk, sm.mean]], itemStyle: { color: INK }, z: 5 });
+      });
+      series.push({ ...base, type: 'line', data: [], markLine: { silent: true, symbol: 'none', label: { show: false }, lineStyle: { color: AXIS, type: 'solid', width: 1 }, data: [{ yAxis: 0 }] } });
     });
-    series.push({ ...base, type: 'line', data: [], markLine: { silent: true, symbol: 'none', label: { show: false }, lineStyle: { color: AXIS, type: 'solid', width: 1 }, data: [{ yAxis: 0 }] } });
+  });
+  const lastRow = rows.length - 1;
+  const title: Record<string, unknown>[] = FLUXES.map((f, i) => panelTitle(FLUX_LABEL[f], grids[i]!.left + grids[i]!.width / 2, 36));
+  rows.forEach((row, ri) => {
+    if (row.title) title.push(rowTitle(row.title, margin.left, grids[ri * cols]!.top - 24));
   });
   const option = {
     legend: { top: 4, left: margin.left, itemGap: 20, textStyle: { fontSize: 12, color: INK }, data: SITES.map((s) => ({ name: SITE_NAMES[s], icon: siteSymbol(d.sites[s].slot), itemStyle: { color: siteColor(d.sites[s].slot) } })) },
-    title: FLUXES.map((f, i) => panelTitle(FLUX_LABEL[f], grids[i]!.left + grids[i]!.width / 2, 36)),
+    title,
     grid: grids.map((g) => ({ left: g.left, top: g.top, width: g.width, height: g.height, containLabel: false })),
     xAxis: grids.map((_, i) => ({
       type: 'value',
@@ -269,7 +421,7 @@ export function changeFigure(d: DisturbanceData): FigureOut {
       axisTick: { show: false },
       splitLine: { show: false },
       axisLine: { onZero: false, lineStyle: { color: AXIS } },
-      axisLabel: { ...axisLabel, customValues: kinds.map((_, k) => k), rotate: 45, formatter: (x: number) => (kinds[x] ? KIND_SHORT[kinds[x]!] : '') },
+      axisLabel: { ...axisLabel, show: Math.floor(i / cols) === lastRow, customValues: kinds.map((_, k) => k), rotate: 45, formatter: (x: number) => (kinds[x] ? KIND_SHORT[kinds[x]!] : '') },
     })),
     yAxis: grids.map((_, i) => ({
       type: 'value',
@@ -277,17 +429,24 @@ export function changeFigure(d: DisturbanceData): FigureOut {
       min: y.min,
       max: y.max,
       interval: y.interval,
-      name: i === 0 ? `Change, after − before (${UNIT_DAY})` : '',
+      name: i % cols === 0 ? layout.yName : '',
       axisLine: { show: false },
       axisTick: { show: false },
       nameLocation: 'middle',
       nameGap: 36,
       nameTextStyle: { fontSize: 12, color: INK },
-      axisLabel: { ...axisLabel, show: i === 0, formatter: (x: number) => minus(x) },
+      axisLabel: { ...axisLabel, show: i % cols === 0, formatter: (x: number) => minus(x) },
       splitLine,
     })),
     series,
   };
+  return { option, width, height, kinds, clipped };
+}
+
+/** Change (after − before) of NEE, GPP and Reco per used episode, grouped by kind, with the kind mean and its bootstrap CI. */
+export function changeFigure(d: DisturbanceData): FigureOut {
+  const row: DotRow = { title: '', value: (e, f) => e.delta[f], summary: (k, f) => d.kinds[k]![f].delta };
+  const { option, width, height, kinds } = dotPanels(d, [row], { panelH: 280, rowGap: 0, top: 70, yName: `Change, after − before (${UNIT_DAY})` });
   const parts = kinds.map((k) => {
     const s = d.kinds[k]!;
     return `${s.label} (n = ${s.nFlux}): mean change of NEE ${f2s(s.nee.delta.mean)}, GPP ${f2s(s.gpp.delta.mean)}, Reco ${f2s(s.reco.delta.mean)}`;
@@ -296,7 +455,37 @@ export function changeFigure(d: DisturbanceData): FigureOut {
   return { svg: renderSvg(option as never, width, height, alt), alt };
 }
 
-// ---------- Figure 3: soil water anomaly and rain per kind ----------
+/**
+ * Relative change (percent) of NEE, GPP and Reco per used episode, grouped by kind, one row per after
+ * window (7, 14 and 21 days). GPP and Reco: percent of their own mean before; NEE: percent of the mean
+ * GPP of the 30 days before the first day of the episode.
+ */
+export function relativeChangeFigure(d: DisturbanceData): FigureOut {
+  const days = d.method.relativeAfterDays;
+  const key = (n: number) => `d${n}`;
+  const rows: DotRow[] = days.map((n) => ({
+    title: `After ${n} days`,
+    value: (e, f) => e.relative[key(n)]?.[f] ?? null,
+    summary: (k, f) => d.kinds[k]!.relative[key(n)]?.[f] ?? EMPTY_SUMMARY,
+  }));
+  const pct = (x: number) => `${fmtNum(x, 0, { sign: true })} %`;
+  const { option, width, height, kinds, clipped } = dotPanels(d, rows, { panelH: 230, rowGap: 70, top: 92, yName: 'Change (% of the reference)', yRange: RELATIVE_Y_CAP, clipLabel: pct });
+  const nClipped = clipped.reduce((a, b) => a + b, 0);
+  const f0s = (x: number | null) => (x === null ? '–' : pct(x));
+  const rowParts = days.map((n) => {
+    const kindParts = kinds.map((k) => {
+      const s = d.kinds[k]!;
+      const r = s.relative[key(n)];
+      if (!r) return `${s.label}: no value`;
+      return `${s.label} (${nText([r.nee.n, r.gpp.n, r.reco.n])}): NEE ${f0s(r.nee.mean)}, GPP ${f0s(r.gpp.mean)}, Reco ${f0s(r.reco.mean)}`;
+    });
+    return `After ${n} days: ${kindParts.join('; ')}`;
+  });
+  const alt = `Dot chart in ${days.length} rows of three panels (NEE, GPP, Reco): relative change of the mean daily flux in percent of a reference, for the ${listText(days)} days after the last day of each episode, grouped by kind of management. GPP and Reco: change in percent of their own mean in the ${d.method.beforeDays} days before the episode. NEE: change in percent of the mean GPP of the ${d.method.gppRefDays} days before the first day of the episode. Each symbol is one episode; the symbol and colour give the site. A diamond with a vertical line gives the mean of the kind and its ${d.method.ciLevelPct} % bootstrap interval. The diamond and its interval need three or more episodes. Values outside ${fmtNum(RELATIVE_Y_CAP.min, 0)} to ${fmtNum(RELATIVE_Y_CAP.max, 0)} % are drawn at the edge of the panel with an arrow and their value; ${nClipped} ${nClipped === 1 ? 'point is' : 'points are'} clipped. ${rowParts.join('. ')}.`;
+  return { svg: renderSvg(option as never, width, height, alt), alt, clipped };
+}
+
+// ---------- Figure 4: soil water anomaly and rain per kind ----------
 
 /** Soil water content as the difference to the mean before the episode, with the mean daily rain as bars, one panel per kind. */
 export function soilWaterFigure(d: DisturbanceData): FigureOut {
@@ -395,7 +584,7 @@ export function soilWaterFigure(d: DisturbanceData): FigureOut {
   return { svg: renderSvg(option as never, width, height, alt), alt };
 }
 
-// ---------- Figure 4: soil water change against the rain difference ----------
+// ---------- Figure 5: soil water change against the rain difference ----------
 
 /** Change of soil water (after − before) against the rain difference of the windows, with a fit line per kind. */
 export function rainFigure(d: DisturbanceData): FigureOut {

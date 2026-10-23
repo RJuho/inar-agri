@@ -29,6 +29,16 @@ checks:
     date: '2026-10-22'
     result: pass
     note: Two rounds. Round one found the short answer too strong for soil water after fertilisation, a wrong half-hour count of the UTC shift, a wrong Viikki sensor statement, a grazing duration off by one, causal wording and three citation page notes. Round two passed with small fixes of wording and one Hu et al. page check. All fixes were applied by Claude Fable 5.1.
+  - kind: recompute
+    by: Claude Sonnet
+    date: '2026-10-23'
+    result: pass
+    note: Relative-change figure (Figure 3). All means and n reproduced from the method text with own code; the bootstrap bounds differ by the seed only. Three points of the method text were made explicit.
+  - kind: review
+    by: Claude Haiku
+    date: '2026-10-23'
+    result: pass
+    note: Relative-change figure (Figure 3). Text fixes (n and intervals with each claim, two caption claims, the window rules and one formula in the method). Applied by Claude Fable 5.1. The numbers were not changed.
 ---
 
 import raw from '../../deep-dives/disturbance-size.json';
@@ -37,13 +47,14 @@ import Cite from '../../components/deep-dive/Cite.astro';
 import Figure from '../../components/deep-dive/Figure.astro';
 import References from '../../components/deep-dive/References.astro';
 import { baseUrl } from '../../lib/deepDive';
-import { changeFigure, compositeFigure, disturbanceData, episodeRows, kindRows, rainFigure, soilWaterFigure } from '../../lib/deepDives/disturbanceSize';
+import { changeFigure, compositeFigure, disturbanceData, episodeRows, kindRows, rainFigure, relativeChangeFigure, soilWaterFigure } from '../../lib/deepDives/disturbanceSize';
 
 export const d = disturbanceData(raw);
 export const fig1 = compositeFigure(d);
 export const fig2 = changeFigure(d);
-export const fig3 = soilWaterFigure(d);
-export const fig4 = rainFigure(d);
+export const fig3 = relativeChangeFigure(d);
+export const fig4 = soilWaterFigure(d);
+export const fig5 = rainFigure(d);
 export const rows = episodeRows(d);
 export const kinds = kindRows(d);
 export const base = baseUrl();
@@ -138,8 +149,23 @@ The days of the episode are not in a window. The late window needs the same mini
 other episode may start in it. Else the late value is empty. The *change* is the mean after minus the mean before. The *excess* is the
 sum of (daily value − mean before) over the <Num k="method.excessDays" digits={0} /> days after the episode, in g C m⁻².
 It needs <Num k="method.minExcessDays" digits={0} /> days with a value and no other episode in the
-<Num k="method.excessDays" digits={0} /> days. The *relative change of GPP* is the change divided by the mean GPP
-before, for episodes with a GPP before of at least <Num k="method.minGppBefore" digits={1} unit={U} />.
+<Num k="method.excessDays" digits={0} /> days.
+
+**Relative change.** Figure 3 gives the change in percent of a reference, for after windows of
+<Num k="method.relativeAfterDays.0" digits={0} />, <Num k="method.relativeAfterDays.1" digits={0} /> and
+<Num k="method.relativeAfterDays.2" digits={0} /> days after the last day of the episode. For GPP and Reco the
+reference is the mean of the same flux in the <Num k="method.beforeDays" digits={0} /> days before the episode. For
+NEE the reference is the mean GPP of the <Num k="method.gppRefDays" digits={0} /> days before the first day of the
+episode, because the NEE before an event can be near zero or negative. Each reference must be at least
+<Num k="method.minRefFlux" digits={1} unit={U} />. Each flux counts its own days. A day counts for NEE when NEE has a
+value on that day, and the same for GPP and Reco. The three fluxes do not need the same days. The GPP reference needs
+only GPP: at least <Num k="method.minGppRefDays" digits={0} /> days with a GPP value. The
+<Num k="method.beforeDays" digits={0} />-day window before needs <Num k="method.minDays" digits={0} /> days with a value.
+An after window runs from the first day to the last day after the episode, both included. An after window of n days
+needs the same share of days with a value (n × <Num k="method.minDays" digits={0} /> /
+<Num k="method.afterDays" digits={0} />, rounded up). When another episode of the site starts on any day of the window,
+the value is empty. The *relative change of GPP* in the table is the value of the <Num k="method.relativeAfterDays.1" digits={0} />-day
+window.
 
 **Seasonal baseline.** The windows also contain the change of the season. For each episode we took the same calendar
 windows in the other years of the same site. A shifted period goes from the start of the before window to the end of
@@ -271,6 +297,50 @@ change of NEE among them is <Num k="kinds.tillageFert.bySite.haltiala.nee.delta.
   </p>
 </Figure>
 
+<Figure
+  id="figure-3"
+  title="Figure 3. Relative change of the mean daily flux per episode, for three window lengths"
+  svg={fig3.svg}
+  alt={fig3.alt}
+  view={{ name: 'Disturbances: cumulative fluxes', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['cumulative'] }}
+>
+  <p>
+    The episodes of Figure 2, as percent of a reference. A window with too few days with a value leaves that episode
+    out; n is given in the text. GPP and Reco: the change as percent of their own
+    mean in the {d.method.beforeDays} days before the episode. NEE: the change as percent of the mean GPP of the{' '}
+    {d.method.gppRefDays} days before the first day of the episode. Rows: the {d.method.relativeAfterDays[0]},{' '}
+    {d.method.relativeAfterDays[1]} and {d.method.relativeAfterDays[2]} days after the last day of the episode. Symbols
+    as in Figure 2. The diamond and its interval need three or more episodes. Values outside the axis range are drawn
+    at the edge with an arrow and their value.
+  </p>
+</Figure>
+
+**Relative change.** After a harvest or cut, GPP changed by <Num k="kinds.harvestCut.relative.d7.gpp.mean" sign digits={0} unit="%" />
+of its mean before in the <Num k="method.relativeAfterDays.0" digits={0} /> days after the episode
+(n = <Num k="kinds.harvestCut.relative.d7.gpp.n" digits={0} />, interval <Num k="kinds.harvestCut.relative.d7.gpp.ciLo" sign digits={0} /> to
+<Num k="kinds.harvestCut.relative.d7.gpp.ciHi" sign digits={0} />), by
+<Num k="kinds.harvestCut.relative.d14.gpp.mean" sign digits={0} unit="%" /> in <Num k="method.relativeAfterDays.1" digits={0} /> days
+(n = <Num k="kinds.harvestCut.relative.d14.gpp.n" digits={0} />, interval <Num k="kinds.harvestCut.relative.d14.gpp.ciLo" sign digits={0} /> to
+<Num k="kinds.harvestCut.relative.d14.gpp.ciHi" sign digits={0} />) and by <Num k="kinds.harvestCut.relative.d21.gpp.mean" sign digits={0} unit="%" />
+in <Num k="method.relativeAfterDays.2" digits={0} /> days (n = <Num k="kinds.harvestCut.relative.d21.gpp.n" digits={0} />,
+interval <Num k="kinds.harvestCut.relative.d21.gpp.ciLo" sign digits={0} /> to <Num k="kinds.harvestCut.relative.d21.gpp.ciHi" sign digits={0} />).
+The change of NEE in <Num k="method.relativeAfterDays.1" digits={0} /> days
+was <Num k="kinds.harvestCut.relative.d14.nee.mean" sign digits={0} unit="%" /> of the GPP of the <Num k="method.gppRefDays" digits={0} /> days before
+(n = <Num k="kinds.harvestCut.relative.d14.nee.n" digits={0} />, interval <Num k="kinds.harvestCut.relative.d14.nee.ciLo" sign digits={0} /> to
+<Num k="kinds.harvestCut.relative.d14.nee.ciHi" sign digits={0} />). After grazing, GPP changed by
+<Num k="kinds.grazing.relative.d14.gpp.mean" sign digits={0} unit="%" /> in <Num k="method.relativeAfterDays.1" digits={0} /> days
+(n = <Num k="kinds.grazing.relative.d14.gpp.n" digits={0} />; the interval is not reliable with so few episodes, see Limits).
+After a fertilisation, GPP changed by
+<Num k="kinds.fertilisation.relative.d14.gpp.mean" sign digits={0} unit="%" /> (n = <Num k="kinds.fertilisation.relative.d14.gpp.n" digits={0} />,
+interval <Num k="kinds.fertilisation.relative.d14.gpp.ciLo" sign digits={0} /> to <Num k="kinds.fertilisation.relative.d14.gpp.ciHi" sign digits={0} />) and
+Reco by <Num k="kinds.fertilisation.relative.d14.reco.mean" sign digits={0} unit="%" /> (n = <Num k="kinds.fertilisation.relative.d14.reco.n" digits={0} />,
+interval <Num k="kinds.fertilisation.relative.d14.reco.ciLo" sign digits={0} /> to <Num k="kinds.fertilisation.relative.d14.reco.ciHi" sign digits={0} />).
+The intervals of these two kinds are wide. The mean GPP before a fertilisation (<Num k="kinds.fertilisation.gpp.before" unit={U} />)
+is lower than before a harvest or cut (<Num k="kinds.harvestCut.gpp.before" unit={U} />). The same absolute change then
+gives a larger percentage. The percent of NEE uses the GPP of the <Num k="method.gppRefDays" digits={0} /> days before as the
+reference, because the NEE before an event can be near zero or negative; a percent of the NEE itself would then be very
+large or have the wrong sign.
+
 **Checks.** With <Num k="method.shortDays" digits={0} />-day windows, the change of NEE after a harvest or cut was
 <Num k="kinds.harvestCut.nee.delta7.mean" sign unit={U} /> (interval <Num k="kinds.harvestCut.nee.delta7.ciLo" sign /> to
 <Num k="kinds.harvestCut.nee.delta7.ciHi" sign />). With the episodes that did not pass rule 3, it was
@@ -281,10 +351,10 @@ after grazing. After a fertilisation it changed by <Num k="kinds.fertilisation.m
 three checks agree with the main result.
 
 <Figure
-  id="figure-3"
-  title="Figure 3. Soil water content around the episodes, as the difference to the level before, with rain"
-  svg={fig3.svg}
-  alt={fig3.alt}
+  id="figure-4"
+  title="Figure 4. Soil water content around the episodes, as the difference to the level before, with rain"
+  svg={fig4.svg}
+  alt={fig4.alt}
   view={{ name: 'Disturbances: soil water and rain', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['swc', 'precip'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
 >
   <p>
@@ -298,7 +368,7 @@ three checks agree with the main result.
 (n = <Num k="kinds.harvestCut.nSwc" digits={0} />, SD <Num k="kinds.harvestCut.swc.delta.sd" digits={3} />). It was
 positive in <Num k="kinds.harvestCut.swc.delta.nPositive" digits={0} /> episodes and negative in the others. For the
 <Num k="kinds.harvestCut.swc.nRainBalanced" digits={0} /> rain-balanced episodes the change was
-<Num k="kinds.harvestCut.swc.deltaRainBalanced.mean" sign digits={3} unit={US} />. Figure 4 shows that the change follows
+<Num k="kinds.harvestCut.swc.deltaRainBalanced.mean" sign digits={3} unit={US} />. Figure 5 shows that the change follows
 the rain difference: Pearson r = <Num k="kinds.harvestCut.swc.rainFit.r" /> (p = <Num k="kinds.harvestCut.swc.rainFit.p" digits={3} />),
 slope <Num k="kinds.harvestCut.swc.rainFit.slope" digits={4} /> m³ m⁻³ per mm, intercept
 <Num k="kinds.harvestCut.swc.rainFit.intercept" sign digits={3} unit={US} />. The data show no change of soil water
@@ -318,10 +388,10 @@ Grazing and tillage only have <Num k="kinds.grazing.nSwc" digits={0} /> and <Num
 episodes with soil water. See the table.
 
 <Figure
-  id="figure-4"
-  title="Figure 4. Change of soil water against the rain difference of the two windows"
-  svg={fig4.svg}
-  alt={fig4.alt}
+  id="figure-5"
+  title="Figure 5. Change of soil water against the rain difference of the two windows"
+  svg={fig5.svg}
+  alt={fig5.alt}
   view={{ name: 'Disturbances: soil water, rain and soil temperature', sites: ['haltiala', 'qvidja', 'viikki'], variables: ['swc', 'precip', 'tsoil'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
 >
   <p>
