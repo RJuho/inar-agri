@@ -168,6 +168,24 @@
   height: auto;
 }
 
+/* Matplotlib SVG of a Python dive (analysis/<slug>/figures/, Figure.astro with svgFile). The SVG
+   keeps its own colours: it is on a white panel, also in dark mode. The recolour rules below apply
+   only to .dd-chart (ECharts SVG of the TypeScript dives), thus they do not change this SVG. */
+.figure-mpl {
+  background: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.figure-mpl svg {
+  display: block;
+  /* 180 mm figures: keep the text readable on a phone; the panel scrolls sideways (as .dd-chart). */
+  min-width: 640px;
+  max-width: 100%;
+  height: auto;
+}
+
 /* ECharts writes fixed colours into the SVG. The page tokens replace the text colour and the
    sentinel colour #7a7974 (NEE, the mean markers and the black site colour), so the figure reads
    in dark mode. */

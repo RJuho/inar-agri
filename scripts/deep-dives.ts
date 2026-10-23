@@ -1,5 +1,7 @@
 // Run the Deep Dive scripts (scripts/deep-dives/*.ts) and write their results to
 // site/src/deep-dives/<slug>.json. The JSON files are in git: each article is a fixed snapshot.
+// Python dives (analysis/<slug>/<slug>.py) write their own analysis/<slug>/results.json. This script
+// runs them with `uv run` for --check (all Python dives) and for a given slug.
 //
 //   npm run deep-dives                     run all dives, write the JSON files
 //   npm run deep-dives -- harvest-carbon   run one dive
@@ -11,6 +13,7 @@
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { DuckDBInstance, type DuckDBConnection } from '@duckdb/node-api';
@@ -40,8 +43,19 @@ if (unknown.length) fail(`unknown option ${unknown.join(' ')}. Use: npm run deep
 const files = readdirSync(DIVE_DIR)
   .filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts'))
   .sort();
+/** Python dives: analysis/<slug>/<slug>.py. */
+const ANALYSIS_DIR = 'analysis';
+const pySlugs = existsSync(ANALYSIS_DIR)
+  ? readdirSync(ANALYSIS_DIR, { withFileTypes: true })
+      .filter((d) => d.isDirectory() && existsSync(`${ANALYSIS_DIR}/${d.name}/${d.name}.py`))
+      .map((d) => d.name)
+      .sort()
+  : [];
 const selected = only.length ? files.filter((f) => only.includes(basename(f, '.ts'))) : files;
-if (only.length && selected.length !== only.length) fail(`unknown dive: ${only.join(', ')}. Dives: ${files.map((f) => basename(f, '.ts')).join(', ')}`);
+const selectedPy = only.length ? pySlugs.filter((s) => only.includes(s)) : check ? pySlugs : [];
+if (only.length && selected.length + selectedPy.length !== only.length) {
+  fail(`unknown dive: ${only.join(', ')}. Dives: ${[...files.map((f) => basename(f, '.ts')), ...pySlugs].join(', ')}`);
+}
 
 const db = await DuckDBInstance.create(':memory:', { threads: '1' });
 const problems: string[] = [];
@@ -87,6 +101,21 @@ for (const file of selected) {
 }
 db.closeSync();
 
+// Python dives. --check: the script compares its fresh numbers with results.json and gives a
+// non-zero exit code on a difference. Without --check (slug given): the script writes its files.
+for (const slug of selectedPy) {
+  const script = `${ANALYSIS_DIR}/${slug}/${slug}.py`;
+  const pyArgs = ['run', script, ...(check ? ['--check'] : []), '--db', 'db', '--calculated', 'data/calculated'];
+  log(`${slug}: uv ${pyArgs.join(' ')}`);
+  const r = spawnSync('uv', pyArgs, { stdio: 'inherit' });
+  if (r.error) {
+    const code = (r.error as NodeJS.ErrnoException).code;
+    problems.push(code === 'ENOENT' ? `${script}: uv is not installed (https://docs.astral.sh/uv/)` : `${script}: ${r.error.message}`);
+  } else if (r.status !== 0) {
+    problems.push(`${script}: exit code ${r.status ?? `signal ${r.signal}`}${check ? ' (results are different from analysis/' + slug + '/results.json, or the run failed)' : ''}`);
+  }
+}
+
 if (problems.length) {
-  fail(`the fresh results are different from the committed JSON:\n${problems.join('\n')}\nRun npm run deep-dives, then check the article text.`);
+  fail(`the fresh results are different from the committed results, or a dive did not run:\n${problems.join('\n')}\nRun npm run deep-dives (Python dive: uv run analysis/<slug>/<slug>.py), then check the article text.`);
 }

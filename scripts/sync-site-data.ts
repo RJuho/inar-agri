@@ -10,9 +10,11 @@
 // 4. Fixed y ranges of all data -> site/src/data/axis-ranges.json (scripts/axis-ranges.ts).
 // 5. db/events.parquet with the site names -> site/src/data/events.json: the
 //    "Events" page reads it at build time.
+// 6. analysis/<slug>/figures/*.svg -> site/public/deep-dive/<slug>/: the download links of the
+//    figures of the Python Deep Dives. Old files in these folders are removed first.
 // Steps 2 to 4 need npm run calc. Design: docs/calculated.md.
 
-import { copyFile, mkdir, stat } from 'node:fs/promises';
+import { copyFile, mkdir, readdir, rm, stat } from 'node:fs/promises';
 import { DuckDBInstance } from '@duckdb/node-api';
 import { writeAxisRanges } from './axis-ranges.ts';
 
@@ -109,4 +111,33 @@ await writeAxisRanges();
   conn.closeSync();
   const { size } = await stat(EVENTS_JSON);
   console.log(`Wrote ${EVENTS_JSON} (${size} bytes)`);
+}
+
+// 6. Figures of the Python Deep Dives. Remove the old folder first, so that a removed or renamed
+//    figure is not served. Skip when analysis/ does not exist.
+{
+  const ANALYSIS_DIR = 'analysis';
+  const FIG_OUT_DIR = 'site/public/deep-dive';
+  await rm(FIG_OUT_DIR, { recursive: true, force: true });
+  let slugs: string[] = [];
+  try {
+    slugs = (await readdir(ANALYSIS_DIR, { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name);
+  } catch {
+    slugs = [];
+  }
+  let count = 0;
+  for (const slug of slugs.sort()) {
+    const figDir = `${ANALYSIS_DIR}/${slug}/figures`;
+    let svgs: string[];
+    try {
+      svgs = (await readdir(figDir)).filter((f) => f.endsWith('.svg')).sort();
+    } catch {
+      continue;
+    }
+    if (svgs.length === 0) continue;
+    await mkdir(`${FIG_OUT_DIR}/${slug}`, { recursive: true });
+    for (const f of svgs) await copyFile(`${figDir}/${f}`, `${FIG_OUT_DIR}/${slug}/${f}`);
+    count += svgs.length;
+  }
+  console.log(`Copied ${count} Deep Dive figures ${ANALYSIS_DIR}/*/figures -> ${FIG_OUT_DIR}`);
 }

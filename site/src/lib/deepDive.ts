@@ -1,6 +1,7 @@
 // Deep Dives: articles that an AI assistant writes from the project data. Each article answers one
 // question. This file has the shared build-time parts: the frontmatter schema (Valibot), the result
-// data of each dive (site/src/deep-dives/<slug>.json, written by `npm run deep-dives`), number
+// data of each dive (TypeScript dive: site/src/deep-dives/<slug>.json, written by `npm run deep-dives`;
+// Python dive: analysis/<slug>/results.json, written by analysis/<slug>/<slug>.py), number
 // format, references and the links to the data page. Rules: CLAUDE.md, section "Deep Dive".
 import * as v from 'valibot';
 import { REFERENCES, REF_IDS, type Reference } from '../scripts/glossary';
@@ -142,7 +143,14 @@ export const FrontmatterSchema = v.pipe(
       v.array(v.strictObject({ model: v.pipe(v.string(), v.nonEmpty()), role: v.pipe(v.string(), v.nonEmpty()) })),
       v.minLength(1),
     ),
-    script: v.pipe(v.string(), v.regex(/^scripts\/deep-dives\/[a-z0-9-]+\.ts$/)),
+    /** TypeScript dive `scripts/deep-dives/<slug>.ts` or Python dive `analysis/<slug>/<slug>.py`. */
+    script: v.pipe(
+      v.string(),
+      v.check(
+        (s: string) => /^scripts\/deep-dives\/[a-z0-9-]+\.ts$/.test(s) || /^analysis\/([a-z0-9-]+)\/\1\.py$/.test(s),
+        'must be scripts/deep-dives/<slug>.ts or analysis/<slug>/<slug>.py',
+      ),
+    ),
     references: v.pipe(v.array(v.picklist(ALL_REF_IDS)), v.minLength(1)),
     checks: v.array(CheckSchema),
   }),
@@ -172,12 +180,23 @@ export function parseFrontmatter(raw: unknown, slug: string): Frontmatter {
     const issues = r.issues.map((i) => `${v.getDotPath(i) ?? '(root)'}: ${i.message}`).join('; ');
     throw new Error(`Deep Dive ${slug}: bad frontmatter: ${issues}`);
   }
-  if (r.output.script !== `scripts/deep-dives/${slug}.ts`) {
-    throw new Error(`Deep Dive ${slug}: script must be scripts/deep-dives/${slug}.ts, not ${r.output.script}`);
+  const allowed = [`scripts/deep-dives/${slug}.ts`, `analysis/${slug}/${slug}.py`];
+  if (!allowed.includes(r.output.script)) {
+    throw new Error(`Deep Dive ${slug}: script must be ${allowed.join(' or ')}, not ${r.output.script}`);
   }
   const data = diveData(slug);
-  if (data.script !== r.output.script) throw new Error(`Deep Dive ${slug}: the JSON was made by ${String(data.script)}, not ${r.output.script}`);
+  if (data.script !== r.output.script) {
+    throw new Error(
+      `Deep Dive ${slug}: the frontmatter script is ${r.output.script}, but ${diveDataPath(slug)} has script ${JSON.stringify(data.script)}. ` +
+        'Use the same path in both, or run the script again.',
+    );
+  }
   return r.output;
+}
+
+/** True when the dive is a Python dive (analysis/<slug>/<slug>.py). */
+export function isPythonDive(fm: Pick<Frontmatter, 'script'>): boolean {
+  return fm.script.startsWith('analysis/');
 }
 
 /** Label of the creation number, for example "Deep Dive #0". */
@@ -206,21 +225,56 @@ export const CHECKED_NOTE =
 
 // ---------- Result data ----------
 
-const DATA = import.meta.glob<Record<string, unknown>>('../deep-dives/*.json', { eager: true, import: 'default' });
+type DiveJson = Record<string, unknown> & { script?: unknown; dataVersion?: DataVersion };
+/** Result JSON of the TypeScript dives (site/src/deep-dives/<slug>.json). */
+const TS_DATA = import.meta.glob<DiveJson>('../deep-dives/*.json', { eager: true, import: 'default' });
+/** Result JSON of the Python dives (analysis/<slug>/results.json at the repository root). */
+const PY_DATA = import.meta.glob<DiveJson>('../../../analysis/*/results.json', { eager: true, import: 'default' });
 
-/** Result JSON of a dive. Stops the build when the file is missing. */
-export function diveData(slug: string): Record<string, unknown> & { script?: unknown; dataVersion?: DataVersion } {
-  const found = DATA[`../deep-dives/${slug}.json`];
-  if (!found) throw new Error(`Deep Dive ${slug}: site/src/deep-dives/${slug}.json is missing. Run npm run deep-dives.`);
+const tsPath = (slug: string) => `site/src/deep-dives/${slug}.json`;
+const pyPath = (slug: string) => `analysis/${slug}/results.json`;
+
+/** Repository path of the result JSON of a dive (for error texts). */
+export function diveDataPath(slug: string): string {
+  return PY_DATA[`../../../${pyPath(slug)}`] ? pyPath(slug) : tsPath(slug);
+}
+
+/**
+ * Result JSON of a dive: site/src/deep-dives/<slug>.json (TypeScript dive) or
+ * analysis/<slug>/results.json (Python dive). Stops the build when neither file or both files exist.
+ */
+export function diveData(slug: string): DiveJson {
+  const ts = TS_DATA[`../deep-dives/${slug}.json`];
+  const py = PY_DATA[`../../../${pyPath(slug)}`];
+  if (ts && py) throw new Error(`Deep Dive ${slug}: both ${tsPath(slug)} and ${pyPath(slug)} exist. Remove one of them.`);
+  const found = ts ?? py;
+  if (!found) {
+    throw new Error(
+      `Deep Dive ${slug}: no result JSON. Expected ${tsPath(slug)} (TypeScript dive, run npm run deep-dives) ` +
+        `or ${pyPath(slug)} (Python dive, run uv run analysis/${slug}/${slug}.py).`,
+    );
+  }
   return found;
 }
 
+/**
+ * Version data of a result JSON. The TypeScript dives write all fields except `snapshot`. The
+ * Python dives can have other fields; thus all fields are optional and the layout shows "–" for a
+ * missing value.
+ */
 export interface DataVersion {
-  generatedAt: string;
-  git: { commit: string; dirty: boolean };
-  dbBuiltAt: string | null;
-  calcBuiltAt: string | null;
-  inputs: { path: string; bytes: number; sha256: string }[];
+  generatedAt?: string;
+  git?: { commit?: string; dirty?: boolean };
+  dbBuiltAt?: string | null;
+  calcBuiltAt?: string | null;
+  inputs?: { path: string; bytes?: number; sha256: string; rows?: number }[];
+  /** Python dives: the published database snapshot that the script reads. `url` is null until the release exists. */
+  snapshot?: {
+    builtAt?: string | null;
+    calcBuiltAt?: string | null;
+    url?: string | null;
+    inputs?: { path: string; sha256: string; rows?: number }[];
+  };
 }
 
 /** Value at a dotted path, for example `sites.qvidja.nee.mean` or `episodes.0.delta.nee`. */
@@ -237,7 +291,7 @@ export function lookup(data: unknown, path: string): unknown {
 export function diveNumber(slug: string, path: string): number {
   const value = lookup(diveData(slug), path);
   if (typeof value !== 'number' || !Number.isFinite(value)) {
-    throw new Error(`Deep Dive ${slug}: key "${path}" is ${value === undefined ? 'missing' : `not a number (${JSON.stringify(value)})`} in site/src/deep-dives/${slug}.json`);
+    throw new Error(`Deep Dive ${slug}: key "${path}" is ${value === undefined ? 'missing' : `not a number (${JSON.stringify(value)})`} in ${diveDataPath(slug)}`);
   }
   return value;
 }
@@ -321,7 +375,12 @@ export function checkBody(html: string, slug: string): void {
   if (h2.join('|') !== expected.join('|')) {
     throw new Error(`Deep Dive ${slug}: the h2 headings must be "${expected.join('", "')}". Found: "${h2.join('", "')}"`);
   }
-  const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+  const all = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]!);
+  const ids = new Set(all);
+  if (ids.size !== all.length) {
+    const dup = [...new Set(all.filter((id, i) => all.indexOf(id) !== i))];
+    throw new Error(`Deep Dive ${slug}: an id is used more than one time in the page: ${dup.join(', ')} (ids of SVG <title> and <desc> must be unique too)`);
+  }
   for (const m of html.matchAll(/href="#(ref-[^"]+)"/g)) {
     if (!ids.has(m[1])) throw new Error(`Deep Dive ${slug}: citation #${m[1]} has no entry in the reference list (add the id to frontmatter references)`);
   }

@@ -20,6 +20,7 @@ const slug = slugFromFile(file);
 const fm = parseFrontmatter(frontmatter, slug);
 const data = diveData(slug);
 const version = data.dataVersion;
+const snapshot = version?.snapshot;
 const body = await Astro.slots.render('default');
 checkBody(body, slug);
 
@@ -84,10 +85,26 @@ const statusText = fm.status === 'checked' ? 'Checked' : 'Draft';
         <div>
           <dt>Data version</dt>
           <dd>
-            Results of {time(version?.generatedAt)}, code commit <code>{version?.git.commit ?? '–'}</code>{version?.git.dirty && ' (with uncommitted changes)'}.
+            Results of {time(version?.generatedAt)}, code commit <code>{version?.git?.commit ?? '–'}</code>{version?.git?.dirty && ' (with uncommitted changes)'}.
             Database built {time(version?.dbBuiltAt)}, calculated data built {time(version?.calcBuiltAt)}.
           </dd>
         </div>
+        {
+          snapshot && (
+            <div>
+              <dt>Database snapshot</dt>
+              <dd>
+                Built {time(snapshot.builtAt)}
+                {snapshot.calcBuiltAt && <>, calculated data built {time(snapshot.calcBuiltAt)}</>}.{' '}
+                {snapshot.url ? (
+                  <a href={snapshot.url} rel="noopener">Release of the snapshot</a>
+                ) : (
+                  'Release: not yet published.'
+                )}
+              </dd>
+            </div>
+          )
+        }
       </dl>
     </header>
 
