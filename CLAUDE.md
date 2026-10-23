@@ -156,6 +156,13 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 
 A Deep Dive is a short article that an AI assistant writes from our data. Each dive answers one question that the data can answer. The list page `/deep-dive/` shows all dives, newest first (number, title, question, short answer, sites, date, status), and a note that "Checked" means a check by two other AI models, not by a person (`CHECKED_NOTE` in `site/src/lib/deepDive.ts`; the article facts box shows the same note).
 
+### Work with subagents
+
+- Use subagents to keep the context window of the main agent small. Give them the tasks that read much text: read PDFs and long files, explore the data, run builds and tests, and draft long parts. The main agent keeps the decisions and the final text.
+- Give each subagent a clear and short brief: the goal, the files to read, the limits, and the output that you want back (a short summary, not file dumps).
+- Use the model that fits the task. Examples: Opus for the question, the method, the script and the article; Sonnet for an independent recompute and for code or test runs; Haiku for searches, simple checks and the language review. The verification steps below must use different models.
+- Run independent subagents in parallel. Do not do the same work again in the main agent.
+
 ### Files
 
 - Article: `site/src/pages/deep-dive/<slug>.mdx` (MDX, `@astrojs/mdx` 8.1.0, frontmatter `layout: ../../layouts/DeepDive.astro`). The list page `site/src/pages/deep-dive/index.astro` finds all MDX files of the folder with `import.meta.glob('./*.mdx', { eager: true })`.
