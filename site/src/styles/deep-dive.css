@@ -180,9 +180,8 @@
 
 .figure-mpl svg {
   display: block;
-  /* 180 mm figures: keep the text readable on a phone; the panel scrolls sideways (as .dd-chart). */
-  min-width: 640px;
-  max-width: 100%;
+  /* Full width of the panel, also on a phone (the reader can zoom). */
+  width: 100%;
   height: auto;
 }
 
