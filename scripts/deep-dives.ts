@@ -7,7 +7,7 @@
 //                                          exit code 1 when a result is different (float tolerance)
 //
 // Each dive module exports `slug`, `title`, `inputs` (files it reads) and `run(conn)`.
-// A dive reads only db/*.parquet and data/calculated/*. See CLAUDE.md, section "Deep Dive".
+// A dive reads only db/*.parquet, data/calculated/* and data/SPI/*.csv. See CLAUDE.md, section "Deep Dive".
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -29,7 +29,7 @@ const OUT_DIR = 'site/src/deep-dives';
 /** Significant digits of the numbers in the JSON files. */
 const DIGITS = 10;
 /** Input folders that a dive can read. */
-const ALLOWED_INPUT = /^(db\/[^/]+\.parquet|data\/calculated\/[^/]+)$/;
+const ALLOWED_INPUT = /^(db\/[^/]+\.parquet|data\/calculated\/[^/]+|data\/SPI\/[^/]+\.csv)$/;
 
 const args = process.argv.slice(2);
 const check = args.includes('--check');
@@ -51,7 +51,7 @@ for (const file of selected) {
   const script = `${DIVE_DIR}/${file}`;
   const mod = (await import(pathToFileURL(join(process.cwd(), script)).href)) as DiveModule;
   if (mod.slug !== basename(file, '.ts')) fail(`${script}: slug '${mod.slug}' is not the file name`);
-  for (const p of mod.inputs) if (!ALLOWED_INPUT.test(p)) fail(`${script}: input ${p} is not in db/*.parquet or data/calculated/`);
+  for (const p of mod.inputs) if (!ALLOWED_INPUT.test(p)) fail(`${script}: input ${p} is not in db/*.parquet, data/calculated/ or data/SPI/*.csv`);
   const t0 = Date.now();
   const conn = await db.connect();
   let result: Record<string, unknown>;

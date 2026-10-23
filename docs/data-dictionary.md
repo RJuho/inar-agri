@@ -774,3 +774,38 @@ The last column has an empty header name.
 
 - `BADM-Site-General-Info-KE-Mkt.xlsx`: AmeriFlux BADM site template. Sheets `Site_General_Info` (Variable, Description, Units, value), `LIST(VOCABULARY)`, `Explanations`. Example: SITE_ID = KE-Mkt, SUBMISSION_DATE = 20250429.
 
+## SPI (`data/SPI/`)
+
+FMI monthly precipitation of three stations and the Standardized Precipitation Index (SPI) made from it with `SPIanalysis.R` (SPEI R package, `spi()`, gamma distribution, reference period 1981 to 2010). Station to site: Vantaa → Haltiala and Viikki, Kaarina Yltöinen → Qvidja, Kuopio Maaninka → Anttila and Särkisuo. `Helsinki_Kumpula_monthlyprecip2006_2026.csv` (2006 to 2026, gaps, no 1981 to 2010 normal) is not used. The PNG files show SPI from 2022 onwards with bars capped at ±3.
+
+### Precipitation files `data/SPI/*monthlyprecip*.csv`
+
+Quoted CSV, comma delimiter, one row per month. Missing value: `-`. One month row is absent: Vantaa 1986-04, Kaarina 1995-01, Kuopio 2014-08.
+
+| Column | Unit | Example (Kaarina Yltöinen) |
+|---|---|---|
+| `Observation station` | - | Kaarina Yltöinen |
+| `Year` | - | 1980 |
+| `Month` | - | 1 |
+| `Day` | - | 1 |
+| `Time [Local time]` | HH:MM | 02:00 |
+| `Monthly precipitation [mm]` | mm | 15.9 |
+
+### `SPI_all_stations.csv` (SPI, monthly)
+
+1684 lines (header + 3 × 561 months, 1980-01 to 2026-09), CRLF, comma delimiter, text fields in double quotes. Missing value: `NA` (absent months, and the k-month windows that contain them; the absent row has `NA` also in `Observation.station`, `Day` and `Time..Local.time.`). The SPI values are not capped; minimum SPI-1 −3.51. `scripts/lib/deep-dive/spi.ts` parses the file.
+
+| Column | Unit | Example |
+|---|---|---|
+| `Date` | yyyy-mm-dd (first day of the month) | 1980-01-01 |
+| `Observation.station` | - | Kaarina Yltöinen |
+| `Year` | - | 1980 |
+| `Month` | - | 1 |
+| `Day` | - | 1 |
+| `Time..Local.time.` | HH:MM | 02:00 |
+| `Monthly.precipitation..mm.` | mm | 15.9 |
+| `SPI1` | - (standard deviations) | -1.47034979186087 |
+| `SPI3` | - | NA |
+| `SPI6` | - | NA |
+| `SPI12` | - | NA |
+| `Station` | - (`Kaarina Yltöinen`, `Vantaa`, `Kuopio Maaninka`) | Kaarina Yltöinen |

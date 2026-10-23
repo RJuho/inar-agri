@@ -1732,6 +1732,31 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
+  test('the NEE without harvest or drought dive has the fixed sections, four figures, the tables and numbers from the JSON', async ({ page }) => {
+    await page.goto('/deep-dive/nee-without-harvest-drought/');
+    await expect(page.locator('h1')).toHaveText('NEE without harvest or drought');
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #3');
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    const figures = page.locator('figure.dd-figure svg[role="img"]');
+    expect(await figures.count()).toBe(4);
+    for (const svg of await figures.all()) expect((await svg.getAttribute('aria-label'))?.length ?? 0).toBeGreaterThan(40);
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(60);
+    // The season table, the episode table and the dry-month table.
+    expect(await page.locator('tr[id^="season-"]').count()).toBeGreaterThan(20);
+    expect(await page.locator('tr[id^="episode-"]').count()).toBe(23);
+    expect(await page.locator('tr[id^="dry-"]').count()).toBeGreaterThan(10);
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    // The SPI figure links to the data page with the monthly rain of the three sites.
+    const href = (await page.locator('#figure-1 .dd-figure-link a').getAttribute('href')) ?? '';
+    const view = JSON.parse(Buffer.from(href.replace(/^\/#view=/, ''), 'base64url').toString('utf8')) as { params: { sites: number[]; variables: string[] } };
+    expect(view.params.sites).toEqual([3, 4, 5]);
+    expect(view.params.variables).toEqual(['precip']);
+    await expectOnlyUpdateScript(page);
+  });
+
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -1749,7 +1774,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);

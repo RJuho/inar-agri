@@ -67,6 +67,11 @@ export const EXTRA_REFERENCES = {
     text: 'Verified data findings of this project, with status and a check query each.',
     file: 'docs/anomaly-data-report.md',
   },
+  'spi-data': {
+    short: 'SPI data, project team 2026',
+    text: 'Project team (2026). Standardized Precipitation Index (SPI) of the FMI stations Vantaa Helsinki-Vantaa airport, Kaarina Yltöinen and Kuopio Maaninka, 1980 to 2026. Computed from FMI monthly precipitation with the SPEI R package (spi(), gamma distribution, unbiased PWM fit, reference period 1981 to 2010), scales 1, 3, 6 and 12 months. Script data/SPI/SPIanalysis.R.',
+    file: 'data/SPI/SPI_all_stations.csv',
+  },
 } as const satisfies Record<string, DiveReference>;
 
 export type DiveRefId = (typeof REF_IDS)[number] | keyof typeof EXTRA_REFERENCES;

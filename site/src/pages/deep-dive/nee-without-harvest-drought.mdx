@@ -1,0 +1,518 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 3
+title: NEE without harvest or drought
+question: How much net CO₂ uptake went away after each harvest and in each dry month at Haltiala, Qvidja and Viikki, and what would the seasonal NEE have been without them?
+shortAnswer: "Grass cuts were associated with a loss of uptake at Qvidja and Viikki. Cereal harvests were not. Dry months gave no consistent loss. Most of the loss was in summer."
+sites: [haltiala, qvidja, viikki]
+variables: [nee_f, gpp, reco, ppfd, sw_in, ta, precip]
+period: { from: 2018, to: 2025 }
+date: '2026-10-23'
+status: checked
+models:
+  - model: claude-fable-5-1
+    role: method decisions, review
+  - model: claude-opus-5-5
+    role: script, figures, article
+  - model: claude-sonnet-5-5
+    role: citation check
+  - model: claude-haiku-5-5
+    role: station distances
+script: scripts/deep-dives/nee-without-harvest-drought.ts
+references: [heimsch2021, heimsch2024, vira2025, ke2025, gao2026, spi-data, calculated-doc, anomaly-report, qvidja-management, viikki-management, haltiala-management]
+checks:
+  - kind: recompute
+    by: claude-sonnet-5-5
+    date: '2026-10-23'
+    result: pass
+    note: Independent recompute from db/ and data/calculated/ with own code, without the dive script and the JSON. The 23 episodes, the H28 of five cuts and the per-site means, the 28 dry months of Vantaa and Kaarina, the June 2022, June 2019 and June 2023 examples and the 46 season totals agree with the article. No differences.
+  - kind: review
+    by: claude-haiku-5-5
+    date: '2026-10-23'
+    result: pass
+    note: Five passes. Checked the language (STE), careful claims, n and spread with each result, typed numbers, and the citations against the PDFs heimsch2021, heimsch2024, vira2025, ke2025 and gao2026. The open points of the passes (upper-bound and ripe claims, the Viikki grass-only mean, typed counts, missing spreads, citation pages) were corrected; the last point, a typed count in the short answer, was corrected after the fifth pass.
+---
+
+import raw from '../../deep-dives/nee-without-harvest-drought.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { cumulativeFigure, dryRows, episodeRows, neeWithoutData, regressionFigure, seasonFigure, seasonRows, seasonSummaryRows, spiFigure } from '../../lib/deepDives/neeWithoutHarvestDrought';
+
+export const d = neeWithoutData(raw);
+export const fig1 = spiFigure(d);
+export const fig2 = cumulativeFigure(d);
+export const fig3 = seasonFigure(d);
+export const fig4 = regressionFigure(d);
+export const episodes = episodeRows(d);
+export const seasons = seasonRows(d);
+export const dry = dryRows(d);
+export const bySeason = seasonSummaryRows(d);
+export const base = baseUrl();
+export const U = 'g C m⁻²';
+export const SITES3 = ['haltiala', 'qvidja', 'viikki'];
+
+## Short answer
+
+We estimated two losses of net CO₂ uptake. The *harvest deficit* H uses a model of the canopy before a cut. The model
+gives the uptake that this canopy would have had in the weather after the cut. H is that uptake minus the observed
+uptake. The *drought anomaly* D compares a dry month with the same calendar month of years that were not dry. First we
+remove H from the NEE of the month. D is that NEE minus the mean NEE of the non-dry years with the same crop class. An NEE below zero is a net uptake. A positive H or D is uptake that was lost. The NEE without harvest
+and drought is NEE − H − D.
+
+- **Grass cuts.** In the <Num k="method.afterDays" digits={0} /> days after a cut, the mean harvest deficit was
+  <Num k="harvest.bySite.qvidja.d28.mean" digits={1} sign unit={U} /> at Qvidja (95 % CI
+  <Num k="harvest.bySite.qvidja.d28.ciLo" digits={1} /> to <Num k="harvest.bySite.qvidja.d28.ciHi" digits={1} />,
+  SD <Num k="harvest.bySite.qvidja.d28.sd" digits={1} />, n = <Num k="harvest.bySite.qvidja.d28.n" digits={0} /> episodes).
+  The grass cuts at Viikki gave <Num k="harvest.bySiteCrop.viikki.grass.d28.mean" digits={1} sign unit={U} />
+  (95 % CI <Num k="harvest.bySiteCrop.viikki.grass.d28.ciLo" digits={1} /> to
+  <Num k="harvest.bySiteCrop.viikki.grass.d28.ciHi" digits={1} />, SD
+  <Num k="harvest.bySiteCrop.viikki.grass.d28.sd" digits={1} />, n = <Num k="harvest.bySiteCrop.viikki.grass.d28.n" digits={0} />
+  cuts). With so few cuts, the interval is only the range of the values. The barley harvest of Viikki gave
+  <Num k="episodes.viikki-2023-08-17.d28" digits={1} sign unit={U} /> and the faba bean harvest
+  <Num k="episodes.viikki-2025-09-10.d28" digits={1} sign unit={U} />.
+- **Cereal harvests** gave a deficit near zero (mean <Num k="harvest.byCrop.cereal.d28.mean" digits={1} sign unit={U} />,
+  SD <Num k="harvest.byCrop.cereal.d28.sd" digits={1} />, n = <Num k="harvest.byCrop.cereal.d28.n" digits={0} />). The Haltiala
+  cereals were harvested at the end of the growing season <Cite ids={['ke2025']} note="p. 5" />. The light-saturated GPP of
+  the model before these harvests was low (see the Haltiala section), thus the model expected little uptake.
+- **Dry months** (SPI-1 ≤ <Num k="method.dryThreshold" digits={0} />) gave no consistent loss. At Qvidja the mean anomaly
+  of the dry months was <Num k="dry.summary.qvidja.anomaly.mean" digits={1} sign unit={U} />
+  (n = <Num k="dry.summary.qvidja.anomaly.n" digits={0} />, SD <Num k="dry.summary.qvidja.anomaly.sd" digits={1} />). These
+  months had a little more uptake. At Haltiala it was <Num k="dry.summary.haltiala.anomaly.mean" digits={1} sign unit={U} />
+  (n = <Num k="dry.summary.haltiala.anomaly.n" digits={0} />, SD <Num k="dry.summary.haltiala.anomaly.sd" digits={1} />). At
+  Viikki it was <Num k="dry.summary.viikki.anomaly.mean" digits={1} sign unit={U} />
+  (n = <Num k="dry.summary.viikki.anomaly.n" digits={0} />, SD <Num k="dry.summary.viikki.anomaly.sd" digits={1} />). The
+  spread is large at all three sites. The regressions of the monthly NEE anomaly on SPI-1 had no clear slope at the three sites.
+- **Seasons.** Over the <Num k="allSites.totals.all.nSeasons" digits={0} /> complete seasons of the three sites, H added up to
+  <Num k="allSites.totals.all.harvestDeficit" digits={0} sign unit={U} /> and D to
+  <Num k="allSites.totals.all.droughtAnomaly" digits={0} sign unit={U} />. The harvest part was
+  <Num k="allSites.totals.all.shareHarvestAbs" digits={0} percent /> of the size of both parts. Most of H was in summer
+  (mean <Num k="allSites.bySeason.JJA.harvestDeficit.mean" digits={1} sign unit={U} /> per site-summer, 95 % CI
+  <Num k="allSites.bySeason.JJA.harvestDeficit.ciLo" digits={1} /> to <Num k="allSites.bySeason.JJA.harvestDeficit.ciHi" digits={1} />,
+  SD <Num k="allSites.bySeason.JJA.harvestDeficit.sd" digits={1} />, n = <Num k="allSites.bySeason.JJA.n" digits={0} />).
+
+This dive is different from the other dives. [Deep Dive #0](../harvest-carbon/) gives the change of the daily fluxes
+in the two weeks after a harvest. [Deep Dive #1](../disturbance-size/) compares the daily NEE after a cut with the mean
+of the days before it. [Deep Dive #2](../natural-events/) compares dry-spell days with other days of the same months.
+This dive uses a model of the canopy before the cut as the reference. The light and the temperature after the cut drive
+this model. We add the losses per month and per season. We also use a drought index of the weather stations.
+
+## Data and method
+
+**Sites and data.** Haltiala (cereals, one failed grass year and one sunflower year), Qvidja (grass for silage) and
+Viikki (grass, a barley and clover mixture, and faba bean). We used the 30-minute gap-filled NEE (`nee_f`), the GPP and
+Reco of the night-time partitioning, the air temperature of the partitioning and the E0 of each row from
+`data/calculated/fluxes_30min.parquet`, and the daily NEE sums (`nee_f_gc`) of `data/calculated/daily.parquet`
+<Cite ids={['calculated-doc']} />. In these files NEE = Reco − GPP in each row. The light driver is the photosynthetic
+photon flux density at Haltiala and Viikki, and the incoming shortwave radiation at Qvidja (Qvidja has no PPFD
+sensor). Days are local days of the site.
+
+**Harvest and cut episodes.** We used the harvest and cut events of the management files
+<Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} />. Events that are not more than
+<Num k="method.mergeDays" digits={0} /> days apart make one episode. This gives
+<Num k="counts.episodes" digits={0} /> episodes: <Num k="sites.haltiala.episodes" digits={0} /> at Haltiala,
+<Num k="sites.qvidja.episodes" digits={0} /> at Qvidja and <Num k="sites.viikki.episodes" digits={0} /> at Viikki. Haltiala
+has no harvest in 2023 (failed grass) and 2024 (sunflower). The Qvidja file has no harvest in 2025, only grazing.
+Ke et al. describe Qvidja as cut in June and August and Haltiala as harvested one time at the end of the season
+<Cite ids={['ke2025']} note="p. 5" />.
+
+**Harvest deficit.** For each episode we fitted a model on the <Num k="method.preDays" digits={0} /> days before the
+first cut day (PRE):
+
+- GPP is a rectangular hyperbola of light. We fitted it on the mean GPP of light bins. A bin is
+  <Num k="method.lightBin.haltiala" digits={0} /> µmol m⁻² s⁻¹ PPFD or <Num k="method.lightBin.qvidja" digits={0} /> W m⁻²
+  shortwave. We used only light above <Num k="method.lightMin" digits={0} />. The fit needs
+  <Num k="method.minBins" digits={0} /> or more bins.
+- Reco is the Lloyd–Taylor function with the E0 of the partitioning. We fitted only the reference respiration.
+- The fit needs <Num k="method.minPreDays" digits={0} /> or more PRE days with data.
+
+Heimsch et al. used the same two functions for Qvidja <Cite ids={['heimsch2021']} note="p. 5" />. The model gives the
+NEE that the canopy before the cut would have had in the light and the temperature of each half hour after the cut. For each
+day we took the mean of (observed NEE − model NEE) over the half hours of the day. The daily deficit is this mean times
+<Num k="method.halfHoursPerDay" digits={0} /> half hours, in g C m⁻² d⁻¹. A day needs
+<Num k="method.minHalfHours" digits={0} /> or more half hours. The window after the cut starts on the day after the
+last cut day. It is <Num k="method.afterDays" digits={0} /> days long (H28). It is shorter when the next episode starts
+earlier. The window needs <Num k="method.minValidShare" digits={0} percent /> valid days. A missing day gets the mean of
+the valid days. NEE = Reco − GPP, thus the deficit splits exactly into two parts. The GPP part is model GPP − observed
+GPP. The Reco part is observed Reco − model Reco. We also found a *recovery day* for each
+episode. It is the first day from day <Num k="method.recovery.fromDay" digits={0} /> on that meets this condition: the mean
+deficit of <Num k="method.recovery.span" digits={0} /> days is at or below
+<Num k="method.recovery.share" digits={0} percent /> of the mean deficit of the first
+<Num k="method.recovery.fromDay" digits={0} /> days.
+
+**Drought index.** The project team computed the Standardized Precipitation Index (SPI) of the FMI stations Vantaa, Kaarina Yltöinen and Kuopio Maaninka from the
+monthly precipitation <Cite ids={['spi-data']} />. The project team used the `spi()` function of the SPEI R package
+with the reference period 1981 to 2010 and the defaults of the function (gamma distribution, unbiased
+probability-weighted moments). Vantaa (Helsinki-Vantaa airport) is about
+<Num k="method.stationKm.haltiala" digits={0} unit="km" /> from Haltiala and <Num k="method.stationKm.viikki" digits={0} unit="km" />
+from Viikki. Kaarina Yltöinen is about <Num k="method.stationKm.qvidja" digits={0} unit="km" /> from Qvidja. A month is
+*dry* when SPI-1 ≤ <Num k="method.dryThreshold" digits={0} />. A season is dry when one or more of its months is dry.
+
+**Drought anomaly.** For each month from March to November with <Num k="method.minMonthDays" digits={0} /> or more days of
+daily NEE, we removed the harvest deficit of the days in that month: NEE_adj = NEE − H. We remove the harvest
+first. The harvest model uses the observed weather of the month, so H is the harvest effect in this weather. The anomaly
+of NEE_adj is then the drought effect without the harvest. The sum is exact: NEE without both = NEE − H − D. The anomaly D of a dry month
+is NEE_adj minus the mean NEE_adj of the same calendar month in the non-dry years of the site with the same crop class.
+When fewer than <Num k="method.minRefYears" digits={0} /> such years exist, we used all non-dry years; with fewer than
+<Num k="method.minRefYears" digits={0} /> of them, the month has no anomaly. Qvidja 2025 (harvest not known) is not used
+as a reference. A month with missing days is scaled to the full month.
+
+**Regression.** For each site we regressed the monthly anomaly (NEE_adj minus the mean of the same calendar month of
+the site) on SPI-1, with a bootstrap 95 % confidence interval of the slope
+(<Num k="method.bootstrapResamplesSlope" digits={0} /> resamples). At Qvidja we also regressed the seasonal sum of NEE_adj
+on the mean SPI-1 of the season.
+
+**Seasons.** Spring (MAM), summer (JJA) and autumn (SON) per site and year. A season is complete when its three months
+are complete. The totals and the all-sites summaries use the complete seasons with a known harvest record. Means have a
+bootstrap 95 % CI (<Num k="method.bootstrapResamplesMean" digits={0} /> resamples).
+
+## Results
+
+### Dry months at the stations
+
+<Figure
+  id="figure-1"
+  title="Figure 1. SPI-1 of the stations Vantaa and Kaarina Yltöinen per month"
+  svg={fig1.svg}
+  alt={fig1.alt}
+  view={{ name: 'Monthly precipitation', sites: SITES3, variables: ['precip'], yearFrom: 2018, yearTo: 2025, aggregation: 'month', diagrams: ['timeseries'] }}
+>
+  <p>
+    Bars: SPI-1 of each month. Dark bars with stripes: dry months (SPI-1 at or below −1). Dashed line: −1. The data page
+    shows the on-site rain; Haltiala has no rain gauge.
+  </p>
+</Figure>
+
+Vantaa had <Num k="stations.vantaa.nDry" digits={0} /> dry months and Kaarina Yltöinen
+<Num k="stations.kaarina.nDry" digits={0} /> from 2018 to 2025. The driest months were August 2022 at Vantaa (SPI-1
+<Num k="stations.vantaa.dryMonths.2022-08" digits={2} />), May 2024 (<Num k="stations.vantaa.dryMonths.2024-05" digits={2} />)
+and June 2023 (<Num k="stations.vantaa.dryMonths.2023-06" digits={2} />). June was dry at Kaarina in most of the
+years. Thus the Qvidja June reference has only the years 2020 and 2024 (n =
+<Num k="dry.months.qvidja.2022-06.refN" digits={0} />). Heimsch et al. classed the months of Qvidja with the 3-month
+SPEI <Cite ids={['heimsch2024']} note="p. 5" />. The SPEI also uses the evaporation, thus its classes are different from
+SPI-1: for example, Heimsch et al. class July 2021 as moderately dry, but SPI-1 of Kaarina was not dry in that month.
+
+<div class="table-wrap">
+<table>
+<caption>Dry site-months: SPI, NEE, harvest deficit H, NEE_adj = NEE − H and the drought anomaly D against the non-dry years ({U} per month; reference = mean ± SD).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Month</th><th scope="col" class="num">SPI-1</th><th scope="col" class="num">SPI-3</th><th scope="col" class="num">NEE</th><th scope="col" class="num">H</th><th scope="col" class="num">NEE_adj</th><th scope="col" class="num">D</th><th scope="col">Reference</th><th scope="col" class="num">n</th><th scope="col">Years</th></tr>
+</thead>
+<tbody>
+{dry.map((r) => (<tr id={`dry-${r.id}`}><td>{r.site}</td><td>{r.month}</td><td class="num">{r.spi1}</td><td class="num">{r.spi3}</td><td class="num">{r.nee}</td><td class="num">{r.h}</td><td class="num">{r.adj}</td><td class="num">{r.anomaly}</td><td class="wrap">{r.ref}</td><td class="num">{r.refN}</td><td>{r.refYears}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+### Uptake lost after the cuts
+
+All <Num k="counts.episodes" digits={0} /> episodes had a converged model and enough valid days
+(<Num k="counts.excluded" digits={0} /> excluded). The mean harvest deficit of all episodes was
+<Num k="harvest.all.d28.mean" digits={1} sign unit={U} /> (95 % CI <Num k="harvest.all.d28.ciLo" digits={1} /> to
+<Num k="harvest.all.d28.ciHi" digits={1} />, n = <Num k="harvest.all.d28.n" digits={0} />). For grass it was
+<Num k="harvest.byCrop.grass.d28.mean" digits={1} sign unit={U} /> (95 % CI <Num k="harvest.byCrop.grass.d28.ciLo" digits={1} />
+to <Num k="harvest.byCrop.grass.d28.ciHi" digits={1} />, n = <Num k="harvest.byCrop.grass.d28.n" digits={0} />). The GPP
+part of the grass deficit was <Num k="harvest.byCrop.grass.gpp28.mean" digits={1} sign unit={U} /> (SD
+<Num k="harvest.byCrop.grass.gpp28.sd" digits={1} />, 95 % CI <Num k="harvest.byCrop.grass.gpp28.ciLo" digits={1} /> to
+<Num k="harvest.byCrop.grass.gpp28.ciHi" digits={1} />) and the Reco part
+<Num k="harvest.byCrop.grass.reco28.mean" digits={1} sign unit={U} /> (SD <Num k="harvest.byCrop.grass.reco28.sd" digits={1} />,
+95 % CI <Num k="harvest.byCrop.grass.reco28.ciLo" digits={1} /> to <Num k="harvest.byCrop.grass.reco28.ciHi" digits={1} />). Thus most of the loss is associated with a
+lower GPP. This agrees with the decrease of GPP after a harvest and the later regrowth that satellite GPP shows for
+forage grass <Cite ids={['vira2025']} note="p. 12" />.
+
+<Figure
+  id="figure-2"
+  title="Figure 2. Cumulative harvest deficit after each cut, per site"
+  svg={fig2.svg}
+  alt={fig2.alt}
+  view={{ name: 'Harvest deficit: daily fluxes', sites: SITES3, variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+>
+  <p>
+    Day 1 is the day after the last cut day of the episode. A positive deficit is uptake that the model of the canopy
+    before the cut expects but that was not observed. Thin dashed lines: single episodes. Thick line: mean.
+  </p>
+</Figure>
+
+The deficit of this dive is smaller than the excess of [Deep Dive #1](../disturbance-size/) on the same days. The mean
+difference (H28 − excess) was <Num k="harvest.all.vsDive1.mean" digits={1} sign unit={U} /> (95 % CI
+<Num k="harvest.all.vsDive1.ciLo" digits={1} /> to <Num k="harvest.all.vsDive1.ciHi" digits={1} />,
+n = <Num k="harvest.all.vsDive1.n" digits={0} />). The excess uses a constant reference. The model of this dive also
+follows the weather after the cut, for example darker or colder days in late summer.
+
+<div class="table-wrap">
+<table>
+<caption>Harvest and cut episodes: deficit after 14 days (H14) and after the full window (H28), its GPP and Reco parts, the recovery day, the excess of Deep Dive #1 on the same days, the share of measured half hours after the cut and the deficit from the measured half hours only ({U}).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Dates</th><th scope="col">Crop</th><th scope="col">Class</th><th scope="col" class="num">Days</th><th scope="col" class="num">H14</th><th scope="col" class="num">H28</th><th scope="col" class="num">GPP part</th><th scope="col" class="num">Reco part</th><th scope="col" class="num">Recovery day</th><th scope="col" class="num">Dive #1 excess</th><th scope="col" class="num">Measured</th><th scope="col" class="num">H28 measured</th><th scope="col">Excluded</th></tr>
+</thead>
+<tbody>
+{episodes.map((r) => (<tr id={`episode-${r.id}`}><td>{r.site}</td><td>{r.dates}</td><td class="wrap">{r.crop}</td><td>{r.cls}</td><td class="num">{r.days}</td><td class="num">{r.d14}</td><td class="num">{r.d28}</td><td class="num">{r.gpp}</td><td class="num">{r.reco}</td><td class="num">{r.recovery}</td><td class="num">{r.excess}</td><td class="num">{r.measured}</td><td class="num">{r.measuredD28}</td><td>{r.excluded}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+### Haltiala
+
+**Harvest.** The <Num k="harvest.bySite.haltiala.d28.n" digits={0} /> cereal harvests had a mean deficit of
+<Num k="harvest.bySite.haltiala.d28.mean" digits={1} sign unit={U} /> (SD
+<Num k="harvest.bySite.haltiala.d28.sd" digits={1} />, from <Num k="harvest.bySite.haltiala.d28.min" digits={1} sign /> to
+<Num k="harvest.bySite.haltiala.d28.max" digits={1} sign />). Haltiala is harvested one time at the end of the growing
+season <Cite ids={['ke2025']} note="p. 5" />. The light-saturated GPP of the model before the harvests was
+<Num k="episodes.haltiala-2021-09-10.fit.beta" digits={1} />, <Num k="episodes.haltiala-2022-08-15.fit.beta" digits={1} /> and
+<Num k="episodes.haltiala-2025-10-03.fit.beta" digits={1} unit="µmol m⁻² s⁻¹" />, against
+<Num k="episodes.qvidja-2019-06-10.fit.beta" digits={1} unit="µmol m⁻² s⁻¹" /> before the June 2019 cut at Qvidja. Thus the
+model expects little uptake after a cereal harvest. The carbon in the
+harvested grain and straw is not in this number; [Deep Dive #0](../harvest-carbon/) discusses the export.
+
+**Drought.** Vantaa had <Num k="dry.summary.haltiala.nDry" digits={0} /> dry months in the Haltiala years. The anomalies
+were from <Num k="dry.summary.haltiala.anomaly.min" digits={1} sign /> to
+<Num k="dry.summary.haltiala.anomaly.max" digits={1} sign unit={U} />. June 2023 (SPI-1
+<Num k="example.haltiala2023June.spi1" digits={2} />) is the month of the failed grass: NEE was
+<Num k="example.haltiala2023June.nee" digits={1} unit={U} />, an anomaly of
+<Num k="example.haltiala2023June.anomaly" digits={1} sign unit={U} /> against the
+<Num k="example.haltiala2023June.refN" digits={0} /> other years with different crops. The reference SD of June is large
+(<Num k="dry.months.haltiala.2023-06.refSd" digits={1} unit={U} />), because the cereal crops of the other years were at
+different stages in June. The failure of the grass is associated with the dry June, but the data do not show the
+cause. The regression slope was <Num k="regression.haltiala.monthly.slope" digits={1} sign /> g C m⁻² per SPI unit
+(95 % CI <Num k="regression.haltiala.monthly.ciLo" digits={1} /> to <Num k="regression.haltiala.monthly.ciHi" digits={1} />,
+n = <Num k="regression.haltiala.monthly.n" digits={0} /> months, p = <Num k="regression.haltiala.monthly.p" digits={2} />).
+
+**Seasons.** Over <Num k="allSites.totals.haltiala.nSeasons" digits={0} /> complete seasons, NEE added up to
+<Num k="allSites.totals.haltiala.nee" digits={0} unit={U} />, H to <Num k="allSites.totals.haltiala.harvestDeficit" digits={0} sign unit={U} />
+and D to <Num k="allSites.totals.haltiala.droughtAnomaly" digits={0} sign unit={U} />. Without both, the sum would be
+<Num k="allSites.totals.haltiala.neeWithout" digits={0} unit={U} />. Most of the D is the anomaly of June 2021
+(<Num k="dry.months.haltiala.2021-06.anomaly" digits={1} sign unit={U} />, reference n =
+<Num k="dry.months.haltiala.2021-06.refN" digits={0} />, SD <Num k="dry.months.haltiala.2021-06.refSd" digits={1} />).
+
+### Qvidja
+
+**Harvest.** The mean deficit was <Num k="harvest.bySite.qvidja.d28.mean" digits={1} sign unit={U} />
+(SD <Num k="harvest.bySite.qvidja.d28.sd" digits={1} />, n = <Num k="harvest.bySite.qvidja.d28.n" digits={0} />). The first
+cut of the year in June had the largest deficits. For example, the deficit was
+<Num k="episodes.qvidja-2019-06-10.d28" digits={1} sign unit={U} /> in 2019. In 2023 it was
+<Num k="episodes.qvidja-2023-06-19.d28" digits={1} sign unit={U} />. Heimsch et al. report the mean NEE of the five days
+before and after each harvest. After the June cut of 2018 the field became a net source. After the June cut of 2019 it
+stayed a small net sink <Cite ids={['heimsch2021']} note="p. 7; Table C1, p. 13" />. The deficit of the first
+<Num k="method.earlyDays" digits={0} /> days was <Num k="harvest.bySite.qvidja.share14.mean" digits={0} percent /> of the
+deficit of the full window (mean of the episodes, SD <Num k="harvest.bySite.qvidja.share14.sd" digits={0} percent />). In
+<Num k="harvest.bySite.qvidja.nNoRecovery" digits={0} /> of the <Num k="harvest.bySite.qvidja.d28.n" digits={0} /> episodes the
+deficit did not recover inside the window. The June cuts had a mean deficit of
+<Num k="harvest.qvidjaCuts.june.d28.mean" digits={1} sign unit={U} /> (SD <Num k="harvest.qvidjaCuts.june.d28.sd" digits={1} />,
+n = <Num k="harvest.qvidjaCuts.june.d28.n" digits={0} />). The later cuts of the year had a mean deficit of
+<Num k="harvest.qvidjaCuts.later.d28.mean" digits={1} sign unit={U} /> (SD <Num k="harvest.qvidjaCuts.later.d28.sd" digits={1} />,
+n = <Num k="harvest.qvidjaCuts.later.d28.n" digits={0} />). The deficit was negative after the cuts of September 2022 and July 2024. The September 2022 cut gave
+<Num k="episodes.qvidja-2022-09-09.d28" digits={1} sign unit={U} />. The July 2024 cut gave
+<Num k="episodes.qvidja-2024-07-18.d28" digits={1} sign unit={U} />, with a window of
+<Num k="episodes.qvidja-2024-07-18.daysUsed" digits={0} /> days.
+
+**Drought.** Kaarina Yltöinen had <Num k="dry.summary.qvidja.nDry" digits={0} /> dry months in the Qvidja years;
+<Num k="dry.summary.qvidja.nWithAnomaly" digits={0} /> have an anomaly (March 2018 has too few days of data). The mean
+anomaly was <Num k="dry.summary.qvidja.anomaly.mean" digits={1} sign unit={U} /> (95 % CI
+<Num k="dry.summary.qvidja.anomaly.ciLo" digits={1} /> to <Num k="dry.summary.qvidja.anomaly.ciHi" digits={1} />), thus
+the dry months had a little more uptake than the non-dry years after the harvest was removed. The largest anomaly was
+June 2019 (<Num k="dry.months.qvidja.2019-06.anomaly" digits={1} sign unit={U} />). In that month H was
+<Num k="dry.months.qvidja.2019-06.harvestDeficit" digits={1} sign unit={U} />, thus D depends strongly on the harvest model.
+
+*Worked example: June 2022.* The month was dry (SPI-1 <Num k="example.qvidja2022June.spi1" digits={2} />) and the field
+was cut on 21 June. NEE was <Num k="example.qvidja2022June.nee" digits={1} unit={U} />. The harvest deficit in June was
+<Num k="example.qvidja2022June.harvestDeficit" digits={1} sign unit={U} />, thus NEE_adj =
+<Num k="example.qvidja2022June.neeAdj" digits={1} unit={U} />. The non-dry Junes of 2020 and 2024 had a mean of
+<Num k="example.qvidja2022June.refMean" digits={1} unit={U} /> (SD <Num k="example.qvidja2022June.refSd" digits={1} />,
+n = <Num k="example.qvidja2022June.refN" digits={0} />). The drought anomaly is thus
+<Num k="example.qvidja2022June.anomaly" digits={1} sign unit={U} />, and June 2022 without harvest and drought would have
+been <Num k="example.qvidja2022June.neeWithout" digits={1} unit={U} />.
+
+The monthly regression slope was <Num k="regression.qvidja.monthly.slope" digits={1} sign /> g C m⁻² per SPI unit (95 % CI
+<Num k="regression.qvidja.monthly.ciLo" digits={1} /> to <Num k="regression.qvidja.monthly.ciHi" digits={1} />,
+n = <Num k="regression.qvidja.monthly.n" digits={0} />, p = <Num k="regression.qvidja.monthly.p" digits={2} />). The
+seasonal regressions had few years: spring slope <Num k="regression.qvidja.seasonal.MAM.slope" digits={0} sign /> g C m⁻²
+per SPI unit (n = <Num k="regression.qvidja.seasonal.MAM.n" digits={0} />, p = <Num k="regression.qvidja.seasonal.MAM.p" digits={2} />),
+summer <Num k="regression.qvidja.seasonal.JJA.slope" digits={0} sign /> (n = <Num k="regression.qvidja.seasonal.JJA.n" digits={0} />,
+p = <Num k="regression.qvidja.seasonal.JJA.p" digits={2} />) and autumn <Num k="regression.qvidja.seasonal.SON.slope" digits={0} sign />
+(n = <Num k="regression.qvidja.seasonal.SON.n" digits={0} />, p = <Num k="regression.qvidja.seasonal.SON.p" digits={2} />).
+For the drought summer of 2018, Heimsch et al. report a lower growing-season uptake than in 2019
+<Cite ids={['heimsch2021']} note="p. 8, Table 3" />, and their model run with average weather gave a higher C sink for 2018
+<Cite ids={['heimsch2024']} note="p. 13" />. The authors call this result realistic in relative terms, but not in
+magnitude. Our summer 2018 has NEE <Num k="seasons.qvidja.2018-JJA.nee" digits={1} unit={U} />,
+H <Num k="seasons.qvidja.2018-JJA.harvestDeficit" digits={1} sign unit={U} /> and D
+<Num k="seasons.qvidja.2018-JJA.droughtAnomaly" digits={1} sign unit={U} />. Our method compares June 2018 only with the
+non-dry Junes of 2020 and 2024, and it does not see a drought effect that already starts in May.
+
+**Seasons.** Over <Num k="allSites.totals.qvidja.nSeasons" digits={0} /> complete seasons (2025 not included), NEE added up
+to <Num k="allSites.totals.qvidja.nee" digits={0} unit={U} />, H to <Num k="allSites.totals.qvidja.harvestDeficit" digits={0} sign unit={U} />
+and D to <Num k="allSites.totals.qvidja.droughtAnomaly" digits={0} sign unit={U} />. Without both, the sum would be
+<Num k="allSites.totals.qvidja.neeWithout" digits={0} unit={U} />. The harvest part was
+<Num k="allSites.totals.qvidja.shareHarvestAbs" digits={0} percent /> of the size of both parts.
+
+### Viikki
+
+**Harvest.** The <Num k="harvest.bySite.viikki.d28.n" digits={0} /> episodes had a mean deficit of
+<Num k="harvest.bySite.viikki.d28.mean" digits={1} sign unit={U} /> (SD <Num k="harvest.bySite.viikki.d28.sd" digits={1} />).
+The grass cuts alone had a mean deficit of <Num k="harvest.bySiteCrop.viikki.grass.d28.mean" digits={1} sign unit={U} />
+(SD <Num k="harvest.bySiteCrop.viikki.grass.d28.sd" digits={1} />, n = <Num k="harvest.bySiteCrop.viikki.grass.d28.n" digits={0} />).
+The grass cuts (n = <Num k="harvest.bySiteCrop.viikki.grass.d28.n" digits={0} />) had deficits from <Num k="episodes.viikki-2024-07-31.d28" digits={1} sign /> to
+<Num k="episodes.viikki-2022-07-01.d28" digits={1} sign unit={U} />. The 2022 grass cuts were on 1 July and 27 August
+<Cite ids={['gao2026']} note="p. 13, Table A2" />. The barley mixture of 2023 (harvested on 17 August
+<Cite ids={['gao2026']} note="p. 3" />) gave <Num k="episodes.viikki-2023-08-17.d28" digits={1} sign unit={U} /> and the faba
+bean of 2025 <Num k="episodes.viikki-2025-09-10.d28" digits={1} sign unit={U} />.
+
+**Drought.** Vantaa had <Num k="dry.summary.viikki.nDry" digits={0} /> dry months in the Viikki years. No calendar month
+had <Num k="method.minRefYears" digits={0} /> non-dry years of the same crop class, thus all anomalies use all non-dry
+years. The anomalies were from <Num k="dry.summary.viikki.anomaly.min" digits={1} sign /> (May 2024) to
+<Num k="dry.summary.viikki.anomaly.max" digits={1} sign unit={U} /> (April 2023, the barley year). The regression slope was
+<Num k="regression.viikki.monthly.slope" digits={1} sign /> g C m⁻² per SPI unit (95 % CI
+<Num k="regression.viikki.monthly.ciLo" digits={1} /> to <Num k="regression.viikki.monthly.ciHi" digits={1} />,
+n = <Num k="regression.viikki.monthly.n" digits={0} />, p = <Num k="regression.viikki.monthly.p" digits={2} />).
+
+**Seasons.** Over <Num k="allSites.totals.viikki.nSeasons" digits={0} /> complete seasons, NEE added up to
+<Num k="allSites.totals.viikki.nee" digits={0} unit={U} />, H to <Num k="allSites.totals.viikki.harvestDeficit" digits={0} sign unit={U} />
+and D to <Num k="allSites.totals.viikki.droughtAnomaly" digits={0} sign unit={U} />. Without both, the sum would be
+<Num k="allSites.totals.viikki.neeWithout" digits={0} unit={U} />. The harvest part was
+<Num k="allSites.totals.viikki.shareHarvestAbs" digits={0} percent /> of the size of both parts.
+
+<div class="table-wrap">
+<table>
+<caption>Seasons per site: observed NEE, number of harvest episodes that start in the season, harvest deficit H, dry months, drought anomaly D and NEE without both = NEE − H − D ({U} per season).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Season</th><th scope="col" class="num">NEE</th><th scope="col" class="num">Harvests</th><th scope="col" class="num">H</th><th scope="col">Dry months</th><th scope="col" class="num">D</th><th scope="col" class="num">NEE without</th><th scope="col">Note</th></tr>
+</thead>
+<tbody>
+{seasons.map((r) => (<tr id={`season-${r.id}`}><td>{r.site}</td><td>{r.season}</td><td class="num">{r.nee}</td><td class="num">{r.harvests}</td><td class="num">{r.h}</td><td>{r.dry}</td><td class="num">{r.dAnom}</td><td class="num">{r.without}</td><td class="wrap">{r.note}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+### All sites together
+
+<div class="table-wrap">
+<table>
+<caption>All sites per season: mean ± SD [95 % CI] over the complete site-years with a known harvest record ({U} per season).</caption>
+<thead>
+<tr><th scope="col">Season</th><th scope="col" class="num">n</th><th scope="col" class="num">NEE</th><th scope="col" class="num">H</th><th scope="col" class="num">D</th><th scope="col" class="num">NEE without</th></tr>
+</thead>
+<tbody>
+{bySeason.map((r) => (<tr id={`by-season-${r.id}`}><td>{r.season}</td><td class="num">{r.n}</td><td class="num">{r.nee}</td><td class="num">{r.h}</td><td class="num">{r.dAnom}</td><td class="num">{r.without}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+In summer the mean H was <Num k="allSites.bySeason.JJA.harvestDeficit.mean" digits={1} sign unit={U} /> (95 % CI
+<Num k="allSites.bySeason.JJA.harvestDeficit.ciLo" digits={1} /> to <Num k="allSites.bySeason.JJA.harvestDeficit.ciHi" digits={1} />,
+n = <Num k="allSites.bySeason.JJA.n" digits={0} />) and the mean D <Num k="allSites.bySeason.JJA.droughtAnomaly.mean" digits={1} sign unit={U} />
+(95 % CI <Num k="allSites.bySeason.JJA.droughtAnomaly.ciLo" digits={1} /> to <Num k="allSites.bySeason.JJA.droughtAnomaly.ciHi" digits={1} />).
+Spring has no harvest. In autumn both parts were small. Over all <Num k="allSites.totals.all.nSeasons" digits={0} /> complete
+seasons, the observed NEE added up to <Num k="allSites.totals.all.nee" digits={0} unit={U} />, and without harvest and
+drought it would be <Num k="allSites.totals.all.neeWithout" digits={0} unit={U} />.
+
+<Figure
+  id="figure-3"
+  title="Figure 3. Observed NEE, harvest deficit, drought anomaly and NEE without both, per site and season"
+  svg={fig3.svg}
+  alt={fig3.alt}
+  view={{ name: 'Seasonal NEE', sites: SITES3, variables: ['nee_f'], yearFrom: 2018, yearTo: 2025, aggregation: 'month', events: true, diagrams: ['timeseries', 'budget'] }}
+>
+  <p>
+    One group of bars per year and season. Dark bars: observed NEE. Blue bars with dots: harvest deficit H. Orange bars
+    with stripes: drought anomaly D. Hollow diamond: NEE − H − D. Light hatched bars: Qvidja 2025, harvest record unknown,
+    not in the totals. A positive H or D is uptake that was lost.
+  </p>
+</Figure>
+
+<Figure
+  id="figure-4"
+  title="Figure 4. Monthly NEE anomaly against SPI-1, per site"
+  svg={fig4.svg}
+  alt={fig4.alt}
+  view={{ name: 'Monthly NEE and rain', sites: SITES3, variables: ['nee_f', 'precip'], yearFrom: 2018, yearTo: 2025, aggregation: 'month', diagrams: ['scatter'] }}
+>
+  <p>
+    One point per site-month from March to November. The anomaly is NEE minus the harvest deficit of the month, minus the
+    mean of the same calendar month of the site. A negative SPI-1 is a dry month. Dashed line: least-squares line. Dotted
+    line: SPI-1 = −1. A positive slope means less uptake in wetter months.
+  </p>
+</Figure>
+
+At none of the three sites did the monthly NEE anomaly have a clear relation with SPI-1: the slopes were positive at all sites,
+but the 95 % CI included zero. A positive slope means that dry months had a little more uptake. A possible reason is
+that dry months have more light. This dive does not test that. [Deep Dive #2](../natural-events/) also found more uptake on dry-spell days.
+
+### Northern sites (Kuopio)
+
+Anttila and Särkisuo have data for the years 2022 and 2023 only, thus there is no reference for an anomaly. Kuopio Maaninka had
+<Num k="north.nDry" digits={0} /> dry months in 2022 and 2023: March 2022 (SPI-1 <Num k="north.dryMonths.2022-03.spi1" digits={2} />)
+and September 2022 (<Num k="north.dryMonths.2022-09.spi1" digits={2} />). In September 2022 the NEE was
+<Num k="north.dryMonths.2022-09.sites.anttila.nee" digits={1} unit={U} /> at Anttila (September 2023:
+<Num k="north.dryMonths.2022-09.sites.anttila.neeOther" digits={1} />) and <Num k="north.dryMonths.2022-09.sites.sarkisuo.nee" digits={1} unit={U} />
+at Särkisuo (September 2023: <Num k="north.dryMonths.2022-09.sites.sarkisuo.neeOther" digits={1} />). Each value is one
+site-month (n = 1); there is no spread. In March 2022 the NEE was
+<Num k="north.dryMonths.2022-03.sites.anttila.nee" digits={1} unit={U} /> at Anttila (March 2023:
+<Num k="north.dryMonths.2022-03.sites.anttila.neeOther" digits={1} />) and <Num k="north.dryMonths.2022-03.sites.sarkisuo.nee" digits={1} unit={U} />
+at Särkisuo (March 2023: <Num k="north.dryMonths.2022-03.sites.sarkisuo.neeOther" digits={1} />), a small release in both years. The northern sites did not have the dry June 2023 of the south: SPI-1 of
+June 2023 was <Num k="north.june2023.kuopioSpi1" digits={2} /> at Kuopio Maaninka and <Num k="north.june2023.vantaaSpi1" digits={2} />
+at Vantaa.
+
+## Limits and uncertainty
+
+- **The harvest deficit can be too large.** The model keeps the canopy of the PRE days for the full window. A grass canopy
+  that was not cut would also age, and its uptake would change. At Qvidja the leaf area of 2021 did not recover after the
+  June harvest <Cite ids={['heimsch2024']} note="p. 6" />. The window after the cut is limited to
+  <Num k="method.afterDays" digits={0} /> days. A loss after that is not in H, and a deficit inside the cut days of a
+  multi-day episode is not in H.
+- **Model fit.** The light response and the reference respiration come from <Num k="method.preDays" digits={0} /> days only.
+  A low reference respiration before the cut gives a large Reco part after it, for example June 2018 and June 2023 at
+  Qvidja (see the episode table). The GPP and Reco after the cut come from the night-time partitioning
+  <Cite ids={['calculated-doc']} />, not from measurements. We did not use the GPP and Reco of the data provider
+  (<a href={`${base}data-report/#finding-QVI-07`}>finding QVI-07</a>).
+- **Gap-filled NEE.** Only <Num k="sites.qvidja.measuredShareAfter.mean" digits={0} percent /> (mean) of the half hours after
+  the cuts at Qvidja and <Num k="sites.viikki.measuredShareAfter.mean" digits={0} percent /> at Viikki were measured. With the
+  measured half hours only, the mean deficit was <Num k="harvest.bySite.qvidja.measuredD28.mean" digits={1} sign unit={U} />
+  at Qvidja (95 % CI <Num k="harvest.bySite.qvidja.measuredD28.ciLo" digits={1} /> to
+  <Num k="harvest.bySite.qvidja.measuredD28.ciHi" digits={1} />, n = <Num k="harvest.bySite.qvidja.measuredD28.n" digits={0} />)
+  and <Num k="harvest.bySite.viikki.measuredD28.mean" digits={1} sign unit={U} /> at Viikki
+  (n = <Num k="harvest.bySite.viikki.measuredD28.n" digits={0} />). Single episodes can differ much (episode table). The
+  annual NEE of Qvidja is more negative than in the article of Heimsch et al.
+  (<a href={`${base}data-report/#finding-QVI-11`}>finding QVI-11</a>).
+- **Small references.** June at Kaarina was dry in most years, thus the Qvidja June reference has
+  n = <Num k="dry.months.qvidja.2022-06.refN" digits={0} />. At Haltiala and Viikki most references have only
+  <Num k="method.minRefYears" digits={0} /> years (see the table of the dry site-months). One year more or less can change D much. The regression uses all
+  months and is the stronger test.
+- **Crop and phenology.** At Haltiala and Viikki the crop changes from year to year. A dry month of a cereal year is
+  compared with other cereal years only when there are enough of them, else with all crops. Thus D also contains the
+  differences between the crops and their stages (for example Haltiala June, Viikki April 2023).
+- **Drought index.** SPI uses only precipitation. SPEI also uses the evaporation. Heimsch et al. used SPEI, and
+  their classes are different from ours <Cite ids={['heimsch2024']} note="p. 5" />. The stations are about <Num k="method.stationKm.haltiala" digits={0} /> to
+  <Num k="method.stationKm.qvidja" digits={0} unit="km" /> from the sites, and summer rain is local. The project team used the
+  `spi()` function of the SPEI R package with the reference period 1981 to 2010 and the defaults of the function (gamma
+  distribution, unbiased probability-weighted moments) <Cite ids={['spi-data']} />. The PNG files in `data/SPI/` cut the bars at plus and minus three; the CSV file has the full values. We did not
+  use soil water, because the soil water of Haltiala 2021 is not comparable with the later years
+  (<a href={`${base}data-report/#finding-HAL-03`}>finding HAL-03</a>). The Qvidja rain gauge has a gap from December 2021 to
+  May 2022 (<a href={`${base}data-report/#finding-QVI-08`}>finding QVI-08</a>), thus we used the station. The humidity of
+  Qvidja before October 2021 has a dry bias (<a href={`${base}data-report/#finding-QVI-04`}>finding QVI-04</a>); VPD is not
+  an input of our model, but it can affect the gap filling.
+- **Unknown harvests.** The Qvidja management file has no harvest in 2025. We kept 2025 out of the references and the
+  totals. Haltiala 2023 was a failed grass crop without a harvest.
+- **Time stamps.** The raw stamps of Viikki are UTC, but the build reads them as local time, thus the values are two
+  hours early (<a href={`${base}data-report/#finding-VII-01`}>finding VII-01</a>). For monthly and seasonal sums this is
+  not important. For the deficit, the time error can move some half hours
+  after a cut to the wrong day.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `site/src/deep-dives/nee-without-harvest-drought.json`. The script
+[`scripts/deep-dives/nee-without-harvest-drought.ts`](https://github.com/RJuho/inar-agri/blob/main/scripts/deep-dives/nee-without-harvest-drought.ts)
+writes this file. It reads only `db/sites.parquet`, `db/events.parquet`, `data/calculated/daily.parquet`,
+`data/calculated/fluxes_30min.parquet` and `data/SPI/SPI_all_stations.csv`. The pure helpers are in
+`scripts/lib/deep-dive/counterfactual.ts` and `scripts/lib/deep-dive/spi.ts` (unit tests `counterfactual.test.ts` and
+`spi.test.ts`).
+
+```sh
+npm run build:db && npm run calc                     # make the inputs
+npm run deep-dives -- nee-without-harvest-drought    # write the JSON again
+npm run deep-dives -- --check                        # compare a fresh run with the committed JSON
+```

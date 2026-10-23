@@ -68,6 +68,16 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Key continuous columns: `FC` (-8.2375), `CO2` (395.027), `H2O` (21.2876), `H` (254.98), `LE` (-9999), `USTAR` (0.58), `WS`, `WD` (48.3), `TA_1_1_1` (27.43), `RH_1_1_1` (59.79), `PA_1_1_1` (89.7), `P_RAIN_1_1_1` (0), `SW_IN_1_1_1` (754.7), `NETRAD_1_1_1`, `NDVI_1_1_1` (0.3647), `SWC_1_1_1` (0.0845), `TS_1_1_1` (26.49), `G_1_1_1` (19.85), `SWP_2_1_1` (-933.4).
 - Site: -3.425833, 38.139444 (project team, 2026-10-22; earlier value -3.425859, 38.140663), UTC+3, maize 80 % and vegetables 20 %, EC height 3.3 m. `Ancillary_KE-Mkt.csv` is a key/value metadata file in Windows-1252 encoding. `BADM-Site-General-Info-KE-Mkt.xlsx` is the AmeriFlux BADM template.
 
+### SPI (`data/SPI/`)
+
+- FMI monthly precipitation, one CSV per station: `Vantaa_HelsinkiVantaa_airport_monthlyprecip_1980_2026.csv`, `Kaarina_Yltöinenmonthlyprecip_1980_2026.csv`, `Kuopio_Maaninkamonthlyprecip_1980_2026.csv`. `Helsinki_Kumpula_monthlyprecip2006_2026.csv` has gaps and no 1981–2010 normal; not used.
+- Quoted CSV, comma delimiter. Columns `Observation station`, `Year`, `Month`, `Day`, `Time [Local time]`, `Monthly precipitation [mm]` (15.9). Missing value: `-`. One month row is absent: Vantaa 1986-04, Kaarina 1995-01, Kuopio 2014-08.
+- Station to site: Vantaa → Haltiala and Viikki, Kaarina Yltöinen → Qvidja, Kuopio Maaninka → Anttila and Särkisuo (`STATION_OF_SITE` in `scripts/lib/deep-dive/spi.ts`).
+- `SPIanalysis.R`: SPEI R package, `spi()`, gamma distribution, reference period 1981–2010, scales 1, 3, 6 and 12 months.
+- `SPI_all_stations.csv`: the R output. 1684 lines (header + 3 × 561 months, 1980-01 to 2026-09), CRLF. Columns `Date` (`1980-01-01`), `Observation.station`, `Year`, `Month`, `Day`, `Time..Local.time.`, `Monthly.precipitation..mm.` (15.9), `SPI1` (-1.47034979186087), `SPI3`, `SPI6`, `SPI12`, `Station` (`Kaarina Yltöinen`, `Vantaa`, `Kuopio Maaninka`). Missing value: `NA` (absent months and the k-month windows that contain them). The values are not capped; minimum SPI-1 −3.51.
+- `SPI_vantaa.png`, `SPI_Kaarina_Yltöinen.png`, `SPI_Kuopio_Maaninka.png`: SPI plots from 2022 onwards, bars capped at ±3.
+- `parseSpiCsv()` in `scripts/lib/deep-dive/spi.ts` parses `SPI_all_stations.csv` (dry month: SPI-1 ≤ −1).
+
 ## Read rules for `data/`
 
 - Treat `data/` as read-only. Do not write, rename or reformat files there.
@@ -167,7 +177,7 @@ A Deep Dive is a short article that an AI assistant writes from our data. Each d
 ### Files
 
 - Article: `site/src/pages/deep-dive/<slug>.mdx` (MDX, `@astrojs/mdx` 8.1.0, frontmatter `layout: ../../layouts/DeepDive.astro`). The list page `site/src/pages/deep-dive/index.astro` finds all MDX files of the folder with `import.meta.glob('./*.mdx', { eager: true })`.
-- Script: `scripts/deep-dives/<slug>.ts` (Node, `@duckdb/node-api`, helpers from `scripts/lib/duck.ts` and `scripts/lib/deep-dive/`). It exports `slug`, `title`, `inputs` and `run(conn)`. It reads only `db/*.parquet` and `data/calculated/*`. Pure helpers go in `scripts/lib/deep-dive/` with a `*.test.ts` file (`npm run test:unit` runs them).
+- Script: `scripts/deep-dives/<slug>.ts` (Node, `@duckdb/node-api`, helpers from `scripts/lib/duck.ts` and `scripts/lib/deep-dive/`). It exports `slug`, `title`, `inputs` and `run(conn)`. It reads only `db/*.parquet`, `data/calculated/*` and `data/SPI/*.csv` (`ALLOWED_INPUT` in `scripts/deep-dives.ts`). Pure helpers go in `scripts/lib/deep-dive/` with a `*.test.ts` file (`npm run test:unit` runs them).
 - Result: `site/src/deep-dives/<slug>.json`. `npm run deep-dives` (`scripts/deep-dives.ts`) writes it: the results, the figure data and `dataVersion` (time of the run, git commit and dirty flag, `builtAt` of `db/report.json` and `data/calculated/report.json`, size and SHA-256 of each input). Numbers have 10 significant digits. Commit the JSON: the article is a fixed snapshot.
 - Shared code: `site/src/lib/deepDive.ts` (frontmatter schema, `diveNumber()`, `fmtNum()`, references, `dataPageHref()`, `checkBody()`), `site/src/lib/deepDiveChart.ts` (`renderSvg()`, colours), `site/src/lib/deepDives/<slug>.ts` (figures and tables of one dive), components in `site/src/components/deep-dive/` (`Num`, `Figure`, `Cite`, `References`), styles `site/src/styles/deep-dive.css`.
 
