@@ -228,6 +228,13 @@
   color: var(--link);
 }
 
+/* A folded group of long tables (for example the composite values per day). */
+details.dd-table > summary {
+  cursor: pointer;
+  color: var(--link);
+  padding: 6px 0;
+}
+
 .dd-figure-link a {
   color: var(--link);
 }

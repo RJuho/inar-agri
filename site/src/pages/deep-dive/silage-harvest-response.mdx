@@ -1,0 +1,391 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 7
+title: 'Silage harvest and grassland CO₂ fluxes: GPP, TER and NEE around the cut'
+question: How do daily GPP, TER and NEE of a grassland develop from two weeks before to four weeks after a silage harvest, per site and over all sites?
+shortAnswer: 'After a silage harvest, GPP falls by roughly half, NEE rises by nearly as much, and TER changes little. Two to four weeks later, GPP is on average still below its level before the harvest.'
+sites: [anttila, sarkisuo, qvidja, viikki]
+variables: [gpp, reco, nee_f]
+period: { from: 2018, to: 2024 }
+date: '2026-10-25'
+status: draft
+models:
+  - model: Claude Fable 5.1
+    role: question, plan, final text
+  - model: Claude Opus 5.5
+    role: Python analysis script, figures, article draft and site integration
+  - model: Claude Sonnet 5.5
+    role: independent recompute of the numbers (own code, without the script and the JSON)
+  - model: Claude Haiku 5.5
+    role: language (STE) and reference review
+script: analysis/silage-harvest-response/silage-harvest-response.py
+references: [shurpali2025, heimsch2021, heimsch2024, gao2026, qvidja-management, viikki-management, haltiala-management, calculated-doc, anomaly-report]
+checks:
+  - kind: recompute
+    by: Claude Sonnet 5.5
+    date: '2026-10-25'
+    result: pass
+    note: Own code from the built page and the snapshot, without the script and the JSON. The episode list, the exclusions, all per-episode changes, the recovery, the change-point offsets, the pre-drop, the summaries and the composite tables agree; the bootstrap bounds differ by the generator only. The agent listed the rules it had to guess; the method text now states the event span, the text that the group rule reads, the overlap span, the measured-fraction mean, the next disturbance, the censor order and the change-point reference.
+  - kind: review
+    by: Claude Haiku 5.5
+    date: '2026-10-25'
+    result: pass
+    note: One pass, partial. Must items fixed by Claude Fable 5.1, who checked the pages and the event sources - the short answer ("about half", "the same amount", "four weeks"), the mean days to recover without the censored episodes, the SD in the day-by-day tables and the figure texts, the Viikki citations (the 14 June 2024 cut and "about one hectare" come from the project event file, the 24 August 2023 harvest from the management file, the crop names from the management file), the Qvidja history (annual rotation 2008 to 2016, grass sown in 2017, Heimsch et al. 2021 p. 3), the Haltiala reason, the finding status wording and the pre-drop sign. Style items (one fact per sentence, term list) were applied in part.
+---
+
+import raw from '../../../../analysis/silage-harvest-response/results.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+import { compositeLabel, compositeRows, epKey, episodeRows, inputRows, overrideTexts, silageData, summaryRows } from '../../lib/deepDives/silageHarvestResponse';
+
+export const d = silageData(raw);
+export const base = baseUrl();
+export const U = 'g C m⁻² d⁻¹';
+export const SITES = ['anttila', 'sarkisuo', 'qvidja', 'viikki'];
+export const VARS = ['gpp', 'reco', 'nee_f'];
+export const VIEW = { name: 'Silage harvest response', sites: SITES, variables: VARS, yearFrom: 2018, yearTo: 2024, aggregation: 'day', events: true, diagrams: ['timeseries'] };
+export const E = (id) => epKey(d, id);
+export const episodes = episodeRows(d);
+export const summary = summaryRows(d);
+export const inputs = inputRows(d);
+export const overrides = overrideTexts(d);
+export const BLOCKS = ['anttila', 'sarkisuo', 'qvidja', 'viikki', 'all'];
+
+export function Composite({ block }) {
+  return (
+    <div class="table-wrap">
+      <table>
+        <caption>{compositeLabel(d, block)}: mean ± sample SD of the episodes per day (GPP, TER and NEE in % of the mean GPP of the {d.method.windowDays} days before the start of the episode) and the number of episodes with a value (n). An empty cell = fewer than {d.method.compositeMinN} episodes with a value.</caption>
+        <thead>
+          <tr><th scope="col" class="num">Day</th><th scope="col" class="num">GPP mean ± SD</th><th scope="col" class="num">n</th><th scope="col" class="num">TER mean ± SD</th><th scope="col" class="num">n</th><th scope="col" class="num">NEE mean ± SD</th><th scope="col" class="num">n</th></tr>
+        </thead>
+        <tbody>
+          {compositeRows(d, block).map((r) => (<tr id={r.id}><td class="num">{r.day}</td><td class="num">{r.gpp}</td><td class="num">{r.gppN}</td><td class="num">{r.reco}</td><td class="num">{r.recoN}</td><td class="num">{r.nee}</td><td class="num">{r.neeN}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+## Short answer
+
+This dive follows the daily GPP, TER and NEE of four grasslands around a silage harvest. TER is the total ecosystem
+respiration (the column `reco` of the night-time partitioning). NEE is the gap-filled NEE; NEE below zero is uptake. The
+window runs from <Num k="method.windowDays" digits={0} /> days before to <Num k="method.compositeTo" digits={0} /> days after
+the harvest. Fluxes are in {U}. The summaries use the <Num k="counts.used" digits={0} /> used episodes of
+<Num k="counts.silageEpisodes" digits={0} />.
+
+- **Drop and rise.** In the <Num k="method.windowDays" digits={0} /> days after a harvest, the mean daily GPP was
+  <Num k="summary.all.deltaGpp.mean" unit={U} /> lower than in the <Num k="method.windowDays" digits={0} /> days before
+  (n = <Num k="summary.all.n" digits={0} />, SD <Num k="summary.all.deltaGpp.sd" />, <Num k="method.ciLevelPct" digits={0} /> %
+  interval <Num k="summary.all.deltaGpp.ciLo" /> to <Num k="summary.all.deltaGpp.ciHi" />). That is
+  <Num k="summary.all.relGpp.mean" sign digits={0} unit="%" /> of the GPP before (interval
+  <Num k="summary.all.relGpp.ciLo" sign digits={0} /> to <Num k="summary.all.relGpp.ciHi" sign digits={0} /> %). NEE rose by
+  <Num k="summary.all.deltaNee.mean" sign unit={U} /> (SD <Num k="summary.all.deltaNee.sd" />, interval
+  <Num k="summary.all.deltaNee.ciLo" sign /> to <Num k="summary.all.deltaNee.ciHi" sign />), or
+  <Num k="summary.all.relNee.mean" sign digits={0} unit="%" /> of the GPP before (interval
+  <Num k="summary.all.relNee.ciLo" sign digits={0} /> to <Num k="summary.all.relNee.ciHi" sign digits={0} /> %). TER changed by
+  <Num k="summary.all.deltaReco.mean" sign unit={U} /> (SD <Num k="summary.all.deltaReco.sd" />, interval
+  <Num k="summary.all.deltaReco.ciLo" sign /> to <Num k="summary.all.deltaReco.ciHi" sign />), or
+  <Num k="summary.all.relReco.mean" sign digits={0} unit="%" /> of the GPP before (interval
+  <Num k="summary.all.relReco.ciLo" sign digits={0} /> to <Num k="summary.all.relReco.ciHi" sign digits={0} /> %); this interval
+  includes zero.
+- **Recovery.** In the days <Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} /> after
+  the harvest, GPP was <Num k="summary.all.recoveryShare.mean" digits={0} unit="%" /> of its level before
+  (n = <Num k="summary.all.recoveryShare.n" digits={0} />, SD <Num k="summary.all.recoveryShare.sd" digits={0} />, interval
+  <Num k="summary.all.recoveryShare.ciLo" digits={0} /> to <Num k="summary.all.recoveryShare.ciHi" digits={0} /> %).
+  <Num k="summary.all.nRecovered" digits={0} /> of <Num k="summary.all.n" digits={0} /> episodes came back to
+  <Num k="method.recoverySharePct" digits={0} /> % of the GPP before within <Num k="method.recoveryMaxDays" digits={0} /> days;
+  among these, the mean time was <Num k="summary.all.daysToRecover.mean" digits={1} unit="days" /> (median
+  <Num k="summary.all.daysToRecover.median" digits={1} />, SD <Num k="summary.all.daysToRecover.sd" digits={1} />, interval
+  <Num k="summary.all.daysToRecover.ciLo" digits={1} /> to <Num k="summary.all.daysToRecover.ciHi" digits={1} /> days). The
+  other <Num k="summary.all.nCensored" digits={0} /> episodes did not reach this level, so the mean does not include them.
+- **Timing.** <Num k="summary.all.clearDrops" digits={0} /> of <Num k="summary.all.timingUsed" digits={0} /> used episodes
+  have a clear GPP drop. The detected day minus the recorded date was <Num k="summary.all.gppOffset.mean" sign digits={1} unit="days" />
+  on average, that is, before the recorded date (SD <Num k="summary.all.gppOffset.sd" digits={1} />, interval
+  <Num k="summary.all.gppOffset.ciLo" sign digits={1} /> to <Num k="summary.all.gppOffset.ciHi" sign digits={1} /> days, median
+  <Num k="summary.all.gppOffset.median" sign digits={0} /> days): <Num k="summary.all.nBefore" digits={0} /> drops before,
+  <Num k="summary.all.nOn" digits={0} /> on and <Num k="summary.all.nAfter" digits={0} /> after the recorded date. The section
+  "Timing of the GPP drop" gives the pre-drop of the days before the recorded date.
+
+The changes are associated with the harvests. The weather, the season and the crop stage change in the same windows. The
+analysis does not show that a harvest caused a change.
+
+## Data and method
+
+**Snapshot and script.** The script `analysis/silage-harvest-response/silage-harvest-response.py` reads the harmonised
+database snapshot built on {d.dataVersion.snapshot.builtAt} (`db/events.parquet`, `db/sites.parquet`,
+`db/variables.parquet`) and `data/calculated/daily.parquet` of the same build <Cite ids={['calculated-doc']} />. It checks
+the SHA-256 and the row count of each file before it reads data (section "Reproduce"). The rules are those of Deep Dive #4
+(<a href={`${base}deep-dive/disturbance-detail/`}>Disturbance detail</a>), ported to Python. All windows include both end
+days. The nine rules below give each constant; open them to reproduce the numbers.
+
+<details class="dd-table" id="method-rules">
+<summary>Rules of the analysis (nine rules and the overrides)</summary>
+
+1. **Data.** The daily GPP, TER and gap-filled NEE ({U}) and the measured fraction of NEE per local day come from
+   `data/calculated/daily.parquet`. TER is the Reco column of the night-time partitioning <Cite ids={['calculated-doc']} />.
+   The local day is the period start in UTC plus the UTC offset of the site (`utc_offset_min`, UTC+2 for all four sites). The
+   events come from `db/events.parquet`.
+2. **Episodes.** The events of `type` `harvest` and `cut` of each of the five Finnish sites (Anttila, Särkisuo, Haltiala,
+   Qvidja, Viikki) are sorted by date. An event
+   spans the days `date` to `date_end` (or `date` only). An event that starts not more
+   than <Num k="method.mergeDays" digits={0} /> days after the last day of the current episode joins it; the episode then
+   ends on the last day of all its events. The *recorded date* is the first event date of the episode. Then the <Num k="counts.overrides" digits={0} />
+   overrides of Deep Dive #4 apply (list below); they change the first or the last day of an episode. An override that
+   matches no episode stops the script. The *group* of an event: a `cut` is a cleaning cut; a `harvest` whose text (the
+   `crop` field, a space, the `detail` field) matches *thresh*, *grain*, *faba*, the whole word *oats*, or *barley* (any
+   case) and does not match the whole word *cut*, *silage* or *grass* (any case) is a grain harvest; every other `harvest`
+   is a silage harvest. The group of an episode is grain
+   when one of its events is a grain harvest, else silage when one event is a harvest, else cleaning cut. The dive keeps the
+   silage harvest episodes: <Num k="counts.silageEpisodes" digits={0} />.
+3. **Windows and change.** From the first day (*start*) and the last day (*end*) of the episode after the overrides: before =
+   start <Num k="method.beforeDays.0" sign digits={0} /> to start <Num k="method.beforeDays.1" sign digits={0} />, after = end
+   <Num k="method.afterDays.0" sign digits={0} /> to end <Num k="method.afterDays.1" sign digits={0} />, late = end
+   <Num k="method.lateDays.0" sign digits={0} /> to end <Num k="method.lateDays.1" sign digits={0} />. The window mean is the
+   mean of the days with a value. The change Δ = mean after − mean before, for GPP, TER and NEE; it is empty when a side has
+   fewer than <Num k="method.minDays" digits={0} /> days with a value. The relative change of each of the three fluxes is
+   100 × Δ / mean GPP before; it is empty when the mean GPP before is below <Num k="method.minGppBefore" digits={1} unit={U} />.
+   Because NEE = TER − GPP, NEE % = TER % − GPP %.
+4. **Exclusions**, in this order: (1) *overlap*: the span (first to last day) of another harvest or cut episode of the site,
+   of any group, or the span of a grazing or tillage event, has a day in common with the days
+   start <Num k="method.beforeDays.0" sign digits={0} /> to end <Num k="method.afterDays.1" sign digits={0} />
+   (<Num k="counts.excluded.overlap" digits={0} /> episodes); (2) *too few days*: GPP, TER or NEE has fewer than
+   <Num k="method.minDays" digits={0} /> days in the before or the after window (<Num k="counts.excluded.too-few-days" digits={0} />);
+   (3) *low measured fraction*: the mean measured fraction of NEE (`frac_measured`, 0 to 1, over the days with a value) is
+   below <Num k="method.minFracPct" digits={0} /> % in the before or the after window
+   (<Num k="counts.excluded.low-measured-fraction" digits={0} />). A fertilisation in the windows only sets a flag.
+   <Num k="counts.used" digits={0} /> episodes are used. Table A gives the windows, the recovery and the timing of all
+   <Num k="counts.silageEpisodes" digits={0} /> episodes; the summaries and the figures use the used episodes only.
+5. **Recovery.** The *next disturbance* is the smallest start of a harvest or cut episode of the site that starts after end,
+   or of a grazing event that starts after end, minus end; a tillage does not count. The recovery share = 100 × mean GPP of the late window / mean GPP before; empty
+   when the next disturbance starts <Num k="method.lateDays.1" digits={0} /> days or less after end, when the late window has
+   fewer than <Num k="method.minDays" digits={0} /> days, or when the GPP before is below
+   <Num k="method.minGppBefore" digits={1} unit={U} />. The days to recover = the first day *d* (1 to
+   <Num k="method.recoveryMaxDays" digits={0} /> after end) whose centred <Num k="method.recoveryRunDays" digits={0} />-day
+   running mean of GPP (<Num k="method.recoveryMinRun" digits={0} /> or more values) is
+   <Num k="method.recoverySharePct" digits={0} /> % or more of the GPP before. Before each day *d* is tested, the episode is
+   censored when the next disturbance comes first (*d* + 2 ≥ next, "blocked"); after a failed test it is censored when no GPP
+   day remains from *d* to day <Num k="method.recoveryMaxDays" digits={0} /> + 2 ("data end"); when no day passes, it is
+   censored at day <Num k="method.recoveryMaxDays" digits={0} /> ("max days").
+6. **Composite curves.** Per site and over all used episodes, for the days <Num k="method.compositeFrom" sign digits={0} /> to
+   <Num k="method.compositeTo" sign digits={0} /> from start. The value of an episode is empty from the day end + next
+   disturbance on. GPP, TER and NEE are in percent of the mean GPP before of the episode (empty when it is below
+   <Num k="method.minGppBefore" digits={1} unit={U} />). Per day: the mean, the sample SD and n over the episodes; the mean and
+   the SD are empty when n is below <Num k="method.compositeMinN" digits={0} />. The y range of both figures is one range over
+   all mean ± SD of the five panels, rounded outwards to a multiple of <Num k="method.yStep" digits={0} /> and extended to hold 0
+   and 100: <Num k="composite.yRange.0" digits={0} /> to <Num k="composite.yRange.1" digits={0} /> %.
+7. **Change point.** For each candidate day *t* from start <Num k="method.searchFrom" sign digits={0} /> to end
+   <Num k="method.searchTo" sign digits={0} />, drop(*t*) = mean GPP of *t* − <Num k="method.sideDays" digits={0} /> to *t* − 1
+   minus mean GPP of *t* to *t* + <Num k="method.sideDays" digits={0} /> − 1, each side with
+   <Num k="method.minSideGpp" digits={0} /> or more values. The detected day is the *t* with the largest drop (the first on a
+   tie). The drop is *clear* when the mean of the <Num k="method.sideDays" digits={0} /> days before the detected day is
+   <Num k="method.minBeforeGpp" digits={0} unit={U} /> or more and the drop is <Num k="method.minDropPct" digits={0} /> % or
+   more of it. Offset = detected day − recorded date (the first event date
+   before the overrides); negative = the drop came before the recorded date. An episode has no timing result when another
+   harvest or cut episode, or a grazing or tillage event, overlaps start <Num k="method.spanOverlapFrom" sign digits={0} /> to
+   end <Num k="method.spanOverlapTo" sign digits={0} />, or when no candidate day has enough GPP days. *Pre-drop* = 100 × (mean
+   GPP of the days <Num k="method.preNear.0" sign digits={0} /> to <Num k="method.preNear.1" sign digits={0} /> − mean of the
+   days <Num k="method.preFar.0" sign digits={0} /> to <Num k="method.preFar.1" sign digits={0} />) / mean of the days
+   <Num k="method.preFar.0" sign digits={0} /> to <Num k="method.preFar.1" sign digits={0} />, counted from the recorded date;
+   the far window needs <Num k="method.preMinFar" digits={0} /> or more values and a mean of
+   <Num k="method.minBeforeGpp" digits={0} unit={U} /> or more, the near window <Num k="method.preMinNear" digits={0} /> or more
+   values.
+8. **Statistics.** Per site and over all used episodes: n, mean, sample SD (n − 1), median (the mean of the two middle values
+   for an even n) and range of ΔGPP, ΔTER and ΔNEE ({U} and %), the recovery share, the days to recover, the GPP drop offset
+   (clear drops only) and the pre-drop; the counts of drops before, on and after the recorded date. The
+   <Num k="method.ciLevelPct" digits={0} /> % interval of the mean is a percentile bootstrap
+   (<Num k="method.bootstrapResamples" digits={0} /> resamples with replacement, the 2.5 and 97.5 percentiles of the resampled
+   means, `numpy` PCG64 with fixed seeds in the manifest) when n is 3 or more; for a smaller n the tables give the values. The
+   intervals of Deep Dive #4 come from another random generator (mulberry32); all other numbers are equal.
+9. **Counts and findings.** Each step that removes rows or changes values logs a count in `dataVersion.steps` of
+   `results.json`. The script prints the open findings of the data report that touch this dive.
+
+The overrides of Deep Dive #4 are:
+
+<ul>
+{overrides.map((t) => (<li>{t}</li>))}
+</ul>
+
+</details>
+
+### Sites
+
+- **Anttila: legume ley, the same ley in both data years (2022, 2023).** Sown on 3 June 2021 with red clover and timothy
+  and barley as a cover crop; whole-crop harvest on 2 August 2021, before the flux data <Cite ids={['shurpali2025']} note="PDF p. 2" />.
+  The 2022 cuts are in Table 2 of the article <Cite ids={['shurpali2025']} note="PDF p. 3, Table 2" />. The recorded date of
+  the second cut of 2022 is 8 August, from the project event file `data/Agri_site_management_events 2018-2025.xlsx` (the
+  event table uses the dates of this file; the article gives 8 September). The 2023 dates and the yields per cut also come
+  from the project file.
+- **Särkisuo: mixed grasses (timothy and meadow fescue), the same ley in both data years (2022, 2023).** Ploughed in June
+  2021 and sown on 9 June 2021 with wheat, oat and grasses; whole-crop harvest in July 2021 without a recorded day, thus not
+  an episode <Cite ids={['shurpali2025']} note="PDF p. 2" />. The 2022 cuts are in Table 2 <Cite ids={['shurpali2025']} note="PDF p. 3, Table 2" />;
+  the 2023 dates and yields come from the project file.
+- **Qvidja: forage grassland since 2017, the same grass from 2018 to 2024.** From 2008 to 2016 the field was in an annual
+  crop rotation; in 2017 the management changed and the grass was sown in spring 2017. In June 2018 the grass was cut at
+  6 cm, in the other harvests at about 15 cm; the cut of 21 August 2018 left the yield in the field, and the field was
+  oversown on 3 September 2018 after a drought <Cite ids={['heimsch2021']} note="PDF p. 3" />. Cows grazed the
+  field in August 2021 and August 2022 <Cite ids={['heimsch2024']} note="PDF p. 2" />. The event table also has harrowing in
+  April 2021, cleaning cuts in 2022 to 2024 and subsoiling in September 2023 <Cite ids={['qvidja-management']} />.
+- **Viikki: a field in rotation, a different crop each year** <Cite ids={['viikki-management']} />. 2022 timothy
+  <Cite ids={['viikki-management']} />, harvested in July and August <Cite ids={['gao2026']} note="PDF p. 3; Table A2, PDF p. 13" />.
+  2023 barley sown on 25 May with a mixed grass seed under it <Cite ids={['gao2026']} note="PDF p. 3; Table A2, PDF p. 13" />;
+  the management file gives the harvests on 17 and 24 August <Cite ids={['viikki-management']} /> (one episode, flag
+  *establishment year*: the first year of the new ley). 2024 grass: the management file names silage with a harvest on
+  31 July <Cite ids={['viikki-management']} />; the project event file `data/Agri_site_management_events 2018-2025.xlsx`
+  names grass hay and adds the first cut of 14 June, where only about one hectare was harvested (flag *partial harvest*). The
+  Viikki yields are year totals on the last harvest of the year.
+- **Haltiala and Maktau.** The Haltiala event file has grass only as an undersown crop (2022, 2025) and as the crop of 2023,
+  which was stopped by disc harrowing in August 2023; all its harvests are grain harvests <Cite ids={['haltiala-management']} />.
+  Rule 2 puts grain harvests in the grain group, so Haltiala has no episode and no panel. Maktau grows maize and has no silage
+  harvest, so it is not in the dive.
+
+## Results
+
+Each panel shows the mean of the episodes per day (lines) and ± 1 SD (bands) of GPP, TER and NEE, in percent of the mean GPP of
+the <Num k="method.windowDays" digits={0} /> days before the harvest. NEE % = TER % − GPP %, thus NEE above zero is a net
+release. The curves are drawn only where <Num k="method.compositeMinN" digits={0} /> or more episodes have a value.
+
+### Per site
+
+<Figure id="figure-1" svgFile="analysis/silage-harvest-response/figures/1-per-site.svg" view={VIEW} />
+
+<div class="table-wrap">
+<table>
+<caption>Table A. All {d.counts.silageEpisodes} silage harvest episodes, in the site order of db/sites.parquet. Cut no. = ordinal among the harvest and cut episodes of the site in the year. Crop = the crop text of the event table (the <a href={`${base}events/`}>Events page</a> has the full detail). Yield in kg DW/ha per cut, or "year:" the yield of the year when only that is recorded. GPP before = mean daily GPP of the {d.method.windowDays} days before the start ({U}). ΔGPP, ΔTER, ΔNEE = mean of the {d.method.windowDays} days after the end minus the mean before ({U}), and in % of the GPP before. Share = GPP of the days {d.method.lateDays[0]} to {d.method.lateDays[1]} in % of the GPP before. Days = days to {d.method.recoverySharePct} % of the GPP before, or the censor reason. Offset = day of the largest GPP drop minus the recorded date (negative = before). Pre-drop = GPP of the days {d.method.preNear[0]} to {d.method.preNear[1]} against the days {d.method.preFar[0]} to {d.method.preFar[1]} before the recorded date, in %. Use: "too few days" = fewer than {d.method.minDays} days with a value in a window; "low measured fraction" = mean measured fraction of NEE below {d.method.minFracPct} % in a window. The summaries use the rows marked "used".</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Dates</th><th scope="col" class="num">Cut no.</th><th scope="col">Crop</th><th scope="col" class="num">Yield</th><th scope="col">Use</th><th scope="col" class="num">GPP before</th><th scope="col" class="num">ΔGPP</th><th scope="col" class="num">ΔTER</th><th scope="col" class="num">ΔNEE</th><th scope="col" class="num">ΔGPP %</th><th scope="col" class="num">ΔTER %</th><th scope="col" class="num">ΔNEE %</th><th scope="col" class="num">Share %</th><th scope="col">Days</th><th scope="col">Offset</th><th scope="col" class="num">Pre-drop %</th><th scope="col">Flag</th></tr>
+</thead>
+<tbody>
+{episodes.map((r) => (<tr id={`episode-${r.id}`}><td>{r.site}</td><td class="wrap">{r.dates}</td><td class="num">{r.cutNo}</td><td>{r.detail}</td><td class="num">{r.yieldKgHa}</td><td>{r.use}</td><td class="num">{r.gppBefore}</td><td class="num">{r.dGpp}</td><td class="num">{r.dReco}</td><td class="num">{r.dNee}</td><td class="num">{r.relGpp}</td><td class="num">{r.relReco}</td><td class="num">{r.relNee}</td><td class="num">{r.recoveryShare}</td><td class="wrap">{r.daysToRecover}</td><td class="wrap">{r.offset}</td><td class="num">{r.preDrop}</td><td class="wrap">{r.flag}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+### All sites together
+
+<Figure id="figure-2" svgFile="analysis/silage-harvest-response/figures/2-all-sites.svg" view={VIEW} />
+
+Over all used episodes, the mean of the days <Num k="method.afterDays.0" sign digits={0} /> to
+<Num k="method.afterDays.1" sign digits={0} /> was <Num k="composite.all.gpp.meanDays1to14" digits={0} unit="%" /> of the GPP
+before for GPP, <Num k="composite.all.reco.meanDays1to14" digits={0} unit="%" /> for TER and
+<Num k="composite.all.nee.meanDays1to14" sign digits={0} unit="%" /> for NEE. In the days
+<Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} /> the values were
+<Num k="composite.all.gpp.meanDays15to28" digits={0} unit="%" /> (GPP), <Num k="composite.all.reco.meanDays15to28" digits={0} unit="%" />
+(TER) and <Num k="composite.all.nee.meanDays15to28" sign digits={0} unit="%" /> (NEE). Each day has
+<Num k="composite.all.gpp.minN" digits={0} /> to <Num k="composite.all.gpp.maxN" digits={0} /> episodes with a value.
+
+<div class="table-wrap">
+<table>
+<caption>Table B. Summaries per site and over all used episodes: mean ± sample SD [{d.method.ciLevelPct} % bootstrap interval] when n is 3 or more, else the values. GPP before = mean of the episode means ({U}). ΔGPP, ΔTER, ΔNEE in {U} and in % of the GPP before. Share = GPP of the days {d.method.lateDays[0]} to {d.method.lateDays[1]} in % of the GPP before. Days = days to {d.method.recoverySharePct} % of the GPP before (recovered episodes). Offset = GPP drop offset of the clear drops, days; before / on / after = drops before, on and after the recorded date. Pre-drop in %.</caption>
+<thead>
+<tr><th scope="col">Group</th><th scope="col" class="num">n</th><th scope="col" class="num">GPP before</th><th scope="col" class="num">ΔGPP</th><th scope="col" class="num">ΔTER</th><th scope="col" class="num">ΔNEE</th><th scope="col" class="num">ΔGPP %</th><th scope="col" class="num">ΔTER %</th><th scope="col" class="num">ΔNEE %</th><th scope="col" class="num">Share %</th><th scope="col" class="num">Days</th><th scope="col" class="num">Offset</th><th scope="col" class="num">Before / on / after</th><th scope="col" class="num">Pre-drop %</th></tr>
+</thead>
+<tbody>
+{summary.map((r) => (<tr id={r.id}><td>{r.group}</td><td class="num">{r.n}</td><td class="num">{r.gppBefore}</td><td class="num">{r.dGpp}</td><td class="num">{r.dReco}</td><td class="num">{r.dNee}</td><td class="num">{r.relGpp}</td><td class="num">{r.relReco}</td><td class="num">{r.relNee}</td><td class="num">{r.recoveryShare}</td><td class="num">{r.daysToRecover}</td><td class="num">{r.offset}</td><td class="num">{r.split}</td><td class="num">{r.preDrop}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+### Timing of the GPP drop
+
+<Num k="summary.all.clearDrops" digits={0} /> of the <Num k="summary.all.timingUsed" digits={0} /> used episodes have a clear
+GPP drop; the other drops are below <Num k="method.minDropPct" digits={0} /> % of the GPP before them. The detected day is
+<Num k="summary.all.gppOffset.mean" sign digits={1} unit="days" /> from the recorded harvest date on average
+(SD <Num k="summary.all.gppOffset.sd" digits={1} />, interval <Num k="summary.all.gppOffset.ciLo" sign digits={1} /> to
+<Num k="summary.all.gppOffset.ciHi" sign digits={1} /> days, median <Num k="summary.all.gppOffset.median" sign digits={0} />,
+range <Num k="summary.all.gppOffset.min" sign digits={0} /> to <Num k="summary.all.gppOffset.max" sign digits={0} /> days).
+<Num k="summary.all.nBefore" digits={0} /> drops came before, <Num k="summary.all.nOn" digits={0} /> on and
+<Num k="summary.all.nAfter" digits={0} /> after the recorded date. At Särkisuo all clear drops are on the recorded date
+(n = <Num k="summary.perSite.sarkisuo.gppOffset.n" digits={0} />); at Qvidja the mean offset is
+<Num k="summary.perSite.qvidja.gppOffset.mean" sign digits={1} unit="days" /> (n = <Num k="summary.perSite.qvidja.gppOffset.n" digits={0} />,
+SD <Num k="summary.perSite.qvidja.gppOffset.sd" digits={1} />, interval <Num k="summary.perSite.qvidja.gppOffset.ciLo" sign digits={1} />
+to <Num k="summary.perSite.qvidja.gppOffset.ciHi" sign digits={1} /> days). The pre-drop (GPP of the days
+<Num k="method.preNear.0" sign digits={0} /> to <Num k="method.preNear.1" sign digits={0} /> against the days
+<Num k="method.preFar.0" sign digits={0} /> to <Num k="method.preFar.1" sign digits={0} />) is
+<Num k="summary.all.preDropPct.mean" sign digits={1} unit="%" /> on average (n = <Num k="summary.all.preDropPct.n" digits={0} />,
+SD <Num k="summary.all.preDropPct.sd" digits={1} />, interval <Num k="summary.all.preDropPct.ciLo" sign digits={1} /> to
+<Num k="summary.all.preDropPct.ciHi" sign digits={1} /> %). A negative pre-drop means that GPP was lower in the days
+<Num k="method.preNear.0" sign digits={0} /> to <Num k="method.preNear.1" sign digits={0} /> than in the days
+<Num k="method.preFar.0" sign digits={0} /> to <Num k="method.preFar.1" sign digits={0} />;
+<Num k="summary.all.preDropPct.nNegative" digits={0} /> episodes have a negative pre-drop and
+<Num k="summary.all.preDropPct.nPositive" digits={0} /> a positive one. Table A gives the offset and the pre-drop of each
+episode.
+
+### Day by day
+
+<details class="dd-table">
+<summary>Composite values per day (five tables)</summary>
+{BLOCKS.map((b) => (<Composite block={b} />))}
+</details>
+
+## Limits and uncertainty
+
+- **Time stamps.** The raw time stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as UTC+2
+  (<a href={`${base}data-report/#finding-ANT-01`}>ANT-01</a>, <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a>,
+  <a href={`${base}data-report/#finding-VII-01`}>VII-01</a>; status: verified, waits for provider) <Cite ids={['anomaly-report']} />.
+  A day of these sites holds the true local time from <Num k="method.utcShiftHours" digits={0} />:00 on that date to
+  <Num k="method.utcShiftHours" digits={0} />:00 on the next date, thus a daily value holds
+  <Num k="method.utcShiftHours" digits={0} /> hours of the next true day. A daily change point can move by not more than one
+  day. A window mean of <Num k="method.windowDays" digits={0} /> days changes only through its first and its last day.
+- **Model values.** GPP and TER are model values of the night-time partitioning of the gap-filled NEE
+  <Cite ids={['calculated-doc']} />, and NEE is the gap-filled NEE. Days with a low measured fraction are not removed; only a
+  window with a mean measured fraction below <Num k="method.minFracPct" digits={0} /> % excludes an episode. This dive has
+  no check on the measured NEE; Deep Dive #4 (<a href={`${base}deep-dive/disturbance-detail/`}>Disturbance detail</a>) has it.
+- **Small n.** Anttila has n = <Num k="summary.perSite.anttila.n" digits={0} />, Särkisuo
+  n = <Num k="summary.perSite.sarkisuo.n" digits={0} />, Qvidja n = <Num k="summary.perSite.qvidja.n" digits={0} /> and Viikki
+  n = <Num k="summary.perSite.viikki.n" digits={0} /> used episodes. The bootstrap interval of a small n is not reliable; for
+  n below 3 the tables give the values, not an interval.
+- **Viikki episodes.** The 2023 episode is the establishment year: barley undersown with clover and grasses, cut green on two
+  days (ΔGPP <Num k={`${E('viikki-2023-08-17')}.relPct.gpp`} sign digits={0} unit="%" />, ΔNEE
+  <Num k={`${E('viikki-2023-08-17')}.relPct.nee`} sign digits={0} unit="%" /> of the GPP before). The first cut of 2024 harvested
+  only about one hectare (ΔGPP <Num k={`${E('viikki-2024-06-14')}.relPct.gpp`} sign digits={0} unit="%" />, ΔNEE
+  <Num k={`${E('viikki-2024-06-14')}.relPct.nee`} sign digits={0} unit="%" />). Both stay in the means; Table A flags them.
+- **Censoring.** The composite value of an episode ends at the next harvest, cut or grazing, and the days to recover are
+  censored at <Num k="method.recoveryMaxDays" digits={0} /> days (<Num k="summary.all.nCensored" digits={0} /> of
+  <Num k="summary.all.n" digits={0} /> episodes). The recovery share is empty when the next disturbance comes within
+  <Num k="method.lateDays.1" digits={0} /> days (n = <Num k="summary.all.recoveryShare.n" digits={0} /> of
+  <Num k="summary.all.n" digits={0} />).
+- **Association.** The changes are associated with the harvests. The weather, the season and the crop stage change in the
+  same windows. The analysis does not show that a harvest caused a change.
+- **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
+  identify it.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `analysis/silage-harvest-response/results.json`. The Python script
+<a href={`${REPO_URL}/blob/main/analysis/silage-harvest-response/silage-harvest-response.py`}><code>analysis/silage-harvest-response/silage-harvest-response.py</code></a>
+writes this file, `manifest.json` and the two SVG figures. It reads only the database snapshot built on
+{d.dataVersion.snapshot.builtAt} and `data/calculated/daily.parquet` of the same build. Release:
+{d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
+The table gives the SHA-256, the row count and the columns read of each file (the paths are relative to the `--db` and
+`--calculated` folders); the script stops when a hash does not agree. The folder
+<a href={`${REPO_URL}/tree/main/analysis/silage-harvest-response`}><code>analysis/silage-harvest-response/</code></a> has the
+lock file, the unit tests and a README.
+
+<div class="table-wrap">
+<table>
+<caption>Input files of the snapshot (database built {d.dataVersion.snapshot.builtAt}, calculated data built {d.dataVersion.snapshot.calcBuiltAt}).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col">SHA-256</th><th scope="col" class="num">Rows</th><th scope="col">Columns read</th></tr>
+</thead>
+<tbody>
+{inputs.map((r) => (<tr><td>{r.path}</td><td class="wrap"><code>{r.sha256}</code></td><td class="num">{r.rows}</td><td class="wrap"><code>{r.columns}</code></td></tr>))}
+</tbody>
+</table>
+</div>
+
+```sh
+npm run build:db && npm run calc                 # make the inputs (the hashes must agree with the script)
+uv run analysis/silage-harvest-response/silage-harvest-response.py --db db --calculated data/calculated
+uv run analysis/silage-harvest-response/silage-harvest-response.py --db db --calculated data/calculated --check
+npm run deep-dives -- --check                    # all dives, TypeScript and Python
+```

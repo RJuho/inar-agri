@@ -1,0 +1,278 @@
+{
+  "generatedAt": "2026-10-25T17:32:31Z",
+  "git": {
+    "commit": "5d69cbd",
+    "dirty": true
+  },
+  "script": {
+    "path": "analysis/silage-harvest-response/silage-harvest-response.py",
+    "sha256": "a954acbe26f82f2caba94125a32cd589a19d20b9feae40b9ecfb2a8b72d51a41"
+  },
+  "lock": {
+    "path": "analysis/silage-harvest-response/silage-harvest-response.py.lock",
+    "sha256": "4c972466e84d58d4b9c2fedc28d91830865d71af372476ab6e50b0251cb3b175"
+  },
+  "python": "3.13.5",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+  "packages": {
+    "annotated-types": "0.8.0",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "fonttools": "4.67.0",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.11.2",
+    "mypy_extensions": "1.1.0",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pandas": "3.1.0",
+    "pandera": "0.34.1",
+    "pillow": "13.0.0",
+    "pyarrow": "26.0.0",
+    "pydantic": "2.14.1",
+    "pydantic_core": "2.50.1",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "3.0.0",
+    "six": "1.17.0",
+    "typeguard": "4.6.0",
+    "typing-inspect": "0.9.0",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.5"
+  },
+  "seeds": {
+    "all.daysToRecover": 9704,
+    "all.deltaGpp": 9004,
+    "all.deltaNee": 9204,
+    "all.deltaReco": 9104,
+    "all.gppOffset": 9804,
+    "all.preDropPct": 9904,
+    "all.recoveryShare": 9604,
+    "all.relGpp": 9304,
+    "all.relNee": 9504,
+    "all.relReco": 9404,
+    "anttila.daysToRecover": 9700,
+    "anttila.deltaGpp": 9000,
+    "anttila.deltaNee": 9200,
+    "anttila.deltaReco": 9100,
+    "anttila.gppOffset": 9800,
+    "anttila.preDropPct": 9900,
+    "anttila.recoveryShare": 9600,
+    "anttila.relGpp": 9300,
+    "anttila.relNee": 9500,
+    "anttila.relReco": 9400,
+    "qvidja.daysToRecover": 9702,
+    "qvidja.deltaGpp": 9002,
+    "qvidja.deltaNee": 9202,
+    "qvidja.deltaReco": 9102,
+    "qvidja.gppOffset": 9802,
+    "qvidja.preDropPct": 9902,
+    "qvidja.recoveryShare": 9602,
+    "qvidja.relGpp": 9302,
+    "qvidja.relNee": 9502,
+    "qvidja.relReco": 9402,
+    "sarkisuo.daysToRecover": 9701,
+    "sarkisuo.deltaGpp": 9001,
+    "sarkisuo.deltaNee": 9201,
+    "sarkisuo.deltaReco": 9101,
+    "sarkisuo.gppOffset": 9801,
+    "sarkisuo.preDropPct": 9901,
+    "sarkisuo.recoveryShare": 9601,
+    "sarkisuo.relGpp": 9301,
+    "sarkisuo.relNee": 9501,
+    "sarkisuo.relReco": 9401,
+    "viikki.daysToRecover": 9703,
+    "viikki.deltaGpp": 9003,
+    "viikki.deltaNee": 9203,
+    "viikki.deltaReco": 9103,
+    "viikki.gppOffset": 9803,
+    "viikki.preDropPct": 9903,
+    "viikki.recoveryShare": 9603,
+    "viikki.relGpp": 9303,
+    "viikki.relNee": 9503,
+    "viikki.relReco": 9403
+  },
+  "bootstrap": {
+    "resamples": 10000,
+    "level": 0.95,
+    "generator": "numpy.random.default_rng (PCG64)"
+  },
+  "args": {
+    "db": "db",
+    "calculated": "data/calculated",
+    "out": null,
+    "check": false
+  },
+  "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+  "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+  "snapshot": {
+    "builtAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "commit": "44ec98f",
+    "commitNote": "HEAD at build time; db/report.json does not record a commit",
+    "url": null,
+    "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+    "inputs": [
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114
+      },
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+        "rows": 26
+      },
+      {
+        "path": "calculated/daily.parquet",
+        "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+        "rows": 11209
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "path": "db/events.parquet",
+      "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+      "rows": 114,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_code",
+        "date",
+        "date_end",
+        "type",
+        "detail",
+        "crop",
+        "dry_mass_kg_ha"
+      ]
+    },
+    {
+      "path": "db/sites.parquet",
+      "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+      "rows": 6,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "code",
+        "name",
+        "utc_offset_min"
+      ]
+    },
+    {
+      "path": "db/variables.parquet",
+      "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+      "rows": 26,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "column_name",
+        "unit"
+      ]
+    },
+    {
+      "path": "calculated/daily.parquet",
+      "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+      "rows": 11209,
+      "builtAt": "2026-10-23T19:03:09.003Z",
+      "columns": [
+        "site_code",
+        "date_local",
+        "gpp_gc",
+        "reco_gc",
+        "nee_f_gc",
+        "frac_measured"
+      ]
+    }
+  ],
+  "steps": {
+    "sites": {
+      "rowsRead": 6,
+      "panelSites": [
+        "anttila",
+        "sarkisuo",
+        "qvidja",
+        "viikki"
+      ]
+    },
+    "events": {
+      "rowsRead": 114,
+      "rowsFinnishSites": 111,
+      "rowsDropped": 3,
+      "harvestCutEvents": 37,
+      "rule": "events of the five Finnish sites; harvest and cut events make the episodes"
+    },
+    "daily": {
+      "rowsRead": 11209,
+      "rowsPanelSites": 5715,
+      "rowsDropped": 5494,
+      "perSite": {
+        "anttila": {
+          "dailyRows": 730,
+          "firstDay": "2022-01-01",
+          "lastDay": "2023-12-31",
+          "daysWithGpp": 730,
+          "daysWithNee": 730,
+          "daysLowFrac": 65
+        },
+        "sarkisuo": {
+          "dailyRows": 730,
+          "firstDay": "2022-01-01",
+          "lastDay": "2023-12-31",
+          "daysWithGpp": 705,
+          "daysWithNee": 730,
+          "daysLowFrac": 50
+        },
+        "qvidja": {
+          "dailyRows": 2794,
+          "firstDay": "2018-05-09",
+          "lastDay": "2025-12-31",
+          "daysWithGpp": 2794,
+          "daysWithNee": 2794,
+          "daysLowFrac": 1230
+        },
+        "viikki": {
+          "dailyRows": 1461,
+          "firstDay": "2022-01-01",
+          "lastDay": "2025-12-31",
+          "daysWithGpp": 1461,
+          "daysWithNee": 1461,
+          "daysLowFrac": 722
+        }
+      },
+      "rule": "daily rows of the four panel sites; no row is removed, a missing value is a gap"
+    },
+    "episodes": {
+      "harvestCutEpisodes": 33,
+      "perGroup": {
+        "silageHarvest": 25,
+        "cleaningCut": 4,
+        "grainHarvest": 4
+      },
+      "silageEpisodes": 25,
+      "used": 20,
+      "excluded": {
+        "overlap": 0,
+        "too-few-days": 2,
+        "low-measured-fraction": 3
+      },
+      "overridesApplied": 5,
+      "rule": "silage harvest episodes; used when no overlap, 12 or more days per window and measured fraction 0.10 or more"
+    }
+  },
+  "outputs": {
+    "results.json": "53eae4fc06ed07a205295d91e72509a00f8b2aa92added7f43059880652710a7",
+    "figures": {
+      "figures/1-per-site.svg": {
+        "sha256": "9021a7bdde7a0f2bcfe18a03d3deda447f5c933b839a7d787638396401156784",
+        "sha256WithoutMetadata": "83ade38d4369c11d3d0c52553d5f5cb0525c7876a30418f7888a09a72f6c80c2"
+      },
+      "figures/2-all-sites.svg": {
+        "sha256": "410ef7b30ada01a862bd9abb0514c82c6a2a1128a2794af152703937e15e030a",
+        "sha256WithoutMetadata": "6b5d1c699f042fed5a2a774bf39f013f6f4fb3a620b490440182701c0f0ad790"
+      }
+    }
+  }
+}

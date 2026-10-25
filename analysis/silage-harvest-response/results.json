@@ -1,0 +1,7107 @@
+{
+  "slug": "silage-harvest-response",
+  "script": "analysis/silage-harvest-response/silage-harvest-response.py",
+  "question": "How do daily GPP, TER (= Reco) and NEE of a grassland develop from 14 days before to 28 days after a silage harvest, per site and over all sites?",
+  "method": {
+    "sites": [
+      "anttila",
+      "sarkisuo",
+      "qvidja",
+      "viikki"
+    ],
+    "episodeSites": [
+      "anttila",
+      "sarkisuo",
+      "haltiala",
+      "qvidja",
+      "viikki"
+    ],
+    "groups": [
+      {
+        "id": "silageHarvest",
+        "label": "Silage harvest (grass removed)"
+      },
+      {
+        "id": "cleaningCut",
+        "label": "Cleaning cut (grass left on the field)"
+      },
+      {
+        "id": "grainHarvest",
+        "label": "Grain or bean harvest"
+      }
+    ],
+    "grainRegex": "thresh|grain|faba|\\boats\\b|barley",
+    "grassRegex": "\\bcut\\b|silage|grass",
+    "mergeDays": 7,
+    "overrides": [
+      {
+        "site": "haltiala",
+        "date": "2021-09-10",
+        "start": "2021-09-08",
+        "end": "2021-09-15",
+        "text": "Start 8 Sep 2021 from the file text (\"harvest started 8 Sep and lasted at least 5 days\"); the rows of 10 Sep and 15 Sep (threshing) are one episode."
+      },
+      {
+        "site": "haltiala",
+        "date": "2022-08-15",
+        "start": "2022-08-15",
+        "end": "2022-08-24",
+        "text": "End 24 Aug 2022 from date_end (\"end 23 or 24 Aug\")."
+      },
+      {
+        "site": "qvidja",
+        "date": "2023-06-19",
+        "text": "Cleaning cut on 19 Jun and silage harvest on 20 Jun 2023 are one episode: start = cut day, group silage harvest, the cut is a co-event."
+      },
+      {
+        "site": "qvidja",
+        "date": "2023-08-21",
+        "text": "Cleaning cut on 21 Aug and silage harvest on 22 Aug 2023 are one episode: start = cut day, group silage harvest, the cut is a co-event."
+      },
+      {
+        "site": "viikki",
+        "date": "2023-08-17",
+        "text": "First cut on 17 Aug and second cut on 24 Aug 2023 (7 days apart) are one episode."
+      }
+    ],
+    "beforeDays": [
+      -14,
+      -1
+    ],
+    "afterDays": [
+      1,
+      14
+    ],
+    "lateDays": [
+      15,
+      28
+    ],
+    "windowDays": 14,
+    "minDays": 12,
+    "minFrac": 0.1,
+    "minFracPct": 10,
+    "minGppBefore": 0.5,
+    "exclusionOrder": [
+      "overlap",
+      "too-few-days",
+      "low-measured-fraction"
+    ],
+    "recoveryDays": [
+      15,
+      28
+    ],
+    "recoverySharePct": 80,
+    "recoveryMaxDays": 60,
+    "recoveryRunDays": 5,
+    "recoveryMinRun": 3,
+    "censorReasons": [
+      "blocked",
+      "data-end",
+      "max-days"
+    ],
+    "searchFrom": -10,
+    "searchTo": 5,
+    "sideDays": 5,
+    "minSideGpp": 4,
+    "minBeforeGpp": 1.0,
+    "minDropPct": 25.0,
+    "spanOverlapFrom": -15,
+    "spanOverlapTo": 9,
+    "preNear": [
+      -3,
+      -1
+    ],
+    "preFar": [
+      -10,
+      -4
+    ],
+    "preMinNear": 2,
+    "preMinFar": 5,
+    "compositeFrom": -14,
+    "compositeTo": 28,
+    "compositeMinN": 2,
+    "compositeEarly": [
+      1,
+      14
+    ],
+    "compositeLate": [
+      15,
+      28
+    ],
+    "yStep": 25,
+    "cutNoRule": "ordinal of the episode among the harvest and cut episodes of the site in that year",
+    "bootstrapResamples": 10000,
+    "bootstrapLevel": 0.95,
+    "ciLevelPct": 95,
+    "utcShiftHours": 2,
+    "nSites": 4,
+    "units": {
+      "daily": "g C m-2 d-1",
+      "yield": "kg DW/ha",
+      "relative": "% of the mean GPP before",
+      "offsets": "days"
+    },
+    "fluxLabels": {
+      "gpp": "GPP",
+      "reco": "TER",
+      "nee": "NEE"
+    },
+    "axisNames": {
+      "x": "Days from the first day of the harvest (local days)",
+      "y": "GPP, TER, NEE (% of the mean GPP of days −14 to −1)"
+    },
+    "rules": [
+      "Sites: Anttila, Sarkisuo, Qvidja and Viikki (order of db/sites.parquet). Haltiala has no silage",
+      "harvest (grain) and gets no panel; Maktau is not in the dive. The rules are those of Deep Dive",
+      "#4 (scripts/deep-dives/disturbance-detail.ts), ported to Python. Day numbers count the days",
+      "since 1970-01-01; all windows include both end days.",
+      "1. Daily GPP, Reco (named TER here) and gap-filled NEE (g C m-2 d-1) and the measured fraction",
+      "of NEE come from data/calculated/daily.parquet (local days). Events come from",
+      "db/events.parquet.",
+      "2. Episodes: the harvest and cut events of each of the five Finnish sites are sorted by date;",
+      "an event that starts not more than 7 days after the last day of the current episode joins",
+      "it. The recorded date is the first event date of the episode. Then the OVERRIDES of Deep",
+      "Dive #4 apply (they change the first or the last day; an override that matches no episode",
+      "stops the script). Group of an event: type cut = cleaning cut; a harvest whose crop or",
+      "detail text matches /thresh|grain|faba|\\boats\\b|barley/i and not /\\bcut\\b|silage|grass/i",
+      "= grain harvest; all other harvests = silage harvest. Group of an episode: grain when one",
+      "event is a grain harvest, else silage when one event is a harvest, else cleaning cut. The",
+      "dive keeps the silage harvest episodes (25).",
+      "3. Windows from the first day (start) and the last day (end) of the episode: before = start-14",
+      "to start-1, after = end+1 to end+14, late = end+15 to end+28. The window mean is the mean",
+      "of the days with a value. The change (delta) = mean after - mean before; null when a side",
+      "has fewer than 12 days with a value. Relative change of GPP, TER and NEE = 100 x delta /",
+      "mean GPP before (null when the mean GPP before is below 0.5 g C m-2 d-1); thus",
+      "NEE % = TER % - GPP %.",
+      "4. An episode is not used (in this order) when (1) another harvest or cut episode, or a",
+      "grazing or tillage event, overlaps the days start-14 to end+14 (\"overlap\"); (2) GPP, TER",
+      "or NEE has fewer than 12 days in the before or the after window (\"too-few-days\"); (3) the",
+      "mean measured fraction of NEE is below 0.10 in a window (\"low-measured-fraction\"). A",
+      "fertilisation in the windows only sets a flag. 20 episodes are used.",
+      "5. Recovery: the next disturbance = the smallest start of a later harvest or cut episode or of",
+      "a grazing event of the site, minus end (tillage does not count). Recovery share = 100 x",
+      "mean GPP of end+15 to end+28 / mean GPP before; null when the next disturbance starts 28",
+      "days or less after end, the window has fewer than 12 days, or the GPP before is below 0.5.",
+      "Days to recover = the first day d (1 to 60 after end) whose centred 5-day running mean of",
+      "GPP (3 or more values) is 80 % or more of the GPP before. Censored when the next",
+      "disturbance comes first (d+2 >= next, \"blocked\"), when the data end (\"data-end\"), or after",
+      "day 60 (\"max-days\").",
+      "6. Change point of the GPP drop: for each candidate day t from start-10 to end+5,",
+      "drop(t) = mean GPP of t-5 to t-1 - mean GPP of t to t+4, each side with 4 or more values.",
+      "The detected day is the t with the largest drop (the first on a tie). The drop is clear",
+      "when the mean before is 1 g C m-2 d-1 or more and the drop is 25 % or more of it. Offset =",
+      "detected day - recorded date (negative = the drop came before the recorded date). An",
+      "episode is not in the timing result when another harvest or cut episode, or a grazing or",
+      "tillage event, overlaps start-15 to end+9, or when no candidate day has enough GPP days.",
+      "Pre-drop = 100 x (mean GPP of days -3 to -1 - mean of days -10 to -4) / mean of days -10 to",
+      "-4 from the recorded date (far window 5 or more values and 1 g C m-2 d-1 or more, near",
+      "window 2 or more values).",
+      "7. Composite curves per site and over all used episodes: offsets -14 to +28 from start; the",
+      "value of an episode is null from the day end + next disturbance on; GPP, TER and NEE in",
+      "percent of the mean GPP before of the episode (null when below 0.5). Per day: mean, sample",
+      "SD and n over the episodes; mean and SD are null when n < 2. The y range of both figures",
+      "is one range over all mean +- SD of all panels, rounded outwards to a multiple of 25 and",
+      "extended to hold 0 and 100.",
+      "8. Summaries per site and over all used episodes: n, mean, SD, median, range of the changes",
+      "(g C m-2 d-1 and %), the recovery share, the days to recover, the GPP drop offset (clear",
+      "drops of the timing result) and the pre-drop; counts of drops before, on and after the",
+      "recorded date. Bootstrap 95 % CI of the mean (10 000 resamples, percentile method, numpy",
+      "PCG64, fixed seeds) when n >= 3. The CIs of Deep Dive #4 come from an other generator",
+      "(mulberry32); the other numbers are equal.",
+      "9. Each step that removes rows or changes values logs a count (results.json dataVersion.steps).",
+      "10. Open findings of docs/anomaly-data-report.md that touch this dive are printed",
+      "(OPEN_FINDINGS)."
+    ],
+    "openFindings": [
+      "ANT-01, SAR-01, VII-01 (open, waits for the providers): the raw stamps of Anttila, Sarkisuo and Viikki are UTC, but the build reads them as UTC+2. A local day of these sites thus starts at 02:00 true local time. A daily window mean changes little; a daily change point can move by not more than 1 day.",
+      "VII-05 (open): Viikki 2024 nee_f is not equal to nee in 1 540 periods. The gap filling around the 2024 harvests can thus differ from the measured values."
+    ],
+    "episodeNotes": {
+      "viikki-2023-08-17": {
+        "establishmentYear": true,
+        "partialHarvest": false,
+        "note": "Establishment year: barley undersown with clover and grasses, cut green on 17 and 24 August."
+      },
+      "viikki-2024-06-14": {
+        "establishmentYear": false,
+        "partialHarvest": true,
+        "note": "Partial harvest: only about one hectare of the field was harvested (poor growth)."
+      }
+    }
+  },
+  "counts": {
+    "events": 111,
+    "harvestCutEpisodes": 33,
+    "perGroup": {
+      "silageHarvest": 25,
+      "cleaningCut": 4,
+      "grainHarvest": 4
+    },
+    "silageEpisodes": 25,
+    "used": 20,
+    "excluded": {
+      "overlap": 0,
+      "too-few-days": 2,
+      "low-measured-fraction": 3
+    },
+    "overrides": 5,
+    "perSite": {
+      "anttila": {
+        "episodes": 5,
+        "used": 4
+      },
+      "sarkisuo": {
+        "episodes": 4,
+        "used": 3
+      },
+      "qvidja": {
+        "episodes": 11,
+        "used": 10
+      },
+      "viikki": {
+        "episodes": 5,
+        "used": 3
+      }
+    },
+    "timingUsed": 20,
+    "clearDrops": 17
+  },
+  "sites": [
+    {
+      "code": "anttila",
+      "name": "Anttila",
+      "siteId": 1,
+      "slot": 0,
+      "utcOffsetMin": 120,
+      "dataYears": [
+        2022,
+        2023
+      ],
+      "episodeYears": [
+        2021,
+        2022,
+        2023
+      ],
+      "episodes": 5,
+      "used": 4,
+      "usedIds": [
+        "anttila-2022-06-21",
+        "anttila-2022-08-08",
+        "anttila-2023-06-21",
+        "anttila-2023-07-19"
+      ]
+    },
+    {
+      "code": "sarkisuo",
+      "name": "Särkisuo",
+      "siteId": 2,
+      "slot": 1,
+      "utcOffsetMin": 120,
+      "dataYears": [
+        2022,
+        2023
+      ],
+      "episodeYears": [
+        2022,
+        2023
+      ],
+      "episodes": 4,
+      "used": 3,
+      "usedIds": [
+        "sarkisuo-2022-06-30",
+        "sarkisuo-2022-08-15",
+        "sarkisuo-2023-08-15"
+      ]
+    },
+    {
+      "code": "qvidja",
+      "name": "Qvidja",
+      "siteId": 4,
+      "slot": 3,
+      "utcOffsetMin": 120,
+      "dataYears": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "episodeYears": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "episodes": 11,
+      "used": 10,
+      "usedIds": [
+        "qvidja-2018-06-12",
+        "qvidja-2018-09-23",
+        "qvidja-2019-06-11",
+        "qvidja-2019-08-20",
+        "qvidja-2020-08-28",
+        "qvidja-2021-06-14",
+        "qvidja-2022-06-21",
+        "qvidja-2023-06-19",
+        "qvidja-2023-08-21",
+        "qvidja-2024-06-15"
+      ]
+    },
+    {
+      "code": "viikki",
+      "name": "Viikki",
+      "siteId": 5,
+      "slot": 4,
+      "utcOffsetMin": 120,
+      "dataYears": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "episodeYears": [
+        2022,
+        2023,
+        2024
+      ],
+      "episodes": 5,
+      "used": 3,
+      "usedIds": [
+        "viikki-2022-07-01",
+        "viikki-2023-08-17",
+        "viikki-2024-06-14"
+      ]
+    }
+  ],
+  "episodes": [
+    {
+      "id": "anttila-2021-08-02",
+      "site": "anttila",
+      "year": 2021,
+      "cutNo": 1,
+      "start": "2021-08-02",
+      "end": "2021-08-02",
+      "recorded": "2021-08-02",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2021-08-02",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Legume grass",
+          "detail": "Whole crop harvest; no yield given",
+          "dryMassKgHa": null,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Legume grass",
+      "detailShort": "Whole crop harvest; no yield given",
+      "yieldKgHa": null,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 0,
+          "gpp": 0,
+          "reco": 0,
+          "frac": 0
+        },
+        "mean": {
+          "nee": null,
+          "gpp": null,
+          "reco": null,
+          "frac": null
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 0,
+          "gpp": 0,
+          "reco": 0,
+          "frac": 0
+        },
+        "mean": {
+          "nee": null,
+          "gpp": null,
+          "reco": null,
+          "frac": null
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 0,
+          "gpp": 0,
+          "reco": 0,
+          "frac": 0
+        },
+        "mean": {
+          "nee": null,
+          "gpp": null,
+          "reco": null,
+          "frac": null
+        }
+      },
+      "delta": {
+        "gpp": null,
+        "reco": null,
+        "nee": null
+      },
+      "deltaLate": {
+        "gpp": null,
+        "reco": null,
+        "nee": null
+      },
+      "relPct": {
+        "gpp": null,
+        "reco": null,
+        "nee": null
+      },
+      "used": false,
+      "exclusion": "too-few-days",
+      "fluxUse": "excluded: fewer than 12 days with flux data in a window (before 0, after 0)",
+      "recovery": {
+        "sharePct": null,
+        "days": null,
+        "censored": false,
+        "reason": "no-reference",
+        "nextDisturbanceDays": 323
+      },
+      "timing": {
+        "used": false,
+        "exclusion": "fewer than 4 of 5 days with GPP on each side of every candidate day",
+        "gpp": {
+          "detectedDate": null,
+          "offset": null,
+          "drop": null,
+          "dropPct": null,
+          "before": null,
+          "clear": false,
+          "reason": "too-few-days"
+        },
+        "preDrop": {
+          "near": null,
+          "far": null,
+          "pct": null
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "anttila-2022-06-21",
+      "site": "anttila",
+      "year": 2022,
+      "cutNo": 1,
+      "start": "2022-06-21",
+      "end": "2022-06-21",
+      "recorded": "2022-06-21",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2022-06-21",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Legume grass",
+          "detail": "Timothy and red clover, first cut, 3360 kg DW/ha",
+          "dryMassKgHa": 3360.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Legume grass",
+      "detailShort": "Timothy and red clover, first cut, 3360 kg DW/ha",
+      "yieldKgHa": 3360.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [
+        {
+          "date": "2022-06-22",
+          "dateEnd": null,
+          "type": "fertilisation",
+          "detail": "Synthetic N fertiliser, 44 kg N/ha, product not given"
+        }
+      ],
+      "fertInWindow": true,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -6.666198909,
+          "gpp": 12.84409509,
+          "reco": 6.177896186,
+          "frac": 0.7455357143
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.6518055691,
+          "gpp": 8.37912633,
+          "reco": 7.727320761,
+          "frac": 0.5550595238
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -6.031309917,
+          "gpp": 12.97717804,
+          "reco": 6.945868127,
+          "frac": 0.6964285714
+        }
+      },
+      "delta": {
+        "gpp": -4.464968765,
+        "reco": 1.549424575,
+        "nee": 6.014393339
+      },
+      "deltaLate": {
+        "gpp": 0.1330829498,
+        "reco": 0.7679719412,
+        "nee": 0.6348889914
+      },
+      "relPct": {
+        "gpp": -34.76281304,
+        "reco": 12.0633222,
+        "nee": 46.82613524
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 101.0361411,
+        "days": 10,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 48
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2022-06-22",
+          "offset": 1,
+          "drop": 6.423561783,
+          "dropPct": 57.01072906,
+          "before": 11.26728581,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 11.27650457,
+          "far": 13.27215456,
+          "pct": -15.03636794
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "anttila-2022-08-08",
+      "site": "anttila",
+      "year": 2022,
+      "cutNo": 2,
+      "start": "2022-08-08",
+      "end": "2022-08-08",
+      "recorded": "2022-08-08",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2022-08-08",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Legume grass",
+          "detail": "Timothy and red clover, second cut, 4140 kg DW/ha; yield of the year 7500 kg DM/ha in the paper (paper date 2022-09-08)",
+          "dryMassKgHa": 4140.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Legume grass",
+      "detailShort": "Timothy and red clover, second cut, 4140 kg DW/ha; yield of the year 7500 kg DM/ha in…",
+      "yieldKgHa": 4140.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -4.318214026,
+          "gpp": 12.34025386,
+          "reco": 8.022039837,
+          "frac": 0.8050595238
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 2.094398791,
+          "gpp": 5.022807449,
+          "reco": 7.11720624,
+          "frac": 0.6011904762
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.997601711,
+          "gpp": 6.792143748,
+          "reco": 4.794542037,
+          "frac": 0.6741071429
+        }
+      },
+      "delta": {
+        "gpp": -7.317446414,
+        "reco": -0.9048335972,
+        "nee": 6.412612817
+      },
+      "deltaLate": {
+        "gpp": -5.548110115,
+        "reco": -3.2274978,
+        "nee": 2.320612315
+      },
+      "relPct": {
+        "gpp": -59.29737342,
+        "reco": -7.332374254,
+        "nee": 51.96499917
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 55.04055122,
+        "days": null,
+        "censored": true,
+        "reason": "max-days",
+        "nextDisturbanceDays": 317
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2022-08-08",
+          "offset": 0,
+          "drop": 8.973170014,
+          "dropPct": 73.95011907,
+          "before": 12.13408461,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 11.92030445,
+          "far": 11.96449438,
+          "pct": -0.3693422319
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "anttila-2023-06-21",
+      "site": "anttila",
+      "year": 2023,
+      "cutNo": 1,
+      "start": "2023-06-21",
+      "end": "2023-06-21",
+      "recorded": "2023-06-21",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2023-06-21",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Legume grass",
+          "detail": "Timothy and red clover, first cut, 5138 kg DW/ha",
+          "dryMassKgHa": 5138.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Legume grass",
+      "detailShort": "Timothy and red clover, first cut, 5138 kg DW/ha",
+      "yieldKgHa": 5138.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [
+        {
+          "date": "2023-06-28",
+          "dateEnd": null,
+          "type": "fertilisation",
+          "detail": "N fertiliser, 48 kg N/ha, product not given"
+        },
+        {
+          "date": "2023-07-19",
+          "dateEnd": null,
+          "type": "harvest",
+          "detail": "Timothy and red clover, second cut, 2576 kg DW/ha"
+        }
+      ],
+      "fertInWindow": true,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -8.962802286,
+          "gpp": 15.48282246,
+          "reco": 6.520020174,
+          "frac": 0.6889880952
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 2.514341273,
+          "gpp": 3.637455659,
+          "reco": 6.151796932,
+          "frac": 0.712797619
+        }
+      },
+      "late": null,
+      "delta": {
+        "gpp": -11.8453668,
+        "reco": -0.3682232429,
+        "nee": 11.47714356
+      },
+      "deltaLate": null,
+      "relPct": {
+        "gpp": -76.50650798,
+        "reco": -2.378269491,
+        "nee": 74.12823849
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": null,
+        "days": 20,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 28
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2023-06-21",
+          "offset": 0,
+          "drop": 12.81495175,
+          "dropPct": 77.86459012,
+          "before": 16.4579968,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 16.26926955,
+          "far": 16.10342467,
+          "pct": 1.029873362
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "anttila-2023-07-19",
+      "site": "anttila",
+      "year": 2023,
+      "cutNo": 2,
+      "start": "2023-07-19",
+      "end": "2023-07-19",
+      "recorded": "2023-07-19",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2023-07-19",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Legume grass",
+          "detail": "Timothy and red clover, second cut, 2576 kg DW/ha",
+          "dryMassKgHa": 2576.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Legume grass",
+      "detailShort": "Timothy and red clover, second cut, 2576 kg DW/ha",
+      "yieldKgHa": 2576.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -4.685548284,
+          "gpp": 12.11181777,
+          "reco": 7.426269489,
+          "frac": 0.6532738095
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -4.504589099,
+          "gpp": 11.62422624,
+          "reco": 7.119637142,
+          "frac": 0.681547619
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 1.432754574,
+          "gpp": 7.015061224,
+          "reco": 8.447815799,
+          "frac": 0.6517857143
+        }
+      },
+      "delta": {
+        "gpp": -0.487591532,
+        "reco": -0.3066323468,
+        "nee": 0.1809591852
+      },
+      "deltaLate": {
+        "gpp": -5.096756548,
+        "reco": 1.02154631,
+        "nee": 6.118302858
+      },
+      "relPct": {
+        "gpp": -4.025750231,
+        "reco": -2.531678998,
+        "nee": 1.494071234
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 57.91914439,
+        "days": 1,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": null
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2023-07-21",
+          "offset": 2,
+          "drop": 3.553650218,
+          "dropPct": 24.2103531,
+          "before": 14.67822548,
+          "clear": false,
+          "reason": "drop-too-small"
+        },
+        "preDrop": {
+          "near": 14.3722203,
+          "far": 13.35254532,
+          "pct": 7.636558819
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2018-06-12",
+      "site": "qvidja",
+      "year": 2018,
+      "cutNo": 1,
+      "start": "2018-06-12",
+      "end": "2018-06-12",
+      "recorded": "2018-06-12",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2018-06-12",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 615 kg/ha fresh, DM 0.3 (paper: 1985 kg DW/ha)",
+          "dryMassKgHa": 1985.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 615 kg/ha fresh, DM 0.3 (paper: 1985 kg DW/ha)",
+      "yieldKgHa": 1985.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -4.064507885,
+          "gpp": 4.706184801,
+          "reco": 0.6416769159,
+          "frac": 0.2827380952
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 0.8456561582,
+          "gpp": 1.792949117,
+          "reco": 2.638605275,
+          "frac": 0.5
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.9191462001,
+          "gpp": 4.918122785,
+          "reco": 3.998976585,
+          "frac": 0.1383928571
+        }
+      },
+      "delta": {
+        "gpp": -2.913235683,
+        "reco": 1.996928359,
+        "nee": 4.910164043
+      },
+      "deltaLate": {
+        "gpp": 0.2119379847,
+        "reco": 3.357299669,
+        "nee": 3.145361685
+      },
+      "relPct": {
+        "gpp": -61.9022798,
+        "reco": 42.43200053,
+        "nee": 104.3342803
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 104.5033927,
+        "days": 13,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 70
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2018-06-12",
+          "offset": 0,
+          "drop": 3.98396365,
+          "dropPct": 78.12180934,
+          "before": 5.099681745,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 4.602621735,
+          "far": 4.346470659,
+          "pct": 5.893311979
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2018-09-23",
+      "site": "qvidja",
+      "year": 2018,
+      "cutNo": 3,
+      "start": "2018-09-23",
+      "end": "2018-09-23",
+      "recorded": "2018-09-23",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2018-09-23",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 1439 kg/ha fresh, DM 0.241 (Qvidja xlsx date 2018-09-25)",
+          "dryMassKgHa": 346.8,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 1439 kg/ha fresh, DM 0.241 (Qvidja xlsx date 2018-09-25)",
+      "yieldKgHa": 346.8,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.4927889338,
+          "gpp": 5.175866412,
+          "reco": 4.683077478,
+          "frac": 0.6160714286
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.4422848007,
+          "gpp": 2.823074281,
+          "reco": 2.38078948,
+          "frac": 0.1696428571
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 0.4529146941,
+          "gpp": 2.078638119,
+          "reco": 2.531552813,
+          "frac": 0.525297619
+        }
+      },
+      "delta": {
+        "gpp": -2.35279213,
+        "reco": -2.302287997,
+        "nee": 0.05050413308
+      },
+      "deltaLate": {
+        "gpp": -3.097228293,
+        "reco": -2.151524665,
+        "nee": 0.9457036279
+      },
+      "relPct": {
+        "gpp": -45.45697171,
+        "reco": -44.4812098,
+        "nee": 0.9757619125
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 40.16019645,
+        "days": 1,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 261
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2018-09-24",
+          "offset": 1,
+          "drop": 2.566202682,
+          "dropPct": 44.58383896,
+          "before": 5.755903354,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 5.248972788,
+          "far": 5.369395684,
+          "pct": -2.242764409
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2019-06-11",
+      "site": "qvidja",
+      "year": 2019,
+      "cutNo": 1,
+      "start": "2019-06-11",
+      "end": "2019-06-11",
+      "recorded": "2019-06-11",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2019-06-11",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 7652 kg/ha fresh, DM 0.406 (Qvidja xlsx date 2019-06-10)",
+          "dryMassKgHa": 3106.7,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 7652 kg/ha fresh, DM 0.406 (Qvidja xlsx date 2019-06-10)",
+      "yieldKgHa": 3106.7,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [
+        {
+          "date": "2019-06-20",
+          "dateEnd": null,
+          "type": "fertilisation",
+          "detail": "Mineral fertiliser NPK 23-10-8, 220 kg/ha"
+        }
+      ],
+      "fertInWindow": true,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -6.562447945,
+          "gpp": 11.99443616,
+          "reco": 5.431988218,
+          "frac": 0.6145833333
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.09717257176,
+          "gpp": 3.233379113,
+          "reco": 3.136206541,
+          "frac": 0.4255952381
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.450305989,
+          "gpp": 4.855953173,
+          "reco": 3.405647184,
+          "frac": 0.2410714286
+        }
+      },
+      "delta": {
+        "gpp": -8.76105705,
+        "reco": -2.295781677,
+        "nee": 6.465275373
+      },
+      "deltaLate": {
+        "gpp": -7.13848299,
+        "reco": -2.026341035,
+        "nee": 5.112141956
+      },
+      "relPct": {
+        "gpp": -73.04267521,
+        "reco": -19.14038848,
+        "nee": 53.90228674
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 40.48504746,
+        "days": 35,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 70
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2019-06-12",
+          "offset": 1,
+          "drop": 9.374676945,
+          "dropPct": 76.30242987,
+          "before": 12.28621023,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 12.80507377,
+          "far": 12.30127145,
+          "pct": 4.095530518
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2019-08-20",
+      "site": "qvidja",
+      "year": 2019,
+      "cutNo": 2,
+      "start": "2019-08-20",
+      "end": "2019-08-20",
+      "recorded": "2019-08-20",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2019-08-20",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 2707 kg/ha fresh, DM 0.38 (Qvidja xlsx date 2019-08-21)",
+          "dryMassKgHa": 1028.7,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 2707 kg/ha fresh, DM 0.38 (Qvidja xlsx date 2019-08-21)",
+      "yieldKgHa": 1028.7,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -2.247185372,
+          "gpp": 8.080117133,
+          "reco": 5.832931761,
+          "frac": 0.4107142857
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.06027591196,
+          "gpp": 4.64432186,
+          "reco": 4.584045948,
+          "frac": 0.4270833333
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.4791491373,
+          "gpp": 3.97530266,
+          "reco": 3.496153523,
+          "frac": 0.3839285714
+        }
+      },
+      "delta": {
+        "gpp": -3.435795273,
+        "reco": -1.248885814,
+        "nee": 2.18690946
+      },
+      "deltaLate": {
+        "gpp": -4.104814473,
+        "reco": -2.336778239,
+        "nee": 1.768036234
+      },
+      "relPct": {
+        "gpp": -42.52160231,
+        "reco": -15.45628353,
+        "nee": 27.06531878
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 49.19857713,
+        "days": null,
+        "censored": true,
+        "reason": "max-days",
+        "nextDisturbanceDays": 308
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2019-08-18",
+          "offset": -2,
+          "drop": 3.197365751,
+          "dropPct": 34.29742556,
+          "before": 9.322465752,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 7.065759726,
+          "far": 9.136307009,
+          "pct": -22.66284704
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2020-06-23",
+      "site": "qvidja",
+      "year": 2020,
+      "cutNo": 1,
+      "start": "2020-06-23",
+      "end": "2020-06-23",
+      "recorded": "2020-06-23",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2020-06-23",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 5027.86 kg/ha fresh, DM 0.439 (Qvidja xlsx date 2020-06-11)",
+          "dryMassKgHa": 2207.2,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 5027.86 kg/ha fresh, DM 0.439 (Qvidja xlsx date 2020-06-11)",
+      "yieldKgHa": 2207.2,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -5.172793657,
+          "gpp": 14.18303136,
+          "reco": 9.010237708,
+          "frac": 0.07886904762
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 2.196351908,
+          "gpp": 7.792939941,
+          "reco": 9.989291849,
+          "frac": 0.4836309524
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.929809497,
+          "gpp": 9.644770412,
+          "reco": 7.714960915,
+          "frac": 0.3943452381
+        }
+      },
+      "delta": {
+        "gpp": -6.390091424,
+        "reco": 0.9790541414,
+        "nee": 7.369145565
+      },
+      "deltaLate": {
+        "gpp": -4.538260953,
+        "reco": -1.295276793,
+        "nee": 3.24298416
+      },
+      "relPct": {
+        "gpp": -45.05448278,
+        "reco": 6.902996378,
+        "nee": 51.95747916
+      },
+      "used": false,
+      "exclusion": "low-measured-fraction",
+      "fluxUse": "excluded: measured fraction of NEE below 10 % in a window",
+      "recovery": {
+        "sharePct": 68.00217925,
+        "days": 24,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 66
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2020-06-24",
+          "offset": 1,
+          "drop": 3.505345481,
+          "dropPct": 24.62826327,
+          "before": 14.23301936,
+          "clear": false,
+          "reason": "drop-too-small"
+        },
+        "preDrop": {
+          "near": 14.61833987,
+          "far": 13.06664302,
+          "pct": 11.87525253
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2020-08-28",
+      "site": "qvidja",
+      "year": 2020,
+      "cutNo": 2,
+      "start": "2020-08-28",
+      "end": "2020-08-28",
+      "recorded": "2020-08-28",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2020-08-28",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 1857.58 kg/ha fresh, DM 0.701 (Qvidja xlsx date 2020-08-27)",
+          "dryMassKgHa": 1302.2,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 1857.58 kg/ha fresh, DM 0.701 (Qvidja xlsx date 2020-08-27)",
+      "yieldKgHa": 1302.2,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.8610580681,
+          "gpp": 4.488247219,
+          "reco": 3.62718915,
+          "frac": 0.318452381
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 1.310043114,
+          "gpp": 2.989001047,
+          "reco": 4.299044161,
+          "frac": 0.2261904762
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 0.4586946104,
+          "gpp": 2.918959077,
+          "reco": 3.377653687,
+          "frac": 0.4360119048
+        }
+      },
+      "delta": {
+        "gpp": -1.499246171,
+        "reco": 0.6718550105,
+        "nee": 2.171101182
+      },
+      "deltaLate": {
+        "gpp": -1.569288142,
+        "reco": -0.2495354634,
+        "nee": 1.319752678
+      },
+      "relPct": {
+        "gpp": -33.40382332,
+        "reco": 14.96920686,
+        "nee": 48.37303018
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 65.03561267,
+        "days": 28,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 290
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2020-08-28",
+          "offset": 0,
+          "drop": 1.758423795,
+          "dropPct": 36.60835739,
+          "before": 4.803339785,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 4.843947664,
+          "far": 4.117841537,
+          "pct": 17.6331731
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2021-06-14",
+      "site": "qvidja",
+      "year": 2021,
+      "cutNo": 1,
+      "start": "2021-06-14",
+      "end": "2021-06-14",
+      "recorded": "2021-06-14",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2021-06-14",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 3526 kg/ha fresh, DM 0.786; AG_XLSX 1968 kg C/ha (Qvidja xlsx date 2021-06-21)",
+          "dryMassKgHa": 4685.7,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 3526 kg/ha fresh, DM 0.786; AG_XLSX 1968 kg C/ha (Qvidja xlsx date…",
+      "yieldKgHa": 4685.7,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -6.490563394,
+          "gpp": 10.44205795,
+          "reco": 3.951494557,
+          "frac": 0.2261904762
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 1.072858967,
+          "gpp": 2.774361186,
+          "reco": 3.847220153,
+          "frac": 0.337797619
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 0.5727583489,
+          "gpp": 4.074894567,
+          "reco": 4.647652916,
+          "frac": 0.25
+        }
+      },
+      "delta": {
+        "gpp": -7.667696764,
+        "reco": -0.1042744037,
+        "nee": 7.563422361
+      },
+      "deltaLate": {
+        "gpp": -6.367163383,
+        "reco": 0.6961583594,
+        "nee": 7.063321742
+      },
+      "relPct": {
+        "gpp": -73.43089649,
+        "reco": -0.998600125,
+        "nee": 72.43229636
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 39.02386471,
+        "days": null,
+        "censored": true,
+        "reason": "max-days",
+        "nextDisturbanceDays": 70
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2021-06-14",
+          "offset": 0,
+          "drop": 6.339888984,
+          "dropPct": 61.65025221,
+          "before": 10.28363836,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 9.82979164,
+          "far": 10.16581963,
+          "pct": -3.305468768
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2022-06-21",
+      "site": "qvidja",
+      "year": 2022,
+      "cutNo": 1,
+      "start": "2022-06-21",
+      "end": "2022-06-21",
+      "recorded": "2022-06-21",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2022-06-21",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 2638.9 kg/ha fresh, DM 0.329; AG_XLSX 439 kg C/ha",
+          "dryMassKgHa": 1045.2,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 2638.9 kg/ha fresh, DM 0.329; AG_XLSX 439 kg C/ha",
+      "yieldKgHa": 1045.2,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [
+        {
+          "date": "2022-07-04",
+          "dateEnd": null,
+          "type": "fertilisation",
+          "detail": "Qvidja compost, 15330 kg/ha fresh, DM 0.354; 1495 kg C/ha and 87 kg N/ha (AG_XLSX, N source not stated)"
+        }
+      ],
+      "fertInWindow": true,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -2.497639294,
+          "gpp": 6.143515437,
+          "reco": 3.645876143,
+          "frac": 0.3839285714
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.21857764,
+          "gpp": 4.800791366,
+          "reco": 3.582213726,
+          "frac": 0.5282738095
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.520823625,
+          "gpp": 4.810264299,
+          "reco": 3.289440674,
+          "frac": 0.2946428571
+        }
+      },
+      "delta": {
+        "gpp": -1.342724071,
+        "reco": -0.06366241678,
+        "nee": 1.279061654
+      },
+      "deltaLate": {
+        "gpp": -1.333251138,
+        "reco": -0.3564354689,
+        "nee": 0.9768156689
+      },
+      "relPct": {
+        "gpp": -21.85595665,
+        "reco": -1.036253875,
+        "nee": 20.81970277
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 78.29823736,
+        "days": 1,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 45
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2022-06-22",
+          "offset": 1,
+          "drop": 1.222120279,
+          "dropPct": 19.72438394,
+          "before": 6.195987074,
+          "clear": false,
+          "reason": "drop-too-small"
+        },
+        "preDrop": {
+          "near": 5.551726491,
+          "far": 6.606598381,
+          "pct": -15.96694439
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2023-06-19",
+      "site": "qvidja",
+      "year": 2023,
+      "cutNo": 1,
+      "start": "2023-06-19",
+      "end": "2023-06-20",
+      "recorded": "2023-06-19",
+      "durationDays": 2,
+      "events": [
+        {
+          "date": "2023-06-19",
+          "dateEnd": null,
+          "type": "cut",
+          "crop": null,
+          "detail": "Cleaning cut (puhdistusniitto), not removed",
+          "dryMassKgHa": null,
+          "group": "cleaningCut"
+        },
+        {
+          "date": "2023-06-20",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 752.1 kg/ha fresh, DM 0.404",
+          "dryMassKgHa": 303.8,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [
+        {
+          "date": "2023-06-19",
+          "type": "cut",
+          "detail": "Cleaning cut (puhdistusniitto), not removed"
+        }
+      ],
+      "crop": "Silage",
+      "detailShort": "Cleaning cut (puhdistusniitto), not removed; Silage, whole crop, 752.1 kg/ha fresh, DM…",
+      "yieldKgHa": 303.8,
+      "yearYieldKgHa": null,
+      "overrides": [
+        "Cleaning cut on 19 Jun and silage harvest on 20 Jun 2023 are one episode: start = cut day, group silage harvest, the cut is a co-event."
+      ],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -4.616571121,
+          "gpp": 6.118155362,
+          "reco": 1.501584241,
+          "frac": 0.2678571429
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 1.50570911,
+          "gpp": 4.021373236,
+          "reco": 5.527082346,
+          "frac": 0.3318452381
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.6728134952,
+          "gpp": 5.329794762,
+          "reco": 4.656981267,
+          "frac": 0.4479166667
+        }
+      },
+      "delta": {
+        "gpp": -2.096782126,
+        "reco": 4.025498104,
+        "nee": 6.12228023
+      },
+      "deltaLate": {
+        "gpp": -0.7883605996,
+        "reco": 3.155397026,
+        "nee": 3.943757625
+      },
+      "relPct": {
+        "gpp": -34.27147566,
+        "reco": 65.79594447,
+        "nee": 100.0674201
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 87.11440699,
+        "days": 5,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 62
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2023-06-10",
+          "offset": -9,
+          "drop": 2.396874454,
+          "dropPct": 30.36945118,
+          "before": 7.892386463,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 4.720661754,
+          "far": 5.591581426,
+          "pct": -15.575552
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2023-08-21",
+      "site": "qvidja",
+      "year": 2023,
+      "cutNo": 2,
+      "start": "2023-08-21",
+      "end": "2023-08-22",
+      "recorded": "2023-08-21",
+      "durationDays": 2,
+      "events": [
+        {
+          "date": "2023-08-21",
+          "dateEnd": null,
+          "type": "cut",
+          "crop": null,
+          "detail": "Cleaning cut (puhdistusniitto), not removed",
+          "dryMassKgHa": null,
+          "group": "cleaningCut"
+        },
+        {
+          "date": "2023-08-22",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 1088.86 kg/ha fresh, DM 0.404",
+          "dryMassKgHa": 439.9,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [
+        {
+          "date": "2023-08-21",
+          "type": "cut",
+          "detail": "Cleaning cut (puhdistusniitto), not removed"
+        }
+      ],
+      "crop": "Silage",
+      "detailShort": "Cleaning cut (puhdistusniitto), not removed; Silage, whole crop, 1088.86 kg/ha fresh, DM…",
+      "yieldKgHa": 439.9,
+      "yearYieldKgHa": null,
+      "overrides": [
+        "Cleaning cut on 21 Aug and silage harvest on 22 Aug 2023 are one episode: start = cut day, group silage harvest, the cut is a co-event."
+      ],
+      "otherEvents": [
+        {
+          "date": "2023-08-30",
+          "dateEnd": null,
+          "type": "fertilisation",
+          "detail": "Soilfood compost fibre (Rav.kuitu II L), 34500 kg/ha fresh, DM 0.48"
+        },
+        {
+          "date": "2023-09-07",
+          "dateEnd": null,
+          "type": "tillage",
+          "detail": "Subsoiling and cultivation (jankkurointi ja kultivointi)"
+        }
+      ],
+      "fertInWindow": true,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.007036233408,
+          "gpp": 7.296895589,
+          "reco": 7.289859355,
+          "frac": 0.3630952381
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 3.386249983,
+          "gpp": 3.318376297,
+          "reco": 6.70462628,
+          "frac": 0.2931547619
+        }
+      },
+      "late": null,
+      "delta": {
+        "gpp": -3.978519292,
+        "reco": -0.5852330755,
+        "nee": 3.393286217
+      },
+      "deltaLate": null,
+      "relPct": {
+        "gpp": -54.52345102,
+        "reco": -8.020302173,
+        "nee": 46.50314884
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 57.01922472,
+        "days": 12,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 298
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2023-08-18",
+          "offset": -3,
+          "drop": 6.913538525,
+          "dropPct": 83.08789106,
+          "before": 8.320753405,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 2.391309444,
+          "far": 8.237646348,
+          "pct": -70.97096255
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "qvidja-2024-06-15",
+      "site": "qvidja",
+      "year": 2024,
+      "cutNo": 1,
+      "start": "2024-06-15",
+      "end": "2024-06-15",
+      "recorded": "2024-06-15",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2024-06-15",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Silage",
+          "detail": "Silage, whole crop, 3936.65 kg/ha fresh, DM 0.423",
+          "dryMassKgHa": 1665.2,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Silage",
+      "detailShort": "Silage, whole crop, 3936.65 kg/ha fresh, DM 0.423",
+      "yieldKgHa": 1665.2,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -2.962812402,
+          "gpp": 7.867787532,
+          "reco": 4.90497513,
+          "frac": 0.5386904762
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.200441322,
+          "gpp": 5.128264466,
+          "reco": 4.927823144,
+          "frac": 0.3526785714
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.381440459,
+          "gpp": 7.522903803,
+          "reco": 6.141463344,
+          "frac": 0.5758928571
+        }
+      },
+      "delta": {
+        "gpp": -2.739523066,
+        "reco": 0.02284801456,
+        "nee": 2.76237108
+      },
+      "deltaLate": {
+        "gpp": -0.3448837294,
+        "reco": 1.236488214,
+        "nee": 1.581371943
+      },
+      "relPct": {
+        "gpp": -34.81948457,
+        "reco": 0.2903994861,
+        "nee": 35.10988406
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 95.61650937,
+        "days": 11,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 33
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2024-06-14",
+          "offset": -1,
+          "drop": 5.608521948,
+          "dropPct": 60.8678019,
+          "before": 9.214267268,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 8.431917339,
+          "far": 8.686281996,
+          "pct": -2.928349057
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "sarkisuo-2022-06-30",
+      "site": "sarkisuo",
+      "year": 2022,
+      "cutNo": 1,
+      "start": "2022-06-30",
+      "end": "2022-06-30",
+      "recorded": "2022-06-30",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2022-06-30",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Mixed grasses",
+          "detail": "Timothy and meadow fescue, first cut, 2450 kg DW/ha",
+          "dryMassKgHa": 2450.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Mixed grasses",
+      "detailShort": "Timothy and meadow fescue, first cut, 2450 kg DW/ha",
+      "yieldKgHa": 2450.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [
+        {
+          "date": "2022-07-04",
+          "dateEnd": null,
+          "type": "fertilisation",
+          "detail": "Synthetic N fertiliser, 69 kg N/ha, product not given"
+        }
+      ],
+      "fertInWindow": true,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -4.061518465,
+          "gpp": 9.885318132,
+          "reco": 5.823799667,
+          "frac": 0.6205357143
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 0.8958384745,
+          "gpp": 6.189333145,
+          "reco": 7.085171619,
+          "frac": 0.4077380952
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -5.442730488,
+          "gpp": 12.1495417,
+          "reco": 6.706811208,
+          "frac": 0.587797619
+        }
+      },
+      "delta": {
+        "gpp": -3.695984988,
+        "reco": 1.261371952,
+        "nee": 4.957356939
+      },
+      "deltaLate": {
+        "gpp": 2.264223564,
+        "reco": 0.8830115409,
+        "nee": -1.381212023
+      },
+      "relPct": {
+        "gpp": -37.38862966,
+        "reco": 12.7600542,
+        "nee": 50.14868387
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 122.9049135,
+        "days": 12,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 46
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2022-06-30",
+          "offset": 0,
+          "drop": 7.161455601,
+          "dropPct": 65.38951778,
+          "before": 10.95199329,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 10.5005833,
+          "far": 10.721009,
+          "pct": -2.056016428
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "sarkisuo-2022-08-15",
+      "site": "sarkisuo",
+      "year": 2022,
+      "cutNo": 2,
+      "start": "2022-08-15",
+      "end": "2022-08-15",
+      "recorded": "2022-08-15",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2022-08-15",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Mixed grasses",
+          "detail": "Timothy and meadow fescue, second cut, 2220 kg DW/ha (paper: yield of the year 4700 kg DM/ha)",
+          "dryMassKgHa": 2220.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Mixed grasses",
+      "detailShort": "Timothy and meadow fescue, second cut, 2220 kg DW/ha (paper: yield of the year 4700 kg…",
+      "yieldKgHa": 2220.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [
+        {
+          "date": "2022-08-03",
+          "dateEnd": "2022-08-15",
+          "type": "other",
+          "detail": "Ditch preparation"
+        }
+      ],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -3.144446574,
+          "gpp": 9.910265735,
+          "reco": 6.765819161,
+          "frac": 0.5595238095
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 2.492952415,
+          "gpp": 3.518747082,
+          "reco": 6.011699497,
+          "frac": 0.4851190476
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.964840882,
+          "gpp": 5.54863531,
+          "reco": 3.583794428,
+          "frac": 0.5520833333
+        }
+      },
+      "delta": {
+        "gpp": -6.391518653,
+        "reco": -0.7541196641,
+        "nee": 5.637398989
+      },
+      "deltaLate": {
+        "gpp": -4.361630425,
+        "reco": -3.182024733,
+        "nee": 1.179605692
+      },
+      "relPct": {
+        "gpp": -64.49391796,
+        "reco": -7.609479748,
+        "nee": 56.88443821
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 55.98876416,
+        "days": null,
+        "censored": true,
+        "reason": "max-days",
+        "nextDisturbanceDays": 318
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2022-08-15",
+          "offset": 0,
+          "drop": 6.409028714,
+          "dropPct": 70.67215792,
+          "before": 9.068675562,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 8.353560938,
+          "far": 9.98090375,
+          "pct": -16.30456372
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "sarkisuo-2023-06-29",
+      "site": "sarkisuo",
+      "year": 2023,
+      "cutNo": 1,
+      "start": "2023-06-29",
+      "end": "2023-06-29",
+      "recorded": "2023-06-29",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2023-06-29",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Mixed grasses",
+          "detail": "Timothy and meadow fescue, first cut, 4032 kg DW/ha",
+          "dryMassKgHa": 4032.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Mixed grasses",
+      "detailShort": "Timothy and meadow fescue, first cut, 4032 kg DW/ha",
+      "yieldKgHa": 4032.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [
+        {
+          "date": "2023-07-03",
+          "dateEnd": null,
+          "type": "fertilisation",
+          "detail": "N fertiliser, 73 kg N/ha, product not given"
+        }
+      ],
+      "fertInWindow": true,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 0,
+          "reco": 0,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -3.404791868,
+          "gpp": null,
+          "reco": null,
+          "frac": 0.5580357143
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 4,
+          "reco": 4,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 2.009283165,
+          "gpp": 7.004734471,
+          "reco": 5.925682645,
+          "frac": 0.6696428571
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -3.579344575,
+          "gpp": 10.05802781,
+          "reco": 6.47868323,
+          "frac": 0.4553571429
+        }
+      },
+      "delta": {
+        "gpp": null,
+        "reco": null,
+        "nee": 5.414075033
+      },
+      "deltaLate": {
+        "gpp": null,
+        "reco": null,
+        "nee": -0.1745527072
+      },
+      "relPct": {
+        "gpp": null,
+        "reco": null,
+        "nee": null
+      },
+      "used": false,
+      "exclusion": "too-few-days",
+      "fluxUse": "excluded: fewer than 12 days with flux data in a window (before 0, after 4)",
+      "recovery": {
+        "sharePct": null,
+        "days": null,
+        "censored": false,
+        "reason": "no-reference",
+        "nextDisturbanceDays": 47
+      },
+      "timing": {
+        "used": false,
+        "exclusion": "fewer than 4 of 5 days with GPP on each side of every candidate day",
+        "gpp": {
+          "detectedDate": null,
+          "offset": null,
+          "drop": null,
+          "dropPct": null,
+          "before": null,
+          "clear": false,
+          "reason": "too-few-days"
+        },
+        "preDrop": {
+          "near": null,
+          "far": null,
+          "pct": null
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "sarkisuo-2023-08-15",
+      "site": "sarkisuo",
+      "year": 2023,
+      "cutNo": 2,
+      "start": "2023-08-15",
+      "end": "2023-08-15",
+      "recorded": "2023-08-15",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2023-08-15",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Mixed grasses",
+          "detail": "Timothy and meadow fescue, second cut, 2440 kg DW/ha",
+          "dryMassKgHa": 2440.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Mixed grasses",
+      "detailShort": "Timothy and meadow fescue, second cut, 2440 kg DW/ha",
+      "yieldKgHa": 2440.0,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -3.535685296,
+          "gpp": 10.13651197,
+          "reco": 6.600826677,
+          "frac": 0.5654761905
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 2.541207906,
+          "gpp": 2.748946812,
+          "reco": 5.290154718,
+          "frac": 0.4732142857
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.701888514,
+          "gpp": 5.510529843,
+          "reco": 3.808641329,
+          "frac": 0.6056547619
+        }
+      },
+      "delta": {
+        "gpp": -7.38756516,
+        "reco": -1.310671958,
+        "nee": 6.076893202
+      },
+      "deltaLate": {
+        "gpp": -4.62598213,
+        "reco": -2.792185348,
+        "nee": 1.833796782
+      },
+      "relPct": {
+        "gpp": -72.88074221,
+        "reco": -12.93020678,
+        "nee": 59.95053543
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 54.36317599,
+        "days": null,
+        "censored": true,
+        "reason": "max-days",
+        "nextDisturbanceDays": null
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2023-08-15",
+          "offset": 0,
+          "drop": 7.551731611,
+          "dropPct": 87.21451998,
+          "before": 8.658800866,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 8.17348154,
+          "far": 9.964580944,
+          "pct": -17.97465858
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "viikki-2022-07-01",
+      "site": "viikki",
+      "year": 2022,
+      "cutNo": 1,
+      "start": "2022-07-01",
+      "end": "2022-07-01",
+      "recorded": "2022-07-01",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2022-07-01",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Timothy",
+          "detail": "Timothy, first cut",
+          "dryMassKgHa": null,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Timothy",
+      "detailShort": "Timothy, first cut",
+      "yieldKgHa": null,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -7.098754138,
+          "gpp": 13.97919941,
+          "reco": 6.880445269,
+          "frac": 0.2276785714
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -2.167089578,
+          "gpp": 7.097942181,
+          "reco": 4.930852603,
+          "frac": 0.3154761905
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -3.94959027,
+          "gpp": 12.20452705,
+          "reco": 8.254936782,
+          "frac": 0.3913690476
+        }
+      },
+      "delta": {
+        "gpp": -6.881257226,
+        "reco": -1.949592666,
+        "nee": 4.93166456
+      },
+      "deltaLate": {
+        "gpp": -1.774672355,
+        "reco": 1.374491513,
+        "nee": 3.149163868
+      },
+      "relPct": {
+        "gpp": -49.22497366,
+        "reco": -13.94638283,
+        "nee": 35.27859083
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 87.30490708,
+        "days": 18,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 57
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2022-06-29",
+          "offset": -2,
+          "drop": 6.625494511,
+          "dropPct": 43.05945102,
+          "before": 15.38685319,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 11.46629454,
+          "far": 16.50113253,
+          "pct": -30.51207537
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "viikki-2022-08-27",
+      "site": "viikki",
+      "year": 2022,
+      "cutNo": 2,
+      "start": "2022-08-27",
+      "end": "2022-08-27",
+      "recorded": "2022-08-27",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2022-08-27",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Timothy",
+          "detail": "Timothy, second cut; yield of the year 3673 kg DW/ha",
+          "dryMassKgHa": 3673.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Timothy",
+      "detailShort": "Timothy, second cut; yield of the year 3673 kg DW/ha",
+      "yieldKgHa": null,
+      "yearYieldKgHa": 3673.0,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.7510170813,
+          "gpp": 6.422377226,
+          "reco": 5.671360145,
+          "frac": 0.1369047619
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.1983635984,
+          "gpp": 3.485210226,
+          "reco": 3.286846628,
+          "frac": 0.08333333333
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 0.9196646276,
+          "gpp": 2.772599628,
+          "reco": 3.692264256,
+          "frac": 0.1845238095
+        }
+      },
+      "delta": {
+        "gpp": -2.937167,
+        "reco": -2.384513517,
+        "nee": 0.5526534829
+      },
+      "deltaLate": {
+        "gpp": -3.649777598,
+        "reco": -1.979095889,
+        "nee": 1.670681709
+      },
+      "relPct": {
+        "gpp": -45.73333046,
+        "reco": -37.1282071,
+        "nee": 8.605123359
+      },
+      "used": false,
+      "exclusion": "low-measured-fraction",
+      "fluxUse": "excluded: measured fraction of NEE below 10 % in a window",
+      "recovery": {
+        "sharePct": 43.17092457,
+        "days": null,
+        "censored": true,
+        "reason": "max-days",
+        "nextDisturbanceDays": 355
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2022-08-20",
+          "offset": -7,
+          "drop": 3.001676926,
+          "dropPct": 36.7680246,
+          "before": 8.163824297,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 3.861730606,
+          "far": 6.138205298,
+          "pct": -37.08697546
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    },
+    {
+      "id": "viikki-2023-08-17",
+      "site": "viikki",
+      "year": 2023,
+      "cutNo": 1,
+      "start": "2023-08-17",
+      "end": "2023-08-24",
+      "recorded": "2023-08-17",
+      "durationDays": 8,
+      "events": [
+        {
+          "date": "2023-08-17",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Barley, clover and grasses",
+          "detail": "Barley, clover and grasses, first cut",
+          "dryMassKgHa": null,
+          "group": "silageHarvest"
+        },
+        {
+          "date": "2023-08-24",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Barley, clover and grasses",
+          "detail": "Barley, clover and grasses, second cut; yield of the year 6773 kg DW/ha",
+          "dryMassKgHa": 6773.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Barley, clover and grasses",
+      "detailShort": "Barley, clover and grasses, first cut; Barley, clover and grasses, second cut; yield of…",
+      "yieldKgHa": null,
+      "yearYieldKgHa": 6773.0,
+      "overrides": [
+        "First cut on 17 Aug and second cut on 24 Aug 2023 (7 days apart) are one episode."
+      ],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 0.4993262613,
+          "gpp": 7.002269964,
+          "reco": 7.501596225,
+          "frac": 0.2842261905
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 2.741500325,
+          "gpp": 0.980040227,
+          "reco": 3.721540552,
+          "frac": 0.2232142857
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": 1.53458093,
+          "gpp": 2.71630361,
+          "reco": 4.25088454,
+          "frac": 0.3288690476
+        }
+      },
+      "delta": {
+        "gpp": -6.022229737,
+        "reco": -3.780055673,
+        "nee": 2.242174064
+      },
+      "deltaLate": {
+        "gpp": -4.285966354,
+        "reco": -3.250711685,
+        "nee": 1.035254669
+      },
+      "relPct": {
+        "gpp": -86.00396397,
+        "reco": -53.9832896,
+        "nee": 32.02067437
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 38.79175787,
+        "days": null,
+        "censored": true,
+        "reason": "max-days",
+        "nextDisturbanceDays": 295
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2023-08-17",
+          "offset": 0,
+          "drop": 4.84930304,
+          "dropPct": 79.7192063,
+          "before": 6.082979579,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 5.468268663,
+          "far": 7.325325269,
+          "pct": -25.35118289
+        }
+      },
+      "flags": {
+        "establishmentYear": true,
+        "partialHarvest": false,
+        "note": "Establishment year: barley undersown with clover and grasses, cut green on 17 and 24 August."
+      }
+    },
+    {
+      "id": "viikki-2024-06-14",
+      "site": "viikki",
+      "year": 2024,
+      "cutNo": 1,
+      "start": "2024-06-14",
+      "end": "2024-06-14",
+      "recorded": "2024-06-14",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2024-06-14",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Grass hay",
+          "detail": "Grass hay (kuivaheinä), first cut, 1660 kg/ha; only about one hectare harvested (poor growth)",
+          "dryMassKgHa": null,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Grass hay",
+      "detailShort": "Grass hay (kuivaheinä), first cut, 1660 kg/ha; only about one hectare harvested (poor…",
+      "yieldKgHa": null,
+      "yearYieldKgHa": null,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -2.150279928,
+          "gpp": 4.521516683,
+          "reco": 2.371236754,
+          "frac": 0.4270833333
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -2.108194467,
+          "gpp": 4.670437917,
+          "reco": 2.562243451,
+          "frac": 0.2678571429
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -2.111542279,
+          "gpp": 5.998295124,
+          "reco": 3.886752844,
+          "frac": 0.4404761905
+        }
+      },
+      "delta": {
+        "gpp": 0.1489212346,
+        "reco": 0.1910066962,
+        "nee": 0.04208546155
+      },
+      "deltaLate": {
+        "gpp": 1.476778441,
+        "reco": 1.51551609,
+        "nee": 0.03873764903
+      },
+      "relPct": {
+        "gpp": 3.293612411,
+        "reco": 4.22439437,
+        "nee": 0.9307819588
+      },
+      "used": true,
+      "exclusion": null,
+      "fluxUse": "used",
+      "recovery": {
+        "sharePct": 132.66113,
+        "days": 1,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 47
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2024-06-13",
+          "offset": -1,
+          "drop": 1.23348299,
+          "dropPct": 21.35094825,
+          "before": 5.777181303,
+          "clear": false,
+          "reason": "drop-too-small"
+        },
+        "preDrop": {
+          "near": 6.118248141,
+          "far": 4.689249669,
+          "pct": 30.47392595
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": true,
+        "note": "Partial harvest: only about one hectare of the field was harvested (poor growth)."
+      }
+    },
+    {
+      "id": "viikki-2024-07-31",
+      "site": "viikki",
+      "year": 2024,
+      "cutNo": 2,
+      "start": "2024-07-31",
+      "end": "2024-07-31",
+      "recorded": "2024-07-31",
+      "durationDays": 1,
+      "events": [
+        {
+          "date": "2024-07-31",
+          "dateEnd": null,
+          "type": "harvest",
+          "crop": "Grass hay",
+          "detail": "Grass hay (kuivaheinä), second cut, 676.45 kg/ha for the whole field; yield of the year 2336 kg DW/ha",
+          "dryMassKgHa": 2336.0,
+          "group": "silageHarvest"
+        }
+      ],
+      "coEvents": [],
+      "crop": "Grass hay",
+      "detailShort": "Grass hay (kuivaheinä), second cut, 676.45 kg/ha for the whole field; yield of the year…",
+      "yieldKgHa": null,
+      "yearYieldKgHa": 2336.0,
+      "overrides": [],
+      "otherEvents": [],
+      "fertInWindow": false,
+      "before": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -4.753112119,
+          "gpp": 10.59507003,
+          "reco": 5.841957908,
+          "frac": 0.1443452381
+        }
+      },
+      "after": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -0.8703690566,
+          "gpp": 7.510795367,
+          "reco": 6.64042631,
+          "frac": 0.08928571429
+        }
+      },
+      "late": {
+        "nDays": {
+          "nee": 14,
+          "gpp": 14,
+          "reco": 14,
+          "frac": 14
+        },
+        "mean": {
+          "nee": -1.820593085,
+          "gpp": 6.311738195,
+          "reco": 4.49114511,
+          "frac": 0.5267857143
+        }
+      },
+      "delta": {
+        "gpp": -3.08427466,
+        "reco": 0.7984684019,
+        "nee": 3.882743062
+      },
+      "deltaLate": {
+        "gpp": -4.283331832,
+        "reco": -1.350812798,
+        "nee": 2.932519034
+      },
+      "relPct": {
+        "gpp": -29.1104698,
+        "reco": 7.536225809,
+        "nee": 36.64669561
+      },
+      "used": false,
+      "exclusion": "low-measured-fraction",
+      "fluxUse": "excluded: measured fraction of NEE below 10 % in a window",
+      "recovery": {
+        "sharePct": 59.57240659,
+        "days": 1,
+        "censored": false,
+        "reason": "recovered",
+        "nextDisturbanceDays": 406
+      },
+      "timing": {
+        "used": true,
+        "exclusion": null,
+        "gpp": {
+          "detectedDate": "2024-07-29",
+          "offset": -2,
+          "drop": 3.44284194,
+          "dropPct": 28.48212436,
+          "before": 12.08772877,
+          "clear": true,
+          "reason": null
+        },
+        "preDrop": {
+          "near": 9.233414232,
+          "far": 11.98635382,
+          "pct": -22.9672812
+        }
+      },
+      "flags": {
+        "establishmentYear": false,
+        "partialHarvest": false,
+        "note": null
+      }
+    }
+  ],
+  "composite": {
+    "offsets": [
+      -14,
+      -13,
+      -12,
+      -11,
+      -10,
+      -9,
+      -8,
+      -7,
+      -6,
+      -5,
+      -4,
+      -3,
+      -2,
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28
+    ],
+    "yRange": [
+      -125.0,
+      225.0
+    ],
+    "perSite": {
+      "anttila": {
+        "episodes": 4,
+        "ids": [
+          "anttila-2022-06-21",
+          "anttila-2022-08-08",
+          "anttila-2023-06-21",
+          "anttila-2023-07-19"
+        ],
+        "gpp": {
+          "mean": [
+            94.62804933,
+            84.28674169,
+            95.0233909,
+            94.51597759,
+            102.4968029,
+            97.97609855,
+            104.7005562,
+            110.1273326,
+            100.9888544,
+            103.4170236,
+            105.7383539,
+            107.3893287,
+            93.8594493,
+            104.8520403,
+            63.62276672,
+            52.94469707,
+            42.81921798,
+            38.39855366,
+            49.79685976,
+            42.2113721,
+            51.23111056,
+            53.40800353,
+            63.09695868,
+            53.15478448,
+            49.11626648,
+            69.21550953,
+            72.31977204,
+            81.27381266,
+            69.93952509,
+            79.78925075,
+            77.41519405,
+            82.68587149,
+            81.54126017,
+            67.30922173,
+            66.71686978,
+            71.21589402,
+            61.23236678,
+            75.62860485,
+            73.31116459,
+            78.03890133,
+            74.63853127,
+            70.63225675,
+            70.09758255
+          ],
+          "sd": [
+            30.75551151,
+            17.05634562,
+            15.37955842,
+            20.62497242,
+            3.144266561,
+            21.00182212,
+            4.409824822,
+            6.733442788,
+            8.157889049,
+            22.42808344,
+            12.38776763,
+            15.87422229,
+            29.2767347,
+            6.830713744,
+            37.3876664,
+            56.13567576,
+            36.0193123,
+            21.16517253,
+            47.87210736,
+            26.61708179,
+            32.53265425,
+            40.28594842,
+            35.67753243,
+            23.25100947,
+            28.23795775,
+            33.7849804,
+            36.54121061,
+            37.12543879,
+            35.93781643,
+            24.42123952,
+            28.18266303,
+            29.91721362,
+            22.34095004,
+            26.79845104,
+            38.80317262,
+            30.3149188,
+            21.23067583,
+            34.77739956,
+            35.35176105,
+            36.09844505,
+            36.20195011,
+            28.24715914,
+            50.40603445
+          ],
+          "n": [
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            3
+          ],
+          "meanDays1to14": 56.35188883,
+          "meanDays15to28": 73.58949786,
+          "minN": 3,
+          "maxN": 4
+        },
+        "reco": {
+          "mean": [
+            54.02376107,
+            54.00219461,
+            52.75334705,
+            51.42992516,
+            52.29968544,
+            51.60490985,
+            52.16173761,
+            54.62082854,
+            53.32063655,
+            53.60176965,
+            56.06620289,
+            59.5028947,
+            57.52784269,
+            54.94543901,
+            57.25680792,
+            57.98018268,
+            55.31792583,
+            55.3568277,
+            54.59265088,
+            54.27435662,
+            54.36685748,
+            50.9136094,
+            51.86261696,
+            52.22287261,
+            50.78339943,
+            54.75078151,
+            57.07634967,
+            55.12875249,
+            52.60748964,
+            51.38273193,
+            50.36475868,
+            47.99184188,
+            48.90676534,
+            53.11971471,
+            53.26488996,
+            53.25991549,
+            53.49061452,
+            54.40084671,
+            54.1166838,
+            55.21775642,
+            55.52429349,
+            55.87881973,
+            55.55110539
+          ],
+          "sd": [
+            17.2634429,
+            16.95273905,
+            15.00201924,
+            11.39652693,
+            7.665366023,
+            6.532374692,
+            7.986470717,
+            11.96617461,
+            9.419548575,
+            14.42328438,
+            18.04709363,
+            19.57124052,
+            17.32588262,
+            14.37923385,
+            13.43499688,
+            12.3291812,
+            10.27752371,
+            7.154568934,
+            7.720281185,
+            7.191330721,
+            8.206519003,
+            9.542154497,
+            10.82865371,
+            13.52121168,
+            17.08978659,
+            18.24865665,
+            17.88716938,
+            18.25683095,
+            17.07259269,
+            15.04043606,
+            15.09030266,
+            15.64013105,
+            15.25179408,
+            16.16722414,
+            13.74808674,
+            9.814265604,
+            12.59397192,
+            13.31807411,
+            13.54980524,
+            15.42150036,
+            15.46164563,
+            16.10659538,
+            20.16481754
+          ],
+          "n": [
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            3
+          ],
+          "meanDays1to14": 54.08819092,
+          "meanDays15to28": 53.03362415,
+          "minN": 3,
+          "maxN": 4
+        },
+        "nee": {
+          "mean": [
+            -40.60428826,
+            -30.28454707,
+            -42.27004385,
+            -43.08605243,
+            -50.19711746,
+            -46.37118869,
+            -52.53881859,
+            -55.50650404,
+            -47.66821787,
+            -49.815254,
+            -49.67215102,
+            -47.88643403,
+            -36.3316066,
+            -49.90660126,
+            -6.365958798,
+            5.035485613,
+            12.49870785,
+            16.95827405,
+            4.795791127,
+            12.06298453,
+            3.135746917,
+            -2.494394136,
+            -11.23434173,
+            -0.9319118675,
+            1.667132952,
+            -14.46472802,
+            -15.24342237,
+            -26.14506017,
+            -17.33203545,
+            -28.40651881,
+            -27.05043538,
+            -34.69402961,
+            -32.63449484,
+            -14.18950702,
+            -13.45197982,
+            -17.95597853,
+            -7.741752261,
+            -21.22775815,
+            -19.19448079,
+            -22.82114491,
+            -19.11423778,
+            -14.75343702,
+            -14.54647716
+          ],
+          "sd": [
+            22.97634792,
+            8.01329213,
+            18.2274761,
+            21.92038926,
+            7.581241921,
+            21.17038305,
+            7.487532869,
+            7.244900573,
+            16.90513183,
+            14.52561858,
+            20.12641976,
+            17.42405046,
+            19.15370288,
+            19.39754499,
+            29.91744172,
+            44.68777107,
+            27.41990567,
+            15.9758999,
+            43.81711267,
+            23.69175193,
+            31.92987804,
+            37.26541398,
+            34.23331037,
+            18.33741741,
+            18.48458102,
+            27.73979636,
+            23.76948529,
+            18.89371819,
+            20.56963125,
+            12.72918564,
+            15.57849128,
+            20.16741437,
+            11.7823855,
+            40.0086353,
+            48.40872184,
+            36.4256527,
+            28.7146954,
+            36.20252253,
+            36.28914204,
+            35.69023141,
+            34.98350679,
+            28.06026264,
+            46.38882019
+          ],
+          "n": [
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            3
+          ],
+          "meanDays1to14": -2.263697908,
+          "meanDays15to28": -20.55587372,
+          "minN": 3,
+          "maxN": 4
+        }
+      },
+      "sarkisuo": {
+        "episodes": 3,
+        "ids": [
+          "sarkisuo-2022-06-30",
+          "sarkisuo-2022-08-15",
+          "sarkisuo-2023-08-15"
+        ],
+        "gpp": {
+          "mean": [
+            107.0499245,
+            102.6478496,
+            105.4325801,
+            96.28843542,
+            114.2575393,
+            98.68811873,
+            106.4936821,
+            90.03311655,
+            99.57493449,
+            106.6970382,
+            101.6866897,
+            92.5172053,
+            86.42141453,
+            92.21147147,
+            15.85517491,
+            24.26241972,
+            29.93119505,
+            25.84688251,
+            30.94435538,
+            35.74088028,
+            39.07637019,
+            33.38951621,
+            45.307659,
+            34.32892156,
+            53.23153853,
+            57.00830364,
+            57.4203301,
+            45.2034749,
+            72.74613368,
+            70.61780967,
+            66.1953793,
+            81.22463272,
+            83.34655951,
+            90.17926899,
+            86.66569855,
+            73.75695968,
+            77.17463931,
+            63.72398602,
+            91.04246904,
+            88.05717163,
+            71.09619028,
+            72.13400177,
+            73.31721707
+          ],
+          "sd": [
+            30.67011999,
+            5.877347741,
+            17.77187086,
+            36.94897447,
+            17.38525665,
+            13.1556995,
+            7.832425883,
+            13.16507748,
+            15.27010567,
+            8.397018988,
+            16.86333136,
+            19.47034722,
+            8.021277518,
+            15.53580559,
+            9.823468431,
+            18.29569788,
+            19.502791,
+            12.2744351,
+            10.59704522,
+            12.92596838,
+            8.167698435,
+            19.32888804,
+            20.34894872,
+            22.0497403,
+            32.74049812,
+            26.66178317,
+            19.89959672,
+            29.23394091,
+            29.20077853,
+            38.44192376,
+            41.39497437,
+            30.43809403,
+            43.63930431,
+            46.95790544,
+            47.71238437,
+            46.85159998,
+            34.31754789,
+            12.25118725,
+            56.44211329,
+            48.0697664,
+            41.63813341,
+            54.40568893,
+            36.50587398
+          ],
+          "n": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "meanDays1to14": 41.74557005,
+          "meanDays15to28": 77.75228454,
+          "minN": 3,
+          "maxN": 3
+        },
+        "reco": {
+          "mean": [
+            66.38263888,
+            63.52961236,
+            63.3929901,
+            63.34748091,
+            65.16417748,
+            64.23090228,
+            61.62604304,
+            60.12411268,
+            61.3148607,
+            64.59501658,
+            66.08881278,
+            66.58120411,
+            64.21814412,
+            66.8215233,
+            67.92798405,
+            70.85310691,
+            71.58320682,
+            68.69655282,
+            67.60805824,
+            65.21410518,
+            62.03177502,
+            59.85010241,
+            59.00909606,
+            59.89013612,
+            59.59500582,
+            58.04508952,
+            57.04870057,
+            53.0843747,
+            48.60325827,
+            44.78931282,
+            43.05036542,
+            43.43076211,
+            44.61794479,
+            46.23126819,
+            48.48443786,
+            49.40226567,
+            50.26042885,
+            44.50795782,
+            45.7331531,
+            49.03956789,
+            50.99447673,
+            50.3827424,
+            49.79187771
+          ],
+          "sd": [
+            11.08293485,
+            12.6952133,
+            13.31121992,
+            19.17081706,
+            20.08490184,
+            15.10760649,
+            8.936040992,
+            6.82847577,
+            0.04889908834,
+            5.097094342,
+            10.79685842,
+            16.55017684,
+            11.36151289,
+            11.99852429,
+            13.26096267,
+            14.82892038,
+            16.42668946,
+            16.3374169,
+            15.1841229,
+            11.18864013,
+            5.883924296,
+            7.771810765,
+            12.63874956,
+            13.60525804,
+            17.05356697,
+            17.84038041,
+            15.31606181,
+            12.37760196,
+            8.53534041,
+            6.76844001,
+            5.474471899,
+            9.632414099,
+            13.38979566,
+            16.00426232,
+            20.19029296,
+            22.85250076,
+            26.22243269,
+            19.88994913,
+            22.76320814,
+            23.64114376,
+            24.64969632,
+            22.19085825,
+            18.20466962
+          ],
+          "n": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "meanDays1to14": 61.50804061,
+          "meanDays15to28": 47.1940401,
+          "minN": 3,
+          "maxN": 3
+        },
+        "nee": {
+          "mean": [
+            -40.66728559,
+            -39.1182372,
+            -42.03959005,
+            -32.94095451,
+            -49.09336186,
+            -34.45721644,
+            -44.86763905,
+            -29.90900387,
+            -38.26007379,
+            -42.10202164,
+            -35.59787691,
+            -25.9360012,
+            -22.20327041,
+            -25.38994817,
+            52.07280914,
+            46.59068719,
+            41.65201177,
+            42.84967031,
+            36.66370286,
+            29.47322491,
+            22.95540483,
+            26.4605862,
+            13.70143706,
+            25.56121456,
+            6.363467283,
+            1.036785887,
+            -0.3716295259,
+            7.880899805,
+            -24.14287541,
+            -25.82849685,
+            -23.14501388,
+            -37.79387061,
+            -38.72861472,
+            -43.9480008,
+            -38.18126069,
+            -24.35469401,
+            -26.91421046,
+            -19.2160282,
+            -45.30931594,
+            -39.01760374,
+            -20.10171355,
+            -21.75125937,
+            -23.52533936
+          ],
+          "sd": [
+            19.64073412,
+            17.89744973,
+            5.098833344,
+            20.18333216,
+            23.57265084,
+            22.79104108,
+            16.26674306,
+            16.29488661,
+            15.31687141,
+            4.495893657,
+            8.161113331,
+            8.886965249,
+            5.475371485,
+            8.987429908,
+            8.812234331,
+            9.555221389,
+            12.15757449,
+            12.44903982,
+            6.481847408,
+            8.421509669,
+            2.657580389,
+            12.81493379,
+            10.78002933,
+            8.461468783,
+            22.65173228,
+            9.960353334,
+            5.375292421,
+            16.87638531,
+            20.78684989,
+            32.30169173,
+            37.33756454,
+            21.13316643,
+            30.30892439,
+            31.022235,
+            27.52971681,
+            25.10926495,
+            16.55816663,
+            20.83671766,
+            33.68436853,
+            25.42415349,
+            17.01528874,
+            32.73115314,
+            18.30132448
+          ],
+          "n": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "meanDays1to14": 19.76247055,
+          "meanDays15to28": -30.55824444,
+          "minN": 3,
+          "maxN": 3
+        }
+      },
+      "qvidja": {
+        "episodes": 10,
+        "ids": [
+          "qvidja-2018-06-12",
+          "qvidja-2018-09-23",
+          "qvidja-2019-06-11",
+          "qvidja-2019-08-20",
+          "qvidja-2020-08-28",
+          "qvidja-2021-06-14",
+          "qvidja-2022-06-21",
+          "qvidja-2023-06-19",
+          "qvidja-2023-08-21",
+          "qvidja-2024-06-15"
+        ],
+        "gpp": {
+          "mean": [
+            106.5830538,
+            96.37553921,
+            102.1023929,
+            107.9178352,
+            107.2314374,
+            98.56548261,
+            101.9963178,
+            106.6510084,
+            88.1661944,
+            104.737088,
+            108.790002,
+            92.31121378,
+            82.23082661,
+            96.34160781,
+            72.8152167,
+            50.53653162,
+            42.48557165,
+            28.86515193,
+            53.88587652,
+            55.41368824,
+            49.17554546,
+            46.30128595,
+            61.94792407,
+            49.29092121,
+            47.64045264,
+            55.00995399,
+            60.23570937,
+            67.14291527,
+            58.80341179,
+            54.27507064,
+            60.55752313,
+            72.62745316,
+            65.14130145,
+            57.80373422,
+            58.13230102,
+            58.3909948,
+            59.06355083,
+            73.31860899,
+            72.69475454,
+            75.70186001,
+            67.37867387,
+            70.64738526,
+            79.06562023
+          ],
+          "sd": [
+            32.52476359,
+            20.99022986,
+            26.12933541,
+            14.47420162,
+            10.31622361,
+            23.77952686,
+            20.90864901,
+            19.76730804,
+            35.41604567,
+            18.39291999,
+            17.09893234,
+            25.00747009,
+            36.75430169,
+            27.94140323,
+            41.28014209,
+            24.23557165,
+            25.19297789,
+            32.77961935,
+            29.53701162,
+            27.46192053,
+            20.24518697,
+            38.49787473,
+            24.99962387,
+            31.98070796,
+            31.02276367,
+            24.16924149,
+            23.5517367,
+            31.11749519,
+            24.81919178,
+            30.53426041,
+            30.89349862,
+            25.7886294,
+            28.28776818,
+            32.97679469,
+            23.274134,
+            30.32741335,
+            26.10537732,
+            35.96965145,
+            34.70289553,
+            42.3872366,
+            34.36878463,
+            32.52200783,
+            36.99430832
+          ],
+          "n": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "meanDays1to14": 51.90963855,
+          "meanDays15to28": 66.05705944,
+          "minN": 10,
+          "maxN": 10
+        },
+        "reco": {
+          "mean": [
+            65.82231053,
+            63.02409674,
+            60.80034048,
+            57.26322602,
+            55.20072618,
+            56.18525327,
+            56.46655121,
+            56.68165272,
+            59.02153966,
+            58.91904282,
+            60.19875031,
+            58.1416335,
+            57.19929332,
+            56.01006765,
+            55.90649933,
+            54.67020737,
+            56.17240261,
+            54.52009034,
+            56.89119435,
+            58.49457646,
+            60.95663633,
+            63.39635092,
+            65.24343739,
+            62.63136273,
+            61.92196661,
+            62.94343551,
+            65.58951951,
+            66.80476617,
+            64.00765234,
+            65.91624835,
+            64.6604717,
+            61.35380165,
+            61.09749805,
+            64.41629642,
+            63.17314201,
+            64.57225035,
+            67.00876981,
+            66.16436041,
+            66.25606586,
+            67.12482447,
+            69.90533946,
+            70.05625009,
+            70.29038565
+          ],
+          "sd": [
+            43.225134,
+            34.4892508,
+            31.74110306,
+            27.51109782,
+            24.69530594,
+            27.13454931,
+            31.14394873,
+            34.32041126,
+            35.18704977,
+            31.86386536,
+            30.61453694,
+            29.00832691,
+            29.52747625,
+            25.18452542,
+            21.13541891,
+            18.6824751,
+            17.12165009,
+            16.55128715,
+            19.29080349,
+            23.84363162,
+            30.69754579,
+            29.76843446,
+            29.09890931,
+            27.52234979,
+            28.72351793,
+            31.64860924,
+            27.26769153,
+            31.34033324,
+            35.99773018,
+            39.00765667,
+            32.18857776,
+            30.07355463,
+            33.8726168,
+            31.43213943,
+            31.05100051,
+            27.85775351,
+            28.09494889,
+            26.67695637,
+            23.76404663,
+            25.4914535,
+            31.67497692,
+            30.76183204,
+            29.12772245
+          ],
+          "n": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "meanDays1to14": 61.0173999,
+          "meanDays15to28": 65.85683602,
+          "minN": 10,
+          "maxN": 10
+        },
+        "nee": {
+          "mean": [
+            -40.7607433,
+            -33.35144247,
+            -41.30205242,
+            -50.65460913,
+            -52.03071127,
+            -42.38022935,
+            -45.52976663,
+            -49.96935567,
+            -29.14465474,
+            -45.81804523,
+            -48.59125166,
+            -34.16958028,
+            -25.03153329,
+            -40.33154016,
+            -16.90871737,
+            4.133675752,
+            13.68683096,
+            25.65493841,
+            3.005317832,
+            3.080888216,
+            11.78109087,
+            17.09506497,
+            3.295513315,
+            13.34044152,
+            14.28151397,
+            7.933481514,
+            5.353810135,
+            -0.3381491028,
+            5.204240549,
+            11.6411777,
+            4.10294857,
+            -11.27365151,
+            -4.043803399,
+            6.612562193,
+            5.040840998,
+            6.181255546,
+            7.945218974,
+            -7.154248582,
+            -6.438688676,
+            -8.577035544,
+            2.526665583,
+            -0.5911351733,
+            -8.77523458
+          ],
+          "sd": [
+            41.9561553,
+            37.65581856,
+            44.3189536,
+            33.88402156,
+            29.02835377,
+            32.44156501,
+            28.5709393,
+            20.10579328,
+            41.57522371,
+            41.84172853,
+            27.34269432,
+            36.59971535,
+            41.91698875,
+            36.96760017,
+            35.48574362,
+            19.68424767,
+            19.88999942,
+            28.04521504,
+            22.56379893,
+            19.25521193,
+            29.14827592,
+            42.07057881,
+            18.14681327,
+            29.35811485,
+            30.42980174,
+            25.29553504,
+            33.67658572,
+            22.0206473,
+            24.91921641,
+            30.98869485,
+            21.19337092,
+            13.56940511,
+            25.83800958,
+            39.73486222,
+            33.08060426,
+            45.11468565,
+            40.2537635,
+            38.88658873,
+            26.94862694,
+            30.36159025,
+            35.26564271,
+            24.06749649,
+            24.76517899
+          ],
+          "n": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "meanDays1to14": 9.10776135,
+          "meanDays15to28": -0.2002234211,
+          "minN": 10,
+          "maxN": 10
+        }
+      },
+      "viikki": {
+        "episodes": 3,
+        "ids": [
+          "viikki-2022-07-01",
+          "viikki-2023-08-17",
+          "viikki-2024-06-14"
+        ],
+        "gpp": {
+          "mean": [
+            83.49379708,
+            64.35176085,
+            106.6183377,
+            88.58960687,
+            120.0040546,
+            98.66741044,
+            106.751569,
+            110.6082301,
+            114.5789397,
+            101.8416176,
+            109.0638371,
+            114.92197,
+            99.94596203,
+            80.56290682,
+            67.70209971,
+            57.28166835,
+            47.91921031,
+            51.02918183,
+            50.45150456,
+            49.98103408,
+            52.55897512,
+            51.47627658,
+            56.41830207,
+            50.59866817,
+            42.22621827,
+            56.35092379,
+            69.93454793,
+            54.90001482,
+            58.20559336,
+            58.07422645,
+            63.50186382,
+            55.36948243,
+            76.73816427,
+            47.79350027,
+            79.73977972,
+            93.5448448,
+            82.42054081,
+            67.39575221,
+            110.1769453,
+            110.9435026,
+            115.4618241,
+            77.00166879,
+            104.5179564
+          ],
+          "sd": [
+            27.41345552,
+            20.46037354,
+            38.47469921,
+            34.44726731,
+            48.24991838,
+            23.46057163,
+            19.28943327,
+            30.23959249,
+            21.32658385,
+            9.018205369,
+            8.726065526,
+            40.05841228,
+            31.16425314,
+            26.59850089,
+            35.63089577,
+            39.69282462,
+            46.90845511,
+            37.92579911,
+            44.46478406,
+            50.75075759,
+            65.17337181,
+            61.66003513,
+            49.60416847,
+            59.26672097,
+            46.02349425,
+            49.5329339,
+            37.83880353,
+            51.52839576,
+            47.26015767,
+            41.95598923,
+            47.35689238,
+            32.05109362,
+            48.52118293,
+            47.38010886,
+            45.52496062,
+            52.8550609,
+            51.46791893,
+            45.97463006,
+            81.75804757,
+            105.2302484,
+            102.6966066,
+            51.75708462,
+            67.40224909
+          ],
+          "n": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "meanDays1to14": 53.5237228,
+          "meanDays15to28": 81.62000371,
+          "minN": 3,
+          "maxN": 3
+        },
+        "reco": {
+          "mean": [
+            59.72810434,
+            56.08623372,
+            57.63859062,
+            55.64597397,
+            63.13283724,
+            60.60200835,
+            62.06375996,
+            64.70587078,
+            71.65800024,
+            77.52249837,
+            85.72038497,
+            91.00956112,
+            86.72611407,
+            82.12962637,
+            74.6900671,
+            67.63128455,
+            61.35238084,
+            56.25773326,
+            53.77729286,
+            49.10823244,
+            47.61705612,
+            47.63415067,
+            46.98788386,
+            49.62340594,
+            49.94315336,
+            50.57144789,
+            51.27457056,
+            50.27049617,
+            51.15891078,
+            48.96482379,
+            47.3040613,
+            48.13935795,
+            52.4972872,
+            52.39372835,
+            58.35039113,
+            67.8281743,
+            75.63980845,
+            80.47194826,
+            85.34784509,
+            83.95540346,
+            82.75164642,
+            80.28498475,
+            74.70442248
+          ],
+          "sd": [
+            39.14915547,
+            43.02673968,
+            48.9378299,
+            56.3115145,
+            72.03576975,
+            51.45453518,
+            39.15816039,
+            28.60961989,
+            26.98373962,
+            21.19833555,
+            26.51668705,
+            34.67513042,
+            36.61889978,
+            34.01180036,
+            28.18293036,
+            22.29178534,
+            21.94656182,
+            23.53995483,
+            24.81395194,
+            24.56930071,
+            21.73683868,
+            19.5184595,
+            17.24185522,
+            16.32924265,
+            10.47654461,
+            4.15419155,
+            3.77971987,
+            3.555385662,
+            5.262708032,
+            0.5915582389,
+            5.113757722,
+            6.782362482,
+            10.77517219,
+            14.73676167,
+            9.485596108,
+            14.09820664,
+            22.95871666,
+            38.27521445,
+            36.55795569,
+            36.2836268,
+            37.00611691,
+            38.32874569,
+            37.51978335
+          ],
+          "n": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "meanDays1to14": 52.37199995,
+          "meanDays15to28": 67.04527735,
+          "minN": 3,
+          "maxN": 3
+        },
+        "nee": {
+          "mean": [
+            -23.76569274,
+            -8.265527137,
+            -48.97974712,
+            -32.9436329,
+            -56.87121735,
+            -38.06540209,
+            -44.68780903,
+            -45.90235933,
+            -42.92093944,
+            -24.31911928,
+            -23.34345215,
+            -23.91240891,
+            -13.21984796,
+            1.566719546,
+            6.987967387,
+            10.3496162,
+            13.43317053,
+            5.228551424,
+            3.325788295,
+            -0.8728016352,
+            -4.941918991,
+            -3.842125905,
+            -9.43041821,
+            -0.9752622261,
+            7.716935093,
+            -5.779475897,
+            -18.65997737,
+            -4.629518656,
+            -7.046682588,
+            -9.10940266,
+            -16.19780251,
+            -7.230124484,
+            -24.24087707,
+            4.600228076,
+            -21.38938859,
+            -25.7166705,
+            -6.780732363,
+            13.07619605,
+            -24.82910018,
+            -26.98809913,
+            -32.7101777,
+            3.283315967,
+            -29.81353388
+          ],
+          "sd": [
+            45.80466823,
+            28.06578283,
+            10.50258418,
+            31.66937357,
+            24.26291284,
+            56.4017767,
+            45.53205018,
+            58.24918149,
+            44.05878603,
+            28.48431741,
+            33.43118322,
+            28.5227474,
+            28.08680644,
+            40.88920209,
+            47.38895837,
+            41.92833123,
+            50.77051755,
+            43.17803428,
+            54.34329119,
+            64.01961904,
+            75.78486814,
+            72.70157885,
+            56.54968644,
+            68.73484278,
+            54.00635657,
+            49.93186724,
+            37.49836455,
+            50.7688078,
+            47.94262009,
+            42.41132328,
+            46.97329382,
+            28.37298594,
+            51.50069535,
+            38.99313022,
+            37.29752977,
+            39.96253148,
+            36.92882896,
+            25.7280814,
+            53.96512492,
+            71.37869293,
+            72.15598449,
+            34.34742657,
+            32.91212083
+          ],
+          "n": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "meanDays1to14": -1.151722853,
+          "meanDays15to28": -14.57472636,
+          "minN": 3,
+          "maxN": 3
+        }
+      }
+    },
+    "all": {
+      "episodes": 20,
+      "ids": [
+        "anttila-2022-06-21",
+        "anttila-2022-08-08",
+        "anttila-2023-06-21",
+        "anttila-2023-07-19",
+        "qvidja-2018-06-12",
+        "qvidja-2018-09-23",
+        "qvidja-2019-06-11",
+        "qvidja-2019-08-20",
+        "qvidja-2020-08-28",
+        "qvidja-2021-06-14",
+        "qvidja-2022-06-21",
+        "qvidja-2023-06-19",
+        "qvidja-2023-08-21",
+        "qvidja-2024-06-15",
+        "sarkisuo-2022-06-30",
+        "sarkisuo-2022-08-15",
+        "sarkisuo-2023-08-15",
+        "viikki-2022-07-01",
+        "viikki-2023-08-17",
+        "viikki-2024-06-14"
+      ],
+      "gpp": {
+        "mean": [
+          100.798695,
+          90.09505951,
+          101.8635123,
+          100.5938194,
+          109.2543184,
+          98.48129039,
+          103.9250578,
+          105.4471727,
+          96.40394921,
+          104.3327471,
+          107.1552508,
+          98.74934893,
+          87.84240965,
+          95.0573687,
+          61.66575289,
+          48.08881843,
+          41.48419023,
+          33.64369635,
+          49.1116892,
+          49.00740569,
+          48.57929664,
+          46.5621126,
+          58.85224793,
+          48.01555596,
+          47.96214314,
+          58.35196302,
+          63.6850408,
+          64.84174363,
+          63.03236997,
+          62.39919089,
+          65.21638684,
+          73.34001815,
+          72.89161133,
+          63.05962685,
+          67.3703462,
+          68.53394688,
+          65.71752579,
+          71.4529862,
+          81.19252233,
+          83.3088114,
+          76.60074535,
+          71.82049456,
+          80.76076159
+        ],
+        "sd": [
+          30.12715327,
+          21.44106377,
+          23.77561249,
+          22.28695395,
+          19.04762271,
+          20.34011902,
+          16.12958921,
+          18.81074316,
+          27.76609674,
+          16.05550267,
+          14.41520061,
+          25.09576309,
+          30.52665469,
+          23.07762396,
+          39.68670145,
+          32.98425699,
+          28.38427308,
+          28.65437998,
+          32.55061493,
+          28.58436797,
+          28.87596202,
+          37.93340837,
+          28.95444564,
+          32.05923097,
+          30.45481811,
+          28.66462592,
+          26.4630815,
+          34.3784534,
+          29.3020274,
+          31.44322911,
+          32.20729556,
+          27.22989775,
+          31.19443879,
+          35.61164812,
+          32.86437617,
+          35.5618449,
+          29.81779032,
+          32.55231078,
+          44.78602877,
+          51.24555079,
+          48.45542498,
+          35.01174433,
+          41.75291571
+        ],
+        "n": [
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          19
+        ],
+        "meanDays1to14": 51.51559097,
+        "meanDays15to28": 71.69035531,
+        "minN": 19,
+        "maxN": 20
+      },
+      "reco": {
+        "mean": [
+          62.63251896,
+          60.2548642,
+          59.10557676,
+          56.76661627,
+          57.30485238,
+          57.1385452,
+          57.21909357,
+          57.98948959,
+          60.12082628,
+          61.49750258,
+          64.08399539,
+          64.61001048,
+          62.74685393,
+          61.33679408,
+          60.79731892,
+          59.70379894,
+          59.09012462,
+          57.07455362,
+          57.57193002,
+          57.2505102,
+          57.79901433,
+          58.0035353,
+          58.89378907,
+          58.1872872,
+          57.54838707,
+          58.71435467,
+          60.45852036,
+          59.93136421,
+          57.48964945,
+          57.29779105,
+          55.95635159,
+          54.01078721,
+          54.89738689,
+          57.62584063,
+          58.26477335,
+          60.52267427,
+          63.0875434,
+          62.70933546,
+          63.61351942,
+          64.55520922,
+          66.1194469,
+          65.80404806,
+          65.42347754
+        ],
+        "sd": [
+          33.62834998,
+          28.93738592,
+          28.22707482,
+          27.65242822,
+          30.1590442,
+          25.98040865,
+          25.53010227,
+          26.1295916,
+          26.62234919,
+          24.95004106,
+          26.03267635,
+          27.4343128,
+          26.98506052,
+          23.80244845,
+          19.89845108,
+          17.5584607,
+          16.3575987,
+          15.80376403,
+          17.17726706,
+          19.42535051,
+          23.17996678,
+          22.89108376,
+          22.84128135,
+          21.56727036,
+          22.55185594,
+          24.19958569,
+          21.45530828,
+          24.2323331,
+          26.7693559,
+          29.04241361,
+          24.84403328,
+          23.25433546,
+          25.62591956,
+          24.74770212,
+          23.91615104,
+          22.50324483,
+          24.59957645,
+          26.15153728,
+          25.28730878,
+          25.73007216,
+          28.84585954,
+          28.2240373,
+          27.33338785
+        ],
+        "n": [
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          19
+        ],
+        "meanDays1to14": 58.40834422,
+        "meanDays15to28": 60.70629893,
+        "minN": 19,
+        "maxN": 20
+      },
+      "nee": {
+        "mean": [
+          -38.16617605,
+          -29.8401953,
+          -42.75793556,
+          -43.82720316,
+          -51.94946601,
+          -41.34274519,
+          -46.70596425,
+          -47.45768312,
+          -36.28312293,
+          -42.83524455,
+          -43.07125539,
+          -34.13933846,
+          -25.09555572,
+          -33.72057463,
+          -0.8684339641,
+          11.61498051,
+          17.60593439,
+          23.43085728,
+          8.460240815,
+          8.243104504,
+          9.219717695,
+          11.4414227,
+          0.04154113888,
+          10.17173124,
+          9.58624393,
+          0.362391651,
+          -3.226520441,
+          -4.910379412,
+          -5.542720515,
+          -5.101399836,
+          -9.26003525,
+          -19.32923094,
+          -17.99422444,
+          -5.433786216,
+          -9.105572857,
+          -8.01127261,
+          -2.629982388,
+          -8.743650743,
+          -17.57900291,
+          -18.75360218,
+          -10.48129845,
+          -6.016446501,
+          -15.33728405
+        ],
+        "sd": [
+          34.88797432,
+          29.86726936,
+          31.69483042,
+          28.81383473,
+          23.11805289,
+          31.20745079,
+          25.50820919,
+          25.51158416,
+          33.97938655,
+          31.92647677,
+          25.26327059,
+          29.04016257,
+          32.04012689,
+          34.3069755,
+          39.70438958,
+          30.42190466,
+          26.46922013,
+          27.36250104,
+          31.74655125,
+          28.36411454,
+          35.23402623,
+          41.9705228,
+          27.67391898,
+          32.47255418,
+          29.67483114,
+          27.92771281,
+          29.75769674,
+          26.81658272,
+          28.16756039,
+          33.34485825,
+          28.78790817,
+          21.07109813,
+          30.58818389,
+          40.05743699,
+          37.16447869,
+          40.33092673,
+          35.07618778,
+          34.13562568,
+          34.25647255,
+          37.08989002,
+          39.47467394,
+          26.83220031,
+          27.81113254
+        ],
+        "n": [
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          19
+        ],
+        "meanDays1to14": 6.892753249,
+        "meanDays15to28": -10.98405638,
+        "minN": 19,
+        "maxN": 20
+      }
+    }
+  },
+  "summary": {
+    "perSite": {
+      "anttila": {
+        "n": 4,
+        "ids": [
+          "anttila-2022-06-21",
+          "anttila-2022-08-08",
+          "anttila-2023-06-21",
+          "anttila-2023-07-19"
+        ],
+        "deltaGpp": {
+          "n": 4,
+          "mean": -6.028843378,
+          "sd": 4.783430371,
+          "median": -5.89120759,
+          "min": -11.8453668,
+          "max": -0.487591532,
+          "ci": [
+            -10.00026729,
+            -2.195055253
+          ],
+          "ciLo": -10.00026729,
+          "ciHi": -2.195055253,
+          "nNegative": 4,
+          "nZero": 0,
+          "nPositive": 0
+        },
+        "deltaReco": {
+          "n": 4,
+          "mean": -0.007566153058,
+          "sd": 1.072197606,
+          "median": -0.3374277948,
+          "min": -0.9048335972,
+          "max": 1.549424575,
+          "ci": [
+            -0.7552832846,
+            1.07001262
+          ],
+          "ciLo": -0.7552832846,
+          "ciHi": 1.07001262,
+          "nNegative": 3,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "deltaNee": {
+          "n": 4,
+          "mean": 6.021277225,
+          "sd": 4.619847876,
+          "median": 6.213503078,
+          "min": 0.1809591852,
+          "max": 11.47714356,
+          "ci": [
+            1.738872593,
+            10.111456
+          ],
+          "ciLo": 1.738872593,
+          "ciHi": 10.111456,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 4
+        },
+        "relGpp": {
+          "n": 4,
+          "mean": -43.64811117,
+          "sd": 31.48255421,
+          "median": -47.03009323,
+          "min": -76.50650798,
+          "max": -4.025750231,
+          "ci": [
+            -67.9019407,
+            -17.84365603
+          ],
+          "ciLo": -67.9019407,
+          "ciHi": -17.84365603,
+          "nNegative": 4,
+          "nZero": 0,
+          "nPositive": 0
+        },
+        "relReco": {
+          "n": 4,
+          "mean": -0.04475013628,
+          "sd": 8.393350715,
+          "median": -2.454974244,
+          "min": -7.332374254,
+          "max": 12.0633222,
+          "ci": [
+            -6.093848063,
+            8.414571899
+          ],
+          "ciLo": -6.093848063,
+          "ciHi": 8.414571899,
+          "nNegative": 3,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "relNee": {
+          "n": 4,
+          "mean": 43.60336103,
+          "sd": 30.47000545,
+          "median": 49.3955672,
+          "min": 1.494071234,
+          "max": 74.12823849,
+          "ci": [
+            14.11180322,
+            67.30271268
+          ],
+          "ciLo": 14.11180322,
+          "ciHi": 67.30271268,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 4
+        },
+        "gppBefore": 13.1947473,
+        "recoveryShare": {
+          "n": 3,
+          "mean": 71.33194557,
+          "sd": 25.76482096,
+          "median": 57.91914439,
+          "min": 55.04055122,
+          "max": 101.0361411,
+          "ci": [
+            55.04055122,
+            101.0361411
+          ],
+          "ciLo": 55.04055122,
+          "ciHi": 101.0361411,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "daysToRecover": {
+          "n": 3,
+          "mean": 10.33333333,
+          "sd": 9.504384953,
+          "median": 10.0,
+          "min": 1.0,
+          "max": 20.0,
+          "ci": [
+            1.0,
+            20.0
+          ],
+          "ciLo": 1.0,
+          "ciHi": 20.0,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "nRecovered": 3,
+        "nCensored": 1,
+        "censored": {
+          "blocked": 0,
+          "data-end": 0,
+          "max-days": 1
+        },
+        "nNoReference": 0,
+        "gppOffset": {
+          "n": 3,
+          "mean": 0.3333333333,
+          "sd": 0.5773502692,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "ci": [
+            0.0,
+            1.0
+          ],
+          "ciLo": 0.0,
+          "ciHi": 1.0,
+          "nNegative": 0,
+          "nZero": 2,
+          "nPositive": 1
+        },
+        "timingUsed": 4,
+        "clearDrops": 3,
+        "notClear": {
+          "flux-too-small": 0,
+          "drop-too-small": 1
+        },
+        "nBefore": 0,
+        "nOn": 2,
+        "nAfter": 1,
+        "shareBeforePct": 0.0,
+        "preDropPct": {
+          "n": 4,
+          "mean": -1.684819497,
+          "sd": 9.561240805,
+          "median": 0.3302655648,
+          "min": -15.03636794,
+          "max": 7.636558819,
+          "ci": [
+            -11.01980761,
+            5.635083556
+          ],
+          "ciLo": -11.01980761,
+          "ciHi": 5.635083556,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 2
+        },
+        "fertInWindow": 2
+      },
+      "sarkisuo": {
+        "n": 3,
+        "ids": [
+          "sarkisuo-2022-06-30",
+          "sarkisuo-2022-08-15",
+          "sarkisuo-2023-08-15"
+        ],
+        "deltaGpp": {
+          "n": 3,
+          "mean": -5.825022934,
+          "sd": 1.909876722,
+          "median": -6.391518653,
+          "min": -7.38756516,
+          "max": -3.695984988,
+          "ci": [
+            -7.38756516,
+            -3.695984988
+          ],
+          "ciLo": -7.38756516,
+          "ciHi": -3.695984988,
+          "nNegative": 3,
+          "nZero": 0,
+          "nPositive": 0
+        },
+        "deltaReco": {
+          "n": 3,
+          "mean": -0.2678065568,
+          "sd": 1.353228657,
+          "median": -0.7541196641,
+          "min": -1.310671958,
+          "max": 1.261371952,
+          "ci": [
+            -1.310671958,
+            1.261371952
+          ],
+          "ciLo": -1.310671958,
+          "ciHi": 1.261371952,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "deltaNee": {
+          "n": 3,
+          "mean": 5.557216377,
+          "sd": 0.5640587728,
+          "median": 5.637398989,
+          "min": 4.957356939,
+          "max": 6.076893202,
+          "ci": [
+            4.957356939,
+            6.076893202
+          ],
+          "ciLo": 4.957356939,
+          "ciHi": 6.076893202,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "relGpp": {
+          "n": 3,
+          "mean": -58.25442995,
+          "sd": 18.55049653,
+          "median": -64.49391796,
+          "min": -72.88074221,
+          "max": -37.38862966,
+          "ci": [
+            -72.88074221,
+            -37.38862966
+          ],
+          "ciLo": -72.88074221,
+          "ciHi": -37.38862966,
+          "nNegative": 3,
+          "nZero": 0,
+          "nPositive": 0
+        },
+        "relReco": {
+          "n": 3,
+          "mean": -2.593210775,
+          "sd": 13.55985225,
+          "median": -7.609479748,
+          "min": -12.93020678,
+          "max": 12.7600542,
+          "ci": [
+            -12.93020678,
+            12.7600542
+          ],
+          "ciLo": -12.93020678,
+          "ciHi": 12.7600542,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "relNee": {
+          "n": 3,
+          "mean": 55.66121917,
+          "sd": 5.014107314,
+          "median": 56.88443821,
+          "min": 50.14868387,
+          "max": 59.95053543,
+          "ci": [
+            50.14868387,
+            59.95053543
+          ],
+          "ciLo": 50.14868387,
+          "ciHi": 59.95053543,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "gppBefore": 9.97736528,
+        "recoveryShare": {
+          "n": 3,
+          "mean": 77.75228454,
+          "sd": 39.11177008,
+          "median": 55.98876416,
+          "min": 54.36317599,
+          "max": 122.9049135,
+          "ci": [
+            54.36317599,
+            122.9049135
+          ],
+          "ciLo": 54.36317599,
+          "ciHi": 122.9049135,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "daysToRecover": {
+          "n": 1,
+          "mean": 12.0,
+          "sd": null,
+          "median": 12.0,
+          "min": 12.0,
+          "max": 12.0,
+          "ci": null,
+          "ciLo": null,
+          "ciHi": null,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "nRecovered": 1,
+        "nCensored": 2,
+        "censored": {
+          "blocked": 0,
+          "data-end": 0,
+          "max-days": 2
+        },
+        "nNoReference": 0,
+        "gppOffset": {
+          "n": 3,
+          "mean": 0.0,
+          "sd": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "ciLo": 0.0,
+          "ciHi": 0.0,
+          "nNegative": 0,
+          "nZero": 3,
+          "nPositive": 0
+        },
+        "timingUsed": 3,
+        "clearDrops": 3,
+        "notClear": {
+          "flux-too-small": 0,
+          "drop-too-small": 0
+        },
+        "nBefore": 0,
+        "nOn": 3,
+        "nAfter": 0,
+        "shareBeforePct": 0.0,
+        "preDropPct": {
+          "n": 3,
+          "mean": -12.11174625,
+          "sd": 8.748461626,
+          "median": -16.30456372,
+          "min": -17.97465858,
+          "max": -2.056016428,
+          "ci": [
+            -17.97465858,
+            -2.056016428
+          ],
+          "ciLo": -17.97465858,
+          "ciHi": -2.056016428,
+          "nNegative": 3,
+          "nZero": 0,
+          "nPositive": 0
+        },
+        "fertInWindow": 1
+      },
+      "qvidja": {
+        "n": 10,
+        "ids": [
+          "qvidja-2018-06-12",
+          "qvidja-2018-09-23",
+          "qvidja-2019-06-11",
+          "qvidja-2019-08-20",
+          "qvidja-2020-08-28",
+          "qvidja-2021-06-14",
+          "qvidja-2022-06-21",
+          "qvidja-2023-06-19",
+          "qvidja-2023-08-21",
+          "qvidja-2024-06-15"
+        ],
+        "deltaGpp": {
+          "n": 10,
+          "mean": -3.678737163,
+          "sd": 2.534794096,
+          "median": -2.826379375,
+          "min": -8.76105705,
+          "max": -1.342724071,
+          "ci": [
+            -5.297064815,
+            -2.327214752
+          ],
+          "ciLo": -5.297064815,
+          "ciHi": -2.327214752,
+          "nNegative": 10,
+          "nZero": 0,
+          "nPositive": 0
+        },
+        "deltaReco": {
+          "n": 10,
+          "mean": 0.0117004105,
+          "sd": 1.91865645,
+          "median": -0.08396841026,
+          "min": -2.302287997,
+          "max": 4.025498104,
+          "ci": [
+            -1.026038467,
+            1.208125529
+          ],
+          "ciLo": -1.026038467,
+          "ciHi": 1.208125529,
+          "nNegative": 6,
+          "nZero": 0,
+          "nPositive": 4
+        },
+        "deltaNee": {
+          "n": 10,
+          "mean": 3.690437573,
+          "sd": 2.464949015,
+          "median": 3.077828649,
+          "min": 0.05050413308,
+          "max": 7.563422361,
+          "ci": [
+            2.291483115,
+            5.154466706
+          ],
+          "ciLo": 2.291483115,
+          "ciHi": 5.154466706,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 10
+        },
+        "relGpp": {
+          "n": 10,
+          "mean": -47.52286167,
+          "sd": 17.64670521,
+          "median": -43.98928701,
+          "min": -73.43089649,
+          "max": -21.85595665,
+          "ci": [
+            -58.15195419,
+            -37.54987257
+          ],
+          "ciLo": -58.15195419,
+          "ciHi": -37.54987257,
+          "nNegative": 10,
+          "nZero": 0,
+          "nPositive": 0
+        },
+        "relReco": {
+          "n": 10,
+          "mean": 3.435451337,
+          "sd": 31.42176293,
+          "median": -1.017427,
+          "min": -44.4812098,
+          "max": 65.79594447,
+          "ci": [
+            -14.1547438,
+            22.53271499
+          ],
+          "ciLo": -14.1547438,
+          "ciHi": 22.53271499,
+          "nNegative": 6,
+          "nZero": 0,
+          "nPositive": 4
+        },
+        "relNee": {
+          "n": 10,
+          "mean": 50.95831301,
+          "sd": 33.30943897,
+          "median": 47.43808951,
+          "min": 0.9757619125,
+          "max": 104.3342803,
+          "ci": [
+            32.15795339,
+            71.07193755
+          ],
+          "ciLo": 32.15795339,
+          "ciHi": 71.07193755,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 10
+        },
+        "gppBefore": 7.23132636,
+        "recoveryShare": {
+          "n": 10,
+          "mean": 65.64550696,
+          "sd": 24.41709182,
+          "median": 61.02741869,
+          "min": 39.02386471,
+          "max": 104.5033927,
+          "ci": [
+            51.75768417,
+            80.15539139
+          ],
+          "ciLo": 51.75768417,
+          "ciHi": 80.15539139,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 10
+        },
+        "daysToRecover": {
+          "n": 8,
+          "mean": 13.25,
+          "sd": 12.33751538,
+          "median": 11.5,
+          "min": 1.0,
+          "max": 35.0,
+          "ci": [
+            5.875,
+            21.75
+          ],
+          "ciLo": 5.875,
+          "ciHi": 21.75,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 8
+        },
+        "nRecovered": 8,
+        "nCensored": 2,
+        "censored": {
+          "blocked": 0,
+          "data-end": 0,
+          "max-days": 2
+        },
+        "nNoReference": 0,
+        "gppOffset": {
+          "n": 9,
+          "mean": -1.444444444,
+          "sd": 3.12694384,
+          "median": 0.0,
+          "min": -9.0,
+          "max": 1.0,
+          "ci": [
+            -3.555555556,
+            0.1111111111
+          ],
+          "ciLo": -3.555555556,
+          "ciHi": 0.1111111111,
+          "nNegative": 4,
+          "nZero": 3,
+          "nPositive": 2
+        },
+        "timingUsed": 10,
+        "clearDrops": 9,
+        "notClear": {
+          "flux-too-small": 0,
+          "drop-too-small": 1
+        },
+        "nBefore": 4,
+        "nOn": 3,
+        "nAfter": 2,
+        "shareBeforePct": 44.44444444,
+        "preDropPct": {
+          "n": 10,
+          "mean": -10.60308726,
+          "sd": 24.29159282,
+          "median": -3.116908913,
+          "min": -70.97096255,
+          "max": 17.6331731,
+          "ci": [
+            -26.2474709,
+            1.439168479
+          ],
+          "ciLo": -26.2474709,
+          "ciHi": 1.439168479,
+          "nNegative": 7,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "fertInWindow": 3
+      },
+      "viikki": {
+        "n": 3,
+        "ids": [
+          "viikki-2022-07-01",
+          "viikki-2023-08-17",
+          "viikki-2024-06-14"
+        ],
+        "deltaGpp": {
+          "n": 3,
+          "mean": -4.251521909,
+          "sd": 3.835023723,
+          "median": -6.022229737,
+          "min": -6.881257226,
+          "max": 0.1489212346,
+          "ci": [
+            -6.881257226,
+            0.1489212346
+          ],
+          "ciLo": -6.881257226,
+          "ciHi": 0.1489212346,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "deltaReco": {
+          "n": 3,
+          "mean": -1.846213881,
+          "sd": 1.987548607,
+          "median": -1.949592666,
+          "min": -3.780055673,
+          "max": 0.1910066962,
+          "ci": [
+            -3.780055673,
+            0.1910066962
+          ],
+          "ciLo": -3.780055673,
+          "ciHi": 0.1910066962,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "deltaNee": {
+          "n": 3,
+          "mean": 2.405308028,
+          "sd": 2.448868199,
+          "median": 2.242174064,
+          "min": 0.04208546155,
+          "max": 4.93166456,
+          "ci": [
+            0.04208546155,
+            4.93166456
+          ],
+          "ciLo": 0.04208546155,
+          "ciHi": 4.93166456,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "relGpp": {
+          "n": 3,
+          "mean": -43.97844174,
+          "sd": 44.87938123,
+          "median": -49.22497366,
+          "min": -86.00396397,
+          "max": 3.293612411,
+          "ci": [
+            -86.00396397,
+            3.293612411
+          ],
+          "ciLo": -86.00396397,
+          "ciHi": 3.293612411,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "relReco": {
+          "n": 3,
+          "mean": -21.23509269,
+          "sd": 29.78049004,
+          "median": -13.94638283,
+          "min": -53.9832896,
+          "max": 4.22439437,
+          "ci": [
+            -53.9832896,
+            4.22439437
+          ],
+          "ciLo": -53.9832896,
+          "ciHi": 4.22439437,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "relNee": {
+          "n": 3,
+          "mean": 22.74334905,
+          "sd": 18.96034196,
+          "median": 32.02067437,
+          "min": 0.9307819588,
+          "max": 35.27859083,
+          "ci": [
+            0.9307819588,
+            35.27859083
+          ],
+          "ciLo": 0.9307819588,
+          "ciHi": 35.27859083,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "gppBefore": 8.500995351,
+        "recoveryShare": {
+          "n": 3,
+          "mean": 86.25259831,
+          "sd": 46.94353279,
+          "median": 87.30490708,
+          "min": 38.79175787,
+          "max": 132.66113,
+          "ci": [
+            38.79175787,
+            132.66113
+          ],
+          "ciLo": 38.79175787,
+          "ciHi": 132.66113,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 3
+        },
+        "daysToRecover": {
+          "n": 2,
+          "mean": 9.5,
+          "sd": 12.02081528,
+          "median": 9.5,
+          "min": 1.0,
+          "max": 18.0,
+          "ci": null,
+          "ciLo": null,
+          "ciHi": null,
+          "nNegative": 0,
+          "nZero": 0,
+          "nPositive": 2
+        },
+        "nRecovered": 2,
+        "nCensored": 1,
+        "censored": {
+          "blocked": 0,
+          "data-end": 0,
+          "max-days": 1
+        },
+        "nNoReference": 0,
+        "gppOffset": {
+          "n": 2,
+          "mean": -1.0,
+          "sd": 1.414213562,
+          "median": -1.0,
+          "min": -2.0,
+          "max": 0.0,
+          "ci": null,
+          "ciLo": null,
+          "ciHi": null,
+          "nNegative": 1,
+          "nZero": 1,
+          "nPositive": 0
+        },
+        "timingUsed": 3,
+        "clearDrops": 2,
+        "notClear": {
+          "flux-too-small": 0,
+          "drop-too-small": 1
+        },
+        "nBefore": 1,
+        "nOn": 1,
+        "nAfter": 0,
+        "shareBeforePct": 50.0,
+        "preDropPct": {
+          "n": 3,
+          "mean": -8.463110766,
+          "sd": 33.81905268,
+          "median": -25.35118289,
+          "min": -30.51207537,
+          "max": 30.47392595,
+          "ci": [
+            -30.51207537,
+            30.47392595
+          ],
+          "ciLo": -30.51207537,
+          "ciHi": 30.47392595,
+          "nNegative": 2,
+          "nZero": 0,
+          "nPositive": 1
+        },
+        "fertInWindow": 0
+      }
+    },
+    "all": {
+      "n": 20,
+      "ids": [
+        "anttila-2022-06-21",
+        "anttila-2022-08-08",
+        "anttila-2023-06-21",
+        "anttila-2023-07-19",
+        "qvidja-2018-06-12",
+        "qvidja-2018-09-23",
+        "qvidja-2019-06-11",
+        "qvidja-2019-08-20",
+        "qvidja-2020-08-28",
+        "qvidja-2021-06-14",
+        "qvidja-2022-06-21",
+        "qvidja-2023-06-19",
+        "qvidja-2023-08-21",
+        "qvidja-2024-06-15",
+        "sarkisuo-2022-06-30",
+        "sarkisuo-2022-08-15",
+        "sarkisuo-2023-08-15",
+        "viikki-2022-07-01",
+        "viikki-2023-08-17",
+        "viikki-2024-06-14"
+      ],
+      "deltaGpp": {
+        "n": 20,
+        "mean": -4.556618983,
+        "sd": 3.117545107,
+        "median": -3.83725214,
+        "min": -11.8453668,
+        "max": 0.1489212346,
+        "ci": [
+          -5.894909431,
+          -3.256566201
+        ],
+        "ciLo": -5.894909431,
+        "ciHi": -3.256566201,
+        "nNegative": 19,
+        "nZero": 0,
+        "nPositive": 1
+      },
+      "deltaReco": {
+        "n": 20,
+        "mean": -0.3127660911,
+        "sd": 1.726404606,
+        "median": -0.3374277948,
+        "min": -3.780055673,
+        "max": 4.025498104,
+        "ci": [
+          -1.033346908,
+          0.4632433102
+        ],
+        "ciLo": -1.033346908,
+        "ciHi": 0.4632433102,
+        "nNegative": 13,
+        "nZero": 0,
+        "nPositive": 7
+      },
+      "deltaNee": {
+        "n": 20,
+        "mean": 4.243852892,
+        "sd": 2.923211359,
+        "median": 4.920914301,
+        "min": 0.04208546155,
+        "max": 11.47714356,
+        "ci": [
+          3.030327678,
+          5.511513921
+        ],
+        "ciLo": 3.030327678,
+        "ciHi": 5.511513921,
+        "nNegative": 0,
+        "nZero": 0,
+        "nPositive": 20
+      },
+      "relGpp": {
+        "n": 20,
+        "mean": -47.82598382,
+        "sd": 23.9891144,
+        "median": -47.34097268,
+        "min": -86.00396397,
+        "max": 3.293612411,
+        "ci": [
+          -57.61272369,
+          -37.48392328
+        ],
+        "ciLo": -57.61272369,
+        "ciHi": -37.48392328,
+        "nNegative": 19,
+        "nZero": 0,
+        "nPositive": 1
+      },
+      "relReco": {
+        "n": 20,
+        "mean": -1.865469878,
+        "sd": 25.81327429,
+        "median": -2.454974244,
+        "min": -53.9832896,
+        "max": 65.79594447,
+        "ci": [
+          -12.50784996,
+          9.345117743
+        ],
+        "ciLo": -12.50784996,
+        "ciHi": 9.345117743,
+        "nNegative": 13,
+        "nZero": 0,
+        "nPositive": 7
+      },
+      "relNee": {
+        "n": 20,
+        "mean": 45.96051395,
+        "sd": 28.75635382,
+        "median": 47.59958271,
+        "min": 0.9307819588,
+        "max": 104.3342803,
+        "ci": [
+          33.92772475,
+          58.42149051
+        ],
+        "ciLo": 33.92772475,
+        "ciHi": 58.42149051,
+        "nNegative": 0,
+        "nZero": 0,
+        "nPositive": 20
+      },
+      "gppBefore": 9.026366734,
+      "recoveryShare": {
+        "n": 19,
+        "mean": 71.70871341,
+        "sd": 29.12850038,
+        "median": 57.91914439,
+        "min": 38.79175787,
+        "max": 132.66113,
+        "ci": [
+          59.6732638,
+          85.0322486
+        ],
+        "ciLo": 59.6732638,
+        "ciHi": 85.0322486,
+        "nNegative": 0,
+        "nZero": 0,
+        "nPositive": 19
+      },
+      "daysToRecover": {
+        "n": 14,
+        "mean": 12.0,
+        "sd": 10.46606237,
+        "median": 11.5,
+        "min": 1.0,
+        "max": 35.0,
+        "ci": [
+          6.928571429,
+          17.5
+        ],
+        "ciLo": 6.928571429,
+        "ciHi": 17.5,
+        "nNegative": 0,
+        "nZero": 0,
+        "nPositive": 14
+      },
+      "nRecovered": 14,
+      "nCensored": 6,
+      "censored": {
+        "blocked": 0,
+        "data-end": 0,
+        "max-days": 6
+      },
+      "nNoReference": 0,
+      "gppOffset": {
+        "n": 17,
+        "mean": -0.8235294118,
+        "sd": 2.377900705,
+        "median": 0.0,
+        "min": -9.0,
+        "max": 1.0,
+        "ci": [
+          -2.058823529,
+          0.05882352941
+        ],
+        "ciLo": -2.058823529,
+        "ciHi": 0.05882352941,
+        "nNegative": 5,
+        "nZero": 9,
+        "nPositive": 3
+      },
+      "timingUsed": 20,
+      "clearDrops": 17,
+      "notClear": {
+        "flux-too-small": 0,
+        "drop-too-small": 3
+      },
+      "nBefore": 5,
+      "nOn": 9,
+      "nAfter": 3,
+      "shareBeforePct": 29.41176471,
+      "preDropPct": {
+        "n": 20,
+        "mean": -8.724736082,
+        "sd": 20.89278106,
+        "median": -3.116908913,
+        "min": -70.97096255,
+        "max": 30.47392595,
+        "ci": [
+          -18.01798924,
+          -0.349513664
+        ],
+        "ciLo": -18.01798924,
+        "ciHi": -0.349513664,
+        "nNegative": 14,
+        "nZero": 0,
+        "nPositive": 6
+      },
+      "fertInWindow": 6
+    },
+    "extra": {
+      "clearDrops": 17,
+      "timingUsed": 20,
+      "nBefore": 5,
+      "nOn": 9,
+      "nAfter": 3,
+      "censored": {
+        "blocked": 0,
+        "data-end": 0,
+        "max-days": 6
+      },
+      "nRecovered": 14,
+      "nCensored": 6,
+      "offsetMedian": 0.0
+    }
+  },
+  "literature": [
+    {
+      "key": "cutRemovesLeafArea",
+      "text": "A cut removes the whole stand and with it the whole photosynthesising leaf area; regrowth uses the stored sugars and nitrogen at the base of the shoots.",
+      "textFi": "Koko kasvusto korjataan ja samalla menetetään koko yhteyttävä lehtipintaala.",
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "peltokasvien-tuotanto",
+      "section": "7.1.2",
+      "page": "s. 91",
+      "tableFigure": null
+    },
+    {
+      "key": "timothyRegrowth",
+      "text": "Timothy regrows slowly, because its regrowth starts from the buds at the base of the shoots; fescues regrow fast.",
+      "textFi": "Timotei on jälkikasvultaan hidas, sillä sen jälkikasvu lähtee liikkeelle versojen tyvellä olevista silmuista.",
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "peltokasvien-tuotanto",
+      "section": "7.1.1",
+      "page": "s. 91",
+      "tableFigure": null
+    },
+    {
+      "key": "silageCuts",
+      "text": "Two or three forage yields are harvested from silage leys per season; the first is usually the largest; the regrowth stand is short and leafy and develops more slowly.",
+      "textFi": "Säilörehunurmista korjataan kasvukauden aikana kaksi tai kolme rehusatoa.",
+      "value": [
+        2,
+        3
+      ],
+      "unit": "cuts per season",
+      "uncertainty": null,
+      "ref": "peltokasvien-tuotanto",
+      "section": "7.2.1",
+      "page": "s. 93–95",
+      "tableFigure": null
+    },
+    {
+      "key": "anttilaCuts",
+      "text": "Anttila 2022 management: fertilisation 23.05.2022 (52 kg N/ha), cut 21.06.2022, fertilisation 22.06.2022 (44 kg N/ha), cut 08.09.2022.",
+      "textFi": null,
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "section": null,
+      "page": "PDF p. 3",
+      "tableFigure": "Table 2"
+    },
+    {
+      "key": "qvidjaGrazing",
+      "text": "Qvidja: in August 2021, 8 cows grazed small paddocks in the EC footprint for 6 days; in August 2022, 9 cows grazed.",
+      "textFi": null,
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "heimsch2024",
+      "section": null,
+      "page": "PDF p. 2",
+      "tableFigure": null
+    }
+  ],
+  "literatureByKey": {
+    "cutRemovesLeafArea": {
+      "key": "cutRemovesLeafArea",
+      "text": "A cut removes the whole stand and with it the whole photosynthesising leaf area; regrowth uses the stored sugars and nitrogen at the base of the shoots.",
+      "textFi": "Koko kasvusto korjataan ja samalla menetetään koko yhteyttävä lehtipintaala.",
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "peltokasvien-tuotanto",
+      "section": "7.1.2",
+      "page": "s. 91",
+      "tableFigure": null
+    },
+    "timothyRegrowth": {
+      "key": "timothyRegrowth",
+      "text": "Timothy regrows slowly, because its regrowth starts from the buds at the base of the shoots; fescues regrow fast.",
+      "textFi": "Timotei on jälkikasvultaan hidas, sillä sen jälkikasvu lähtee liikkeelle versojen tyvellä olevista silmuista.",
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "peltokasvien-tuotanto",
+      "section": "7.1.1",
+      "page": "s. 91",
+      "tableFigure": null
+    },
+    "silageCuts": {
+      "key": "silageCuts",
+      "text": "Two or three forage yields are harvested from silage leys per season; the first is usually the largest; the regrowth stand is short and leafy and develops more slowly.",
+      "textFi": "Säilörehunurmista korjataan kasvukauden aikana kaksi tai kolme rehusatoa.",
+      "value": [
+        2,
+        3
+      ],
+      "unit": "cuts per season",
+      "uncertainty": null,
+      "ref": "peltokasvien-tuotanto",
+      "section": "7.2.1",
+      "page": "s. 93–95",
+      "tableFigure": null,
+      "valueMin": 2,
+      "valueMax": 3
+    },
+    "anttilaCuts": {
+      "key": "anttilaCuts",
+      "text": "Anttila 2022 management: fertilisation 23.05.2022 (52 kg N/ha), cut 21.06.2022, fertilisation 22.06.2022 (44 kg N/ha), cut 08.09.2022.",
+      "textFi": null,
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "section": null,
+      "page": "PDF p. 3",
+      "tableFigure": "Table 2"
+    },
+    "qvidjaGrazing": {
+      "key": "qvidjaGrazing",
+      "text": "Qvidja: in August 2021, 8 cows grazed small paddocks in the EC footprint for 6 days; in August 2022, 9 cows grazed.",
+      "textFi": null,
+      "value": null,
+      "unit": null,
+      "uncertainty": null,
+      "ref": "heimsch2024",
+      "section": null,
+      "page": "PDF p. 2",
+      "tableFigure": null
+    }
+  },
+  "figures": [
+    {
+      "n": 1,
+      "file": "figures/1-per-site.svg",
+      "title": "Daily GPP, TER and NEE from 14 days before to 28 days after a silage harvest at Anttila (n = 4), Särkisuo (n = 3), Qvidja (n = 10) and Viikki (n = 3), in percent of the mean GPP of the 14 days before the harvest; mean and ± 1 SD over the episodes.",
+      "desc": "Four panels side by side, one per site, with the same axes. X axis: days from the first day of the harvest (−14 to +28, local days, UTC+2). Y axis: GPP, TER and NEE in percent of the mean GPP of the days −14 to −1 before the harvest, from −125 to 225 % (NEE in percent of the GPP before: NEE < 0 = uptake, NEE % = TER % − GPP %). Lines: GPP light blue solid with circles, TER light pink dashed with squares, NEE steel blue dash-dotted with triangles; markers every 7 days. The band around each line is the mean ± 1 SD over the episodes; line and band are drawn only where 2 or more episodes have a value. An orange vertical line marks day 0 (the first day of the harvest), thin lines mark 100 % and 0, a dotted grey line marks 80 % (the recovery level). Anttila (n = 4; 3 to 4 episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in percent of the GPP before: ΔGPP −44 % (SD 31, n 4), ΔTER 0 % (SD 8, n 4), ΔNEE 44 % (SD 30, n 4). Mean of the curve over days +1 to +14: GPP 56 %, TER 54 %, NEE −2 %; days +15 to +28: GPP 74 %, TER 53 %, NEE −21 %. Särkisuo (n = 3; 3 to 3 episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in percent of the GPP before: ΔGPP −58 % (SD 19, n 3), ΔTER −3 % (SD 14, n 3), ΔNEE 56 % (SD 5, n 3). Mean of the curve over days +1 to +14: GPP 42 %, TER 62 %, NEE 20 %; days +15 to +28: GPP 78 %, TER 47 %, NEE −31 %. Qvidja (n = 10; 10 to 10 episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in percent of the GPP before: ΔGPP −48 % (SD 18, n 10), ΔTER 3 % (SD 31, n 10), ΔNEE 51 % (SD 33, n 10). Mean of the curve over days +1 to +14: GPP 52 %, TER 61 %, NEE 9 %; days +15 to +28: GPP 66 %, TER 66 %, NEE 0 %. Viikki (n = 3; 3 to 3 episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in percent of the GPP before: ΔGPP −44 % (SD 45, n 3), ΔTER −21 % (SD 30, n 3), ΔNEE 23 % (SD 19, n 3). Mean of the curve over days +1 to +14: GPP 54 %, TER 52 %, NEE −1 %; days +15 to +28: GPP 82 %, TER 67 %, NEE −15 %."
+    },
+    {
+      "n": 2,
+      "file": "figures/2-all-sites.svg",
+      "title": "Daily GPP, TER and NEE from 14 days before to 28 days after a silage harvest, all 20 used episodes of the four sites together, in percent of the mean GPP of the 14 days before the harvest; mean and ± 1 SD over the episodes.",
+      "desc": "One panel. X axis: days from the first day of the harvest (−14 to +28, local days, UTC+2). Y axis: GPP, TER and NEE in percent of the mean GPP of the days −14 to −1 before the harvest, from −125 to 225 % (NEE in percent of the GPP before: NEE < 0 = uptake, NEE % = TER % − GPP %). Lines: GPP light blue solid with circles, TER light pink dashed with squares, NEE steel blue dash-dotted with triangles; markers every 7 days. The band around each line is the mean ± 1 SD over the episodes; line and band are drawn only where 2 or more episodes have a value. An orange vertical line marks day 0 (the first day of the harvest), thin lines mark 100 % and 0, a dotted grey line marks 80 % (the recovery level). All sites (n = 20; 19 to 20 episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in percent of the GPP before: ΔGPP −48 % (SD 24, n 20), ΔTER −2 % (SD 26, n 20), ΔNEE 46 % (SD 29, n 20). Mean of the curve over days +1 to +14: GPP 52 %, TER 58 %, NEE 7 %; days +15 to +28: GPP 72 %, TER 61 %, NEE −11 %."
+    }
+  ],
+  "dataVersion": {
+    "generatedAt": "2026-10-25T17:32:31Z",
+    "git": {
+      "commit": "5d69cbd",
+      "dirty": true
+    },
+    "script": {
+      "path": "analysis/silage-harvest-response/silage-harvest-response.py",
+      "sha256": "a954acbe26f82f2caba94125a32cd589a19d20b9feae40b9ecfb2a8b72d51a41"
+    },
+    "lock": {
+      "path": "analysis/silage-harvest-response/silage-harvest-response.py.lock",
+      "sha256": "4c972466e84d58d4b9c2fedc28d91830865d71af372476ab6e50b0251cb3b175"
+    },
+    "python": "3.13.5",
+    "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+    "packages": {
+      "annotated-types": "0.8.0",
+      "contourpy": "1.4.0",
+      "cycler": "0.12.1",
+      "fonttools": "4.67.0",
+      "kiwisolver": "1.5.1",
+      "matplotlib": "3.11.2",
+      "mypy_extensions": "1.1.0",
+      "numpy": "2.5.4",
+      "packaging": "26.3",
+      "pandas": "3.1.0",
+      "pandera": "0.34.1",
+      "pillow": "13.0.0",
+      "pyarrow": "26.0.0",
+      "pydantic": "2.14.1",
+      "pydantic_core": "2.50.1",
+      "pyparsing": "3.3.3",
+      "python-dateutil": "3.0.0",
+      "six": "1.17.0",
+      "typeguard": "4.6.0",
+      "typing-inspect": "0.9.0",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "tzdata": "2026.5"
+    },
+    "seeds": {
+      "all.daysToRecover": 9704,
+      "all.deltaGpp": 9004,
+      "all.deltaNee": 9204,
+      "all.deltaReco": 9104,
+      "all.gppOffset": 9804,
+      "all.preDropPct": 9904,
+      "all.recoveryShare": 9604,
+      "all.relGpp": 9304,
+      "all.relNee": 9504,
+      "all.relReco": 9404,
+      "anttila.daysToRecover": 9700,
+      "anttila.deltaGpp": 9000,
+      "anttila.deltaNee": 9200,
+      "anttila.deltaReco": 9100,
+      "anttila.gppOffset": 9800,
+      "anttila.preDropPct": 9900,
+      "anttila.recoveryShare": 9600,
+      "anttila.relGpp": 9300,
+      "anttila.relNee": 9500,
+      "anttila.relReco": 9400,
+      "qvidja.daysToRecover": 9702,
+      "qvidja.deltaGpp": 9002,
+      "qvidja.deltaNee": 9202,
+      "qvidja.deltaReco": 9102,
+      "qvidja.gppOffset": 9802,
+      "qvidja.preDropPct": 9902,
+      "qvidja.recoveryShare": 9602,
+      "qvidja.relGpp": 9302,
+      "qvidja.relNee": 9502,
+      "qvidja.relReco": 9402,
+      "sarkisuo.daysToRecover": 9701,
+      "sarkisuo.deltaGpp": 9001,
+      "sarkisuo.deltaNee": 9201,
+      "sarkisuo.deltaReco": 9101,
+      "sarkisuo.gppOffset": 9801,
+      "sarkisuo.preDropPct": 9901,
+      "sarkisuo.recoveryShare": 9601,
+      "sarkisuo.relGpp": 9301,
+      "sarkisuo.relNee": 9501,
+      "sarkisuo.relReco": 9401,
+      "viikki.daysToRecover": 9703,
+      "viikki.deltaGpp": 9003,
+      "viikki.deltaNee": 9203,
+      "viikki.deltaReco": 9103,
+      "viikki.gppOffset": 9803,
+      "viikki.preDropPct": 9903,
+      "viikki.recoveryShare": 9603,
+      "viikki.relGpp": 9303,
+      "viikki.relNee": 9503,
+      "viikki.relReco": 9403
+    },
+    "bootstrap": {
+      "resamples": 10000,
+      "level": 0.95,
+      "generator": "numpy.random.default_rng (PCG64)"
+    },
+    "args": {
+      "db": "db",
+      "calculated": "data/calculated",
+      "out": null,
+      "check": false
+    },
+    "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "snapshot": {
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+      "commit": "44ec98f",
+      "commitNote": "HEAD at build time; db/report.json does not record a commit",
+      "url": null,
+      "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+      "inputs": [
+        {
+          "path": "db/events.parquet",
+          "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+          "rows": 114
+        },
+        {
+          "path": "db/sites.parquet",
+          "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+          "rows": 6
+        },
+        {
+          "path": "db/variables.parquet",
+          "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+          "rows": 26
+        },
+        {
+          "path": "calculated/daily.parquet",
+          "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+          "rows": 11209
+        }
+      ]
+    },
+    "inputs": [
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "site_code",
+          "date",
+          "date_end",
+          "type",
+          "detail",
+          "crop",
+          "dry_mass_kg_ha"
+        ]
+      },
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "site_id",
+          "code",
+          "name",
+          "utc_offset_min"
+        ]
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+        "rows": 26,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "column_name",
+          "unit"
+        ]
+      },
+      {
+        "path": "calculated/daily.parquet",
+        "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+        "rows": 11209,
+        "builtAt": "2026-10-23T19:03:09.003Z",
+        "columns": [
+          "site_code",
+          "date_local",
+          "gpp_gc",
+          "reco_gc",
+          "nee_f_gc",
+          "frac_measured"
+        ]
+      }
+    ],
+    "steps": {
+      "sites": {
+        "rowsRead": 6,
+        "panelSites": [
+          "anttila",
+          "sarkisuo",
+          "qvidja",
+          "viikki"
+        ]
+      },
+      "events": {
+        "rowsRead": 114,
+        "rowsFinnishSites": 111,
+        "rowsDropped": 3,
+        "harvestCutEvents": 37,
+        "rule": "events of the five Finnish sites; harvest and cut events make the episodes"
+      },
+      "daily": {
+        "rowsRead": 11209,
+        "rowsPanelSites": 5715,
+        "rowsDropped": 5494,
+        "perSite": {
+          "anttila": {
+            "dailyRows": 730,
+            "firstDay": "2022-01-01",
+            "lastDay": "2023-12-31",
+            "daysWithGpp": 730,
+            "daysWithNee": 730,
+            "daysLowFrac": 65
+          },
+          "sarkisuo": {
+            "dailyRows": 730,
+            "firstDay": "2022-01-01",
+            "lastDay": "2023-12-31",
+            "daysWithGpp": 705,
+            "daysWithNee": 730,
+            "daysLowFrac": 50
+          },
+          "qvidja": {
+            "dailyRows": 2794,
+            "firstDay": "2018-05-09",
+            "lastDay": "2025-12-31",
+            "daysWithGpp": 2794,
+            "daysWithNee": 2794,
+            "daysLowFrac": 1230
+          },
+          "viikki": {
+            "dailyRows": 1461,
+            "firstDay": "2022-01-01",
+            "lastDay": "2025-12-31",
+            "daysWithGpp": 1461,
+            "daysWithNee": 1461,
+            "daysLowFrac": 722
+          }
+        },
+        "rule": "daily rows of the four panel sites; no row is removed, a missing value is a gap"
+      },
+      "episodes": {
+        "harvestCutEpisodes": 33,
+        "perGroup": {
+          "silageHarvest": 25,
+          "cleaningCut": 4,
+          "grainHarvest": 4
+        },
+        "silageEpisodes": 25,
+        "used": 20,
+        "excluded": {
+          "overlap": 0,
+          "too-few-days": 2,
+          "low-measured-fraction": 3
+        },
+        "overridesApplied": 5,
+        "rule": "silage harvest episodes; used when no overlap, 12 or more days per window and measured fraction 0.10 or more"
+      }
+    }
+  }
+}
