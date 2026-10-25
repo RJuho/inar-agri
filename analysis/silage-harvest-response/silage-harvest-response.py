@@ -483,7 +483,12 @@ BAND_ALPHA = 0.25
 MARK_EVERY = (0, 7)
 MM = 1 / 25.4
 FIG_WIDTH_IN = 180 * MM
+# The user asked for a wider per-site figure than the 180 mm default of CLAUDE.md: 220 mm
+# (about 830 px at 96 px per inch), so that the four panels have room.
+FIG1_WIDTH_IN = 220 * MM
 FIG1_HEIGHT_IN = 85 * MM
+# Y major ticks of Figure 1 every 50 % (the panels are narrow); Figure 2 keeps Y_STEP.
+FIG1_Y_TICK_STEP = 50
 FIG2_HEIGHT_IN = 100 * MM
 FIGURES = ((1, "per-site"), (2, "all-sites"))
 X_LABEL = "Days from the first day of the harvest (local days)"
@@ -1880,7 +1885,11 @@ def arr(values: Sequence[float | None]) -> np.ndarray:
 
 
 def draw_panel(
-    ax: Any, comp: dict[str, Any], offsets: np.ndarray, yr: Sequence[float]
+    ax: Any,
+    comp: dict[str, Any],
+    offsets: np.ndarray,
+    yr: Sequence[float],
+    y_step: float = Y_STEP,
 ) -> None:
     """Three curves with bands, the harvest line, the 100 %, 80 % and 0 lines, the axis ranges."""
     ax.axvline(0, color=HARVEST_LINE, lw=1.2, alpha=0.5, zorder=1)
@@ -1906,7 +1915,9 @@ def draw_panel(
         )
     ax.set_xlim(COMPOSITE[0] - 0.5, COMPOSITE[1] + 0.5)
     ax.set_ylim(yr[0], yr[1])
-    ax.set_yticks(np.arange(yr[0], yr[1] + 1, Y_STEP))
+    # Ticks on the multiples of y_step inside the range (the range itself is a multiple of 25).
+    first_tick = math.ceil(yr[0] / y_step) * y_step
+    ax.set_yticks(np.arange(first_tick, yr[1] + 1, y_step))
 
 
 def legend_handles() -> list[Any]:
@@ -1961,11 +1972,11 @@ def fig_per_site(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
     offsets = np.array(comp["offsets"], dtype=float)
     yr = comp["yRange"]
     fig, axes = plt.subplots(
-        1, len(SITES), figsize=(FIG_WIDTH_IN, FIG1_HEIGHT_IN), sharey=True
+        1, len(SITES), figsize=(FIG1_WIDTH_IN, FIG1_HEIGHT_IN), sharey=True
     )
     for ax, site in zip(axes, SITES, strict=True):
         c = comp["perSite"][site]
-        draw_panel(ax, c, offsets, yr)
+        draw_panel(ax, c, offsets, yr, FIG1_Y_TICK_STEP)
         # The site name as the title and n on a line below it: "Qvidja (n = 10)" does not fit
         # into a panel of about 32 mm.
         # The site emoji and the plain name; the <title>, <desc> and the tables keep the plain name.
@@ -1992,7 +2003,7 @@ def fig_per_site(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         handlelength=3.2,
         columnspacing=2.0,
     )
-    fig.subplots_adjust(left=0.15, right=0.99, top=0.76, bottom=0.2, wspace=0.3)
+    fig.subplots_adjust(left=0.125, right=0.99, top=0.76, bottom=0.2, wspace=0.3)
     names = ", ".join(
         f"{data.names[s]} (n = {comp['perSite'][s]['episodes']})" for s in SITES[:-1]
     )

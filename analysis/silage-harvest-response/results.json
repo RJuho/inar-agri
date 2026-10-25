@@ -6840,14 +6840,14 @@
     }
   ],
   "dataVersion": {
-    "generatedAt": "2026-10-25T17:32:31Z",
+    "generatedAt": "2026-10-25T17:54:27Z",
     "git": {
-      "commit": "5d69cbd",
+      "commit": "0ace848",
       "dirty": true
     },
     "script": {
       "path": "analysis/silage-harvest-response/silage-harvest-response.py",
-      "sha256": "a954acbe26f82f2caba94125a32cd589a19d20b9feae40b9ecfb2a8b72d51a41"
+      "sha256": "43e0e9bdb80425ff3274ed17855f2cf92455af92c659df1a6dd3a6f3d6430406"
     },
     "lock": {
       "path": "analysis/silage-harvest-response/silage-harvest-response.py.lock",
