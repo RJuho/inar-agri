@@ -1827,6 +1827,51 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
+  test('the event timing dive (Python) has one figure per site, the alternative-date rows and SVG downloads', async ({ page, request }) => {
+    const slug = 'event-timing';
+    await page.goto(`/deep-dive/${slug}/`);
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #6');
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    // Six site figures (1 to 6), the offsets figure and the course figure.
+    const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
+    expect(await figures.count()).toBeGreaterThanOrEqual(8);
+    for (const svg of await figures.all()) {
+      const info = await svg.evaluate((el) => {
+        const [first, second] = [el.children[0], el.children[1]];
+        return {
+          labelledby: el.getAttribute('aria-labelledby') ?? '',
+          first: first?.tagName.toLowerCase(),
+          second: second?.tagName.toLowerCase(),
+          titleId: first?.id ?? '',
+          descId: second?.id ?? '',
+          desc: second?.textContent?.trim() ?? '',
+        };
+      });
+      expect(info.first).toBe('title');
+      expect(info.second).toBe('desc');
+      expect(info.desc.length).toBeGreaterThan(0);
+      expect(info.labelledby.split(/\s+/)).toEqual([info.titleId, info.descId]);
+    }
+    const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(downloads.length).toBe(await figures.count());
+    for (const href of downloads) {
+      expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
+      const res = await request.get(href);
+      expect(res.status(), href).toBe(200);
+    }
+    // One h3 per site in the Results section.
+    const h3 = await page.locator('main h3').allInnerTexts();
+    for (const name of ['Anttila', 'Särkisuo', 'Haltiala', 'Qvidja', 'Viikki', 'Maktau']) expect(h3.some((t) => t.includes(name)), name).toBe(true);
+    // The alternative-date rows and the numbers.
+    expect(await page.locator('tr[id^="alt-"]').count()).toBeGreaterThanOrEqual(10);
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(40);
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    await expectOnlyUpdateScript(page);
+  });
+
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -1844,7 +1889,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);

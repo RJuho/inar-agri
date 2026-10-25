@@ -11,6 +11,8 @@ All data is located in 'data/'.
 
 `data/articles/`: nine articles (PDF) about the sites and methods. `site/src/scripts/glossary.ts` lists them.
 
+`data/Peltokasvien_tuotanto/`: the textbook *Peltokasvien tuotanto* (Seppänen, Yli-Halla, Stoddard, Mäkelä and Helenius 2016, 3rd ed., Opetushallitus, ISBN 978-952-13-5189-1) as a DAISY e-book. All text is in `content.html` (1.3 MB; headings have ids `h1_N`, `h2_N`, `h3_N`; printed pages are `<span class="page-normal" id="page-N">`). `ncc.html` is the table of contents. The `.mp3` and `.smil` files are the audio. Read it with `grep` or `python3 -I`, not with a browser. Reference id `peltokasvien-tuotanto` in `EXTRA_REFERENCES` (`site/src/lib/deepDive.ts`); cite the section and the printed page.
+
 Use DuckDB as SQL database to store data.
 https://duckdb.org/llms.txt
 

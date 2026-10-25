@@ -94,6 +94,16 @@ The file date is used for all date conflicts (user decision 2026-10-23). For thr
 | Qvidja | grazing 2022 (9 cows, 15 days) | 2022-06-01 (Qvidja xlsx) | 2022-08-05 | drop on 5 August; the paper gives August 2022, 9 cows, 9 days |
 | Viikki | tillage 2022 | 2022-11-02 (docx) | 2022-11-01 | Gao et al. 2026 also give 1 November |
 
+Other date differences between the sources (found 2026-10-25 for Deep Dive #6; the row keeps the date of the source named first):
+
+| Site | Event | Date of the row (source) | Other date (source) |
+|---|---|---|---|
+| Qvidja | mineral fertiliser 2019 | 2019-06-20 (Heimsch et al. 2021, Table 1, PDF p. 4; events file) | 2019-06-26 (Heimsch et al. 2021, text, PDF p. 3) |
+| Viikki | second cut 2023 | 2023-08-24 (docx) | not in the events file and not in Gao et al. 2026, which give 17 August only |
+| Haltiala | Jett Mn235 2025 | 2025-06-16 (parcel card) | 2025-05-16 (Haltiala xlsx) |
+| Haltiala | harvest 2021 | 2021-09-10 and 2021-09-15 threshing (xlsx rows) | the xlsx text says the harvest started on 8 September and lasted at least 5 days |
+| Maktau | sowing 2020 | no row | third week of March 2020 (Räsänen et al. 2026, PDF p. 3) |
+
 Other differences (the old value is kept unless stated):
 
 - Anttila and Särkisuo carbon: the file says "Maaninka C content of dry biomass 41.7 %", but its C column is yield × 0.583. The grass carbon content 0.47 of Shurpali et al. 2025 is kept (user decision 2026-10-23).

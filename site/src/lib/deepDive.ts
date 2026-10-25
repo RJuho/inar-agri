@@ -68,6 +68,11 @@ export const EXTRA_REFERENCES = {
     text: 'Verified data findings of this project, with status and a check query each.',
     file: 'docs/anomaly-data-report.md',
   },
+  'peltokasvien-tuotanto': {
+    short: 'Seppänen et al. 2016',
+    text: 'Seppänen, M., Yli-Halla, M., Stoddard, F., Mäkelä, P. and Helenius, J. (2016). Peltokasvien tuotanto. 3rd edition. Opetushallitus, Helsinki. 206 p. ISBN 978-952-13-5189-1. DAISY edition by Celia 2020; the printed page numbers are cited.',
+    file: 'data/Peltokasvien_tuotanto/content.html',
+  },
   'spi-data': {
     short: 'SPI data, project team 2026',
     text: 'Project team (2026). Standardized Precipitation Index (SPI) of the FMI stations Vantaa Helsinki-Vantaa airport, Kaarina Yltöinen and Kuopio Maaninka, 1980 to 2026. Computed from FMI monthly precipitation with the SPEI R package (spi(), gamma distribution, unbiased PWM fit, reference period 1981 to 2010), scales 1, 3, 6 and 12 months. Script data/SPI/SPIanalysis.R.',

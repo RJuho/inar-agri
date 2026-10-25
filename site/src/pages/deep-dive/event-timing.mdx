@@ -1,0 +1,854 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 6
+title: 'Management events on the flux timeline: timing per site'
+question: Where do the recorded management events of each site sit on the daily GPP, Reco and NEE record, and on which day does the flux change around each recorded date?
+shortAnswer: 'At harvests, GPP drops mostly on or before the recorded date; the interval of the mean offset is below zero. NEE rises after harvests. No tested event is nearer to its second source date.'
+sites: [anttila, sarkisuo, haltiala, qvidja, viikki, maktau]
+variables: [gpp, reco, nee_f, nee, ta, swc, precip]
+period: { from: 2018, to: 2025 }
+date: '2026-10-25'
+status: draft
+models:
+  - model: Claude Fable 5.1
+    role: question, plan, final text
+  - model: Claude Opus 5.5
+    role: Python analysis script, figures, article draft and site integration
+  - model: Claude Sonnet 5.5
+    role: independent recompute of the numbers (own code, without the script and the JSON)
+  - model: Claude Haiku 5.5
+    role: language (STE) and reference review
+script: analysis/event-timing/event-timing.py
+references: [peltokasvien-tuotanto, shurpali2025, heimsch2021, heimsch2024, gao2026, rasanen2026, qvidja-management, viikki-management, haltiala-management, calculated-doc, anomaly-report]
+checks:
+  - kind: recompute
+    by: Claude Sonnet 5.5
+    date: '2026-10-25'
+    result: pass
+    note: Own code from the method text of the built page, without the script and the JSON. The event and episode counts, the offset summaries per kind and per site, the 7-day changes, the four highlighted episodes, the second-date table, the thermal seasons and the measured-NEE agreement all agree; the bootstrap bounds differ by the seed only. Fourteen rules the text did not state were made explicit in the method text (side days, ties, the scope of the span exclusion, the season run, the sample SD and the percentiles, the sowing date, the second-date span).
+  - kind: review
+    by: Claude Haiku 5.5
+    date: '2026-10-25'
+    result: pass
+    note: One pass, partial. Five must items were fixed by Claude Fable 5.1, who checked the PDF pages and the book text (a grazing sentence that put horses into Heimsch et al. 2024, course and window means without n or spread, and the ripening of the crop stated as a fact instead of a possible reason). All book pages, PDF pages, event dates, data-report statuses and the tone passed.
+---
+
+import raw from '../../../../analysis/event-timing/results.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+import {
+  altKey,
+  altNotes,
+  altRows,
+  changeRows,
+  epKey,
+  episodeRows,
+  evKey,
+  eventTimingData,
+  inputColumnRows,
+  inputRows,
+  kindRows,
+  outsideText,
+  seasonRows,
+  wetMonthsText,
+  yearKey,
+} from '../../lib/deepDives/eventTiming';
+
+export const d = eventTimingData(raw);
+export const inputs = inputRows(d);
+export const inputColumns = inputColumnRows(d);
+export const kinds = kindRows(d);
+export const changes = changeRows(d);
+export const base = baseUrl();
+export const U = 'g C m⁻² d⁻¹';
+export const VARS = ['gpp', 'reco', 'nee_f', 'ta', 'swc', 'precip'];
+export const ALL_SITES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'];
+export const E = (id) => epKey(d, id);
+export const TEST_KINDS = ['harvest', 'cut', 'grazing', 'tillage', 'sowing'];
+export const spanOverlapTested = Object.values(raw.sites).flatMap((s) => s.episodes).filter((e) => e.spanOverlap && TEST_KINDS.includes(e.kind)).length;
+export const book = (key) => {
+  const r = raw.literature.find((x) => x.key === key);
+  if (!r) throw new Error(`event-timing: no literature row ${key}`);
+  return `section ${r.section}, p. ${r.page.replace(/^s\. /, '')}${r.tableFigure ? `, ${r.tableFigure}` : ''}`;
+};
+
+export function Seasons({ site, name }) {
+  return (
+    <div class="table-wrap">
+      <table>
+        <caption>{name}: days with gap-filled NEE per year, days with a measured fraction of NEE of {d.method.minFracPct} % or more, the thermal growing season (start and end by the +{d.method.seasonThresholdC} °C rule with a run of {d.method.seasonRunDays} days, length) and the recorded events per type. Episodes = episodes that start in the year.</caption>
+        <thead>
+          <tr><th scope="col">Year</th><th scope="col" class="num">Days with NEE</th><th scope="col" class="num">Days measured</th><th scope="col">Thermal growing season</th><th scope="col">Events</th><th scope="col" class="num">Episodes</th></tr>
+        </thead>
+        <tbody>
+          {seasonRows(d, site).map((r) => (<tr id={r.id}><td>{r.year}</td><td class="num">{r.days}</td><td class="num">{r.measured}</td><td class="wrap">{r.season}</td><td class="wrap">{r.events}</td><td class="num">{r.episodes}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function Episodes({ site, name }) {
+  return (
+    <div class="table-wrap">
+      <table>
+        <caption>{name}: all episodes. Anchor = first date of an event of the episode kind. GPP before = mean daily GPP of the {d.method.windowDays} days before the start (g C m⁻² d⁻¹). ΔGPP, ΔReco, ΔNEE = mean of the {d.method.windowDays} days after the end minus the mean of the {d.method.windowDays} days before the start (g C m⁻² d⁻¹; ΔGPP also in % of the GPP before). Detected = day of the largest step; offset = detected day minus anchor (negative = before the recorded date). Other tests = GPP rise after a sowing in the episode and Reco rise for a tillage, with their offsets. NEE check = drop of the day-time measured NEE (offset, clear, agreement with the GPP drop within {d.method.agreeDays} day).</caption>
+        <thead>
+          <tr><th scope="col">Dates</th><th scope="col">Kind</th><th scope="col">Types</th><th scope="col">Anchor</th><th scope="col" class="num">GPP before</th><th scope="col" class="num">ΔGPP</th><th scope="col" class="num">ΔReco</th><th scope="col" class="num">ΔNEE</th><th scope="col">Test</th><th scope="col">Detected</th><th scope="col" class="num">Offset</th><th scope="col">Clear</th><th scope="col">Other tests</th><th scope="col">NEE check</th><th scope="col">Use</th></tr>
+        </thead>
+        <tbody>
+          {episodeRows(d, site).map((r) => (<tr id={`episode-${r.id}`}><td class="wrap">{r.dates}</td><td>{r.kind}</td><td class="wrap">{r.types}</td><td>{r.anchor}</td><td class="num">{r.gppBefore}</td><td class="num">{r.dGpp}</td><td class="num">{r.dReco}</td><td class="num">{r.dNee}</td><td class="wrap">{r.test}</td><td>{r.detected}</td><td class="num">{r.offset}</td><td class="wrap">{r.clear}</td><td class="wrap">{r.other}</td><td class="wrap">{r.nee}</td><td class="wrap">{r.use}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function Alts({ site, name }) {
+  return (
+    <div class="table-wrap">
+      <table>
+        <caption>{name}: events with a second date in another source. Date in the database = the date of db/events.parquet. Test result = the largest GPP drop (for a tillage also the Reco rise) on the candidate days around both dates. Offsets = detected day minus each date. Nearer to = the date that is nearer to a clear change point.</caption>
+        <thead>
+          <tr><th scope="col">Type</th><th scope="col">Date in the database</th><th scope="col">Other date</th><th scope="col">Source of the other date</th><th scope="col">Test result</th><th scope="col" class="num">Offset to the database date</th><th scope="col" class="num">Offset to the other date</th><th scope="col">Nearer to</th></tr>
+        </thead>
+        <tbody>
+          {altRows(d, site).map((r) => (<tr id={r.id}><td>{r.type}</td><td class="wrap">{r.dateUsed}</td><td class="wrap">{r.dateOther}</td><td class="wrap">{r.source}</td><td class="wrap">{r.test}</td><td class="num">{r.toUsed}</td><td class="num">{r.toOther}</td><td class="wrap">{r.nearer}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function Notes({ site }) {
+  const notes = altNotes(d, site);
+  return notes.length ? (
+    <ul>
+      {notes.map((n) => (<li>{n.text} Source: <code>{n.source}</code>.</li>))}
+    </ul>
+  ) : null;
+}
+
+## Short answer
+
+This dive is a routine inspection of the management events of the six sites. It puts each recorded event on the daily
+GPP, Reco and gap-filled NEE of the site, and it finds the day on which the flux changes most near the recorded date. The
+crop calendar of the textbook *Peltokasvien tuotanto* <Cite ids={['peltokasvien-tuotanto']} /> is the reference for each site.
+GPP and Reco are in {U}. NEE below zero is uptake.
+
+- **Harvests.** <Num k="byKind.harvest.n" digits={0} /> of <Num k="byKind.harvest.nSearched" digits={0} /> searched harvest
+  episodes have a clear drop of daily GPP. The mean offset from the recorded date is <Num k="byKind.harvest.mean" sign digits={1} unit="d" />
+  (SD <Num k="byKind.harvest.sd" digits={1} />, <Num k="method.ciLevelPct" digits={0} /> % interval
+  <Num k="byKind.harvest.ciLo" sign digits={1} /> to <Num k="byKind.harvest.ciHi" sign digits={1} /> d, median
+  <Num k="byKind.harvest.median" digits={0} /> d). The interval excludes zero: on average, the drop comes on or a little
+  before the recorded date. In the <Num k="method.windowDays" digits={0} /> days after a harvest, NEE was <Num k="changes.harvest.nee.mean" sign unit={U} /> higher
+  than in the <Num k="method.windowDays" digits={0} /> days before (n = <Num k="changes.harvest.nee.n" digits={0} />, SD <Num k="changes.harvest.nee.sd" />,
+  interval <Num k="changes.harvest.nee.ciLo" sign /> to <Num k="changes.harvest.nee.ciHi" sign />).
+- **Other kinds.** Grazing has a mean offset of <Num k="byKind.grazing.mean" sign digits={1} unit="d" />
+  (n = <Num k="byKind.grazing.n" digits={0} />, SD <Num k="byKind.grazing.sd" digits={1} />, interval
+  <Num k="byKind.grazing.ciLo" sign digits={1} /> to <Num k="byKind.grazing.ciHi" sign digits={1} /> d), and tillage
+  <Num k="byKind.tillage.mean" sign digits={1} unit="d" /> (n = <Num k="byKind.tillage.n" digits={0} />,
+  SD <Num k="byKind.tillage.sd" digits={1} />, interval <Num k="byKind.tillage.ciLo" sign digits={1} /> to
+  <Num k="byKind.tillage.ciHi" sign digits={1} /> d). Both intervals include zero. After a sowing, the largest GPP rise came
+  <Num k="tests.sowingRise.mean" digits={1} unit="d" /> later on average (n = <Num k="tests.sowingRise.n" digits={0} />,
+  SD <Num k="tests.sowingRise.sd" digits={1} />, interval <Num k="tests.sowingRise.ciLo" digits={1} /> to
+  <Num k="tests.sowingRise.ciHi" digits={1} /> d). The
+  cleaning cuts gave <Num k="byKind.cut.nClear" digits={0} /> clear drops in <Num k="byKind.cut.nSearched" digits={0} /> tests.
+- **Second dates in the sources.** <Num k="counts.nAltDates" digits={0} /> events have a second date in another source.
+  <Num k="counts.nAltDatesClear" digits={0} /> of them have a clear change point. The change point is nearer to the date in
+  the database for <Num k="counts.nAltNearerUsed" digits={0} />, at the same distance from both dates for
+  <Num k="counts.nAltNearerEqual" digits={0} />, and nearer to the other date for <Num k="counts.nAltNearerOther" digits={0} />.
+
+The changes are associated with the events. The weather and the season also change on the same days. The data do not record the crop stage.
+
+## Data and method
+
+**Snapshot and script.** The script `analysis/event-timing/event-timing.py` reads the harmonised database snapshot built on
+{d.dataVersion.snapshot.builtAt} and `data/calculated/daily.parquet` of the same build <Cite ids={['calculated-doc']} />.
+It checks the SHA-256 and the row count of each file before it reads data. The table gives the files, the row counts and the
+columns that the script reads. Section "Reproduce" gives the hashes.
+
+<div class="table-wrap">
+<table>
+<caption>Input files of the script (paths relative to the --db and --calculated folders).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col" class="num">Rows</th><th scope="col">Columns read</th></tr>
+</thead>
+<tbody>
+{inputColumns.map((r) => (<tr><td>{r.path}</td><td class="num">{r.rows}</td><td class="wrap"><code>{r.columns}</code></td></tr>))}
+</tbody>
+</table>
+</div>
+
+**Events.** The events come from `db/events.parquet`: <Num k="counts.events" digits={0} /> events of the six sites (Anttila,
+Särkisuo, Haltiala, Qvidja, Viikki and Maktau, in the order of `db/sites.parquet`). The <a href={`${base}events/`}>Events page</a>
+gives the source of each event. The event table is typed from the management files of Haltiala, Qvidja and Viikki
+<Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} />, from the project event file and from the
+articles. The build keeps one date for each event.
+
+**Rules.** The script applies these rules in this order.
+
+1. **Local day.** Local day = period start in UTC (`ts_start`) plus the UTC offset of the site (`utc_offset_min`). The daily
+   air temperature and soil water content are the means of the 30-min values of `db/observations.parquet`. The daily
+   precipitation is the sum; it is empty when all half hours of the day are empty
+   (<Num k="dataVersion.steps.observations.precipNullAllHalfHoursNull" digits={0} /> site days). The daily GPP, Reco and
+   gap-filled NEE ({U}), the measured fraction of NEE and the daily mean air temperature for the season come from
+   `data/calculated/daily.parquet`. Days with a measured fraction below <Num k="method.minFracPct" digits={0} /> % are drawn
+   lighter. They are not removed. The timeline of a site is the period from the first to the last day with a gap-filled NEE
+   value.
+2. **Episodes.** The events of one site form one episode when an event starts not more than
+   <Num k="method.mergeDays" digits={0} /> days after the last day of the current episode (its `date_end`, else its `date`).
+   The event "EC system installed" (Haltiala) is not a field operation and is not in an episode. The episode starts on its
+   first date and ends on its last `date_end` (or `date`). The *episode kind* is the first type of this list that is in the
+   episode: harvest, cut, grazing, tillage, sowing, fertilisation, spraying, other. The *anchor* is the first date of an
+   event of the episode kind. This gives <Num k="counts.episodes" digits={0} /> episodes.
+3. **Before and after.** The before window is the <Num k="method.windowDays" digits={0} /> days before the start (days
+   <Num k="method.beforeDays.0" sign digits={0} /> to <Num k="method.beforeDays.1" sign digits={0} />). The after window is the
+   <Num k="method.windowDays" digits={0} /> days after the end (days <Num k="method.afterDays.0" sign digits={0} /> to
+   <Num k="method.afterDays.1" sign digits={0} />). The change is the mean after minus the mean before of the daily GPP, Reco and
+   NEE ({U}). The GPP change is also given in percent of the GPP before, only when the GPP before is
+   <Num k="method.minBefore" digits={0} unit={U} /> or more. Each side needs <Num k="method.minDays" digits={0} /> days with
+   a value. An episode with a day of another episode in its windows is flagged "overlap" and is not in the summaries
+   (<Num k="counts.overlap" digits={0} /> episodes). The 7-day change uses no other exclusion. A missing day is an empty
+   value; the timeline of a site has one row for each calendar day from the first to the last day with a gap-filled NEE.
+4. **Change point.** The test is a port of `detectDrop` of `scripts/lib/deep-dive/change-point.ts`. For each candidate day
+   *t*, step(*t*) = sign × (mean of the days *t* − <Num k="method.sideDays" digits={0} /> to *t* − 1 − mean of the days *t*
+   to *t* + <Num k="method.sideDays" digits={0} /> − 1). The sign is +1 for a drop and −1 for a rise. Each side needs
+   <Num k="method.minSide" digits={0} /> or more values. The detected day is the *t* with the largest step (the first one on a
+   tie). The step is *clear* when the higher side (the side before for a drop, the side after for a rise) has a mean of
+   <Num k="method.minBefore" digits={0} unit={U} /> or more and the step is <Num k="method.minStepPct" digits={0} /> % or more
+   of that mean.
+   - Harvest, cut, grazing and tillage episodes: the largest GPP drop, for *t* from the start
+     <Num k="method.searchFrom" sign digits={0} /> days to the end <Num k="method.searchTo" sign digits={0} /> days.
+   - Episodes with a sowing: the largest GPP rise, for *t* from the sowing date to the sowing date
+     <Num k="method.sowingSearchTo" sign digits={0} /> days. The span is long so that it covers the emergence and the early growth.
+     The offset of this test is counted from the sowing date (the first sowing event of the episode).
+   - Episodes with a tillage: also the largest Reco rise, from the start <Num k="method.searchFrom" sign digits={0} /> days to
+     the end <Num k="method.searchTo" sign digits={0} /> days.
+   - Fertilisation, spraying and other episodes: no change point. They have only the 7-day change.
+
+   Offset = detected day − anchor, in days. A negative offset means that the flux changed before the recorded date. An
+   episode is not in the offset summaries when another episode with a change-point test (harvest, cut, grazing, tillage or
+   sowing) has a day in the days that its search reads, from the start <Num k="method.spanOverlapFrom" sign digits={0} />
+   days to the end <Num k="method.spanOverlapTo" sign digits={0} /> days. The flag marks <Num k="counts.spanOverlap" digits={0} />
+   episodes; {spanOverlapTested} of them has a change-point test (a sowing), the others are fertilisation or spraying
+   episodes without a test. This exclusion applies to the summaries per kind and per site and kind. The test rows "all
+   episodes with a sowing" and "all tillage episodes, Reco rise" in section "Sites compared" do not apply it.
+   **Check on measured NEE:** the daily mean of the measured NEE (`nee` not empty and `nee_qc` 0 or empty) of the half hours
+   that start from <Num k="method.dayTimeFromHour" digits={0} />:00 and before <Num k="method.dayTimeToHour" digits={0} />:00
+   local time, on days with <Num k="method.minMeasuredHalfHours" digits={0} /> or more such half hours. The script finds the
+   largest drop of −NEE in the same span as the GPP drop, with <Num k="method.minSideNee" digits={0} /> or more values per
+   side and a higher side of <Num k="method.minBeforeNee" digits={0} unit="µmol m⁻² s⁻¹" /> or more. The two change points
+   *agree* when they differ by <Num k="method.agreeDays" digits={0} /> day or less.
+5. **Second dates.** Some events have a second date in another source. These dates are not in the database. The script has
+   them as one typed table, `ALTERNATIVE_DATES`, with the source and the page or file of each date. For each row, the
+   candidate days are the days from <Num k="method.searchFrom" sign digits={0} /> to <Num k="method.searchTo" sign digits={0} />
+   days around the date in the database (to its end day) and around the other date (the other date gets the same number
+   of days as the event in the database, from `date` to `date_end`). The union of the two spans is searched once; on a tie
+   the first day wins. A candidate day is skipped when its side days (*t* − <Num k="method.sideDays" digits={0} /> to
+   *t* + <Num k="method.sideDays" digits={0} /> − 1) touch a day of another episode of the site (the days of the event itself
+   do not skip a candidate). The test is the GPP drop. The result gives the
+   offset to each date and the date that is nearer to the detected day. Only a clear change point gives a "nearer" date. For a
+   tillage with a GPP drop that is not clear, a clear Reco rise is used. Types without a change-point test
+   (fertilisation, spraying) get no result.
+6. **Summaries.** Per site and kind, and per kind over all sites: n, mean, SD, median and range of the offsets of the clear
+   change points; the counts before (offset below zero), on (zero) and after (above zero) the anchor; and the share of clear
+   tests. The <Num k="method.ciLevelPct" digits={0} /> % interval of the mean is a percentile bootstrap
+   (<Num k="method.bootstrapResamples" digits={0} /> resamples with replacement, the 2.5 and 97.5 percentiles of the
+   resampled means, `numpy` PCG64, fixed seeds in the manifest) when n is 3 or more; else the text gives the range. The SD
+   is the sample SD (n − 1). The median of an even n is the mean of the two middle values. The 7-day changes have the same
+   summaries.
+7. **Thermal growing season** (Finnish sites). The +<Num k="method.seasonThresholdC" digits={0} /> °C rule comes from the
+   book <Cite ids={['peltokasvien-tuotanto']} note={book('thermalSeason')} />; the run of
+   <Num k="method.seasonRunDays" digits={0} /> days is our rule. Start = the first day from the first day of March on with
+   a daily mean above +<Num k="method.seasonThresholdC" digits={0} /> °C on that day and on the days after it, together
+   <Num k="method.seasonRunDays" digits={0} /> days, all with a value. End = the first day *t* from the first day of August
+   on with a daily mean below +<Num k="method.seasonThresholdC" digits={0} /> °C on *t* and the days after it, together
+   <Num k="method.seasonRunDays" digits={0} /> days. The length is end minus start, in days. A year has no start when its data begin after
+   the first day of March. Maktau has no thermal season: its figure marks the months with a precipitation sum above
+   <Num k="method.wetMonthMm" digits={0} unit="mm" /> (our rule).
+8. **Counts.** Each step that removes rows or changes values logs a count in `dataVersion.steps` of `results.json` and in
+   the manifest.
+9. **Open findings.** The script prints the open findings of the data report that touch this dive. Section "Limits and
+   uncertainty" gives their effect.
+
+**What a season looks like.** The book gives the crop calendar of the crops of these sites. It gives nothing on GPP, Reco,
+NEE or on the days from an event to a flux change. We use it only for the calendar.
+
+- **Silage ley** (Anttila, Särkisuo, Qvidja, Viikki 2022 and 2024). Two or three forage yields are harvested from a silage
+  ley per season. The first is usually the largest, and the regrowth stand develops more slowly
+  <Cite ids={['peltokasvien-tuotanto']} note={book('silageCuts')} />. Forage grass is not harvested ripe; the harvest date
+  follows the yield and quality targets <Cite ids={['peltokasvien-tuotanto']} note={book('grassHarvestTiming')} />. A cut
+  removes the whole photosynthesising leaf area <Cite ids={['peltokasvien-tuotanto']} note={book('cutRemovesLeafArea')} />.
+  Timothy regrows slowly, from the buds at the base of the shoots
+  <Cite ids={['peltokasvien-tuotanto']} note={book('timothyRegrowth')} />. A dry spell after the first harvest can slow or
+  even prevent the regrowth <Cite ids={['peltokasvien-tuotanto']} note={book('drySpellRegrowth')} />. For a silage ley that
+  is harvested three times on coarse mineral soils, the book recommends <Num k="literatureByKey.leyNitrogen.value" digits={0} unit="kg N/ha" />
+  <Cite ids={['peltokasvien-tuotanto']} note={book('leyNitrogen')} />. Leys are established in spring under a cover crop or
+  in summer or autumn without one <Cite ids={['peltokasvien-tuotanto']} note={book('leyEstablishment')} />, and they are
+  renewed usually every <Num k="literatureByKey.leyRenewal.valueMin" digits={0} /> to
+  <Num k="literatureByKey.leyRenewal.valueMax" digits={0} /> years <Cite ids={['peltokasvien-tuotanto']} note={book('leyRenewal')} />.
+- **Spring cereal** (Haltiala barley and oats, Viikki barley). Spring cereals are sown in April and May and harvested in late
+  summer <Cite ids={['peltokasvien-tuotanto']} note={book('springCerealCalendar')} />. They usually get their fertiliser in one
+  application at sowing <Cite ids={['peltokasvien-tuotanto']} note={book('springCerealFertilisation')} />. The earliest
+  varieties start to ripen at the end of July, late varieties only in September; at ripening the leaves die and dry
+  <Cite ids={['peltokasvien-tuotanto']} note={book('cerealRipening')} />. A barley variety needs
+  <Num k="literatureByKey.barleyGrowingTime.valueMin" digits={0} /> to <Num k="literatureByKey.barleyGrowingTime.valueMax" digits={0} />
+  days, by growing zone <Cite ids={['peltokasvien-tuotanto']} note={book('barleyGrowingTime')} />.
+- **Fava bean** (Viikki 2025). The growing time is <Num k="literatureByKey.favaBeanGrowingTime.value" digits={0} unit="days" />
+  <Cite ids={['peltokasvien-tuotanto']} note={book('favaBeanGrowingTime')} />. In Finland, the flowering starts in late June and
+  continues to the end of July <Cite ids={['peltokasvien-tuotanto']} note={book('favaBeanFlowering')} />.
+- **Maize** (Maktau). In Finland, maize is best sown in the first or second week of May. Emergence takes
+  <Num k="literatureByKey.maizeCalendar.valueMin" digits={0} /> to <Num k="literatureByKey.maizeCalendar.valueMax" digits={0} />
+  weeks, and the plant usually flowers in July <Cite ids={['peltokasvien-tuotanto']} note={book('maizeCalendar')} />. The book
+  has nothing on maize in Kenya.
+- **Thermal season.** The thermal growing season lasts from <Num k="literatureByKey.thermalSeasonLength.valueMax" digits={0} />
+  days in southern Finland to <Num k="literatureByKey.thermalSeasonLength.valueMin" digits={0} /> days in the far north
+  <Cite ids={['peltokasvien-tuotanto']} note={book('thermalSeasonLength')} />. Grasses start to grow in spring when the
+  temperature rises just above zero <Cite ids={['peltokasvien-tuotanto']} note={book('grassStart')} />.
+
+## Results
+
+Each site figure has four panels on one date axis in local time. Panel (a) shows the daily GPP and Reco. Panel (b) shows the
+daily gap-filled NEE. Panel (c) shows the daily air temperature and soil water content. Panel (d) shows the daily precipitation. A vertical line marks each recorded event, with the type
+letter at the top. A dashed line marks the second date of an event in another source. Grey bands show the thermal growing
+season (Maktau: the wet months).
+
+### Anttila
+
+<Figure
+  id="figure-1"
+  svgFile="analysis/event-timing/figures/1-anttila.svg"
+  view={{ name: 'Anttila events', sites: ['anttila'], variables: VARS, yearFrom: 2022, yearTo: 2023, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+**Record.** The flux data cover {d.sites.anttila.fluxFirst} to {d.sites.anttila.fluxLast}:
+<Num k="sites.anttila.daysWithNee" digits={0} /> days with gap-filled NEE, of these
+<Num k="sites.anttila.daysLowFrac" digits={0} /> days with a measured fraction below <Num k="method.minFracPct" digits={0} /> %.
+The ley of timothy and red clover was sown on 3 June 2021 with barley as a cover crop
+<Cite ids={['shurpali2025']} note="PDF p. 2, Tables 2 and 4" />. This agrees with the book: a ley can be established in spring
+under a cover crop <Cite ids={['peltokasvien-tuotanto']} note={book('leyEstablishment')} />. The sowing and the first harvest
+of 2021 ({outsideText(d, 'anttila')}) lie before the flux data. They are listed, not drawn.
+
+**Event calendar.** In 2022 and 2023 the site has the calendar of a silage ley with two cuts: a fertilisation in May, the
+first cut on 21 June, a second fertilisation within a week of the first cut, and the second cut on 8 August 2022 and
+19 July 2023. The book gives two or three cuts per season <Cite ids={['peltokasvien-tuotanto']} note={book('silageCuts')} />.
+The yields were <Num k={`${evKey(d, 'anttila', '2022-06-21', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" /> and
+<Num k={`${evKey(d, 'anttila', '2022-08-08', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" /> in 2022, and
+<Num k={`${evKey(d, 'anttila', '2023-06-21', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" /> and
+<Num k={`${evKey(d, 'anttila', '2023-07-19', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" /> in 2023. In 2022 the second
+cut gave the larger yield; in 2023 the first cut did.
+
+<Seasons site="anttila" name="Anttila" />
+
+**Offsets.** <Num k="bySiteKind.anttila.harvest.n" digits={0} /> of <Num k="bySiteKind.anttila.harvest.nSearched" digits={0} />
+searched harvest episodes have a clear GPP drop. The mean offset is <Num k="bySiteKind.anttila.harvest.mean" sign digits={1} unit="d" />
+(SD <Num k="bySiteKind.anttila.harvest.sd" digits={1} />, interval <Num k="bySiteKind.anttila.harvest.ciLo" sign digits={1} />
+to <Num k="bySiteKind.anttila.harvest.ciHi" sign digits={1} /> d). The second cut of 2023 has its largest GPP drop on
+{d.sites.anttila.episodes.find((e) => e.id === 'anttila-2023-07-19')?.detected}, but the step is below the
+<Num k="method.minStepPct" digits={0} /> % rule. The drop of the measured NEE gives the same day as the GPP drop, within
+<Num k="method.agreeDays" digits={0} /> day, for each clear harvest (column "NEE check").
+
+<Episodes site="anttila" name="Anttila" />
+
+**Second dates.** The second cut of 2022 has the date 8 August 2022 in the project event file and 8 September 2022 in
+Shurpali et al. <Cite ids={['shurpali2025']} note="PDF p. 3, Table 2" />. The sources give two dates for this event. The flux
+change is nearer to 2022-08-08 (project event file): the largest GPP drop is <Num k="highlights.anttila-2022-08-08.offsetToUsed" sign digits={0} unit="d" />
+from it and <Num k="highlights.anttila-2022-08-08.offsetToOther" sign digits={0} unit="d" /> from the other date. The step is
+<Num k="highlights.anttila-2022-08-08.stepPct" digits={0} unit="%" /> of the mean GPP of the days before it, and the drop of the measured NEE is on
+the same day (offset <Num k="highlights.anttila-2022-08-08.neeOffset" sign digits={0} unit="d" />).
+
+<Alts site="anttila" name="Anttila" />
+
+### Särkisuo
+
+<Figure
+  id="figure-2"
+  svgFile="analysis/event-timing/figures/2-sarkisuo.svg"
+  view={{ name: 'Särkisuo events', sites: ['sarkisuo'], variables: VARS, yearFrom: 2022, yearTo: 2023, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+**Record.** The flux data cover {d.sites.sarkisuo.fluxFirst} to {d.sites.sarkisuo.fluxLast}:
+<Num k="sites.sarkisuo.daysWithNee" digits={0} /> days with gap-filled NEE, of these
+<Num k="sites.sarkisuo.daysLowFrac" digits={0} /> days with a measured fraction below <Num k="method.minFracPct" digits={0} /> %.
+A mixture of wheat, oat and grasses was sown on 9 June 2021 <Cite ids={['shurpali2025']} note="PDF p. 2, Tables 2 and 4" />.
+This sowing ({outsideText(d, 'sarkisuo')}) lies before the flux data.
+
+**Event calendar.** Särkisuo has the calendar of a silage ley with two cuts of timothy and meadow fescue, the same pattern as at Anttila: a
+fertilisation in late May, the first cut at the end of June, a fertilisation a few days after it, and the second cut on
+15 August in both years. In 2022 the event table also has a herbicide spraying on 8 June and two periods of ditch
+preparation (10 to 17 March and 3 to 15 August). The first cut gave the larger yield in both years
+(<Num k={`${evKey(d, 'sarkisuo', '2022-06-30', 'harvest')}.yieldTHa`} digits={2} /> and
+<Num k={`${evKey(d, 'sarkisuo', '2022-08-15', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" /> in 2022,
+<Num k={`${evKey(d, 'sarkisuo', '2023-06-29', 'harvest')}.yieldTHa`} digits={2} /> and
+<Num k={`${evKey(d, 'sarkisuo', '2023-08-15', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" /> in 2023). This agrees with the
+book <Cite ids={['peltokasvien-tuotanto']} note={book('silageCuts')} />.
+
+<Seasons site="sarkisuo" name="Särkisuo" />
+
+**Offsets.** <Num k="bySiteKind.sarkisuo.harvest.n" digits={0} /> of <Num k="bySiteKind.sarkisuo.harvest.nSearched" digits={0} />
+searched harvest episodes have a clear GPP drop, all on the recorded date (mean <Num k="bySiteKind.sarkisuo.harvest.mean" sign digits={1} unit="d" />,
+SD <Num k="bySiteKind.sarkisuo.harvest.sd" digits={1} />, range <Num k="bySiteKind.sarkisuo.harvest.min" sign digits={0} /> to
+<Num k="bySiteKind.sarkisuo.harvest.max" sign digits={0} /> d). The measured NEE agrees for each of them. The first cut of
+2023 has too few days with GPP for the search. The second cut of 2022 is in one episode with the ditch preparation of August;
+the anchor is the harvest date, 15 August 2022.
+
+<Episodes site="sarkisuo" name="Särkisuo" />
+
+Särkisuo has no event with a second date in another source.
+
+### Haltiala
+
+<Figure
+  id="figure-3"
+  svgFile="analysis/event-timing/figures/3-haltiala.svg"
+  view={{ name: 'Haltiala events', sites: ['haltiala'], variables: VARS, yearFrom: 2021, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+**Record.** The flux data cover {d.sites.haltiala.fluxFirst} to {d.sites.haltiala.fluxLast}:
+<Num k="sites.haltiala.daysWithNee" digits={0} /> days with gap-filled NEE, of these
+<Num k="sites.haltiala.daysLowFrac" digits={0} /> days with a measured fraction below <Num k="method.minFracPct" digits={0} /> %.
+Haltiala has no precipitation in the database; panel (d) is empty. The event "EC system installed" on 7 May 2021 is not a
+field operation.
+
+**Event calendar.** Haltiala is cropland <Cite ids={['haltiala-management']} />. The event table gives:
+
+- 2021: barley sown on 13 May with fertiliser and glyphosate on the same day, a spraying on 10 June, and the harvest on
+  10 September with the threshing on 15 September.
+- 2022: a tillage on 29 April (plate modification) and harrowing on 3 May, oats and a green manure grass sown on 4 and 5 May with fertiliser, and the
+  harvest from 15 to 24 August.
+- 2023: manure on 19 to 21 June and on 1 to 2 August, disc harrowing on 4 to 9 August "to stop the grass", harrowing on
+  15 August and on 8 September. The table has no sowing in 2023; the autumn rye was not sown (field too wet).
+- 2024: harrowing on 8 and 14 May, fertiliser and sunflower sown on 16 May, and crushing of the sunflower crop on 10 to 11 and
+  14 to 15 October.
+- 2025: disc harrowing and harrowing on 10 and 13 May, oats sown with fertiliser on 15 May, Italian ryegrass sown on 6 June,
+  a herbicide on 16 June, the harvest on 3 October and glyphosate on 10 October.
+
+The sowings of barley and oats in May agree with the book: spring cereals are sown in April and May
+<Cite ids={['peltokasvien-tuotanto']} note={book('springCerealCalendar')} />. The fertiliser was given on the sowing day of the
+cereals in 2021, 2022 and 2025, which is the usual practice for spring cereals
+<Cite ids={['peltokasvien-tuotanto']} note={book('springCerealFertilisation')} />. The book has no calendar for sunflower.
+
+<Seasons site="haltiala" name="Haltiala" />
+
+**Offsets.** Harvests: <Num k="bySiteKind.haltiala.harvest.n" digits={0} /> clear of
+<Num k="bySiteKind.haltiala.harvest.nSearched" digits={0} /> searched, offsets from
+<Num k="bySiteKind.haltiala.harvest.min" sign digits={0} /> to <Num k="bySiteKind.haltiala.harvest.max" sign digits={0} /> d
+(range only). Tillage: <Num k="bySiteKind.haltiala.tillage.n" digits={0} /> clear of
+<Num k="bySiteKind.haltiala.tillage.nSearched" digits={0} />, mean <Num k="bySiteKind.haltiala.tillage.mean" sign digits={1} unit="d" />
+(SD <Num k="bySiteKind.haltiala.tillage.sd" digits={1} />, interval <Num k="bySiteKind.haltiala.tillage.ciLo" sign digits={1} />
+to <Num k="bySiteKind.haltiala.tillage.ciHi" sign digits={1} /> d). Sowing episodes: <Num k="bySiteKind.haltiala.sowing.n" digits={0} />
+clear GPP rises, <Num k="bySiteKind.haltiala.sowing.min" sign digits={0} /> and
+<Num k="bySiteKind.haltiala.sowing.max" sign digits={0} /> d after the sowing date.
+
+- **Harvest of oats, 2022.** The largest GPP drop is <Num k={`${E('haltiala-2022-08-15')}.offset`} sign digits={0} unit="d" />
+  from the start of the harvest, on {d.sites.haltiala.episodes.find((e) => e.id === 'haltiala-2022-08-15')?.detected}, the
+  first day of the search. The mean GPP of the <Num k="method.windowDays" digits={0} /> days before the harvest was
+  <Num k={`${E('haltiala-2022-08-15')}.before.mean.gpp`} unit={U} /> (n = <Num k={`${E('haltiala-2022-08-15')}.before.n.gpp`} digits={0} /> days).
+  The low GPP before the harvest may reflect the ripening of the crop; the event table has no record of the crop stage. The
+  book says that cereals start to ripen from the end of July, and that the leaves die at ripening
+  <Cite ids={['peltokasvien-tuotanto']} note={book('cerealRipening')} />. At the harvest of 2021 the mean GPP of the
+  <Num k="method.windowDays" digits={0} /> days before was <Num k={`${E('haltiala-2021-09-10')}.before.mean.gpp`} unit={U} />
+  (n = <Num k={`${E('haltiala-2021-09-10')}.before.n.gpp`} digits={0} /> days), below the level of the rule; the test is not clear.
+- **Disc harrowing, August 2023.** GPP fell by <Num k={`${E('haltiala-2023-08-01')}.change.gpp`} abs unit={U} />
+  (<Num k={`${E('haltiala-2023-08-01')}.change.gppPct`} digits={0} unit="%" />), and NEE rose by
+  <Num k={`${E('haltiala-2023-08-01')}.change.nee`} unit={U} />. The drop is on 1 August, the first day of the manure event; this is
+  <Num k={`${E('haltiala-2023-08-01')}.offset`} sign digits={0} unit="d" /> from the first tillage date (the anchor).
+- **Sowings.** In 2021 the GPP rise came <Num k={`${E('haltiala-2021-05-13')}.sowingRise.offset`} digits={0} unit="d" /> after
+  the sowing of barley. The oats sowing of 15 May 2025 (<Num k={`${E('haltiala-2025-05-10')}.sowingRise.offset`} sign digits={0} unit="d" />)
+  and the ryegrass sowing of 6 June 2025 (<Num k={`${E('haltiala-2025-06-06')}.sowingRise.offset`} sign digits={0} unit="d" />)
+  give the same detected day, {d.sites.haltiala.episodes.find((e) => e.id === 'haltiala-2025-06-06')?.detected}. The two tests
+  cannot be separated. The sunflower rise of 2024 is at the end of the search span
+  (<Num k={`${E('haltiala-2024-05-08')}.sowingRise.offset`} sign digits={0} unit="d" />).
+
+<Episodes site="haltiala" name="Haltiala" />
+
+**Second dates.** The manganese fertiliser Jett Mn235 was in a tank mix with the herbicide of 16 June 2025. The parcel card
+gives 16 June 2025 and the management file gives 16 May 2025 <Cite ids={['haltiala-management']} />. The sources give two dates
+for this event. The database type is spraying, which has no change-point test, so the flux gives no "nearer" date.
+
+<Alts site="haltiala" name="Haltiala" />
+
+<Notes site="haltiala" />
+
+### Qvidja
+
+<Figure
+  id="figure-4"
+  svgFile="analysis/event-timing/figures/4-qvidja.svg"
+  view={{ name: 'Qvidja events', sites: ['qvidja'], variables: VARS, yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+**Record.** The flux data cover {d.sites.qvidja.fluxFirst} to {d.sites.qvidja.fluxLast}:
+<Num k="sites.qvidja.daysWithNee" digits={0} /> days with gap-filled NEE, of these
+<Num k="sites.qvidja.daysLowFrac" digits={0} /> days with a measured fraction below <Num k="method.minFracPct" digits={0} /> %.
+Qvidja is a forage grassland.
+
+**Event calendar.** From 2018 to 2020 the ley had two silage harvests per year, in June and in August or September, with
+organic and mineral fertilisers in spring and between the harvests <Cite ids={['qvidja-management']} />. This is the two-cut calendar
+of the book <Cite ids={['peltokasvien-tuotanto']} note={book('silageCuts')} />. The first harvest gave the larger yield in each
+of these years, for example <Num k={`${evKey(d, 'qvidja', '2019-06-11', 'harvest')}.yieldTHa`} digits={2} /> and
+<Num k={`${evKey(d, 'qvidja', '2019-08-20', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" /> in 2019. In 2018 the event
+table records an oversowing on 3 September after drought damage, and the second harvest was small
+(<Num k={`${evKey(d, 'qvidja', '2018-09-23', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" />). The book states that a dry
+spell after the first harvest can slow or prevent the regrowth <Cite ids={['peltokasvien-tuotanto']} note={book('drySpellRegrowth')} />.
+From 2021 the calendar changes: harrowing in April 2021, one or two silage harvests per year from 2021 to 2024, cleaning cuts
+that leave the grass on the field, and subsoiling and cultivation on 7 September 2023. Heimsch et al. report cows on the field in August 2021 and
+August 2022 <Cite ids={['heimsch2024']} note="PDF p. 2" />. The management file records horses in 2021
+<Cite ids={['qvidja-management']} />; the two sources differ in the animals and in the days. The event table has grazing also
+in 2024 and 2025. In 2025 the event table
+has only grazing.
+
+<Seasons site="qvidja" name="Qvidja" />
+
+**Offsets.** Harvests: <Num k="bySiteKind.qvidja.harvest.n" digits={0} /> clear of
+<Num k="bySiteKind.qvidja.harvest.nSearched" digits={0} /> searched, mean <Num k="bySiteKind.qvidja.harvest.mean" sign digits={1} unit="d" />
+(SD <Num k="bySiteKind.qvidja.harvest.sd" digits={1} />, interval <Num k="bySiteKind.qvidja.harvest.ciLo" sign digits={1} />
+to <Num k="bySiteKind.qvidja.harvest.ciHi" sign digits={1} /> d, median <Num k="bySiteKind.qvidja.harvest.median" digits={0} /> d).
+Cuts: <Num k="bySiteKind.qvidja.cut.nClear" digits={0} /> clear of <Num k="bySiteKind.qvidja.cut.nSearched" digits={0} />;
+the cleaning cuts leave the grass on the field, and their GPP steps are below the rule. Grazing:
+<Num k="bySiteKind.qvidja.grazing.n" digits={0} /> clear, mean <Num k="bySiteKind.qvidja.grazing.mean" sign digits={1} unit="d" />
+(SD <Num k="bySiteKind.qvidja.grazing.sd" digits={1} />, interval <Num k="bySiteKind.qvidja.grazing.ciLo" sign digits={1} /> to
+<Num k="bySiteKind.qvidja.grazing.ciHi" sign digits={1} /> d). Tillage: <Num k="bySiteKind.qvidja.tillage.n" digits={0} /> clear,
+both at <Num k="bySiteKind.qvidja.tillage.max" sign digits={0} unit="d" />. The oversowing of 2018 has no clear rise, and its
+search reads days of another episode.
+
+- **Harvest of 14 June 2021.** The GPP drop is on the recorded date (offset <Num k="highlights.qvidja-2021-06-14.offset" sign digits={0} unit="d" />,
+  step <Num k="highlights.qvidja-2021-06-14.stepPct" digits={0} unit="%" /> of the mean GPP of the days before it), and the drop of the measured NEE
+  is <Num k="highlights.qvidja-2021-06-14.neeOffset" sign digits={0} unit="d" /> from it.
+- **Harvest of 23 June 2020.** The largest GPP drop is <Num k="highlights.qvidja-2020-06-23.offset" sign digits={0} unit="d" />
+  from the recorded date, but the step is <Num k="highlights.qvidja-2020-06-23.stepPct" digits={1} unit="%" /> of the mean GPP of the days before it,
+  just below the rule. The test is not clear.
+- **Harvest of 20 June 2023.** The largest GPP drop is at the first day of the search
+  (<Num k={`${E('qvidja-2023-06-19')}.offset`} sign digits={0} unit="d" />). The yield was small
+  (<Num k={`${evKey(d, 'qvidja', '2023-06-20', 'harvest')}.yieldTHa`} digits={2} unit="t DW/ha" />), and GPP changed by only
+  <Num k={`${E('qvidja-2023-06-19')}.change.gpp`} sign unit={U} /> over the 7-day windows.
+- **Grazing of August 2022.** The largest GPP drop came <Num k="highlights.qvidja-2022-08-05.offset" sign digits={0} unit="d" />
+  after the start of the grazing, which lasted to 19 August. The drop of the measured NEE is on the start day
+  (<Num k="highlights.qvidja-2022-08-05.neeOffset" sign digits={0} unit="d" />). The two change points do not agree. A grazing
+  takes days, and the animals move between small paddocks in the footprint <Cite ids={['heimsch2024']} note="PDF p. 2" />.
+
+<Episodes site="qvidja" name="Qvidja" />
+
+**Second dates.** Qvidja has <Num k="sites.qvidja.alternativeDates.length" digits={0} /> events with a second date. Most
+of the second dates come from the management file of the site <Cite ids={['qvidja-management']} />. The table gives both dates and the
+offsets to both. These cases have the largest differences:
+
+- **Harvest of 2021.** The sources give two dates for this event. The flux change is nearer to 2021-06-14 (project event
+  file): offset <Num k={`${altKey(d, 'qvidja', '2021-06-14')}.offsetToUsed`} sign digits={0} unit="d" />, and
+  <Num k={`${altKey(d, 'qvidja', '2021-06-14')}.offsetToOther`} sign digits={0} unit="d" /> from 2021-06-21 (management file).
+- **First harvest of 2020.** The management file gives 11 June 2020 and the project event file 23 June 2020. The largest GPP
+  drop is <Num k={`${altKey(d, 'qvidja', '2020-06-23')}.offsetToUsed`} sign digits={0} unit="d" /> from 23 June and
+  <Num k={`${altKey(d, 'qvidja', '2020-06-23')}.offsetToOther`} sign digits={0} unit="d" /> from 11 June. The step is below
+  the rule, so the test gives no "nearer" date.
+- **Grazing of 2021 and 2022.** The management file gives grazing from 1 June in both years. The project event file and
+  Heimsch et al. give August <Cite ids={['heimsch2024']} note="PDF p. 2" />. The flux change is nearer to the August dates
+  (offsets <Num k={`${altKey(d, 'qvidja', '2021-08-23')}.offsetToUsed`} sign digits={0} unit="d" /> and
+  <Num k={`${altKey(d, 'qvidja', '2022-08-05')}.offsetToUsed`} sign digits={0} unit="d" />, against
+  <Num k={`${altKey(d, 'qvidja', '2021-08-23')}.offsetToOther`} sign digits={0} unit="d" /> and
+  <Num k={`${altKey(d, 'qvidja', '2022-08-05')}.offsetToOther`} sign digits={0} unit="d" /> from 1 June).
+
+The two fertilisations with a second date have no change-point test. For the mineral fertiliser of 2019, Heimsch et al. give
+20 June in their Table 1 and 26 June in the text <Cite ids={['heimsch2021']} note="PDF p. 3 and 4" />. For the own NPK mix of
+2020, the management file gives 25 May and Heimsch et al. give about 26 May <Cite ids={['heimsch2024']} note="PDF p. 7" />; the
+project event file gives 27 July.
+
+<Alts site="qvidja" name="Qvidja" />
+
+<Notes site="qvidja" />
+
+### Viikki
+
+<Figure
+  id="figure-5"
+  svgFile="analysis/event-timing/figures/5-viikki.svg"
+  view={{ name: 'Viikki events', sites: ['viikki'], variables: VARS, yearFrom: 2022, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+**Record.** The flux data cover {d.sites.viikki.fluxFirst} to {d.sites.viikki.fluxLast}:
+<Num k="sites.viikki.daysWithNee" digits={0} /> days with gap-filled NEE, of these
+<Num k="sites.viikki.daysLowFrac" digits={0} /> days with a measured fraction below <Num k="method.minFracPct" digits={0} /> %.
+
+**Event calendar.** Viikki is a field in rotation <Cite ids={['viikki-management', 'gao2026']} />:
+
+- 2022, timothy ley: mineral fertiliser on 10 May, cuts on 1 July and 27 August, tillage on 1 November. Two cuts agree with
+  the book <Cite ids={['peltokasvien-tuotanto']} note={book('silageCuts')} />.
+- 2023: dry manure on 27 April and a levelling harrow on 28 April; on 25 May, tillage, mineral N and barley sown with a grass
+  seed mixture under it; micronutrients on 21 June; cuts on 17 and 24 August. A barley sowing in May agrees with the book
+  <Cite ids={['peltokasvien-tuotanto']} note={book('springCerealCalendar')} />, and so does a ley under a cover crop
+  <Cite ids={['peltokasvien-tuotanto']} note={book('leyEstablishment')} />.
+- 2024, grassland: mineral fertiliser on 8 May and liquid manure on 22 May; hay cuts on 14 June (only about one hectare) and
+  31 July; a herbicide on 16 September; manure and tillage on 9 October.
+- 2025, fava bean: tillage on 8 to 9 May, fertiliser on 10 May, harvest on 10 September. The event table has no sowing date
+  for the fava bean. Thus the growing time of the book (<Num k="literatureByKey.favaBeanGrowingTime.value" digits={0} unit="days" />
+  <Cite ids={['peltokasvien-tuotanto']} note={book('favaBeanGrowingTime')} />) cannot be compared with the record.
+
+<Seasons site="viikki" name="Viikki" />
+
+**Offsets.** Harvests: <Num k="bySiteKind.viikki.harvest.n" digits={0} /> clear of
+<Num k="bySiteKind.viikki.harvest.nSearched" digits={0} /> searched, mean <Num k="bySiteKind.viikki.harvest.mean" sign digits={1} unit="d" />
+(SD <Num k="bySiteKind.viikki.harvest.sd" digits={1} />, interval <Num k="bySiteKind.viikki.harvest.ciLo" sign digits={1} />
+to <Num k="bySiteKind.viikki.harvest.ciHi" sign digits={1} /> d). Tillage: <Num k="bySiteKind.viikki.tillage.n" digits={0} />
+clear of <Num k="bySiteKind.viikki.tillage.nSearched" digits={0} />, offsets <Num k="bySiteKind.viikki.tillage.min" sign digits={0} />
+and <Num k="bySiteKind.viikki.tillage.max" sign digits={0} /> d (range only). The other tillage episodes come when the GPP
+before is below the level of the rule (autumn and early spring). The Reco rise is clear for each of the tillage episodes
+except May 2023 (column "Other tests"). The hay cut of 14 June 2024, on about one hectare only, has a step below the rule.
+The cut of 27 August 2022 has its largest drop <Num k={`${E('viikki-2022-08-27')}.offset`} sign digits={0} unit="d" /> from
+the recorded date. After the barley sowing of 25 May 2023, the GPP rise came
+<Num k={`${E('viikki-2023-05-25')}.sowingRise.offset`} digits={0} unit="d" /> later. The measured NEE has few day-time values
+at Viikki: only <Num k="dataVersion.steps.daily.perSite.viikki.daysWithMeasuredNee" digits={0} /> days have enough measured
+day-time half hours for a daily value. Thus the NEE check has few results there.
+
+<Episodes site="viikki" name="Viikki" />
+
+**Second dates.** The tillage of autumn 2022 has the date 1 November 2022 in the project event file and in Gao et al.
+<Cite ids={['gao2026']} note="PDF p. 13, Table A2" />, and 2 November 2022 in the Viikki management file. The sources give two
+dates for this event. The GPP before was too low for a clear drop. The Reco rise is clear and is nearer to 2022-11-01:
+<Num k={`${altKey(d, 'viikki', '2022-11-01')}.recoRise.offset`} sign digits={0} unit="d" /> from it and
+<Num k={`${altKey(d, 'viikki', '2022-11-01')}.recoRise.offsetToOther`} sign digits={0} unit="d" /> from 2022-11-02.
+
+<Alts site="viikki" name="Viikki" />
+
+<Notes site="viikki" />
+
+### Maktau
+
+<Figure
+  id="figure-6"
+  svgFile="analysis/event-timing/figures/6-maktau.svg"
+  view={{ name: 'Maktau events', sites: ['maktau'], variables: VARS, yearFrom: 2018, yearTo: 2024, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+**Record.** The flux data cover {d.sites.maktau.fluxFirst} to {d.sites.maktau.fluxLast}:
+<Num k="sites.maktau.daysWithNee" digits={0} /> days with gap-filled NEE, of these
+<Num k="sites.maktau.daysLowFrac" digits={0} /> days with a measured fraction below <Num k="method.minFracPct" digits={0} /> %.
+<Num k="sites.maktau.daysNoNeeInFluxPeriod" digits={0} /> days in the flux period have no NEE. Maktau has no gap filling by
+the provider: its gap-filled NEE, GPP and Reco come from the MDS gap filling and the partitioning of this project
+<Cite ids={['calculated-doc']} />. The site is in UTC+3.
+
+**Event calendar.** The event table has <Num k="counts.eventsPerSite.maktau" digits={0} /> events, all from Räsänen et al.
+<Cite ids={['rasanen2026']} note="PDF p. 3" />. In 2019 the rains came late. The maize was planted on 12 April after a rain in
+the second week of April. It was harvested on 13 August, <Num k="literatureByKey.maktauPlanting.valueMin" digits={0} /> days later.
+In 2020 the maize was planted in the third week of March and harvested on 30 July, <Num k="literatureByKey.maktauPlanting.valueMax" digits={0} />
+days after the planting. The 2020 planting has no day and is not a database row. The book gives the maize calendar for
+Finland only <Cite ids={['peltokasvien-tuotanto']} note={book('maizeCalendar')} />; it has no calendar for Kenya. Maktau has no
+thermal season. Months with more than <Num k="method.wetMonthMm" digits={0} unit="mm" /> of precipitation:
+{wetMonthsText(d)}.
+
+<div class="table-wrap">
+<table>
+<caption>Maktau: days with gap-filled NEE per year, days with a measured fraction of NEE of {d.method.minFracPct} % or more, the wet months (precipitation sum above the limit) and the recorded events per type.</caption>
+<thead>
+<tr><th scope="col">Year</th><th scope="col" class="num">Days with NEE</th><th scope="col" class="num">Days measured</th><th scope="col">Wet months</th><th scope="col">Events</th><th scope="col" class="num">Episodes</th></tr>
+</thead>
+<tbody>
+{seasonRows(d, 'maktau').map((r) => (<tr id={r.id}><td>{r.year}</td><td class="num">{r.days}</td><td class="num">{r.measured}</td><td class="wrap">{r.season}</td><td class="wrap">{r.events}</td><td class="num">{r.episodes}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+**Offsets.** Harvest: <Num k="bySiteKind.maktau.harvest.n" digits={0} /> clear of
+<Num k="bySiteKind.maktau.harvest.nSearched" digits={0} />. The harvest of 2020 has its largest GPP drop
+<Num k={`${E('maktau-2020-07-30')}.offset`} sign digits={0} unit="d" /> from the recorded date, at the first day of the
+search. The mean GPP of the <Num k="method.windowDays" digits={0} /> days before was
+<Num k={`${E('maktau-2020-07-30')}.before.mean.gpp`} unit={U} /> (n = <Num k={`${E('maktau-2020-07-30')}.before.n.gpp`} digits={0} /> days). The drop of the measured
+NEE is <Num k={`${E('maktau-2020-07-30')}.neeDrop.offset`} sign digits={0} unit="d" /> from the recorded date. The harvest of 2019 and the
+sowing of 2019 have no clear step. After the sowing, the largest GPP rise is
+<Num k={`${E('maktau-2019-04-12')}.sowingRise.offset`} digits={0} unit="d" /> later, below the rule.
+
+<Episodes site="maktau" name="Maktau" />
+
+<Notes site="maktau" />
+
+### Sites compared
+
+<Figure
+  id="figure-7"
+  svgFile="analysis/event-timing/figures/7-offsets.svg"
+  view={{ name: 'Event timing, all sites', sites: ALL_SITES, variables: ['gpp', 'reco', 'nee_f'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+Figure 7 shows the offset of each searched episode. For harvests and cuts together, <Num k="byKind.harvestCut.n" digits={0} />
+of <Num k="byKind.harvestCut.nSearched" digits={0} /> searched episodes have a clear GPP drop. The mean offset is
+<Num k="byKind.harvestCut.mean" sign digits={1} unit="d" /> (SD <Num k="byKind.harvestCut.sd" digits={1} />, interval
+<Num k="byKind.harvestCut.ciLo" sign digits={1} /> to <Num k="byKind.harvestCut.ciHi" sign digits={1} /> d):
+<Num k="byKind.harvestCut.nBefore" digits={0} /> before, <Num k="byKind.harvestCut.nOn" digits={0} /> on and
+<Num k="byKind.harvestCut.nAfter" digits={0} /> after the recorded date. Grazing has a wide spread (range
+<Num k="byKind.grazing.min" sign digits={0} /> to <Num k="byKind.grazing.max" sign digits={0} /> d). Tillage is close to the
+recorded date (mean <Num k="byKind.tillage.mean" sign digits={1} unit="d" />, SD <Num k="byKind.tillage.sd" digits={1} />,
+interval <Num k="byKind.tillage.ciLo" sign digits={1} /> to <Num k="byKind.tillage.ciHi" sign digits={1} /> d). The grey pairs
+show the events with a second date.
+
+<div class="table-wrap">
+<table>
+<caption>Offsets of the clear change points per episode kind, all sites (days; negative = before the recorded date). Episodes = episodes of the kind. Clear = clear tests of the searched tests. Mean ± SD [{d.method.ciLevelPct} % interval]; the interval only with three or more values. Before / on / after = offsets below, at and above zero. The last four rows are the tests over all episodes that have the test.</caption>
+<thead>
+<tr><th scope="col">Kind and test</th><th scope="col" class="num">Episodes</th><th scope="col" class="num">Clear</th><th scope="col" class="num">Mean offset</th><th scope="col" class="num">Median</th><th scope="col" class="num">Range</th><th scope="col" class="num">Before / on / after</th></tr>
+</thead>
+<tbody>
+{kinds.map((r) => (<tr id={r.id}><td>{r.kind}</td><td class="num">{r.episodes}</td><td class="num">{r.clear}</td><td class="num">{r.mean}</td><td class="num">{r.median}</td><td class="num">{r.range}</td><td class="num">{r.split}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+- **GPP rise after sowing.** Over all episodes with a sowing, <Num k="tests.sowingRise.n" digits={0} /> of
+  <Num k="tests.sowingRise.nSearched" digits={0} /> searched tests are clear. The rise came
+  <Num k="tests.sowingRise.mean" digits={1} unit="d" /> after the sowing on average (SD <Num k="tests.sowingRise.sd" digits={1} />,
+  interval <Num k="tests.sowingRise.ciLo" digits={1} /> to <Num k="tests.sowingRise.ciHi" digits={1} /> d). The book gives no
+  days to emergence for cereals or grasses; we do not compare this value with it.
+- **Reco rise at tillage.** <Num k="tests.recoRiseTillage.n" digits={0} /> of <Num k="tests.recoRiseTillage.nSearched" digits={0} />
+  tests are clear. Mean <Num k="tests.recoRiseTillage.mean" sign digits={1} unit="d" /> (SD <Num k="tests.recoRiseTillage.sd" digits={1} />,
+  interval <Num k="tests.recoRiseTillage.ciLo" sign digits={1} /> to <Num k="tests.recoRiseTillage.ciHi" sign digits={1} /> d).
+  <Num k="tests.recoRiseTillage.nBefore" digits={0} /> of them come before the recorded date. The interval includes zero.
+- **Measured NEE.** <Num k="tests.neeAgree.nBothClear" digits={0} /> episodes have a clear GPP drop and a clear drop of the
+  measured NEE. In <Num k="tests.neeAgree.nAgree" digits={0} /> of them the two days differ by
+  <Num k="tests.neeAgree.agreeDays" digits={0} /> day or less. The other episodes are at Qvidja (grazing and harvests) and at
+  Maktau (harvest of 2020).
+
+<Figure
+  id="figure-8"
+  svgFile="analysis/event-timing/figures/8-course.svg"
+  view={{ name: 'Event course, all sites', sites: ALL_SITES, variables: ['gpp', 'reco', 'nee_f'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+Figure 8 shows the mean course around the recorded date, in percent of the mean of the <Num k="method.windowDays" digits={0} />
+days before. Over days <Num k="method.afterDays.0" sign digits={0} /> to <Num k="method.afterDays.1" sign digits={0} />,
+the mean GPP after a harvest or cut was <Num k="course.groups.harvestCut.gpp.meanDays1to7" digits={0} unit="%" /> of the GPP
+before (n = <Num k="course.groups.harvestCut.episodes" digits={0} /> episodes; the change of GPP per episode is
+<Num k="changes.harvestCut.gppPct.mean" sign digits={0} unit="%" />, SD <Num k="changes.harvestCut.gppPct.sd" digits={0} />,
+interval <Num k="changes.harvestCut.gppPct.ciLo" sign digits={0} /> to <Num k="changes.harvestCut.gppPct.ciHi" sign digits={0} /> %,
+n = <Num k="changes.harvestCut.gppPct.n" digits={0} />), and Reco was
+<Num k="course.groups.harvestCut.reco.meanDays1to7" digits={0} unit="%" /> of the Reco before. After tillage, GPP was
+<Num k="course.groups.tillage.gpp.meanDays1to7" digits={0} unit="%" /> (n = <Num k="course.groups.tillage.episodes" digits={0} />;
+per episode <Num k="changes.tillage.gppPct.mean" sign digits={0} unit="%" />, SD <Num k="changes.tillage.gppPct.sd" digits={0} />,
+n = <Num k="changes.tillage.gppPct.n" digits={0} />); the GPP before was low, so NEE in percent of it is large. After
+fertilisation, GPP was <Num k="course.groups.fertilisation.gpp.meanDays1to7" digits={0} unit="%" /> of the GPP before
+(n = <Num k="course.groups.fertilisation.episodes" digits={0} />; per episode
+<Num k="changes.fertilisation.gppPct.mean" sign digits={0} unit="%" />, SD <Num k="changes.fertilisation.gppPct.sd" digits={0} />,
+interval <Num k="changes.fertilisation.gppPct.ciLo" sign digits={0} /> to <Num k="changes.fertilisation.gppPct.ciHi" sign digits={0} /> %,
+n = <Num k="changes.fertilisation.gppPct.n" digits={0} />). Many of the fertilisations are in May. In May, GPP
+can increase with the season also without a fertiliser. The band in the figure is the 25 to 75 % range of the episodes. The table below gives the SD and the
+interval of each change.
+
+<div class="table-wrap">
+<table>
+<caption>Changes in the {d.method.windowDays} days after the episode minus the {d.method.windowDays} days before, per episode kind, all sites (g C m⁻² d⁻¹; ΔGPP also in % of the GPP before, only when the GPP before is {d.method.minBefore} g C m⁻² d⁻¹ or more). Mean ± SD [{d.method.ciLevelPct} % interval]; the interval only with three or more values. n = episodes with both windows.</caption>
+<thead>
+<tr><th scope="col">Kind</th><th scope="col" class="num">n</th><th scope="col" class="num">ΔGPP</th><th scope="col" class="num">ΔGPP (%)</th><th scope="col" class="num">ΔReco</th><th scope="col" class="num">ΔNEE</th></tr>
+</thead>
+<tbody>
+{changes.map((r) => (<tr id={r.id}><td>{r.kind}</td><td class="num">{r.n}</td><td class="num">{r.gpp}</td><td class="num">{r.gppPct}</td><td class="num">{r.reco}</td><td class="num">{r.nee}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+- **Harvest.** GPP fell by <Num k="changes.harvest.gpp.mean" abs unit={U} /> (n = <Num k="changes.harvest.gpp.n" digits={0} />,
+  SD <Num k="changes.harvest.gpp.sd" />, interval <Num k="changes.harvest.gpp.ciLo" sign /> to <Num k="changes.harvest.gpp.ciHi" sign />),
+  or <Num k="changes.harvest.gppPct.mean" abs digits={0} unit="%" /> of the GPP before (n = <Num k="changes.harvest.gppPct.n" digits={0} />,
+  SD <Num k="changes.harvest.gppPct.sd" digits={0} />).
+  Reco changed by <Num k="changes.harvest.reco.mean" sign unit={U} /> (interval <Num k="changes.harvest.reco.ciLo" sign /> to
+  <Num k="changes.harvest.reco.ciHi" sign />). Thus the NEE rise after a harvest is associated mainly with the lower GPP.
+- **Fertilisation.** GPP rose by <Num k="changes.fertilisation.gpp.mean" unit={U} /> (n = <Num k="changes.fertilisation.gpp.n" digits={0} />,
+  SD <Num k="changes.fertilisation.gpp.sd" />, interval <Num k="changes.fertilisation.gpp.ciLo" sign /> to
+  <Num k="changes.fertilisation.gpp.ciHi" sign />). For the fertilisation-only episodes,
+  <a href={`${base}deep-dive/fertilisation-weather/`}>Deep Dive #5</a> found no clear change of GPP beyond the change that the
+  weather of the same days explains.
+- **Cuts that leave the grass on the field** (Qvidja, n = <Num k="changes.cut.n" digits={0} />): GPP changed by
+  <Num k="changes.cut.gpp.mean" sign unit={U} /> (SD <Num k="changes.cut.gpp.sd" />, interval <Num k="changes.cut.gpp.ciLo" sign />
+  to <Num k="changes.cut.gpp.ciHi" sign />). <a href={`${base}deep-dive/disturbance-detail/`}>Deep Dive #4</a> also found no
+  GPP drop at the cleaning cuts.
+
+**Comparison with Deep Dive #4.** <a href={`${base}deep-dive/disturbance-detail/`}>Deep Dive #4</a> measured the offset of the
+GPP drop for harvests and cuts only: <Num dive="disturbance-detail" k="timing.all.nClear" digits={0} /> clear of
+<Num dive="disturbance-detail" k="timing.all.n" digits={0} /> episodes, mean <Num dive="disturbance-detail" k="timing.all.offsets.mean" sign digits={1} unit="d" />
+(SD <Num dive="disturbance-detail" k="timing.all.offsets.sd" digits={2} />). This dive repeats the test on all kinds and all
+six sites, with <Num k="method.windowDays" digits={0} />-day windows and the whole record of each site. Thus the numbers are
+not identical. The sign of the result is the same: the GPP drop of a harvest comes on or a little before the recorded date.
+<a href={`${base}deep-dive/disturbance-size/`}>Deep Dive #1</a> gives the size of the changes with the same episode rule.
+
+## Limits and uncertainty
+
+- **Time stamps.** The raw time stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as UTC+2
+  (<a href={`${base}data-report/#finding-ANT-01`}>ANT-01</a>, <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a>,
+  <a href={`${base}data-report/#finding-VII-01`}>VII-01</a>; status: waits for provider). A local day of these sites thus starts
+  <Num k="method.utcShiftHours" digits={0} /> hours after true local midnight. The day-time window of the measured NEE is
+  <Num k="method.utcShiftHours" digits={0} /> hours later in true local time. A day has
+  <Num k="method.halfHoursPerDay" digits={0} /> half hours; the shift moves only the first hours of a day. A daily change point
+  can thus move by not more than one day.
+- **Gap filling.** GPP and Reco are model values from the gap-filled NEE <Cite ids={['calculated-doc']} />. Many days have a
+  low measured fraction: Qvidja <Num k="sites.qvidja.daysLowFrac" digits={0} /> of <Num k="sites.qvidja.daysWithNee" digits={0} />,
+  Viikki <Num k="sites.viikki.daysLowFrac" digits={0} /> of <Num k="sites.viikki.daysWithNee" digits={0} /> and Maktau
+  <Num k="sites.maktau.daysLowFrac" digits={0} /> of <Num k="sites.maktau.daysWithNee" digits={0} /> days. A gap-filled day
+  near an event can move or smooth a step. At Viikki, the 2024 gap-filled NEE differs from the measured NEE in many periods
+  (<a href={`${base}data-report/#finding-VII-05`}>VII-05</a>; status: waits for provider).
+- **Small n.** Many site and kind cells have fewer than three clear change points; the text gives the range for them.
+  Intervals that rest on fewer than about ten values are not reliable.
+- **Search edges.** A detected day at the first day of the search (offset <Num k="method.searchFrom" sign digits={0} unit="d" />)
+  can mean that the largest step lies before the span. This occurs for the oats harvest of Haltiala in 2022, the harvest of
+  Qvidja on 20 June 2023 and the harvest of Maktau in 2020. For the Haltiala oats, the low GPP before the harvest may reflect
+  the ripening of the crop, which the book puts from the end of July on <Cite ids={['peltokasvien-tuotanto']} note={book('cerealRipening')} />;
+  the event table has no record of the crop stage.
+  The sunflower rise of Haltiala in 2024 is at the end of the sowing search.
+- **Events before the flux data.** <Num k="counts.outsideFluxPeriod" digits={0} /> episodes (the sowings of Anttila and
+  Särkisuo and the first harvest of Anttila in 2021) lie before the flux data. They are listed, not tested.
+- **Season rule.** The run of <Num k="method.seasonRunDays" digits={0} /> days is our rule, not the rule of the book. In warm
+  autumns it gives a late end, for example in December 2024 and 2025. At Qvidja in 2025 no run ends the season before the end
+  of the year.
+- **Book.** The book gives the crop calendar. It does not give the days to emergence of cereals
+  or grasses, the calendar dates of cuts, the regrowth days, the timing of grazing, the calendar of sunflower, maize in Kenya,
+  or anything on GPP, Reco, NEE or eddy covariance. We do not cite it for these.
+- **Sources.** For <Num k="counts.nAltDates" digits={0} /> events the sources give a second date. The database keeps one date
+  per event. The tables of each site list the second dates.
+- **Weather and meteorology gaps.** The Qvidja rain gauge has a gap from 29 December 2021 to 24 May 2022
+  (<a href={`${base}data-report/#finding-QVI-08`}>QVI-08</a>; status: waits for provider). All Qvidja meteorology is lost from
+  11 February to 1 March 2023 (<a href={`${base}data-report/#finding-QVI-09`}>QVI-09</a>; status: resolved); no event is in this
+  period. Haltiala has no precipitation in the database. The Maktau findings
+  <a href={`${base}data-report/#finding-MKT-01`}>MKT-01</a> (status: resolved),
+  <a href={`${base}data-report/#finding-MKT-02`}>MKT-02</a> (status: open) and
+  <a href={`${base}data-report/#finding-MKT-03`}>MKT-03</a> (status: waits for provider) are outside the event years 2019 and
+  2020 <Cite ids={['anomaly-report']} />.
+- **Maktau.** The gap-filled values of Maktau come from the MDS gap filling of this project, not from the provider. Maktau has
+  no NEE quality flag; all its NEE values count as measured in the NEE check.
+- **Association.** The changes and the change points are *associated with* the events. The weather, the season and the crop
+  stage also change in the same days. The analysis does not show that an event caused a change.
+- **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
+  identify it.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `analysis/event-timing/results.json`. The Python script
+<a href={`${REPO_URL}/blob/main/analysis/event-timing/event-timing.py`}><code>analysis/event-timing/event-timing.py</code></a>
+writes this file, `manifest.json` and the eight SVG figures. It reads only the database snapshot built on
+{d.dataVersion.snapshot.builtAt} (`db/events.parquet`, `db/sites.parquet`, `db/observations.parquet`,
+`db/variables.parquet`) and `data/calculated/daily.parquet` of the same build. Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
+The table gives the SHA-256 and the row count of each file (the paths are relative to the `--db` and `--calculated`
+folders); the script stops when a hash does not agree. The folder
+<a href={`${REPO_URL}/tree/main/analysis/event-timing`}><code>analysis/event-timing/</code></a> has the lock file, the unit
+tests and a README.
+
+<div class="table-wrap">
+<table>
+<caption>Input files of the snapshot (database built {d.dataVersion.snapshot.builtAt}, calculated data built {d.dataVersion.snapshot.calcBuiltAt}).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col">SHA-256</th><th scope="col" class="num">Rows</th></tr>
+</thead>
+<tbody>
+{inputs.map((r) => (<tr><td>{r.path}</td><td class="wrap"><code>{r.sha256}</code></td><td class="num">{r.rows}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+```sh
+npm run build:db && npm run calc                 # make the inputs (the hashes must agree with the script)
+uv run analysis/event-timing/event-timing.py --db db --calculated data/calculated
+uv run analysis/event-timing/event-timing.py --db db --calculated data/calculated --check
+npm run deep-dives -- --check                    # all dives, TypeScript and Python
+```

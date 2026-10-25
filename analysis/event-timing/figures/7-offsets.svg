@@ -1,0 +1,1264 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="317.232pt" viewBox="0 0 510.23622 317.232" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="event-timing-fig7-title event-timing-fig7-desc">
+ <title id="event-timing-fig7-title">Offset of the largest daily GPP change from the recorded date of each harvest, cut, grazing, tillage and sowing episode, per site. Filled markers are clear change points; grey markers show the offset to the other date of the same event in another source.</title>
+ <desc id="event-timing-fig7-desc">Strip plot. X axis: detected day minus recorded date (days, -15 to +45; negative = the flux changed before the recorded date). One row per site; the row label gives the clear and the searched episodes. Marker shape = episode kind (circle harvest or cut, square grazing, triangle tillage, diamond sowing with a GPP rise); open = not clear. Harvest or cut: 23 clear of 33 searched, mean offset −2.0 d, SD 3.7, median 0.0 d, 95 % CI −3.5 to −0.6; 10 before, 9 on and 4 after the recorded date. Grazing: 5 clear of 5 searched, mean offset 2.8 d, SD 6.6, median 1.0 d, 95 % CI −2.2 to 8.0; 2 before, 0 on and 3 after the recorded date. Tillage: 8 clear of 13 searched, mean offset −0.1 d, SD 1.9, median 0.0 d, 95 % CI −1.4 to 1.0; 4 before, 0 on and 4 after the recorded date. Sowing: 2 clear of 3 searched, mean offset 16.5 d, SD 13.4, median 16.5 d, range 7 to 26; 0 before, 0 on and 2 after the recorded date. Grey pairs (other date in a source): Anttila harvest 2022-08-08 0 d / 2022-09-08 −31 d; Qvidja harvest 2018-09-23 +1 d / 2018-09-25 −1 d; Qvidja harvest 2019-06-11 +1 d / 2019-06-10 +2 d; Qvidja harvest 2019-08-20 −2 d / 2019-08-21 −3 d; Qvidja harvest 2020-06-23 +1 d / 2020-06-11 +13 d; Qvidja harvest 2020-08-28 0 d / 2020-08-27 +1 d; Qvidja harvest 2021-06-14 0 d / 2021-06-21 −7 d; Qvidja grazing 2021-08-23 +11 d / 2021-06-01 +94 d; Qvidja grazing 2022-08-05 +8 d / 2022-06-01 +73 d; Viikki tillage 2022-11-01 −9 d / 2022-11-02 −10 d. Offsets beyond the axis are drawn at the edge with their value. Not drawn: anttila-2021-06-03 (no data), anttila-2021-08-02 (no data), sarkisuo-2021-06-09 (no data), sarkisuo-2023-06-29 (no data), qvidja-2018-09-03 (overlap).</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Offset of the largest daily GPP change from the recorded date of each harvest, cut, grazing, tillage and sowing episode, per site. Filled markers are clear change points; grey markers show the offset to the other date of the same event in another source.</dc:title>
+    <dc:description>Strip plot. X axis: detected day minus recorded date (days, -15 to +45; negative = the flux changed before the recorded date). One row per site; the row label gives the clear and the searched episodes. Marker shape = episode kind (circle harvest or cut, square grazing, triangle tillage, diamond sowing with a GPP rise); open = not clear. Harvest or cut: 23 clear of 33 searched, mean offset −2.0 d, SD 3.7, median 0.0 d, 95 % CI −3.5 to −0.6; 10 before, 9 on and 4 after the recorded date. Grazing: 5 clear of 5 searched, mean offset 2.8 d, SD 6.6, median 1.0 d, 95 % CI −2.2 to 8.0; 2 before, 0 on and 3 after the recorded date. Tillage: 8 clear of 13 searched, mean offset −0.1 d, SD 1.9, median 0.0 d, 95 % CI −1.4 to 1.0; 4 before, 0 on and 4 after the recorded date. Sowing: 2 clear of 3 searched, mean offset 16.5 d, SD 13.4, median 16.5 d, range 7 to 26; 0 before, 0 on and 2 after the recorded date. Grey pairs (other date in a source): Anttila harvest 2022-08-08 0 d / 2022-09-08 −31 d; Qvidja harvest 2018-09-23 +1 d / 2018-09-25 −1 d; Qvidja harvest 2019-06-11 +1 d / 2019-06-10 +2 d; Qvidja harvest 2019-08-20 −2 d / 2019-08-21 −3 d; Qvidja harvest 2020-06-23 +1 d / 2020-06-11 +13 d; Qvidja harvest 2020-08-28 0 d / 2020-08-27 +1 d; Qvidja harvest 2021-06-14 0 d / 2021-06-21 −7 d; Qvidja grazing 2021-08-23 +11 d / 2021-06-01 +94 d; Qvidja grazing 2022-08-05 +8 d / 2022-06-01 +73 d; Viikki tillage 2022-11-01 −9 d / 2022-11-02 −10 d. Offsets beyond the axis are drawn at the edge with their value. Not drawn: anttila-2021-06-03 (no data), anttila-2021-08-02 (no data), sarkisuo-2021-06-09 (no data), sarkisuo-2023-06-29 (no data), qvidja-2018-09-03 (overlap).</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/observations.parquet sha256 922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9</dc:relation>
+    <dc:source>analysis/event-timing/event-timing.py (git c6c7639, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="et7-figure_1">
+  <g id="et7-patch_1">
+   <path d="M 0 317.232 
+L 510.23622 317.232 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="et7-axes_1">
+   <g id="et7-patch_2">
+    <path d="M 102.047244 248.832 
+L 500.031496 248.832 
+L 500.031496 7.2 
+L 102.047244 7.2 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="et7-patch_3">
+    <path d="M 135.212598 248.832 
+L 201.543307 248.832 
+L 201.543307 7.2 
+L 135.212598 7.2 
+z
+" clip-path="url(#et7-pec93bfbefc)" style="fill: #8a8a8a; opacity: 0.08"/>
+   </g>
+   <g id="et7-line2d_1">
+    <path d="M 201.543307 248.832 
+L 201.543307 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #222222; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-matplotlib.axis_1">
+    <g id="et7-xtick_1">
+     <g id="et7-line2d_2">
+      <path d="M 102.047244 248.832 
+L 102.047244 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_3">
+      <defs>
+       <path id="et7-m4e6bbc44ff" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="102.047244" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_1">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="102.047244" y="261.150359" transform="rotate(-0 102.047244 261.150359)">−15</text>
+     </g>
+    </g>
+    <g id="et7-xtick_2">
+     <g id="et7-line2d_4">
+      <path d="M 135.212598 248.832 
+L 135.212598 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_5">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="135.212598" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_2">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="135.212598" y="261.150359" transform="rotate(-0 135.212598 261.150359)">−10</text>
+     </g>
+    </g>
+    <g id="et7-xtick_3">
+     <g id="et7-line2d_6">
+      <path d="M 168.377953 248.832 
+L 168.377953 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_7">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="168.377953" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_3">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="168.377953" y="261.150359" transform="rotate(-0 168.377953 261.150359)">−5</text>
+     </g>
+    </g>
+    <g id="et7-xtick_4">
+     <g id="et7-line2d_8">
+      <path d="M 201.543307 248.832 
+L 201.543307 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_9">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="201.543307" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_4">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="201.543307" y="261.150359" transform="rotate(-0 201.543307 261.150359)">0</text>
+     </g>
+    </g>
+    <g id="et7-xtick_5">
+     <g id="et7-line2d_10">
+      <path d="M 234.708661 248.832 
+L 234.708661 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_11">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="234.708661" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_5">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="234.708661" y="261.150359" transform="rotate(-0 234.708661 261.150359)">5</text>
+     </g>
+    </g>
+    <g id="et7-xtick_6">
+     <g id="et7-line2d_12">
+      <path d="M 267.874016 248.832 
+L 267.874016 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_13">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="267.874016" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_6">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="267.874016" y="261.150359" transform="rotate(-0 267.874016 261.150359)">10</text>
+     </g>
+    </g>
+    <g id="et7-xtick_7">
+     <g id="et7-line2d_14">
+      <path d="M 301.03937 248.832 
+L 301.03937 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_15">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="301.03937" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_7">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="301.03937" y="261.150359" transform="rotate(-0 301.03937 261.150359)">15</text>
+     </g>
+    </g>
+    <g id="et7-xtick_8">
+     <g id="et7-line2d_16">
+      <path d="M 334.204724 248.832 
+L 334.204724 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_17">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="334.204724" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_8">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="334.204724" y="261.150359" transform="rotate(-0 334.204724 261.150359)">20</text>
+     </g>
+    </g>
+    <g id="et7-xtick_9">
+     <g id="et7-line2d_18">
+      <path d="M 367.370079 248.832 
+L 367.370079 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_19">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="367.370079" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_9">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="367.370079" y="261.150359" transform="rotate(-0 367.370079 261.150359)">25</text>
+     </g>
+    </g>
+    <g id="et7-xtick_10">
+     <g id="et7-line2d_20">
+      <path d="M 400.535433 248.832 
+L 400.535433 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_21">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="400.535433" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_10">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="400.535433" y="261.150359" transform="rotate(-0 400.535433 261.150359)">30</text>
+     </g>
+    </g>
+    <g id="et7-xtick_11">
+     <g id="et7-line2d_22">
+      <path d="M 433.700787 248.832 
+L 433.700787 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_23">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="433.700787" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_11">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="433.700787" y="261.150359" transform="rotate(-0 433.700787 261.150359)">35</text>
+     </g>
+    </g>
+    <g id="et7-xtick_12">
+     <g id="et7-line2d_24">
+      <path d="M 466.866142 248.832 
+L 466.866142 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_25">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="466.866142" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_12">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="466.866142" y="261.150359" transform="rotate(-0 466.866142 261.150359)">40</text>
+     </g>
+    </g>
+    <g id="et7-xtick_13">
+     <g id="et7-line2d_26">
+      <path d="M 500.031496 248.832 
+L 500.031496 7.2 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #e6e6e6; stroke-width: 0.5; stroke-linecap: square"/>
+     </g>
+     <g id="et7-line2d_27">
+      <g>
+       <use xlink:href="#et7-m4e6bbc44ff" x="500.031496" y="248.832" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_13">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="500.031496" y="261.150359" transform="rotate(-0 500.031496 261.150359)">45</text>
+     </g>
+    </g>
+    <g id="et7-text_14">
+     <text style="font-size: 7.5px; font-family: system-ui, sans-serif; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="301.03937" y="272.530828" transform="rotate(-0 301.03937 272.530828)">Offset of the detected day from the recorded date (days; local days)</text>
+    </g>
+   </g>
+   <g id="et7-matplotlib.axis_2">
+    <g id="et7-ytick_1">
+     <g id="et7-line2d_28">
+      <defs>
+       <path id="et7-m6bd0d8e5e7" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#et7-m6bd0d8e5e7" x="102.047244" y="22.197848" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_15">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="95.047244" y="24.857301" transform="rotate(-0 95.047244 24.857301)">Anttila (3 of 4)</text>
+     </g>
+    </g>
+    <g id="et7-ytick_2">
+     <g id="et7-line2d_29">
+      <g>
+       <use xlink:href="#et7-m6bd0d8e5e7" x="102.047244" y="55.859686" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_16">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="95.047244" y="58.519139" transform="rotate(-0 95.047244 58.519139)">Särkisuo (3 of 3)</text>
+     </g>
+    </g>
+    <g id="et7-ytick_3">
+     <g id="et7-line2d_30">
+      <g>
+       <use xlink:href="#et7-m6bd0d8e5e7" x="102.047244" y="80.856099" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_17">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="95.047244" y="83.515552" transform="rotate(-0 95.047244 83.515552)">Haltiala (8 of 11)</text>
+     </g>
+    </g>
+    <g id="et7-ytick_4">
+     <g id="et7-line2d_31">
+      <g>
+       <use xlink:href="#et7-m6bd0d8e5e7" x="102.047244" y="105.852513" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_18">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="95.047244" y="108.511966" transform="rotate(-0 95.047244 108.511966)">Qvidja (16 of 22)</text>
+     </g>
+    </g>
+    <g id="et7-ytick_5">
+     <g id="et7-line2d_32">
+      <g>
+       <use xlink:href="#et7-m6bd0d8e5e7" x="102.047244" y="200.172314" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_19">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="95.047244" y="202.831768" transform="rotate(-0 95.047244 202.831768)">Viikki (7 of 11)</text>
+     </g>
+    </g>
+    <g id="et7-ytick_6">
+     <g id="et7-line2d_33">
+      <g>
+       <use xlink:href="#et7-m6bd0d8e5e7" x="102.047244" y="233.834152" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="et7-text_20">
+      <text style="font-size: 7px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="95.047244" y="236.493605" transform="rotate(-0 95.047244 236.493605)">Maktau (1 of 3)</text>
+     </g>
+    </g>
+   </g>
+   <g id="et7-line2d_34">
+    <path d="M 201.543307 34.196127 
+L 106.027087 34.196127 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_35">
+    <path d="M 208.176378 117.850792 
+L 194.910236 117.850792 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_36">
+    <path d="M 208.176378 126.516215 
+L 214.809449 126.516215 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_37">
+    <path d="M 188.277165 135.181639 
+L 181.644094 135.181639 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_38">
+    <path d="M 208.176378 143.847062 
+L 287.773228 143.847062 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_39">
+    <path d="M 201.543307 152.512486 
+L 208.176378 152.512486 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_40">
+    <path d="M 201.543307 161.177909 
+L 155.111811 161.177909 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_41">
+    <path d="M 274.507087 169.843332 
+L 496.051654 169.843332 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_42">
+    <path d="M 254.607874 178.508756 
+L 496.051654 178.508756 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_43">
+    <path d="M 141.845669 212.170593 
+L 135.212598 212.170593 
+" clip-path="url(#et7-pec93bfbefc)" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="et7-patch_4">
+    <path d="M 102.047244 248.832 
+L 102.047244 7.2 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="et7-patch_5">
+    <path d="M 102.047244 248.832 
+L 500.031496 248.832 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="et7-line2d_44">
+    <defs>
+     <path id="et7-m6cddbaef09" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #0072b2"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m6cddbaef09" x="208.176378" y="18.198422" style="fill: #0072b2; stroke: #0072b2"/>
+    </g>
+   </g>
+   <g id="et7-line2d_45">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m6cddbaef09" x="201.543307" y="18.198422" style="fill: #0072b2; stroke: #0072b2"/>
+    </g>
+   </g>
+   <g id="et7-line2d_46">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m6cddbaef09" x="201.543307" y="22.197848" style="fill: #0072b2; stroke: #0072b2"/>
+    </g>
+   </g>
+   <g id="et7-line2d_47">
+    <defs>
+     <path id="et7-mb85bf7a479" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #0072b2"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mb85bf7a479" x="214.809449" y="18.198422" style="fill: #ffffff; stroke: #0072b2"/>
+    </g>
+   </g>
+   <g id="et7-line2d_48">
+    <defs>
+     <path id="et7-m0e2a78013d" d="M 0 1.8 
+C 0.477366 1.8 0.935244 1.610341 1.272792 1.272792 
+C 1.610341 0.935244 1.8 0.477366 1.8 0 
+C 1.8 -0.477366 1.610341 -0.935244 1.272792 -1.272792 
+C 0.935244 -1.610341 0.477366 -1.8 0 -1.8 
+C -0.477366 -1.8 -0.935244 -1.610341 -1.272792 -1.272792 
+C -1.610341 -0.935244 -1.8 -0.477366 -1.8 0 
+C -1.8 0.477366 -1.610341 0.935244 -1.272792 1.272792 
+C -0.935244 1.610341 -0.477366 1.8 0 1.8 
+z
+" style="stroke: #0072b2"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m0e2a78013d" x="201.543307" y="34.196127" style="fill: #0072b2; stroke: #0072b2"/>
+    </g>
+   </g>
+   <g id="et7-line2d_49">
+    <defs>
+     <path id="et7-m5045bda0c2" d="M 0 1.8 
+C 0.477366 1.8 0.935244 1.610341 1.272792 1.272792 
+C 1.610341 0.935244 1.8 0.477366 1.8 0 
+C 1.8 -0.477366 1.610341 -0.935244 1.272792 -1.272792 
+C 0.935244 -1.610341 0.477366 -1.8 0 -1.8 
+C -0.477366 -1.8 -0.935244 -1.610341 -1.272792 -1.272792 
+C -1.610341 -0.935244 -1.8 -0.477366 -1.8 0 
+C -1.8 0.477366 -1.610341 0.935244 -1.272792 1.272792 
+C -0.935244 1.610341 -0.477366 1.8 0 1.8 
+z
+" style="stroke: #8a8a8a"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m5045bda0c2" x="106.027087" y="34.196127" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-line2d_50">
+    <defs>
+     <path id="et7-m6670343836" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #e69f00"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m6670343836" x="201.543307" y="51.860259" style="fill: #e69f00; stroke: #e69f00"/>
+    </g>
+   </g>
+   <g id="et7-line2d_51">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m6670343836" x="201.543307" y="55.859686" style="fill: #e69f00; stroke: #e69f00"/>
+    </g>
+   </g>
+   <g id="et7-line2d_52">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m6670343836" x="201.543307" y="59.859112" style="fill: #e69f00; stroke: #e69f00"/>
+    </g>
+   </g>
+   <g id="et7-line2d_53">
+    <defs>
+     <path id="et7-m3fd4d51a16" d="M -0 3.535534 
+L 3.535534 0 
+L 0 -3.535534 
+L -3.535534 -0 
+z
+" style="stroke: #56b4e9; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m3fd4d51a16" x="374.00315" y="76.856673" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_54">
+    <defs>
+     <path id="et7-mcbb8e455d9" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #56b4e9"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mcbb8e455d9" x="194.910236" y="76.856673" style="fill: #ffffff; stroke: #56b4e9"/>
+    </g>
+   </g>
+   <g id="et7-line2d_55">
+    <defs>
+     <path id="et7-md6917d63f8" d="M 0 -2.5 
+L -2.5 2.5 
+L 2.5 2.5 
+z
+" style="stroke: #56b4e9; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-md6917d63f8" x="141.845669" y="76.856673" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_56">
+    <defs>
+     <path id="et7-m438f88fd6c" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #56b4e9"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m438f88fd6c" x="135.212598" y="76.856673" style="fill: #56b4e9; stroke: #56b4e9"/>
+    </g>
+   </g>
+   <g id="et7-line2d_57">
+    <defs>
+     <path id="et7-mfa8f51afbb" d="M 0 -2.5 
+L -2.5 2.5 
+L 2.5 2.5 
+z
+" style="stroke: #56b4e9; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mfa8f51afbb" x="181.644094" y="76.856673" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_58">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-md6917d63f8" x="208.176378" y="76.856673" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_59">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mfa8f51afbb" x="208.176378" y="80.856099" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_60">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mfa8f51afbb" x="194.910236" y="80.856099" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_61">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mfa8f51afbb" x="188.277165" y="76.856673" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_62">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m3fd4d51a16" x="247.974803" y="76.856673" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_63">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m438f88fd6c" x="188.277165" y="80.856099" style="fill: #56b4e9; stroke: #56b4e9"/>
+    </g>
+   </g>
+   <g id="et7-line2d_64">
+    <defs>
+     <path id="et7-m317f251dfe" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #cc79a7"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="201.543307" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_65">
+    <defs>
+     <path id="et7-ma1b2069248" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #cc79a7"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma1b2069248" x="228.075591" y="101.853087" style="fill: #ffffff; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_66">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="208.176378" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_67">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="208.176378" y="105.852513" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_68">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="188.277165" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_69">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma1b2069248" x="208.176378" y="109.851939" style="fill: #ffffff; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_70">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="201.543307" y="105.852513" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_71">
+    <defs>
+     <path id="et7-md9396c40bd" d="M 0 -2.5 
+L -2.5 2.5 
+L 2.5 2.5 
+z
+" style="stroke: #cc79a7; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-md9396c40bd" x="214.809449" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_72">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="201.543307" y="109.851939" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_73">
+    <defs>
+     <path id="et7-m868da78a0c" d="M -2.5 2.5 
+L 2.5 2.5 
+L 2.5 -2.5 
+L -2.5 -2.5 
+z
+" style="stroke: #cc79a7; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m868da78a0c" x="274.507087" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_74">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma1b2069248" x="208.176378" y="101.853087" style="fill: #ffffff; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_75">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m868da78a0c" x="254.607874" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_76">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma1b2069248" x="228.075591" y="105.852513" style="fill: #ffffff; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_77">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="135.212598" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_78">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="175.011024" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_79">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-md9396c40bd" x="214.809449" y="105.852513" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_80">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m317f251dfe" x="194.910236" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_81">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma1b2069248" x="175.011024" y="105.852513" style="fill: #ffffff; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_82">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma1b2069248" x="141.845669" y="101.853087" style="fill: #ffffff; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_83">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m868da78a0c" x="208.176378" y="105.852513" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_84">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m868da78a0c" x="168.377953" y="101.853087" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_85">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m868da78a0c" x="194.910236" y="105.852513" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_86">
+    <defs>
+     <path id="et7-m8ebd378dab" d="M 0 1.8 
+C 0.477366 1.8 0.935244 1.610341 1.272792 1.272792 
+C 1.610341 0.935244 1.8 0.477366 1.8 0 
+C 1.8 -0.477366 1.610341 -0.935244 1.272792 -1.272792 
+C 0.935244 -1.610341 0.477366 -1.8 0 -1.8 
+C -0.477366 -1.8 -0.935244 -1.610341 -1.272792 -1.272792 
+C -1.610341 -0.935244 -1.8 -0.477366 -1.8 0 
+C -1.8 0.477366 -1.610341 0.935244 -1.272792 1.272792 
+C -0.935244 1.610341 -0.477366 1.8 0 1.8 
+z
+" style="stroke: #cc79a7"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m8ebd378dab" x="208.176378" y="117.850792" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_87">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m5045bda0c2" x="194.910236" y="117.850792" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-line2d_88">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m8ebd378dab" x="208.176378" y="126.516215" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_89">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m5045bda0c2" x="214.809449" y="126.516215" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-line2d_90">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m8ebd378dab" x="188.277165" y="135.181639" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_91">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m5045bda0c2" x="181.644094" y="135.181639" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-line2d_92">
+    <defs>
+     <path id="et7-me657fd39bf" d="M 0 1.8 
+C 0.477366 1.8 0.935244 1.610341 1.272792 1.272792 
+C 1.610341 0.935244 1.8 0.477366 1.8 0 
+C 1.8 -0.477366 1.610341 -0.935244 1.272792 -1.272792 
+C 0.935244 -1.610341 0.477366 -1.8 0 -1.8 
+C -0.477366 -1.8 -0.935244 -1.610341 -1.272792 -1.272792 
+C -1.610341 -0.935244 -1.8 -0.477366 -1.8 0 
+C -1.8 0.477366 -1.610341 0.935244 -1.272792 1.272792 
+C -0.935244 1.610341 -0.477366 1.8 0 1.8 
+z
+" style="stroke: #cc79a7"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-me657fd39bf" x="208.176378" y="143.847062" style="fill: #ffffff; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_93">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m5045bda0c2" x="287.773228" y="143.847062" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-line2d_94">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m8ebd378dab" x="201.543307" y="152.512486" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_95">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m5045bda0c2" x="208.176378" y="152.512486" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-line2d_96">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m8ebd378dab" x="201.543307" y="161.177909" style="fill: #cc79a7; stroke: #cc79a7"/>
+    </g>
+   </g>
+   <g id="et7-line2d_97">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m5045bda0c2" x="155.111811" y="161.177909" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-line2d_98">
+    <defs>
+     <path id="et7-ma0ce926740" d="M -1.8 1.8 
+L 1.8 1.8 
+L 1.8 -1.8 
+L -1.8 -1.8 
+z
+" style="stroke: #cc79a7; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma0ce926740" x="274.507087" y="169.843332" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_99">
+    <defs>
+     <path id="et7-mc001ed5dd3" d="M -1.8 1.8 
+L 1.8 1.8 
+L 1.8 -1.8 
+L -1.8 -1.8 
+z
+" style="stroke: #8a8a8a; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mc001ed5dd3" x="496.051654" y="169.843332" style="fill: #ffffff; stroke: #8a8a8a; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_100">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-ma0ce926740" x="254.607874" y="178.508756" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_101">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mc001ed5dd3" x="496.051654" y="178.508756" style="fill: #ffffff; stroke: #8a8a8a; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_102">
+    <defs>
+     <path id="et7-m0d487ed7d9" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #000000"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m0d487ed7d9" x="188.277165" y="196.172888" style="stroke: #000000"/>
+    </g>
+   </g>
+   <g id="et7-line2d_103">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m0d487ed7d9" x="155.111811" y="196.172888" style="stroke: #000000"/>
+    </g>
+   </g>
+   <g id="et7-line2d_104">
+    <defs>
+     <path id="et7-mb00081131e" d="M 0 -2.5 
+L -2.5 2.5 
+L 2.5 2.5 
+z
+" style="stroke: #000000; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mb00081131e" x="141.845669" y="196.172888" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_105">
+    <defs>
+     <path id="et7-m3af1059ba0" d="M 0 -2.5 
+L -2.5 2.5 
+L 2.5 2.5 
+z
+" style="stroke: #000000; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m3af1059ba0" x="194.910236" y="196.172888" style="stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_106">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m3af1059ba0" x="208.176378" y="196.172888" style="stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_107">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m0d487ed7d9" x="201.543307" y="196.172888" style="stroke: #000000"/>
+    </g>
+   </g>
+   <g id="et7-line2d_108">
+    <defs>
+     <path id="et7-m2f9491b298" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #000000"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m2f9491b298" x="194.910236" y="200.172314" style="fill: #ffffff; stroke: #000000"/>
+    </g>
+   </g>
+   <g id="et7-line2d_109">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m0d487ed7d9" x="188.277165" y="200.172314" style="stroke: #000000"/>
+    </g>
+   </g>
+   <g id="et7-line2d_110">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mb00081131e" x="214.809449" y="196.172888" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_111">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mb00081131e" x="181.644094" y="196.172888" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_112">
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m0d487ed7d9" x="214.809449" y="200.172314" style="stroke: #000000"/>
+    </g>
+   </g>
+   <g id="et7-line2d_113">
+    <defs>
+     <path id="et7-m84d7e52fe9" d="M 0 -1.8 
+L -1.8 1.8 
+L 1.8 1.8 
+z
+" style="stroke: #000000; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m84d7e52fe9" x="141.845669" y="212.170593" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_114">
+    <defs>
+     <path id="et7-mfeabfed507" d="M 0 -1.8 
+L -1.8 1.8 
+L 1.8 1.8 
+z
+" style="stroke: #8a8a8a; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-mfeabfed507" x="135.212598" y="212.170593" style="fill: #ffffff; stroke: #8a8a8a; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_115">
+    <defs>
+     <path id="et7-m16120dfc23" d="M -0 3.535534 
+L 3.535534 0 
+L 0 -3.535534 
+L -3.535534 -0 
+z
+" style="stroke: #d55e00; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m16120dfc23" x="453.6" y="229.834726" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-line2d_116">
+    <defs>
+     <path id="et7-me9f967f8ce" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #d55e00"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-me9f967f8ce" x="234.708661" y="229.834726" style="fill: #ffffff; stroke: #d55e00"/>
+    </g>
+   </g>
+   <g id="et7-line2d_117">
+    <defs>
+     <path id="et7-m1eb667b681" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #d55e00"/>
+    </defs>
+    <g clip-path="url(#et7-pec93bfbefc)">
+     <use xlink:href="#et7-m1eb667b681" x="135.212598" y="229.834726" style="fill: #d55e00; stroke: #d55e00"/>
+    </g>
+   </g>
+   <g id="et7-text_21">
+    <g id="et7-patch_6">
+     <path d="M 206.243307 37.496361 
+L 336.894245 37.496361 
+L 336.894245 30.895893 
+L 206.243307 30.895893 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="206.543307" y="35.754955" transform="rotate(-0 206.543307 35.754955)">H 2022-08-08 / 09-08 (article), other −31 d</text>
+   </g>
+   <g id="et7-text_22">
+    <g id="et7-patch_7">
+     <path d="M 212.876378 121.151026 
+L 296.518253 121.151026 
+L 296.518253 114.550557 
+L 212.876378 114.550557 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="213.176378" y="119.40962" transform="rotate(-0 213.176378 119.40962)">H 2018-09-23 / 09-25 (xlsx)</text>
+   </g>
+   <g id="et7-text_23">
+    <g id="et7-patch_8">
+     <path d="M 219.509449 129.81645 
+L 303.151324 129.81645 
+L 303.151324 123.215981 
+L 219.509449 123.215981 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="219.809449" y="128.075043" transform="rotate(-0 219.809449 128.075043)">H 2019-06-11 / 06-10 (xlsx)</text>
+   </g>
+   <g id="et7-text_24">
+    <g id="et7-patch_9">
+     <path d="M 192.977165 138.481873 
+L 276.61904 138.481873 
+L 276.61904 131.881404 
+L 192.977165 131.881404 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="193.277165" y="136.740467" transform="rotate(-0 193.277165 136.740467)">H 2019-08-20 / 08-21 (xlsx)</text>
+   </g>
+   <g id="et7-text_25">
+    <g id="et7-patch_10">
+     <path d="M 292.473228 147.147296 
+L 376.115103 147.147296 
+L 376.115103 140.546828 
+L 292.473228 140.546828 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="292.773228" y="145.40589" transform="rotate(-0 292.773228 145.40589)">H 2020-06-23 / 06-11 (xlsx)</text>
+   </g>
+   <g id="et7-text_26">
+    <g id="et7-patch_11">
+     <path d="M 212.876378 155.81272 
+L 296.518253 155.81272 
+L 296.518253 149.212251 
+L 212.876378 149.212251 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="213.176378" y="154.071314" transform="rotate(-0 213.176378 154.071314)">H 2020-08-28 / 08-27 (xlsx)</text>
+   </g>
+   <g id="et7-text_27">
+    <g id="et7-patch_12">
+     <path d="M 206.243307 164.478143 
+L 289.885182 164.478143 
+L 289.885182 157.877675 
+L 206.243307 157.877675 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="206.543307" y="162.736737" transform="rotate(-0 206.543307 162.736737)">H 2021-06-14 / 06-21 (xlsx)</text>
+   </g>
+   <g id="et7-text_28">
+    <g id="et7-patch_13">
+     <path d="M 145.944587 173.143567 
+L 269.807087 173.143567 
+L 269.807087 166.543098 
+L 145.944587 166.543098 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="269.507087" y="171.402161" transform="rotate(-0 269.507087 171.402161)">G 2021-08-23 / 06-01 (xlsx), other +94 d</text>
+   </g>
+   <g id="et7-text_29">
+    <g id="et7-patch_14">
+     <path d="M 126.045374 181.80899 
+L 249.907874 181.80899 
+L 249.907874 175.208521 
+L 126.045374 175.208521 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="249.607874" y="180.067584" transform="rotate(-0 249.607874 180.067584)">G 2022-08-05 / 06-01 (xlsx), other +73 d</text>
+   </g>
+   <g id="et7-text_30">
+    <g id="et7-patch_15">
+     <path d="M 146.545669 215.470827 
+L 231.775669 215.470827 
+L 231.775669 208.870359 
+L 146.545669 208.870359 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 6px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="146.845669" y="213.729421" transform="rotate(-0 146.845669 213.729421)">T 2022-11-01 / 11-02 (docx)</text>
+   </g>
+  </g>
+  <g id="et7-legend_1">
+   <g id="et7-line2d_118">
+    <defs>
+     <path id="et7-m78f80230cc" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #222222"/>
+    </defs>
+    <g>
+     <use xlink:href="#et7-m78f80230cc" x="128.764671" y="296.897875" style="fill: #222222; stroke: #222222"/>
+    </g>
+   </g>
+   <g id="et7-text_31">
+    <text style="font-size: 6.8px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="141.004671" y="299.277875" transform="rotate(-0 141.004671 299.277875)">Harvest or cut</text>
+   </g>
+   <g id="et7-line2d_119">
+    <defs>
+     <path id="et7-m98b2e18478" d="M -2.5 2.5 
+L 2.5 2.5 
+L 2.5 -2.5 
+L -2.5 -2.5 
+z
+" style="stroke: #222222; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#et7-m98b2e18478" x="128.764671" y="307.098406" style="fill: #222222; stroke: #222222; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-text_32">
+    <text style="font-size: 6.8px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="141.004671" y="309.478406" transform="rotate(-0 141.004671 309.478406)">Grazing</text>
+   </g>
+   <g id="et7-line2d_120">
+    <defs>
+     <path id="et7-m03f0af1267" d="M 0 -2.5 
+L -2.5 2.5 
+L 2.5 2.5 
+z
+" style="stroke: #222222; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#et7-m03f0af1267" x="209.890796" y="296.897875" style="fill: #222222; stroke: #222222; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-text_33">
+    <text style="font-size: 6.8px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="222.130796" y="299.277875" transform="rotate(-0 222.130796 299.277875)">Tillage</text>
+   </g>
+   <g id="et7-line2d_121">
+    <defs>
+     <path id="et7-m3a653a000e" d="M -0 3.535534 
+L 3.535534 0 
+L 0 -3.535534 
+L -3.535534 -0 
+z
+" style="stroke: #222222; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#et7-m3a653a000e" x="209.890796" y="307.098406" style="fill: #222222; stroke: #222222; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="et7-text_34">
+    <text style="font-size: 6.8px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="222.130796" y="309.478406" transform="rotate(-0 222.130796 309.478406)">Sowing (GPP rise)</text>
+   </g>
+   <g id="et7-line2d_122">
+    <defs>
+     <path id="et7-m9e7edb4279" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #222222"/>
+    </defs>
+    <g>
+     <use xlink:href="#et7-m9e7edb4279" x="302.593921" y="296.897875" style="fill: #ffffff; stroke: #222222"/>
+    </g>
+   </g>
+   <g id="et7-text_35">
+    <text style="font-size: 6.8px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="314.833921" y="299.277875" transform="rotate(-0 314.833921 299.277875)">Not clear</text>
+   </g>
+   <g id="et7-line2d_123">
+    <path d="M 295.793921 307.098406 
+L 302.593921 307.098406 
+L 309.393921 307.098406 
+" style="fill: none; stroke: #8a8a8a; stroke-width: 0.8; stroke-linecap: square"/>
+    <g>
+     <use xlink:href="#et7-m5045bda0c2" x="302.593921" y="307.098406" style="fill: #ffffff; stroke: #8a8a8a"/>
+    </g>
+   </g>
+   <g id="et7-text_36">
+    <text style="font-size: 6.8px; font-family: system-ui, sans-serif; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="314.833921" y="309.478406" transform="rotate(-0 314.833921 309.478406)">Same event, offset to the other date</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="et7-pec93bfbefc">
+   <rect x="102.047244" y="7.2" width="397.984252" height="241.632"/>
+  </clipPath>
+ </defs>
+</svg>

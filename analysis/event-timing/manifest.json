@@ -1,0 +1,372 @@
+{
+  "generatedAt": "2026-10-25T11:26:38Z",
+  "git": {
+    "commit": "c6c7639",
+    "dirty": true
+  },
+  "script": {
+    "path": "analysis/event-timing/event-timing.py",
+    "sha256": "d7ee658970108e3965a6f7c933317463473319287a11b1404904e2cbe09be229"
+  },
+  "lock": {
+    "path": "analysis/event-timing/event-timing.py.lock",
+    "sha256": "4c972466e84d58d4b9c2fedc28d91830865d71af372476ab6e50b0251cb3b175"
+  },
+  "python": "3.13.5",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+  "packages": {
+    "annotated-types": "0.8.0",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "fonttools": "4.67.0",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.11.2",
+    "mypy_extensions": "1.1.0",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pandas": "3.1.0",
+    "pandera": "0.34.1",
+    "pillow": "13.0.0",
+    "pyarrow": "26.0.0",
+    "pydantic": "2.14.1",
+    "pydantic_core": "2.50.1",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "3.0.0",
+    "six": "1.17.0",
+    "typeguard": "4.6.0",
+    "typing-inspect": "0.9.0",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.5"
+  },
+  "seeds": {
+    "changes.cut.gpp": 8310,
+    "changes.cut.gppPct": 8313,
+    "changes.cut.nee": 8312,
+    "changes.cut.reco": 8311,
+    "changes.fertilisation.gpp": 8360,
+    "changes.fertilisation.gppPct": 8363,
+    "changes.fertilisation.nee": 8362,
+    "changes.fertilisation.reco": 8361,
+    "changes.grazing.gpp": 8330,
+    "changes.grazing.gppPct": 8333,
+    "changes.grazing.nee": 8332,
+    "changes.grazing.reco": 8331,
+    "changes.harvest.gpp": 8300,
+    "changes.harvest.gppPct": 8303,
+    "changes.harvest.nee": 8302,
+    "changes.harvest.reco": 8301,
+    "changes.harvestCut.gpp": 8320,
+    "changes.harvestCut.gppPct": 8323,
+    "changes.harvestCut.nee": 8322,
+    "changes.harvestCut.reco": 8321,
+    "changes.other.gpp": 8380,
+    "changes.other.gppPct": 8383,
+    "changes.other.nee": 8382,
+    "changes.other.reco": 8381,
+    "changes.sowing.gpp": 8350,
+    "changes.sowing.gppPct": 8353,
+    "changes.sowing.nee": 8352,
+    "changes.sowing.reco": 8351,
+    "changes.spraying.gpp": 8370,
+    "changes.spraying.gppPct": 8373,
+    "changes.spraying.nee": 8372,
+    "changes.spraying.reco": 8371,
+    "changes.tillage.gpp": 8340,
+    "changes.tillage.gppPct": 8343,
+    "changes.tillage.nee": 8342,
+    "changes.tillage.reco": 8341,
+    "offsets.anttila.harvest": 8100,
+    "offsets.anttila.harvestCut": 8102,
+    "offsets.anttila.sowing": 8105,
+    "offsets.cut": 8001,
+    "offsets.grazing": 8003,
+    "offsets.haltiala.harvest": 8120,
+    "offsets.haltiala.harvestCut": 8122,
+    "offsets.haltiala.sowing": 8125,
+    "offsets.haltiala.tillage": 8124,
+    "offsets.harvest": 8000,
+    "offsets.harvestCut": 8002,
+    "offsets.maktau.harvest": 8150,
+    "offsets.maktau.harvestCut": 8152,
+    "offsets.maktau.sowing": 8155,
+    "offsets.qvidja.cut": 8131,
+    "offsets.qvidja.grazing": 8133,
+    "offsets.qvidja.harvest": 8130,
+    "offsets.qvidja.harvestCut": 8132,
+    "offsets.qvidja.sowing": 8135,
+    "offsets.qvidja.tillage": 8134,
+    "offsets.sarkisuo.harvest": 8110,
+    "offsets.sarkisuo.harvestCut": 8112,
+    "offsets.sarkisuo.sowing": 8115,
+    "offsets.sowing": 8005,
+    "offsets.tillage": 8004,
+    "offsets.viikki.harvest": 8140,
+    "offsets.viikki.harvestCut": 8142,
+    "offsets.viikki.tillage": 8144,
+    "tests.gppDrop": 8502,
+    "tests.neeDrop": 8503,
+    "tests.recoRise": 8501,
+    "tests.sowingRise": 8500
+  },
+  "bootstrap": {
+    "resamples": 10000,
+    "level": 0.95,
+    "generator": "numpy.random.default_rng (PCG64)"
+  },
+  "args": {
+    "db": "db",
+    "calculated": "data/calculated",
+    "out": null,
+    "check": false
+  },
+  "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+  "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+  "snapshot": {
+    "builtAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "commit": "44ec98f",
+    "commitNote": "HEAD at build time; db/report.json does not record a commit",
+    "url": null,
+    "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+    "inputs": [
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114
+      },
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6
+      },
+      {
+        "path": "db/observations.parquet",
+        "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+        "rows": 537980
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+        "rows": 26
+      },
+      {
+        "path": "calculated/daily.parquet",
+        "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+        "rows": 11209
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "path": "db/events.parquet",
+      "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+      "rows": 114,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_code",
+        "date",
+        "date_end",
+        "type",
+        "detail",
+        "source",
+        "crop",
+        "dry_mass_kg_ha",
+        "n_kg_ha"
+      ]
+    },
+    {
+      "path": "db/sites.parquet",
+      "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+      "rows": 6,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "code",
+        "name",
+        "utc_offset_min"
+      ]
+    },
+    {
+      "path": "db/observations.parquet",
+      "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+      "rows": 537980,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "ts_start",
+        "nee",
+        "nee_qc",
+        "ta",
+        "swc",
+        "precip"
+      ]
+    },
+    {
+      "path": "db/variables.parquet",
+      "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+      "rows": 26,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "column_name",
+        "unit"
+      ]
+    },
+    {
+      "path": "calculated/daily.parquet",
+      "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+      "rows": 11209,
+      "builtAt": "2026-10-23T19:03:09.003Z",
+      "columns": [
+        "site_code",
+        "date_local",
+        "gpp_gc",
+        "reco_gc",
+        "nee_f_gc",
+        "frac_measured",
+        "ta_mean"
+      ]
+    }
+  ],
+  "steps": {
+    "sites": {
+      "rowsRead": 6,
+      "rowsKept": 6
+    },
+    "events": {
+      "rowsRead": 114,
+      "notFieldOperation": 1,
+      "rule": "events whose detail is 'EC system installed' are listed, not merged into episodes"
+    },
+    "observations": {
+      "rowsRead": 537980,
+      "localDays": 11209,
+      "precipNullAllHalfHoursNull": 2140,
+      "measuredNeeHalfHoursDayTime": 57639,
+      "measuredNeeDays": 4578,
+      "measuredNeeDaysFewerThan8": 1750,
+      "rule": "local day = ts_start + utc_offset_min; ta and swc = mean of the 30-min values; precip = sum (null when all are null); measured NEE = nee not null and nee_qc 0 or null, half hours that start from 10:00 to 15:30 local time, 8 or more per day"
+    },
+    "daily": {
+      "rowsRead": 11209,
+      "perSite": {
+        "anttila": {
+          "dailyRows": 730,
+          "fluxFirst": "2022-01-01",
+          "fluxLast": "2023-12-31",
+          "daysInFluxPeriod": 730,
+          "daysWithNee": 730,
+          "daysOutsideFluxPeriod": 0,
+          "daysNoNeeInFluxPeriod": 0,
+          "daysLowFrac": 65,
+          "daysWithMeasuredNee": 569
+        },
+        "sarkisuo": {
+          "dailyRows": 730,
+          "fluxFirst": "2022-01-01",
+          "fluxLast": "2023-12-31",
+          "daysInFluxPeriod": 730,
+          "daysWithNee": 730,
+          "daysOutsideFluxPeriod": 0,
+          "daysNoNeeInFluxPeriod": 0,
+          "daysLowFrac": 50,
+          "daysWithMeasuredNee": 538
+        },
+        "haltiala": {
+          "dailyRows": 1700,
+          "fluxFirst": "2021-05-07",
+          "fluxLast": "2025-12-31",
+          "daysInFluxPeriod": 1700,
+          "daysWithNee": 1700,
+          "daysOutsideFluxPeriod": 0,
+          "daysNoNeeInFluxPeriod": 0,
+          "daysLowFrac": 61,
+          "daysWithMeasuredNee": 1163
+        },
+        "qvidja": {
+          "dailyRows": 2794,
+          "fluxFirst": "2018-05-09",
+          "fluxLast": "2025-12-31",
+          "daysInFluxPeriod": 2794,
+          "daysWithNee": 2794,
+          "daysOutsideFluxPeriod": 0,
+          "daysNoNeeInFluxPeriod": 0,
+          "daysLowFrac": 1230,
+          "daysWithMeasuredNee": 825
+        },
+        "viikki": {
+          "dailyRows": 1461,
+          "fluxFirst": "2022-01-01",
+          "fluxLast": "2025-12-31",
+          "daysInFluxPeriod": 1461,
+          "daysWithNee": 1461,
+          "daysOutsideFluxPeriod": 0,
+          "daysNoNeeInFluxPeriod": 0,
+          "daysLowFrac": 722,
+          "daysWithMeasuredNee": 349
+        },
+        "maktau": {
+          "dailyRows": 3794,
+          "fluxFirst": "2018-12-18",
+          "fluxLast": "2024-09-03",
+          "daysInFluxPeriod": 2087,
+          "daysWithNee": 1902,
+          "daysOutsideFluxPeriod": 1707,
+          "daysNoNeeInFluxPeriod": 185,
+          "daysLowFrac": 960,
+          "daysWithMeasuredNee": 1134
+        }
+      },
+      "rule": "timeline = first to last day with nee_f_gc; days with frac_measured < 0.10 are drawn lighter"
+    },
+    "episodes": {
+      "episodes": 80,
+      "overlap": 0,
+      "spanOverlap": 6,
+      "outsideFluxPeriod": 3,
+      "withChangePointTest": 59,
+      "searched": 55,
+      "usedForOffset": 54,
+      "clearUsed": 38,
+      "usedForChange": 76,
+      "rule": "overlap = a day of another episode in the 7-day windows (not in the summaries); spanOverlap = another episode with a change-point test in the days that the search reads (not in the offset summaries); searched = the test has at least one candidate day"
+    }
+  },
+  "outputs": {
+    "results.json": "2466f344e3070b8c441cc3c7077ed47617d05ab9403694846e2ce67267bf6f78",
+    "figures": {
+      "figures/1-anttila.svg": {
+        "sha256": "6041f430f69b4064ecf0785bb9afeb0b927387c0476b1791b9ab2ef3eefd83bd",
+        "sha256WithoutMetadata": "de277aad02462c4c46d6b4f3dfe4626ce104b6d6c3edc6e741f6424a9ddee29e"
+      },
+      "figures/2-sarkisuo.svg": {
+        "sha256": "6f3bda09807801929e79ca6374c067b2b8ebbfd09faed1885f147f0246f5d345",
+        "sha256WithoutMetadata": "306eabcdb0eed6f71a59ad3cbf840df48de4199ed3d1e3eb67cbc9df00bb87f6"
+      },
+      "figures/3-haltiala.svg": {
+        "sha256": "79789be601edacaae4b158d8696f6b79941b8159faba5413c96ce0f8429f5195",
+        "sha256WithoutMetadata": "f5174d53a35a1afa7933cf6df4f3eb7a64bb932df5e3b0f7a8beccfdc0ec5ca4"
+      },
+      "figures/4-qvidja.svg": {
+        "sha256": "5b21859b6a4de59833bd9faf40dd8f96de76daa561a33dcd8a495dd4807ad548",
+        "sha256WithoutMetadata": "f5961a0f28eb8daa4c3404776e42cea0ae5237b11172606366f27537c077ee44"
+      },
+      "figures/5-viikki.svg": {
+        "sha256": "9c0ff9b1551cddc98c19c9ef771d5b8e52621440edbd698013fc9afb978eae48",
+        "sha256WithoutMetadata": "5ba0db4c293418736aef019d81650772c8848f82a699d309a96da6fecc483eed"
+      },
+      "figures/6-maktau.svg": {
+        "sha256": "18b667d316e9b7d68987886cbc2d7c6c3d666a50631805d1eb008771d8b51fe0",
+        "sha256WithoutMetadata": "fdbee71f820f5116d69901c745380a9a5a37a50175595da9cf6a3c705bf44e4d"
+      },
+      "figures/7-offsets.svg": {
+        "sha256": "69332b6ddb18b79592f2fc062297599eb4909e848ca212870ea85d2017fa55b5",
+        "sha256WithoutMetadata": "9cf46009d1f4b621e8576e1875821bbfd1e5a8d65819b26552a365fca665af0f"
+      },
+      "figures/8-course.svg": {
+        "sha256": "e0326bd036d93ca63dc4a6aa3de553aa90e08edf5a53eaf51df17bcd2607931e",
+        "sha256WithoutMetadata": "9f1195836fd608feeda933e04fc0f5f215a4ca80c2d0c87a4d9360225b2050d5"
+      }
+    }
+  }
+}
