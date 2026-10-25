@@ -196,7 +196,7 @@ The article stays in `site/src/pages/deep-dive/<slug>.mdx`. The frontmatter `scr
 #### Database snapshot
 
 - A dive uses one fixed snapshot of the harmonised database. The snapshot is identified by its build date (`builtAt` of `db/report.json`, also in the Parquet key/value metadata `built_at`) and the SHA-256 of each file.
-- The Parquet files are not in git. Publish each snapshot that a dive uses as a release asset (`db-<yyyy-mm-dd>.zip`, with `report.md` and `report.json`), so that others can get the same files. The script gives the URL.
+- The Parquet files are not in git. Those can be downloaded from https://inar.rjuho.dev by user when needed.
 - `npm run build:db` writes the rows in a fixed order (`ORDER BY site_id, ts_start`) and writes `built_at` into the key/value metadata of each Parquet file.
 
 #### Script header
