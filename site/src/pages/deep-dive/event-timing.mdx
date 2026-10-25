@@ -43,6 +43,8 @@ import { REPO_URL } from '../../lib/dataReport';
 import {
   altKey,
   altNotes,
+  altNotesAll,
+  altRowsAll,
   altRows,
   changeRows,
   epKey,
@@ -769,6 +771,37 @@ GPP drop for harvests and cuts only: <Num dive="disturbance-detail" k="timing.al
 six sites, with <Num k="method.windowDays" digits={0} />-day windows and the whole record of each site. Thus the numbers are
 not identical. The sign of the result is the same: the GPP drop of a harvest comes on or a little before the recorded date.
 <a href={`${base}deep-dive/disturbance-size/`}>Deep Dive #1</a> gives the size of the changes with the same episode rule.
+
+### Summary of the second dates
+
+The sources give a second date for <Num k="counts.nAltDates" digits={0} /> events of the <Num k="counts.events" digits={0} />
+in the database. The table puts all of them together, in site order. <Num k="counts.nAltDatesWithTest" digits={0} /> of them
+have a change-point test (harvest, grazing or tillage; fertilisation and spraying have no test), and
+<Num k="counts.nAltDatesClear" digits={0} /> of these have a clear change point. The change point is nearer to the date in
+the database for <Num k="counts.nAltNearerUsed" digits={0} /> events, at the same distance from both dates for
+<Num k="counts.nAltNearerEqual" digits={0} /> and nearer to the other date for <Num k="counts.nAltNearerOther" digits={0} />.
+The offsets count from the first day of the event; a negative offset means that the flux changed before that date. The
+database keeps one date per event (the date of the project file on a conflict, see the
+<a href={`${base}events/`}>Events page</a>); the other dates are a documented part of the record and are typed in the
+script with their source.
+
+<div class="table-wrap">
+<table>
+<caption>All events with a second date in another source, in site order. Days apart = other date minus the date in the database (negative = the other date is earlier). Offset = detected day of the largest GPP drop (for the Viikki tillage: the Reco rise) minus the date; negative = the flux changed before the date. Nearer = the date with the smaller absolute offset, only for a clear change point.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Type</th><th scope="col">Date in the database</th><th scope="col">Other date</th><th scope="col" class="num">Days apart</th><th scope="col">Source of the other date</th><th scope="col">Test result</th><th scope="col" class="num">Offset to the database date</th><th scope="col" class="num">Offset to the other date</th><th scope="col">Nearer to</th></tr>
+</thead>
+<tbody>
+{altRowsAll(d).map((r) => (<tr id={r.id}><td>{r.site}</td><td>{r.type}</td><td class="wrap">{r.dateUsed}</td><td class="wrap">{r.dateOther}</td><td class="num">{r.daysApart}</td><td class="wrap">{r.source}</td><td class="wrap">{r.test}</td><td class="num">{r.toUsed}</td><td class="num">{r.toOther}</td><td class="wrap">{r.nearer}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+The sources also differ on these points, which are not dates of a single event or have no day:
+
+<ul>
+{altNotesAll(d).map((n) => (<li><strong>{n.site}.</strong> {n.text} Source: <code>{n.source}</code>.</li>))}
+</ul>
 
 ## Limits and uncertainty
 

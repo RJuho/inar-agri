@@ -448,6 +448,28 @@ export function altRows(d: EventTimingData, site: SiteCode): AltRow[] {
     });
 }
 
+export interface AltAllRow extends AltRow {
+  site: string;
+  daysApart: string;
+}
+
+/** All rows of ALTERNATIVE_DATES, in site order, for the summary table (ids `alt-all-<site>-<date>`). */
+export function altRowsAll(d: EventTimingData): AltAllRow[] {
+  const order = Object.keys(SITE_NAMES) as SiteCode[];
+  return order.flatMap((site) =>
+    altRows(d, site).map((r) => {
+      const a = d.alternativeDates.find((x) => x.site === site && `alt-${site}-${x.dateUsed}` === r.id);
+      return { ...r, id: `alt-all-${site}-${a?.dateUsed ?? r.dateUsed}`, site: SITE_NAMES[site], daysApart: a ? `${fmtNum(a.daysApart, 0)} d` : dash };
+    }),
+  );
+}
+
+/** All notes on other dates and amounts, in site order, with the site name. */
+export function altNotesAll(d: EventTimingData): { site: string; text: string; source: string }[] {
+  const order = Object.keys(SITE_NAMES) as SiteCode[];
+  return order.flatMap((site) => altNotes(d, site).map((n) => ({ site: SITE_NAMES[site], ...n })));
+}
+
 /** The notes on other dates and amounts of one site (results.json altNotes). */
 export function altNotes(d: EventTimingData, site: SiteCode): { text: string; source: string }[] {
   return d.altNotes.filter((n) => n.site === site).map((n) => ({ text: n.text, source: n.source }));
