@@ -12,7 +12,7 @@
     <dc:description>Three panels: GPP, Reco and NEE. X axis: day relative to the recorded date (-14 to +14, local days). Y axis: percent of the before mean (GPP and Reco: 100 % = no change; NEE: percent of the GPP before, 0 = neutral, NEE &lt; 0 = uptake). A day is drawn when 2 or more episodes have a value; the band is the 25 to 75 % range when 5 or more episodes have a value. Episodes need a GPP before of 1 g C m-2 d-1 or more. Harvest or cut (n = 32): mean of days +1 to +7: GPP 57 %, Reco 115 %, NEE 21 % of the GPP before. Grazing (n = 5): mean of days +1 to +7: GPP 86 %, Reco 109 %, NEE −5 % of the GPP before. Tillage (n = 6): mean of days +1 to +7: GPP 39 %, Reco 93 %, NEE 163 % of the GPP before. Sowing (n = 3): mean of days +1 to +7: GPP 117 %, Reco 108 %, NEE 7 % of the GPP before. Fertilisation (n = 13): mean of days +1 to +7: GPP 163 %, Reco 159 %, NEE −31 % of the GPP before.</dc:description>
     <dc:format>image/svg+xml</dc:format>
     <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/observations.parquet sha256 922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9</dc:relation>
-    <dc:source>analysis/event-timing/event-timing.py (git 0d3e6aa, dirty)</dc:source>
+    <dc:source>analysis/event-timing/event-timing.py (git efe1164, dirty)</dc:source>
     <dc:creator>
      <cc:Agent>
       <dc:title>matplotlib 3.11.2</dc:title>

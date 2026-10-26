@@ -60,6 +60,8 @@
     "minFracPct": 10,
     "searchFrom": -10,
     "searchTo": 5,
+    "wideDays": 12,
+    "wideMarginDays": 10,
     "sowingSearchFrom": 0,
     "sowingSearchTo": 40,
     "sideDays": 5,
@@ -137,6 +139,11 @@
       "that is nearer to the detected day. It also gives the files of the source column of",
       "db/events.parquet that give the date in the database (sourceUsed: the files of the",
       "event without the file of the other date; all files when both dates come from one file).",
+      "5b. Wide second dates (second_dates.py, |days apart| > 12): for the database date and the",
+      "other date, the mean of GPP, Reco, NEE, measured day-time -NEE, air temperature and soil",
+      "water over the 7 days before the first day and the 7 days after the end day, the change",
+      "and the percent change, the precipitation sums, and the lowest and highest daily GPP of",
+      "the span (10 days before the earlier date to 10 days after the later end day).",
       "6. Summaries per site and kind and per kind: n, mean, SD, median, range of the offset of the",
       "clear change points, counts before (< 0), on (0) and after (> 0) the anchor, and the share of",
       "clear tests. Bootstrap 95 % CI of the mean (10 000 resamples, percentile method, numpy",
@@ -275,6 +282,7 @@
       "other": 1
     },
     "nAltDates": 13,
+    "nWideDates": 5,
     "nAltDatesWithTest": 10,
     "nAltDatesClear": 9,
     "nAltNearerUsed": 8,
@@ -13709,6 +13717,978 @@
       "recoRise": null
     }
   ],
+  "wideDates": [
+    {
+      "site": "anttila",
+      "type": "harvest",
+      "episodeId": "anttila-2022-08-08",
+      "dateUsed": "2022-08-08",
+      "dateEndUsed": null,
+      "dateOther": "2022-09-08",
+      "dateEndOther": null,
+      "daysApart": 31,
+      "sourceUsed": "data/Agri_site_management_events 2018-2025.xlsx",
+      "sourceOther": "shurpali2025",
+      "sourceShort": "article",
+      "detected": "2022-08-08",
+      "nearer": "used",
+      "used": {
+        "start": "2022-08-08",
+        "end": "2022-08-08",
+        "windowBefore": [
+          "2022-08-01",
+          "2022-08-07"
+        ],
+        "windowAfter": [
+          "2022-08-09",
+          "2022-08-15"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 12.32438221
+          },
+          "reco": {
+            "n": 7,
+            "mean": 8.111180886
+          },
+          "nee": {
+            "n": 7,
+            "mean": -4.213201326
+          },
+          "mneg": {
+            "n": 7,
+            "mean": 13.69139526
+          },
+          "ta": {
+            "n": 7,
+            "mean": 17.61367619
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.2821443452
+          },
+          "precip": {
+            "n": 7,
+            "sum": 13.9
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 3.627853019
+          },
+          "reco": {
+            "n": 7,
+            "mean": 7.051374001
+          },
+          "nee": {
+            "n": 7,
+            "mean": 3.423520983
+          },
+          "mneg": {
+            "n": 5,
+            "mean": -1.178182607
+          },
+          "ta": {
+            "n": 7,
+            "mean": 16.83898185
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.2326895833
+          },
+          "precip": {
+            "n": 7,
+            "sum": 0.0
+          }
+        },
+        "change": {
+          "gpp": -8.696529194,
+          "reco": -1.059806885,
+          "nee": 7.636722309,
+          "mneg": -14.86957787,
+          "ta": -0.7746943452,
+          "swc": -0.0494547619
+        },
+        "changePct": {
+          "gpp": -70.56361158,
+          "reco": -13.06599988
+        }
+      },
+      "other": {
+        "start": "2022-09-08",
+        "end": "2022-09-08",
+        "windowBefore": [
+          "2022-09-01",
+          "2022-09-07"
+        ],
+        "windowAfter": [
+          "2022-09-09",
+          "2022-09-15"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 5.92339969
+          },
+          "reco": {
+            "n": 7,
+            "mean": 3.876185104
+          },
+          "nee": {
+            "n": 7,
+            "mean": -2.047214586
+          },
+          "mneg": {
+            "n": 7,
+            "mean": 7.975112574
+          },
+          "ta": {
+            "n": 7,
+            "mean": 7.821674107
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.2584029762
+          },
+          "precip": {
+            "n": 7,
+            "sum": 0.5
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 4.538035536
+          },
+          "reco": {
+            "n": 7,
+            "mean": 3.564465126
+          },
+          "nee": {
+            "n": 7,
+            "mean": -0.9735704091
+          },
+          "mneg": {
+            "n": 5,
+            "mean": 5.864877084
+          },
+          "ta": {
+            "n": 7,
+            "mean": 10.12114286
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.242410119
+          },
+          "precip": {
+            "n": 7,
+            "sum": 9.6
+          }
+        },
+        "change": {
+          "gpp": -1.385364155,
+          "reco": -0.3117199777,
+          "nee": 1.073644177,
+          "mneg": -2.11023549,
+          "ta": 2.29946875,
+          "swc": -0.01599285714
+        },
+        "changePct": {
+          "gpp": -23.38799047,
+          "reco": -8.041927033
+        }
+      },
+      "span": {
+        "from": "2022-07-29",
+        "to": "2022-09-18",
+        "nGpp": 52,
+        "gppMin": 2.640902929,
+        "gppMinDay": "2022-08-12",
+        "gppMax": 13.64655957,
+        "gppMaxDay": "2022-08-01",
+        "precipDays": 52,
+        "precipMm": 64.9
+      }
+    },
+    {
+      "site": "qvidja",
+      "type": "fertilisation",
+      "episodeId": "qvidja-2020-07-27",
+      "dateUsed": "2020-07-27",
+      "dateEndUsed": null,
+      "dateOther": "2020-05-25",
+      "dateEndOther": null,
+      "daysApart": -63,
+      "sourceUsed": "data/Agri_site_management_events 2018-2025.xlsx",
+      "sourceOther": "qvidja-xlsx",
+      "sourceShort": "xlsx",
+      "detected": null,
+      "nearer": null,
+      "used": {
+        "start": "2020-07-27",
+        "end": "2020-07-27",
+        "windowBefore": [
+          "2020-07-20",
+          "2020-07-26"
+        ],
+        "windowAfter": [
+          "2020-07-28",
+          "2020-08-03"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 8.683422873
+          },
+          "reco": {
+            "n": 7,
+            "mean": 6.883254155
+          },
+          "nee": {
+            "n": 7,
+            "mean": -1.800168718
+          },
+          "mneg": {
+            "n": 3,
+            "mean": 12.6011377
+          },
+          "ta": {
+            "n": 7,
+            "mean": 15.71690476
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.2829111631
+          },
+          "precip": {
+            "n": 7,
+            "sum": 23.82
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 6.853848793
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.639746479
+          },
+          "nee": {
+            "n": 7,
+            "mean": -2.214102314
+          },
+          "mneg": {
+            "n": 2,
+            "mean": 13.52002573
+          },
+          "ta": {
+            "n": 7,
+            "mean": 16.9071131
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.281861635
+          },
+          "precip": {
+            "n": 7,
+            "sum": 4.85
+          }
+        },
+        "change": {
+          "gpp": -1.82957408,
+          "reco": -2.243507677,
+          "nee": -0.4139335965,
+          "mneg": null,
+          "ta": 1.190208333,
+          "swc": -0.001049528086
+        },
+        "changePct": {
+          "gpp": -21.06973375,
+          "reco": -32.59370678
+        }
+      },
+      "other": {
+        "start": "2020-05-25",
+        "end": "2020-05-25",
+        "windowBefore": [
+          "2020-05-18",
+          "2020-05-24"
+        ],
+        "windowAfter": [
+          "2020-05-26",
+          "2020-06-01"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 6.915927299
+          },
+          "reco": {
+            "n": 7,
+            "mean": 2.577136282
+          },
+          "nee": {
+            "n": 7,
+            "mean": -4.338791018
+          },
+          "mneg": {
+            "n": 1,
+            "mean": 8.279036317
+          },
+          "ta": {
+            "n": 7,
+            "mean": 8.843392857
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3734236254
+          },
+          "precip": {
+            "n": 7,
+            "sum": 0.54
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 11.95583067
+          },
+          "reco": {
+            "n": 7,
+            "mean": 6.966769781
+          },
+          "nee": {
+            "n": 7,
+            "mean": -4.989060885
+          },
+          "mneg": {
+            "n": 0,
+            "mean": null
+          },
+          "ta": {
+            "n": 7,
+            "mean": 14.08922619
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.310058677
+          },
+          "precip": {
+            "n": 7,
+            "sum": 0.22
+          }
+        },
+        "change": {
+          "gpp": 5.039903366,
+          "reco": 4.389633499,
+          "nee": -0.650269867,
+          "mneg": null,
+          "ta": 5.245833333,
+          "swc": -0.06336494846
+        },
+        "changePct": {
+          "gpp": 72.87386273,
+          "reco": 170.3298941
+        }
+      },
+      "span": {
+        "from": "2020-05-15",
+        "to": "2020-08-06",
+        "nGpp": 84,
+        "gppMin": 2.9050463,
+        "gppMinDay": "2020-05-16",
+        "gppMax": 16.62492614,
+        "gppMaxDay": "2020-06-10",
+        "precipDays": 84,
+        "precipMm": 164.55
+      }
+    },
+    {
+      "site": "qvidja",
+      "type": "grazing",
+      "episodeId": "qvidja-2021-08-23",
+      "dateUsed": "2021-08-23",
+      "dateEndUsed": "2021-08-29",
+      "dateOther": "2021-06-01",
+      "dateEndOther": "2021-06-07",
+      "daysApart": -83,
+      "sourceUsed": "data/Agri_site_management_events 2018-2025.xlsx",
+      "sourceOther": "qvidja-xlsx",
+      "sourceShort": "xlsx",
+      "detected": "2021-09-03",
+      "nearer": "used",
+      "used": {
+        "start": "2021-08-23",
+        "end": "2021-08-29",
+        "windowBefore": [
+          "2021-08-16",
+          "2021-08-22"
+        ],
+        "windowAfter": [
+          "2021-08-30",
+          "2021-09-05"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 5.887186749
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.535807443
+          },
+          "nee": {
+            "n": 7,
+            "mean": -1.351379306
+          },
+          "mneg": {
+            "n": 4,
+            "mean": 10.97029101
+          },
+          "ta": {
+            "n": 7,
+            "mean": 14.91747024
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.4187787653
+          },
+          "precip": {
+            "n": 7,
+            "sum": 70.07
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 7.384596863
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.685729512
+          },
+          "nee": {
+            "n": 7,
+            "mean": -2.698867352
+          },
+          "mneg": {
+            "n": 0,
+            "mean": null
+          },
+          "ta": {
+            "n": 7,
+            "mean": 11.460625
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3788477688
+          },
+          "precip": {
+            "n": 7,
+            "sum": 1.41
+          }
+        },
+        "change": {
+          "gpp": 1.497410114,
+          "reco": 0.1499220686,
+          "nee": -1.347488046,
+          "mneg": null,
+          "ta": -3.456845238,
+          "swc": -0.03993099654
+        },
+        "changePct": {
+          "gpp": 25.43507074,
+          "reco": 3.305300554
+        }
+      },
+      "other": {
+        "start": "2021-06-01",
+        "end": "2021-06-07",
+        "windowBefore": [
+          "2021-05-25",
+          "2021-05-31"
+        ],
+        "windowAfter": [
+          "2021-06-08",
+          "2021-06-14"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 10.11933499
+          },
+          "reco": {
+            "n": 7,
+            "mean": 3.990678978
+          },
+          "nee": {
+            "n": 7,
+            "mean": -6.128656014
+          },
+          "mneg": {
+            "n": 1,
+            "mean": 15.28702334
+          },
+          "ta": {
+            "n": 7,
+            "mean": 10.93541667
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3950929517
+          },
+          "precip": {
+            "n": 7,
+            "sum": 37.46
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 9.307228355
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.165159042
+          },
+          "nee": {
+            "n": 7,
+            "mean": -5.142069312
+          },
+          "mneg": {
+            "n": 3,
+            "mean": 11.31286764
+          },
+          "ta": {
+            "n": 7,
+            "mean": 16.33059524
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3276289408
+          },
+          "precip": {
+            "n": 7,
+            "sum": 28.04
+          }
+        },
+        "change": {
+          "gpp": -0.8121066372,
+          "reco": 0.1744800647,
+          "nee": 0.9865867019,
+          "mneg": null,
+          "ta": 5.395178571,
+          "swc": -0.0674640109
+        },
+        "changePct": {
+          "gpp": -8.025296503,
+          "reco": 4.372189939
+        }
+      },
+      "span": {
+        "from": "2021-05-22",
+        "to": "2021-09-08",
+        "nGpp": 110,
+        "gppMin": 0.631856416,
+        "gppMinDay": "2021-08-07",
+        "gppMax": 13.48406047,
+        "gppMaxDay": "2021-06-13",
+        "precipDays": 104,
+        "precipMm": 300.36
+      }
+    },
+    {
+      "site": "qvidja",
+      "type": "grazing",
+      "episodeId": "qvidja-2022-08-05",
+      "dateUsed": "2022-08-05",
+      "dateEndUsed": "2022-08-19",
+      "dateOther": "2022-06-01",
+      "dateEndOther": "2022-06-15",
+      "daysApart": -65,
+      "sourceUsed": "data/Agri_site_management_events 2018-2025.xlsx",
+      "sourceOther": "qvidja-xlsx",
+      "sourceShort": "xlsx",
+      "detected": "2022-08-13",
+      "nearer": "used",
+      "used": {
+        "start": "2022-08-05",
+        "end": "2022-08-19",
+        "windowBefore": [
+          "2022-07-29",
+          "2022-08-04"
+        ],
+        "windowAfter": [
+          "2022-08-20",
+          "2022-08-26"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 6.797893346
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.504771913
+          },
+          "nee": {
+            "n": 7,
+            "mean": -2.293121433
+          },
+          "mneg": {
+            "n": 4,
+            "mean": 11.75056056
+          },
+          "ta": {
+            "n": 7,
+            "mean": 17.12800595
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.2096537404
+          },
+          "precip": {
+            "n": 7,
+            "sum": 0.33
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 3.736535561
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.85940608
+          },
+          "nee": {
+            "n": 7,
+            "mean": 1.122870519
+          },
+          "mneg": {
+            "n": 1,
+            "mean": 5.558023968
+          },
+          "ta": {
+            "n": 7,
+            "mean": 18.07549107
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.2058828368
+          },
+          "precip": {
+            "n": 7,
+            "sum": 35.78
+          }
+        },
+        "change": {
+          "gpp": -3.061357785,
+          "reco": 0.354634167,
+          "nee": 3.415991952,
+          "mneg": null,
+          "ta": 0.947485119,
+          "swc": -0.003770903593
+        },
+        "changePct": {
+          "gpp": -45.03391903,
+          "reco": 7.872411164
+        }
+      },
+      "other": {
+        "start": "2022-06-01",
+        "end": "2022-06-15",
+        "windowBefore": [
+          "2022-05-25",
+          "2022-05-31"
+        ],
+        "windowAfter": [
+          "2022-06-16",
+          "2022-06-22"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 4.673180951
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.617825466
+          },
+          "nee": {
+            "n": 7,
+            "mean": -0.05535548578
+          },
+          "mneg": {
+            "n": 4,
+            "mean": 3.784277689
+          },
+          "ta": {
+            "n": 7,
+            "mean": 11.94184524
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.1932064465
+          },
+          "precip": {
+            "n": 7,
+            "sum": 8.22
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 6.048449713
+          },
+          "reco": {
+            "n": 7,
+            "mean": 4.089836776
+          },
+          "nee": {
+            "n": 7,
+            "mean": -1.958612938
+          },
+          "mneg": {
+            "n": 2,
+            "mean": 3.040966908
+          },
+          "ta": {
+            "n": 7,
+            "mean": 15.8519494
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.1908342569
+          },
+          "precip": {
+            "n": 7,
+            "sum": 6.52
+          }
+        },
+        "change": {
+          "gpp": 1.375268762,
+          "reco": -0.52798869,
+          "nee": -1.903257452,
+          "mneg": null,
+          "ta": 3.910104167,
+          "swc": -0.002372189584
+        },
+        "changePct": {
+          "gpp": 29.42896448,
+          "reco": -11.43370822
+        }
+      },
+      "span": {
+        "from": "2022-05-22",
+        "to": "2022-08-29",
+        "nGpp": 100,
+        "gppMin": -1.002063924,
+        "gppMinDay": "2022-08-17",
+        "gppMax": 8.807271385,
+        "gppMaxDay": "2022-07-22",
+        "precipDays": 97,
+        "precipMm": 189.06
+      }
+    },
+    {
+      "site": "haltiala",
+      "type": "spraying",
+      "episodeId": "haltiala-2025-06-16",
+      "dateUsed": "2025-06-16",
+      "dateEndUsed": null,
+      "dateOther": "2025-05-16",
+      "dateEndOther": null,
+      "daysApart": -31,
+      "sourceUsed": "data/Haltiala/haltiala_smear_Lohkokortit_2025.pdf",
+      "sourceOther": "haltiala-xlsx",
+      "sourceShort": "xlsx",
+      "detected": null,
+      "nearer": null,
+      "used": {
+        "start": "2025-06-16",
+        "end": "2025-06-16",
+        "windowBefore": [
+          "2025-06-09",
+          "2025-06-15"
+        ],
+        "windowAfter": [
+          "2025-06-17",
+          "2025-06-23"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": 10.41497987
+          },
+          "reco": {
+            "n": 7,
+            "mean": 6.112685072
+          },
+          "nee": {
+            "n": 7,
+            "mean": -4.302294798
+          },
+          "mneg": {
+            "n": 7,
+            "mean": 13.28856303
+          },
+          "ta": {
+            "n": 7,
+            "mean": 14.66860119
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3285416667
+          },
+          "precip": {
+            "n": 0,
+            "sum": null
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 12.70528026
+          },
+          "reco": {
+            "n": 7,
+            "mean": 7.668322515
+          },
+          "nee": {
+            "n": 7,
+            "mean": -5.036957747
+          },
+          "mneg": {
+            "n": 7,
+            "mean": 15.6606075
+          },
+          "ta": {
+            "n": 7,
+            "mean": 14.08955357
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3413095238
+          },
+          "precip": {
+            "n": 0,
+            "sum": null
+          }
+        },
+        "change": {
+          "gpp": 2.290300392,
+          "reco": 1.555637443,
+          "nee": -0.7346629489,
+          "mneg": 2.372044474,
+          "ta": -0.579047619,
+          "swc": 0.01276785714
+        },
+        "changePct": {
+          "gpp": 21.99044473,
+          "reco": 25.44933077
+        }
+      },
+      "other": {
+        "start": "2025-05-16",
+        "end": "2025-05-16",
+        "windowBefore": [
+          "2025-05-09",
+          "2025-05-15"
+        ],
+        "windowAfter": [
+          "2025-05-17",
+          "2025-05-23"
+        ],
+        "before": {
+          "gpp": {
+            "n": 7,
+            "mean": -0.144012375
+          },
+          "reco": {
+            "n": 7,
+            "mean": 1.600884352
+          },
+          "nee": {
+            "n": 7,
+            "mean": 1.744896727
+          },
+          "mneg": {
+            "n": 7,
+            "mean": -2.246394008
+          },
+          "ta": {
+            "n": 7,
+            "mean": 8.427470238
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3919940476
+          },
+          "precip": {
+            "n": 0,
+            "sum": null
+          }
+        },
+        "after": {
+          "gpp": {
+            "n": 7,
+            "mean": 0.238369958
+          },
+          "reco": {
+            "n": 7,
+            "mean": 2.51337746
+          },
+          "nee": {
+            "n": 7,
+            "mean": 2.275007502
+          },
+          "mneg": {
+            "n": 5,
+            "mean": -3.063200683
+          },
+          "ta": {
+            "n": 7,
+            "mean": 12.26449405
+          },
+          "swc": {
+            "n": 7,
+            "mean": 0.3848809524
+          },
+          "precip": {
+            "n": 0,
+            "sum": null
+          }
+        },
+        "change": {
+          "gpp": 0.382382333,
+          "reco": 0.9124931083,
+          "nee": 0.5301107753,
+          "mneg": -0.8168066753,
+          "ta": 3.83702381,
+          "swc": -0.007113095238
+        },
+        "changePct": {
+          "gpp": null,
+          "reco": 56.99931462
+        }
+      },
+      "span": {
+        "from": "2025-05-06",
+        "to": "2025-06-26",
+        "nGpp": 52,
+        "gppMin": -0.8997440874,
+        "gppMinDay": "2025-05-17",
+        "gppMax": 18.3534765,
+        "gppMaxDay": "2025-06-26",
+        "precipDays": 0,
+        "precipMm": null
+      }
+    }
+  ],
   "altNotes": [
     {
       "site": "viikki",
@@ -16730,17 +17710,26 @@
       "file": "figures/8-course.svg",
       "title": "Mean course of daily GPP, Reco and NEE from 14 days before to 14 days after the recorded date, per episode kind and over all sites, in percent of the mean of the 7 days before the episode (NEE in percent of the GPP before).",
       "desc": "Three panels: GPP, Reco and NEE. X axis: day relative to the recorded date (-14 to +14, local days). Y axis: percent of the before mean (GPP and Reco: 100 % = no change; NEE: percent of the GPP before, 0 = neutral, NEE < 0 = uptake). A day is drawn when 2 or more episodes have a value; the band is the 25 to 75 % range when 5 or more episodes have a value. Episodes need a GPP before of 1 g C m-2 d-1 or more. Harvest or cut (n = 32): mean of days +1 to +7: GPP 57 %, Reco 115 %, NEE 21 % of the GPP before. Grazing (n = 5): mean of days +1 to +7: GPP 86 %, Reco 109 %, NEE −5 % of the GPP before. Tillage (n = 6): mean of days +1 to +7: GPP 39 %, Reco 93 %, NEE 163 % of the GPP before. Sowing (n = 3): mean of days +1 to +7: GPP 117 %, Reco 108 %, NEE 7 % of the GPP before. Fertilisation (n = 13): mean of days +1 to +7: GPP 163 %, Reco 159 %, NEE −31 % of the GPP before."
+    },
+    {
+      "n": 9,
+      "file": "figures/9-second-dates.svg",
+      "title": "Daily GPP, Reco, gap-filled NEE and precipitation around the 5 events whose second date is more than 12 days from the date in the database. The solid line marks the database date, the dashed line the other date; the bands are the days of each.",
+      "desc": "5 panels, one per event. X axis: date (local time). Left y axis: g C m-2 d-1 (GPP solid blue, Reco dashed orange, NEE dotted black; NEE < 0 = uptake). Right y axis: precipitation in mm per day (bars). The span runs from 10 days before the earlier date to 10 days after the later end day. Anttila harvest, database date 2022-08-08 and other date 2022-09-08 (+31 days). Around the database date (2022-08-08): GPP 12.32 before and 3.63 after, change −8.70 (−71 %); Reco 8.11 and 7.05, change −1.06 (−13 %); NEE −4.21 and 3.42 g C m-2 d-1; air temperature 17.6 and 16.8 degC; precipitation 14 and 0 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Around the other date (2022-09-08): GPP 5.92 before and 4.54 after, change −1.39 (−23 %); Reco 3.88 and 3.56, change −0.31 (−8 %); NEE −2.05 and −0.97 g C m-2 d-1; air temperature 7.8 and 10.1 degC; precipitation 0 and 10 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Lowest daily GPP of the span: 2.64 on 2022-08-12; highest: 13.65 on 2022-08-01; precipitation of the span 65 mm. Qvidja fertilisation, database date 2020-07-27 and other date 2020-05-25 (-63 days). Around the database date (2020-07-27): GPP 8.68 before and 6.85 after, change −1.83 (−21 %); Reco 6.88 and 4.64, change −2.24 (−33 %); NEE −1.80 and −2.21 g C m-2 d-1; air temperature 15.7 and 16.9 degC; precipitation 24 and 5 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Around the other date (2020-05-25): GPP 6.92 before and 11.96 after, change 5.04 (73 %); Reco 2.58 and 6.97, change 4.39 (170 %); NEE −4.34 and −4.99 g C m-2 d-1; air temperature 8.8 and 14.1 degC; precipitation 1 and 0 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Lowest daily GPP of the span: 2.91 on 2020-05-16; highest: 16.62 on 2020-06-10; precipitation of the span 165 mm. Qvidja grazing, database date 2021-08-23 to 2021-08-29 and other date 2021-06-01 to 2021-06-07 (-83 days). Around the database date (2021-08-23 to 2021-08-29): GPP 5.89 before and 7.38 after, change 1.50 (25 %); Reco 4.54 and 4.69, change 0.15 (3 %); NEE −1.35 and −2.70 g C m-2 d-1; air temperature 14.9 and 11.5 degC; precipitation 70 and 1 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Around the other date (2021-06-01 to 2021-06-07): GPP 10.12 before and 9.31 after, change −0.81 (−8 %); Reco 3.99 and 4.17, change 0.17 (4 %); NEE −6.13 and −5.14 g C m-2 d-1; air temperature 10.9 and 16.3 degC; precipitation 37 and 28 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Lowest daily GPP of the span: 0.63 on 2021-08-07; highest: 13.48 on 2021-06-13; precipitation of the span 300 mm. Qvidja grazing, database date 2022-08-05 to 2022-08-19 and other date 2022-06-01 to 2022-06-15 (-65 days). Around the database date (2022-08-05 to 2022-08-19): GPP 6.80 before and 3.74 after, change −3.06 (−45 %); Reco 4.50 and 4.86, change 0.35 (8 %); NEE −2.29 and 1.12 g C m-2 d-1; air temperature 17.1 and 18.1 degC; precipitation 0 and 36 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Around the other date (2022-06-01 to 2022-06-15): GPP 4.67 before and 6.05 after, change 1.38 (29 %); Reco 4.62 and 4.09, change −0.53 (−11 %); NEE −0.06 and −1.96 g C m-2 d-1; air temperature 11.9 and 15.9 degC; precipitation 8 and 7 mm (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Lowest daily GPP of the span: −1.00 on 2022-08-17; highest: 8.81 on 2022-07-22; precipitation of the span 189 mm. Haltiala spraying, database date 2025-06-16 and other date 2025-05-16 (-31 days). Around the database date (2025-06-16): GPP 10.41 before and 12.71 after, change 2.29 (22 %); Reco 6.11 and 7.67, change 1.56 (25 %); NEE −4.30 and −5.04 g C m-2 d-1; air temperature 14.7 and 14.1 degC; no precipitation data (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Around the other date (2025-05-16): GPP −0.14 before and 0.24 after, change 0.38; Reco 1.60 and 2.51, change 0.91 (57 %); NEE 1.74 and 2.28 g C m-2 d-1; air temperature 8.4 and 12.3 degC; no precipitation data (7 days before the first day and 7 days after the end day, 5 or more values per side for a change). Lowest daily GPP of the span: −0.90 on 2025-05-17; highest: 18.35 on 2025-06-26; no precipitation data."
     }
   ],
   "dataVersion": {
-    "generatedAt": "2026-10-26T07:42:26Z",
+    "generatedAt": "2026-10-26T08:02:27Z",
     "git": {
-      "commit": "0d3e6aa",
+      "commit": "efe1164",
       "dirty": true
     },
     "script": {
       "path": "analysis/event-timing/event-timing.py",
-      "sha256": "9c2c0e4c2de3846f8f87f4b7b1fd08184fef4ae3e8e11dc86d41aff8d6eac1f4"
+      "sha256": "bb50eff8b5c57f7b81d64b4c1f469c9843e7facd61e6d73edb93930dcc33c2f8"
+    },
+    "modules": {
+      "analysis/event-timing/second_dates.py": "abe81ced4105680f19c89a865937107da2d9aa650ad700ccfe9eb2e08716ac0b"
     },
     "lock": {
       "path": "analysis/event-timing/event-timing.py.lock",

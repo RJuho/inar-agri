@@ -106,6 +106,49 @@ const Alt = v.object({
   recoRise: v.nullable(v.object({ detected: S, offset: N, clear: B, offsetToOther: N })),
 });
 
+const Win = v.object({ n: v.number(), mean: N });
+const WinSum = v.object({ n: v.number(), sum: N });
+const WinSide = v.object({ gpp: Win, reco: Win, nee: Win, mneg: Win, ta: Win, swc: Win, precip: WinSum });
+const DateWindows = v.object({
+  start: v.string(),
+  end: v.string(),
+  windowBefore: v.array(v.string()),
+  windowAfter: v.array(v.string()),
+  before: WinSide,
+  after: WinSide,
+  change: v.object({ gpp: N, reco: N, nee: N, mneg: N, ta: N, swc: N }),
+  changePct: v.object({ gpp: N, reco: N }),
+});
+/** One event whose second date is more than `method.wideDays` days from the database date (second_dates.py). */
+const Wide = v.object({
+  site: SITE,
+  type: v.string(),
+  episodeId: v.string(),
+  dateUsed: v.string(),
+  dateEndUsed: S,
+  dateOther: v.string(),
+  dateEndOther: S,
+  daysApart: v.number(),
+  sourceUsed: v.string(),
+  sourceOther: v.string(),
+  sourceShort: v.string(),
+  detected: S,
+  nearer: v.nullable(v.picklist(['used', 'other', 'equal'])),
+  used: DateWindows,
+  other: DateWindows,
+  span: v.object({
+    from: v.string(),
+    to: v.string(),
+    nGpp: v.number(),
+    gppMin: N,
+    gppMinDay: S,
+    gppMax: N,
+    gppMaxDay: S,
+    precipDays: v.number(),
+    precipMm: N,
+  }),
+});
+
 const Site = v.object({
   name: v.string(),
   utcOffsetMin: v.number(),
@@ -162,6 +205,7 @@ const DataSchema = v.object({
   tests: v.object({ sowingRise: Offsets, recoRiseTillage: Offsets, gppDrop: Offsets, neeDrop: Offsets }),
   changes: v.record(v.string(), Change),
   alternativeDates: v.array(Alt),
+  wideDates: v.array(Wide),
   altNotes: v.array(v.object({ site: SITE, text: v.string(), source: v.string() })),
   counts: v.object({ eventsOutsideFluxPeriod: v.record(v.string(), v.array(v.string())) }),
   dataVersion: v.object({
@@ -466,6 +510,53 @@ export function altRowsAll(d: EventTimingData): AltAllRow[] {
     altRows(d, site).map((r) => {
       const a = d.alternativeDates.find((x) => x.site === site && `alt-${site}-${x.dateUsed}` === r.id);
       return { ...r, id: `alt-all-${site}-${a?.dateUsed ?? r.dateUsed}`, site: SITE_NAMES[site], daysApart: a ? `${fmtNum(a.daysApart, 0)} d` : dash };
+    }),
+  );
+}
+
+/** Dotted path of one wide second date, for example `wideDates.1`. */
+export function wideKey(d: EventTimingData, site: SiteCode, dateUsed: string): string {
+  const i = d.wideDates.findIndex((a) => a.site === site && a.dateUsed === dateUsed);
+  if (i < 0) throw new Error(`event-timing: no wide second date ${site} ${dateUsed}`);
+  return `wideDates.${i}`;
+}
+
+export interface WideRow {
+  id: string;
+  event: string;
+  which: string;
+  date: string;
+  source: string;
+  gpp: string;
+  reco: string;
+  nee: string;
+  mneg: string;
+  ta: string;
+  precip: string;
+}
+
+const f0 = (x: number | null | undefined) => (x === null || x === undefined ? dash : fmtNum(x, 0));
+
+/** Two rows per wide second date (the database date, then the other date): the window means before and after. */
+export function wideRows(d: EventTimingData): WideRow[] {
+  const arrow = (a: number | null, b: number | null, pct?: number | null) =>
+    `${f1(a)} → ${f1(b)}${pct !== undefined && pct !== null ? ` (${f0s(pct)} %)` : ''}`;
+  return d.wideDates.flatMap((w) =>
+    (['used', 'other'] as const).map((k) => {
+      const x = w[k];
+      return {
+        id: `wide-${w.site}-${w.dateUsed}-${k}`,
+        event: `${SITE_NAMES[w.site]}, ${TYPE_TEXT[w.type] ?? w.type}`,
+        which: k === 'used' ? 'database' : 'other',
+        date: x.end !== x.start ? `${x.start} to ${x.end}` : x.start,
+        source: k === 'used' ? sourceFileText(w.sourceUsed) : (SOURCE_TEXT[w.sourceOther] ?? w.sourceOther),
+        gpp: arrow(x.before.gpp.mean, x.after.gpp.mean, x.changePct.gpp),
+        reco: arrow(x.before.reco.mean, x.after.reco.mean, x.changePct.reco),
+        nee: arrow(x.before.nee.mean, x.after.nee.mean),
+        mneg: arrow(x.before.mneg.mean, x.after.mneg.mean),
+        ta: arrow(x.before.ta.mean, x.after.ta.mean),
+        precip: `${f0(x.before.precip.sum)} / ${f0(x.after.precip.sum)}`,
+      };
     }),
   );
 }

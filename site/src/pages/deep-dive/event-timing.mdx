@@ -57,6 +57,8 @@ import {
   outsideText,
   seasonRows,
   wetMonthsText,
+  wideKey,
+  wideRows,
   yearKey,
 } from '../../lib/deepDives/eventTiming';
 
@@ -803,6 +805,128 @@ The sources also differ on these points, which are not dates of a single event o
 {altNotesAll(d).map((n) => (<li><strong>{n.site}.</strong> {n.text} Source: <code>{n.source}</code>.</li>))}
 </ul>
 
+#### Dates more than 12 days apart
+
+<Num k="counts.nWideDates" digits={0} /> of the <Num k="counts.nAltDates" digits={0} /> events have a second date that is
+more than <Num k="method.wideDays" digits={0} /> days from the date in the database. We read the sources of these events
+again:
+
+- **Anttila, harvest 2022-08-08.** The project event file gives 8 August 2022 with 4140 kg DW/ha. Table 2 of Shurpali
+  et al. gives the second grass cut on 08.09.2022 <Cite ids={['shurpali2025']} note="PDF p. 3, Table 2" />. Both dates are
+  typed as the sources give them. The article date is one month later.
+- **Qvidja, fertilisation 2020-07-27 (own NPK mix, 9380 kg/ha, 49 kg N/ha).** The management file gives 2020-05-25
+  <Cite ids={['qvidja-management']} />. The project event file gives 2020-07-27, the same day as its compost row, with the
+  note "from Heimsch et al. (2024)". Heimsch et al. write that the higher N₂O fluxes of 2020 came one day after the
+  fertilisation, on 27 May <Cite ids={['heimsch2024']} note="PDF p. 7" />. Thus two sources put this fertilisation in
+  late May, and the project file date is the date of the compost.
+- **Qvidja, grazing 2021-08-23 and 2022-08-05.** The management file gives 2021-06-01 (4 horses, 7 days) and 2022-06-01
+  (9 cows, 15 days) <Cite ids={['qvidja-management']} />; both are the first day of a month. The project event file gives
+  23 August 2021 (4 horses × 7 days) and 5 August 2022 (9 cows × 15 days). Heimsch et al. write that 8 cows grazed small
+  paddocks for 6 days in August 2021 and 9 cows for 9 days in August 2022 <Cite ids={['heimsch2024']} note="PDF p. 2" />.
+  The article supports August in both years. The animals and the days differ between the sources.
+- **Haltiala, spraying 2025-06-16.** The parcel card lists Jett Mn235 on 16.06.2025 as a fertiliser added to the tank
+  mix, and the herbicide spraying on the same day, at the start of stem elongation
+  <Cite ids={['haltiala-management']} note="parcel card haltiala_smear_Lohkokortit_2025.pdf, p. 1 and 2" />. The management
+  file gives 2025-05-16 for Jett Mn235 <Cite ids={['haltiala-management']} />. The card also has a note of 16.05.2025 on the
+  harrowing of 10 and 13 May; the oats were sown on 15 May.
+
+For each of the two dates of an event we take the mean of the daily GPP, Reco and gap-filled NEE, of the measured day-time
+−NEE, and of the air temperature over the 7 days before the first day and the 7 days after the end day, and the
+precipitation sum of the same windows. A change needs 5 or more values on each side. The module
+`analysis/event-timing/second_dates.py` makes these numbers.
+
+<div class="table-wrap">
+<table>
+<caption>The fluxes and the weather around both dates of the events whose second date is more than 12 days from the date in the database. Each cell gives the mean of the 7 days before the first day → the mean of the 7 days after the end day; GPP and Reco add the change in percent of the mean before. GPP, Reco and NEE in g C m⁻² d⁻¹ (NEE < 0 = uptake); measured −NEE = day-time mean of the measured NEE with the sign turned, in µmol CO₂ m⁻² s⁻¹; Tair in °C; precipitation = sum of the 7 days before / after in mm (Haltiala has no precipitation in the database).</caption>
+<thead>
+<tr><th scope="col">Event</th><th scope="col">Date</th><th scope="col">Source</th><th scope="col">GPP</th><th scope="col">Reco</th><th scope="col">NEE</th><th scope="col">Measured −NEE</th><th scope="col">Tair</th><th scope="col">Precip. before / after</th></tr>
+</thead>
+<tbody>
+{wideRows(d).map((r) => (<tr id={r.id}><td class="wrap">{r.event} ({r.which})</td><td class="wrap">{r.date}</td><td class="wrap">{r.source}</td><td class="num">{r.gpp}</td><td class="num">{r.reco}</td><td class="num">{r.nee}</td><td class="num">{r.mneg}</td><td class="num">{r.ta}</td><td class="num">{r.precip}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<Figure
+  id="figure-9"
+  svgFile="analysis/event-timing/figures/9-second-dates.svg"
+  view={{ name: 'Second dates, both dates', sites: ['anttila', 'qvidja', 'haltiala'], variables: ['gpp', 'reco', 'nee_f', 'precip'], yearFrom: 2020, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] }}
+/>
+
+What the fluxes show at each date:
+
+- **Anttila harvest.** At 8 August GPP falls from
+  <Num k={`${wideKey(d, 'anttila', '2022-08-08')}.used.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'anttila', '2022-08-08')}.used.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'anttila', '2022-08-08')}.used.changePct.gpp`} sign digits={0} unit="%" />), and the NEE turns from
+  <Num k={`${wideKey(d, 'anttila', '2022-08-08')}.used.before.nee.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'anttila', '2022-08-08')}.used.after.nee.mean`} sign digits={1} unit="g C m⁻² d⁻¹" />: the cut.
+  Around 8 September GPP goes from
+  <Num k={`${wideKey(d, 'anttila', '2022-08-08')}.other.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'anttila', '2022-08-08')}.other.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'anttila', '2022-08-08')}.other.changePct.gpp`} sign digits={0} unit="%" />) with no step
+  (Figure 9). The fluxes support 8 August. The lowest GPP of the span is
+  <Num k={`${wideKey(d, 'anttila', '2022-08-08')}.span.gppMin`} digits={1} unit="g C m⁻² d⁻¹" /> on
+  {d.wideDates.find((w) => w.site === 'anttila' && w.dateUsed === '2022-08-08')?.span.gppMinDay}.
+- **Qvidja NPK fertilisation 2020.** Around 25 May GPP rises from
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.other.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.other.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.other.changePct.gpp`} sign digits={0} unit="%" />) and Reco from
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.other.before.reco.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.other.after.reco.mean`} digits={1} unit="g C m⁻² d⁻¹" />, while the air
+  temperature goes from <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.other.before.ta.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.other.after.ta.mean`} digits={1} unit="°C" />: the spring growth of the
+  grass, which a fertilisation in late May and the warming both feed. Around 27 July GPP falls from
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.used.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.used.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.used.changePct.gpp`} sign digits={0} unit="%" />) and Reco by
+  <Num k={`${wideKey(d, 'qvidja', '2020-07-27')}.used.changePct.reco`} sign digits={0} unit="%" />, after the harvest of
+  23 June and with the compost of the same day. A fertilisation gives no step of its own in these fluxes, so the fluxes
+  cannot decide between the dates. The sources do: the management file and Heimsch et al. put the NPK mix in late May.
+  The database keeps the project file date by rule; this row is an open point for the project event file.
+- **Qvidja grazing 2021.** Around 1 to 7 June GPP is
+  <Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.other.before.gpp.mean`} digits={1} /> before and
+  <Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.other.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" /> after
+  (<Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.other.changePct.gpp`} sign digits={0} unit="%" />); the clear drop a
+  week later is the harvest of 14 June. Around 23 to 29 August GPP rises from
+  <Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.used.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.used.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.used.changePct.gpp`} sign digits={0} unit="%" />), after
+  <Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.used.before.precip.sum`} digits={0} unit="mm" /> of rain in the 7 days
+  before; the lowest GPP of the span,
+  <Num k={`${wideKey(d, 'qvidja', '2021-08-23')}.span.gppMin`} digits={1} unit="g C m⁻² d⁻¹" />, is on
+  {d.wideDates.find((w) => w.site === 'qvidja' && w.dateUsed === '2021-08-23')?.span.gppMinDay}, before the grazing. Neither date shows a grazing step. Four horses on a small paddock
+  give no signal in the footprint. The article supports August.
+- **Qvidja grazing 2022.** Around 1 to 15 June GPP goes from
+  <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.other.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.other.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.other.changePct.gpp`} sign digits={0} unit="%" />), with no step.
+  Around 5 to 19 August GPP falls from
+  <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.used.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.used.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.used.changePct.gpp`} sign digits={0} unit="%" />), the NEE turns from
+  <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.used.before.nee.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.used.after.nee.mean`} sign digits={1} unit="g C m⁻² d⁻¹" />, and the
+  measured −NEE halves (<Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.used.before.mneg.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.used.after.mneg.mean`} digits={1} unit="µmol CO₂ m⁻² s⁻¹" />). The
+  lowest GPP of the span, <Num k={`${wideKey(d, 'qvidja', '2022-08-05')}.span.gppMin`} digits={1} unit="g C m⁻² d⁻¹" />
+  on {d.wideDates.find((w) => w.site === 'qvidja' && w.dateUsed === '2022-08-05')?.span.gppMinDay}, is in the grazing days. The fluxes and the article support August.
+- **Haltiala spraying 2025.** On 16 May the oats were sown the day before: GPP is
+  <Num k={`${wideKey(d, 'haltiala', '2025-06-16')}.other.before.gpp.mean`} digits={1} /> before and
+  <Num k={`${wideKey(d, 'haltiala', '2025-06-16')}.other.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" /> after, so a
+  fertiliser or a herbicide on that day cannot show in the fluxes. Around 16 June the crop grows: GPP goes from
+  <Num k={`${wideKey(d, 'haltiala', '2025-06-16')}.used.before.gpp.mean`} digits={1} /> to
+  <Num k={`${wideKey(d, 'haltiala', '2025-06-16')}.used.after.gpp.mean`} digits={1} unit="g C m⁻² d⁻¹" />
+  (<Num k={`${wideKey(d, 'haltiala', '2025-06-16')}.used.changePct.gpp`} sign digits={0} unit="%" />) with no break.
+  The parcel card is the primary record of the farm, and a manganese fertiliser in a tank mix with a herbicide at stem
+  elongation is the usual practice. The management file date is one month earlier and equals the date of the note on the
+  card.
+
+In sum: the fluxes support the database date for the Anttila harvest and the Qvidja grazing of 2022. For the Qvidja NPK
+fertilisation of 2020 the fluxes show no step at either date, and the sources point to late May, not to the project file
+date. For the Qvidja grazing of 2021 and the Haltiala spraying neither date leaves a mark in the fluxes; the article and
+the parcel card support the database dates.
+
 ## Limits and uncertainty
 
 - **Time stamps.** The raw time stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as UTC+2
@@ -835,7 +959,10 @@ The sources also differ on these points, which are not dates of a single event o
   or grasses, the calendar dates of cuts, the regrowth days, the timing of grazing, the calendar of sunflower, maize in Kenya,
   or anything on GPP, Reco, NEE or eddy covariance. We do not cite it for these.
 - **Sources.** For <Num k="counts.nAltDates" digits={0} /> events the sources give a second date. The database keeps one date
-  per event. The tables of each site list the second dates.
+  per event. The tables of each site list the second dates. For the <Num k="counts.nWideDates" digits={0} /> events with
+  dates more than <Num k="method.wideDays" digits={0} /> days apart, the section "Dates more than 12 days apart" compares
+  the fluxes around both dates; for the Qvidja NPK fertilisation of 2020 the sources point to late May, not to the
+  project file date.
 - **Weather and meteorology gaps.** The Qvidja rain gauge has a gap from 29 December 2021 to 24 May 2022
   (<a href={`${base}data-report/#finding-QVI-08`}>QVI-08</a>; status: waits for provider). All Qvidja meteorology is lost from
   11 February to 1 March 2023 (<a href={`${base}data-report/#finding-QVI-09`}>QVI-09</a>; status: resolved); no event is in this

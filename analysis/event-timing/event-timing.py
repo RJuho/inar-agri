@@ -57,6 +57,11 @@ METHOD
        that is nearer to the detected day. It also gives the files of the source column of
        db/events.parquet that give the date in the database (sourceUsed: the files of the
        event without the file of the other date; all files when both dates come from one file).
+       5b. Wide second dates (second_dates.py, |days apart| > 12): for the database date and the
+       other date, the mean of GPP, Reco, NEE, measured day-time -NEE, air temperature and soil
+       water over the 7 days before the first day and the 7 days after the end day, the change
+       and the percent change, the precipitation sums, and the lowest and highest daily GPP of
+       the span (10 days before the earlier date to 10 days after the later end day).
     6. Summaries per site and kind and per kind: n, mean, SD, median, range of the offset of the
        clear change points, counts before (< 0), on (0) and after (> 0) the anchor, and the share of
        clear tests. Bootstrap 95 % CI of the mean (10 000 resamples, percentile method, numpy
@@ -89,6 +94,8 @@ OUTPUTS
     figures/1-anttila.svg .. figures/6-maktau.svg   timeline of each site with the events
     figures/7-offsets.svg                offsets of the change points per site and kind
     figures/8-course.svg                 mean course of GPP, Reco and NEE around the events per kind
+    figures/9-second-dates.svg           GPP, Reco, NEE and precipitation around both dates of the
+                                         events whose second date is more than 12 days away
     output/run.log                       run log (not in git)
     output/episodes.csv                  all episodes with the change points (not in git)
     With --check, all outputs go to output/ and the script compares them with the committed files.
@@ -136,6 +143,7 @@ import numpy as np
 import pandas as pd
 import pandera.pandas as pa
 import pyarrow.parquet as pq
+import second_dates as sd
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
@@ -666,6 +674,18 @@ SOURCE_FILE = {
     "rasanen2026": "data/articles/Räsänen_2026_kenia.pdf",
 }
 
+# The name of each source key in a figure title.
+SOURCE_NAME = {
+    "qvidja-xlsx": "Qvidja management file",
+    "haltiala-xlsx": "Haltiala management file",
+    "viikki-docx": "Viikki management file",
+    "shurpali2025": "article of Shurpali et al. 2025",
+    "heimsch2021": "article of Heimsch et al. 2021",
+    "heimsch2024": "article of Heimsch et al. 2024",
+    "gao2026": "article of Gao et al. 2026",
+    "rasanen2026": "article of Räsänen et al. 2026",
+}
+
 
 def source_of_used_date(db_source: str, source_other: str) -> str:
     """The files of the source column of db/events.parquet that give the date in the database.
@@ -896,6 +916,7 @@ FIGURES = (
     (6, "maktau"),
     (7, "offsets"),
     (8, "course"),
+    (9, "second-dates"),
 )
 KIND_STYLE: dict[str, tuple[str, str, tuple[float, ...] | None, str]] = {
     # label, colour, dash, marker
@@ -2347,6 +2368,7 @@ def analyse(data: Data) -> dict[str, Any]:
             if any(p.kind == k for p in eps)
         },
         "nAltDates": len(alts),
+        "nWideDates": sum(1 for a in alts if sd.is_wide(a)),
         "nAltDatesWithTest": sum(1 for a in alts if a["test"] is not None),
         "nAltDatesClear": sum(1 for a in alts if a["nearer"] is not None),
         "nAltNearerUsed": sum(1 for a in alts if a["nearer"] == "used"),
@@ -2398,6 +2420,7 @@ def analyse(data: Data) -> dict[str, Any]:
         "changes": change_summary,
         "tests": tests,
         "alternativeDates": alts,
+        "wideDates": sd.analyse_wide(alts, data.tables),
         "altNotes": list(ALT_NOTES),
         "seasons": seasons_all,
         "highlights": highlights,
@@ -3320,6 +3343,11 @@ def data_version(
         "generatedAt": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "git": git_info(script_dir),
         "script": {"path": SCRIPT_PATH, "sha256": sha256_file(script)},
+        "modules": {
+            f"analysis/{SLUG}/second_dates.py": sha256_file(
+                script.parent / "second_dates.py"
+            )
+        },
         "lock": {
             "path": f"analysis/{SLUG}/{SLUG}.py.lock",
             "sha256": sha256_file(lock) if lock.is_file() else None,
@@ -3379,6 +3407,8 @@ def method_json() -> dict[str, Any]:
         "minFracPct": round(MIN_FRAC * 100),
         "searchFrom": SEARCH_FROM,
         "searchTo": SEARCH_TO,
+        "wideDays": sd.WIDE_DAYS,
+        "wideMarginDays": sd.MARGIN_DAYS,
         "sowingSearchFrom": SOWING_SEARCH[0],
         "sowingSearchTo": SOWING_SEARCH[1],
         "sideDays": SIDE_DAYS,
@@ -3503,6 +3533,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             fig, title, desc = fig_site(res, data, name)
         elif name == "offsets":
             fig, title, desc = fig_offsets(res, data)
+        elif name == "second-dates":
+            fig, title, desc = sd.fig_wide(
+                res["wideDates"],
+                data.tables,
+                {k: v["name"] for k, v in res["sites"].items()},
+                {k: v["utcOffsetMin"] for k, v in res["sites"].items()},
+                SOURCE_NAME,
+            )
         else:
             fig, title, desc = fig_course(res)
         path = target / "figures" / f"{n}-{name}.svg"

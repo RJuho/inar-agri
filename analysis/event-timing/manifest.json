@@ -1,12 +1,15 @@
 {
-  "generatedAt": "2026-10-26T07:42:26Z",
+  "generatedAt": "2026-10-26T08:02:27Z",
   "git": {
-    "commit": "0d3e6aa",
+    "commit": "efe1164",
     "dirty": true
   },
   "script": {
     "path": "analysis/event-timing/event-timing.py",
-    "sha256": "9c2c0e4c2de3846f8f87f4b7b1fd08184fef4ae3e8e11dc86d41aff8d6eac1f4"
+    "sha256": "bb50eff8b5c57f7b81d64b4c1f469c9843e7facd61e6d73edb93930dcc33c2f8"
+  },
+  "modules": {
+    "analysis/event-timing/second_dates.py": "abe81ced4105680f19c89a865937107da2d9aa650ad700ccfe9eb2e08716ac0b"
   },
   "lock": {
     "path": "analysis/event-timing/event-timing.py.lock",
@@ -333,39 +336,43 @@
     }
   },
   "outputs": {
-    "results.json": "67b0444fa99ac3c6b75008b07b115372b28db095d9fecd356613112375e7bdf3",
+    "results.json": "e72dcfd72b202ff621ab501348d740d9e54e84bf4fc1ebdd65b8d2f310b49936",
     "figures": {
       "figures/1-anttila.svg": {
-        "sha256": "299b0e8ddd66bbd7ac89a0e6199b662f434576167c30adb25bf1238bc06b0350",
+        "sha256": "a67c77d02425276ff8429aa09d1ce27c66b779df268eafeb9b245c319712bd94",
         "sha256WithoutMetadata": "de277aad02462c4c46d6b4f3dfe4626ce104b6d6c3edc6e741f6424a9ddee29e"
       },
       "figures/2-sarkisuo.svg": {
-        "sha256": "0109113c6a3673958ed6f07e0e5f2f59bf4a9b221db1f8ef28e1bddebfabb910",
+        "sha256": "fe58c44c5878e0610aca351e29bd29b4674e219b466c9130b53d64c7343ff398",
         "sha256WithoutMetadata": "306eabcdb0eed6f71a59ad3cbf840df48de4199ed3d1e3eb67cbc9df00bb87f6"
       },
       "figures/3-haltiala.svg": {
-        "sha256": "b15be5b206596673004d864743e2ae9035f36c8e42148d86d2e771437410bbc0",
+        "sha256": "94de087386fed3d6ce619ea582becfcb4924cb6c163d5e7be5b04ea3007bed5c",
         "sha256WithoutMetadata": "f5174d53a35a1afa7933cf6df4f3eb7a64bb932df5e3b0f7a8beccfdc0ec5ca4"
       },
       "figures/4-qvidja.svg": {
-        "sha256": "4b104dc2b42d238553ff34737bf6a73f56e60304f14b43b8abb71cef373f1573",
+        "sha256": "d1de717316d10621e6dcab3c8427ed6c02809796e431bbf006589c9d4e4b5292",
         "sha256WithoutMetadata": "f5961a0f28eb8daa4c3404776e42cea0ae5237b11172606366f27537c077ee44"
       },
       "figures/5-viikki.svg": {
-        "sha256": "0d656fe353abaf78298b058b3535d3f29f733086d7767cfb95edbdfe7d5f3994",
+        "sha256": "6ec1cf6ff8411559b9b6b44381ba2c466d36fcf6921737bf672c25ccb224a649",
         "sha256WithoutMetadata": "5ba0db4c293418736aef019d81650772c8848f82a699d309a96da6fecc483eed"
       },
       "figures/6-maktau.svg": {
-        "sha256": "7c1bba6cde61b4a6e36831319fa43a3e50f4728cf746fa9698a5b93b10fee926",
+        "sha256": "1492c70ab463b02d851d4f80d2cc6a177c3b32229fcd41f074ebd380cf5194de",
         "sha256WithoutMetadata": "fdbee71f820f5116d69901c745380a9a5a37a50175595da9cf6a3c705bf44e4d"
       },
       "figures/7-offsets.svg": {
-        "sha256": "da499a822cfdae9beb14e432bdc7e135aba7478081b12a5bb15cb39e374cb03c",
+        "sha256": "8e7267161ea5e97c9eb737810f886671af9847367435ea3501aedbb80bcd7b8f",
         "sha256WithoutMetadata": "9cf46009d1f4b621e8576e1875821bbfd1e5a8d65819b26552a365fca665af0f"
       },
       "figures/8-course.svg": {
-        "sha256": "634b0630dab6c5c0d870f7371966896249af057650ca75ecd81e718d18db5bbe",
+        "sha256": "5977326e5f4eae762a1102f4e92ccef16778a51e1937ebf40c755ef6f0ae8504",
         "sha256WithoutMetadata": "9f1195836fd608feeda933e04fc0f5f215a4ca80c2d0c87a4d9360225b2050d5"
+      },
+      "figures/9-second-dates.svg": {
+        "sha256": "ee88350edbf0f3376f8473a921ee15573ae5eddb38bc02d1eafcfcb4dedc89e1",
+        "sha256WithoutMetadata": "d98a8cc1c9371ad7e79d1d26cad4d8b4359d9c91b9f489bb2c8e171b31b5186a"
       }
     }
   }
