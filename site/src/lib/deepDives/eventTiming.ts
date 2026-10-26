@@ -87,6 +87,7 @@ const Alt = v.object({
   dateOther: v.string(),
   sourceOther: v.string(),
   sourceShort: v.string(),
+  sourceUsed: v.string(),
   page: v.string(),
   note: v.string(),
   episodeId: v.string(),
@@ -410,12 +411,16 @@ export interface AltRow {
   type: string;
   dateUsed: string;
   dateOther: string;
+  sourceUsed: string;
   source: string;
   test: string;
   toUsed: string;
   toOther: string;
   nearer: string;
 }
+
+/** File name of each source, without the folder; a note in brackets stays (the rule of the Events page). */
+const sourceFileText = (s: string) => s.split('; ').map((p) => p.replace(/^data\/(?:[^ ]*\/)?/, '')).join('; ');
 
 const NEARER_TEXT = { used: 'the date in the database', other: 'the other date', equal: 'same distance' } as const;
 
@@ -439,6 +444,7 @@ export function altRows(d: EventTimingData, site: SiteCode): AltRow[] {
         type: TYPE_TEXT[a.type] ?? a.type,
         dateUsed: a.dateEndUsed ? `${a.dateUsed} to ${a.dateEndUsed}` : a.dateUsed,
         dateOther: a.dateEndOther ? `${a.dateOther} to ${a.dateEndOther}` : a.dateOther,
+        sourceUsed: sourceFileText(a.sourceUsed),
         source: `${SOURCE_TEXT[a.sourceOther] ?? a.sourceOther}: ${a.page}${a.note ? `. ${a.note}` : ''}`,
         test,
         toUsed: toUsed === null ? dash : `${f0s(toUsed)} d`,

@@ -54,7 +54,8 @@ METHOD
        on the candidate days within -10 .. +5 days of the used date and of the other date
        (the other event gets the same duration as the used one). Candidates whose 10 side days
        touch another episode are skipped. The result gives the offset to each date and the date
-       that is nearer to the detected day.
+       that is nearer to the detected day. It also gives the source column of db/events.parquet
+       of the event that the database uses (sourceUsed).
     6. Summaries per site and kind and per kind: n, mean, SD, median, range of the offset of the
        clear change points, counts before (< 0), on (0) and after (> 0) the anchor, and the share of
        clear tests. Bootstrap 95 % CI of the mean (10 000 resamples, percentile method, numpy
@@ -1930,6 +1931,7 @@ def alt_search(
     out: dict[str, Any] = {
         **row,
         "sourceShort": SOURCE_SHORT[row["sourceOther"]],
+        "sourceUsed": ev.source,
         "episodeId": ep.id,
         "dateEndUsed": None if ev.date_end is None else iso_day(ev.date_end),
         "dateEndOther": None if ev.date_end is None else iso_day(other + duration),

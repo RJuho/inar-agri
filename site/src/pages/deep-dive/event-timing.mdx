@@ -787,12 +787,12 @@ script with their source.
 
 <div class="table-wrap">
 <table>
-<caption>All events with a second date in another source, in site order. Days apart = other date minus the date in the database (negative = the other date is earlier). Offset = detected day of the largest GPP drop (for the Viikki tillage: the Reco rise) minus the date; negative = the flux changed before the date. Nearer = the date with the smaller absolute offset, only for a clear change point.</caption>
+<caption>All events with a second date in another source, in site order. Source of the database date = the source column of db/events.parquet (file names); when it lists the project event file, the date of that file is the one in the database. Days apart = other date minus the date in the database (negative = the other date is earlier). Offset = detected day of the largest GPP drop (for the Viikki tillage: the Reco rise) minus the date; negative = the flux changed before the date. Nearer = the date with the smaller absolute offset, only for a clear change point.</caption>
 <thead>
-<tr><th scope="col">Site</th><th scope="col">Type</th><th scope="col">Date in the database</th><th scope="col">Other date</th><th scope="col" class="num">Days apart</th><th scope="col">Source of the other date</th><th scope="col">Test result</th><th scope="col" class="num">Offset to the database date</th><th scope="col" class="num">Offset to the other date</th><th scope="col">Nearer to</th></tr>
+<tr><th scope="col">Site</th><th scope="col">Type</th><th scope="col">Date in the database</th><th scope="col">Source of the database date</th><th scope="col">Other date</th><th scope="col" class="num">Days apart</th><th scope="col">Source of the other date</th><th scope="col">Test result</th><th scope="col" class="num">Offset to the database date</th><th scope="col" class="num">Offset to the other date</th><th scope="col">Nearer to</th></tr>
 </thead>
 <tbody>
-{altRowsAll(d).map((r) => (<tr id={r.id}><td>{r.site}</td><td>{r.type}</td><td class="wrap">{r.dateUsed}</td><td class="wrap">{r.dateOther}</td><td class="num">{r.daysApart}</td><td class="wrap">{r.source}</td><td class="wrap">{r.test}</td><td class="num">{r.toUsed}</td><td class="num">{r.toOther}</td><td class="wrap">{r.nearer}</td></tr>))}
+{altRowsAll(d).map((r) => (<tr id={r.id}><td>{r.site}</td><td>{r.type}</td><td class="wrap">{r.dateUsed}</td><td class="wrap">{r.sourceUsed}</td><td class="wrap">{r.dateOther}</td><td class="num">{r.daysApart}</td><td class="wrap">{r.source}</td><td class="wrap">{r.test}</td><td class="num">{r.toUsed}</td><td class="num">{r.toOther}</td><td class="wrap">{r.nearer}</td></tr>))}
 </tbody>
 </table>
 </div>

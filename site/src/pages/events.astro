@@ -38,7 +38,7 @@ const num = (x: number | null) => (x === null ? '' : factNumber(x));
 const dm = (x: number | null) => (x === null ? '' : String(Math.round(x * 1000) / 1000));
 const amount = (e: EventJson) => (e.amount === null ? '' : `${factNumber(e.amount)} ${e.amount_unit === 'm3/ha' ? 'm³/ha' : e.amount_unit}`);
 /** File name of each source, without the folder. A note in brackets stays. */
-const sourceText = (s: string) => s.split('; ').map((p) => p.replace(/^data\/[^ ]*\//, '')).join('; ');
+const sourceText = (s: string) => s.split('; ').map((p) => p.replace(/^data\/(?:[^ ]*\/)?/, '')).join('; ');
 const count = (list: EventJson[], f: (e: EventJson) => boolean) => list.filter(f).length;
 ---
 

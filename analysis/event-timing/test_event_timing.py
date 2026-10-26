@@ -338,6 +338,22 @@ def test_highlights_present() -> None:
     assert len(r["literatureByKey"]) == len(r["literature"])
 
 
+def test_alternative_dates_source_used() -> None:
+    """sourceUsed of each alternative-date row is the source of the matched database event."""
+    r = results()
+    for a, row in zip(r["alternativeDates"], et.ALTERNATIVE_DATES, strict=True):
+        assert a["sourceUsed"].strip()
+        match = [
+            e
+            for e in r["sites"][a["site"]]["events"]
+            if e["date"] == a["dateUsed"]
+            and e["type"] == a["type"]
+            and row.get("detailMatch", "") in e["detail"]
+        ]
+        assert len(match) == 1
+        assert a["sourceUsed"] == match[0]["source"]
+
+
 def test_data_version_keys() -> None:
     dv = results()["dataVersion"]
     assert {
