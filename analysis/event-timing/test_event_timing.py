@@ -338,8 +338,18 @@ def test_highlights_present() -> None:
     assert len(r["literatureByKey"]) == len(r["literature"])
 
 
+def test_source_of_used_date() -> None:
+    xlsx = "data/Qvidja/Qvidja_management.xlsx"
+    ag = "data/Agri_site_management_events 2018-2025.xlsx"
+    assert et.source_of_used_date(f"{xlsx}; {ag}", "qvidja-xlsx") == ag
+    assert et.source_of_used_date(ag, "qvidja-xlsx") == ag
+    pdf = "data/Qvidja/Qvidja_C-balance.pdf (Heimsch et al. 2021, Table 1)"
+    assert et.source_of_used_date(pdf, "heimsch2021") == pdf
+    assert set(et.SOURCE_FILE) == set(et.SOURCE_SHORT)
+
+
 def test_alternative_dates_source_used() -> None:
-    """sourceUsed of each alternative-date row is the source of the matched database event."""
+    """sourceUsed of each row is the source of the matched event without the file of the other date."""
     r = results()
     for a, row in zip(r["alternativeDates"], et.ALTERNATIVE_DATES, strict=True):
         assert a["sourceUsed"].strip()
@@ -351,7 +361,14 @@ def test_alternative_dates_source_used() -> None:
             and row.get("detailMatch", "") in e["detail"]
         ]
         assert len(match) == 1
-        assert a["sourceUsed"] == match[0]["source"]
+        db_parts = match[0]["source"].split("; ")
+        used_parts = a["sourceUsed"].split("; ")
+        assert set(used_parts) <= set(db_parts)
+        other_file = et.SOURCE_FILE[a["sourceOther"]]
+        if any(not p.startswith(other_file) for p in db_parts):
+            assert not any(p.startswith(other_file) for p in used_parts)
+        else:
+            assert used_parts == db_parts
 
 
 def test_data_version_keys() -> None:

@@ -54,8 +54,9 @@ METHOD
        on the candidate days within -10 .. +5 days of the used date and of the other date
        (the other event gets the same duration as the used one). Candidates whose 10 side days
        touch another episode are skipped. The result gives the offset to each date and the date
-       that is nearer to the detected day. It also gives the source column of db/events.parquet
-       of the event that the database uses (sourceUsed).
+       that is nearer to the detected day. It also gives the files of the source column of
+       db/events.parquet that give the date in the database (sourceUsed: the files of the
+       event without the file of the other date; all files when both dates come from one file).
     6. Summaries per site and kind and per kind: n, mean, SD, median, range of the offset of the
        clear change points, counts before (< 0), on (0) and after (> 0) the anchor, and the share of
        clear tests. Bootstrap 95 % CI of the mean (10 000 resamples, percentile method, numpy
@@ -653,6 +654,32 @@ SOURCE_SHORT = {
     "gao2026": "article",
     "rasanen2026": "article",
 }
+# The file of each source key, as it starts in the source column of db/events.parquet.
+SOURCE_FILE = {
+    "qvidja-xlsx": "data/Qvidja/Qvidja_management.xlsx",
+    "haltiala-xlsx": "data/Haltiala/haltiala_smear_management.xlsx",
+    "viikki-docx": "data/Viikki/EC/Management Information.docx",
+    "shurpali2025": "data/articles/Shurpali_2025.pdf",
+    "heimsch2021": "data/Qvidja/Qvidja_C-balance.pdf",
+    "heimsch2024": "data/articles/Heimsch_2024.pdf",
+    "gao2026": "data/articles/Gao_2026_Cfootprint_milk-DNDC.pdf",
+    "rasanen2026": "data/articles/Räsänen_2026_kenia.pdf",
+}
+
+
+def source_of_used_date(db_source: str, source_other: str) -> str:
+    """The files of the source column of db/events.parquet that give the date in the database.
+
+    The source column lists all files that record the event, with "; " between them. The file
+    of the other date is removed. When all files are that file (both dates come from one file),
+    the full list stays.
+    """
+    parts = [p for p in db_source.split("; ") if p]
+    file = SOURCE_FILE[source_other]
+    keep = [p for p in parts if not p.startswith(file)]
+    return "; ".join(keep if keep else parts)
+
+
 ALTERNATIVE_DATES: tuple[dict[str, Any], ...] = (
     {
         "site": "anttila",
@@ -1931,7 +1958,7 @@ def alt_search(
     out: dict[str, Any] = {
         **row,
         "sourceShort": SOURCE_SHORT[row["sourceOther"]],
-        "sourceUsed": ev.source,
+        "sourceUsed": source_of_used_date(ev.source, row["sourceOther"]),
         "episodeId": ep.id,
         "dateEndUsed": None if ev.date_end is None else iso_day(ev.date_end),
         "dateEndOther": None if ev.date_end is None else iso_day(other + duration),

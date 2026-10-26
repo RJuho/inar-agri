@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-26T07:13:08Z",
+  "generatedAt": "2026-10-26T07:42:26Z",
   "git": {
-    "commit": "ba2d57d",
+    "commit": "0d3e6aa",
     "dirty": true
   },
   "script": {
     "path": "analysis/event-timing/event-timing.py",
-    "sha256": "2543b3b5651d9a7fcf2463cb8c8bcf0ded45ea2606d08a74a7d6772ec2afacf3"
+    "sha256": "9c2c0e4c2de3846f8f87f4b7b1fd08184fef4ae3e8e11dc86d41aff8d6eac1f4"
   },
   "lock": {
     "path": "analysis/event-timing/event-timing.py.lock",
@@ -333,38 +333,38 @@
     }
   },
   "outputs": {
-    "results.json": "88fd2553016fc0819de63498b1737cd613539b0352c6b4d0e82591c7128b0e5e",
+    "results.json": "67b0444fa99ac3c6b75008b07b115372b28db095d9fecd356613112375e7bdf3",
     "figures": {
       "figures/1-anttila.svg": {
-        "sha256": "1f70f1de224ae2092423feb8f3cb1ae54e94cf2270803ad9da74c59a0db24a43",
+        "sha256": "299b0e8ddd66bbd7ac89a0e6199b662f434576167c30adb25bf1238bc06b0350",
         "sha256WithoutMetadata": "de277aad02462c4c46d6b4f3dfe4626ce104b6d6c3edc6e741f6424a9ddee29e"
       },
       "figures/2-sarkisuo.svg": {
-        "sha256": "74df20fa6d62688b389430e98395a4d0d8ab1ad150968ec46f229bb4926c75e7",
+        "sha256": "0109113c6a3673958ed6f07e0e5f2f59bf4a9b221db1f8ef28e1bddebfabb910",
         "sha256WithoutMetadata": "306eabcdb0eed6f71a59ad3cbf840df48de4199ed3d1e3eb67cbc9df00bb87f6"
       },
       "figures/3-haltiala.svg": {
-        "sha256": "cb8e401de6841c94a9977f3a9f9b77b850ede00afa5baa493480bea36c537e27",
+        "sha256": "b15be5b206596673004d864743e2ae9035f36c8e42148d86d2e771437410bbc0",
         "sha256WithoutMetadata": "f5174d53a35a1afa7933cf6df4f3eb7a64bb932df5e3b0f7a8beccfdc0ec5ca4"
       },
       "figures/4-qvidja.svg": {
-        "sha256": "d04a954697fe413b91090772c3fd50d6dfbaff077b373457323fbbc45cfef3e4",
+        "sha256": "4b104dc2b42d238553ff34737bf6a73f56e60304f14b43b8abb71cef373f1573",
         "sha256WithoutMetadata": "f5961a0f28eb8daa4c3404776e42cea0ae5237b11172606366f27537c077ee44"
       },
       "figures/5-viikki.svg": {
-        "sha256": "45e5214286b68d050a442a61df09a6192e93a577838827ccc29460ec174e1006",
+        "sha256": "0d656fe353abaf78298b058b3535d3f29f733086d7767cfb95edbdfe7d5f3994",
         "sha256WithoutMetadata": "5ba0db4c293418736aef019d81650772c8848f82a699d309a96da6fecc483eed"
       },
       "figures/6-maktau.svg": {
-        "sha256": "146a2a56eb4e1258c44cd6879b76e38b271b1e23263a93923acab5057b7bbaae",
+        "sha256": "7c1bba6cde61b4a6e36831319fa43a3e50f4728cf746fa9698a5b93b10fee926",
         "sha256WithoutMetadata": "fdbee71f820f5116d69901c745380a9a5a37a50175595da9cf6a3c705bf44e4d"
       },
       "figures/7-offsets.svg": {
-        "sha256": "359588a8962959958c366732414e245f5777de386fbbda598a007029210dc7d3",
+        "sha256": "da499a822cfdae9beb14e432bdc7e135aba7478081b12a5bb15cb39e374cb03c",
         "sha256WithoutMetadata": "9cf46009d1f4b621e8576e1875821bbfd1e5a8d65819b26552a365fca665af0f"
       },
       "figures/8-course.svg": {
-        "sha256": "c946973f40b393df9664ac37c71810b0cfc1d0d5c6d4d7c3f289144f9b75126b",
+        "sha256": "634b0630dab6c5c0d870f7371966896249af057650ca75ecd81e718d18db5bbe",
         "sha256WithoutMetadata": "9f1195836fd608feeda933e04fc0f5f215a4ca80c2d0c87a4d9360225b2050d5"
       }
     }
