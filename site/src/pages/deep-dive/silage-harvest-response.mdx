@@ -53,13 +53,13 @@ export const episodes = episodeRows(d);
 export const summary = summaryRows(d);
 export const inputs = inputRows(d);
 export const overrides = overrideTexts(d);
-export const BLOCKS = ['anttila', 'sarkisuo', 'qvidja', 'viikki', 'all'];
+export const BLOCKS = ['anttila', 'sarkisuo', 'qvidja', 'viikki', 'all', 'allAbs'];
 
 export function Composite({ block }) {
   return (
     <div class="table-wrap">
       <table>
-        <caption>{compositeLabel(d, block)}: mean ± sample SD of the episodes per day (GPP, TER and NEE in % of the mean GPP of the {d.method.windowDays} days before the start of the episode) and the number of episodes with a value (n). An empty cell = fewer than {d.method.compositeMinN} episodes with a value.</caption>
+        <caption>{compositeLabel(d, block)}: mean ± sample SD of the episodes per day ({block === 'allAbs' ? `GPP, TER and NEE in ${U}` : `GPP, TER and NEE as a fraction of the mean GPP of the ${d.method.windowDays} days before the start of the episode`}; day 0 = the last day of the harvest) and the number of episodes with a value (n). An empty cell = fewer than {d.method.compositeMinN} episodes with a value.</caption>
         <thead>
           <tr><th scope="col" class="num">Day</th><th scope="col" class="num">GPP mean ± SD</th><th scope="col" class="num">n</th><th scope="col" class="num">TER mean ± SD</th><th scope="col" class="num">n</th><th scope="col" class="num">NEE mean ± SD</th><th scope="col" class="num">n</th></tr>
         </thead>
@@ -173,12 +173,15 @@ days. The nine rules below give each constant; open them to reproduce the number
    day remains from *d* to day <Num k="method.recoveryMaxDays" digits={0} /> + 2 ("data end"); when no day passes, it is
    censored at day <Num k="method.recoveryMaxDays" digits={0} /> ("max days").
 6. **Composite curves.** Per site and over all used episodes, for the days <Num k="method.compositeFrom" sign digits={0} /> to
-   <Num k="method.compositeTo" sign digits={0} /> from start. The value of an episode is empty from the day end + next
-   disturbance on. GPP, TER and NEE are in percent of the mean GPP before of the episode (empty when it is below
-   <Num k="method.minGppBefore" digits={1} unit={U} />). Per day: the mean, the sample SD and n over the episodes; the mean and
-   the SD are empty when n is below <Num k="method.compositeMinN" digits={0} />. The y range of both figures is one range over
-   all mean ± SD of the five panels, rounded outwards to a multiple of <Num k="method.yStep" digits={0} /> and extended to hold 0
-   and 100: <Num k="composite.yRange.0" digits={0} /> to <Num k="composite.yRange.1" digits={0} /> %.
+   <Num k="method.compositeTo" sign digits={0} /> from end (the last day of the harvest). The value of an episode is empty from
+   the day end + next disturbance on. GPP, TER and NEE are a fraction of the mean GPP before of the episode (empty when it is
+   below <Num k="method.minGppBefore" digits={1} unit={U} />). Per day: the mean, the sample SD and n over the episodes; the
+   mean and the SD are empty when n is below <Num k="method.compositeMinN" digits={0} />. The y range of Figures 1 and 2 is one
+   range over all mean ± SD of the five panels, rounded outwards to a multiple of <Num k="method.yStep" digits={2} /> and
+   extended to hold 0 and 1: <Num k="composite.yRange.0" digits={2} /> to <Num k="composite.yRange.1" digits={2} />. A second
+   composite over all used episodes holds the fluxes in {U} (no check of the GPP before); its y range (Figure 3) is rounded
+   outwards to a multiple of <Num k="method.yStepAbs" digits={0} unit={U} /> and extended to hold 0:
+   <Num k="composite.yRangeAbs.0" digits={0} /> to <Num k="composite.yRangeAbs.1" digits={0} unit={U} />.
 7. **Change point.** For each candidate day *t* from start <Num k="method.searchFrom" sign digits={0} /> to end
    <Num k="method.searchTo" sign digits={0} />, drop(*t*) = mean GPP of *t* − <Num k="method.sideDays" digits={0} /> to *t* − 1
    minus mean GPP of *t* to *t* + <Num k="method.sideDays" digits={0} /> − 1, each side with
@@ -246,9 +249,10 @@ The overrides of Deep Dive #4 are:
 
 ## Results
 
-Each panel shows the mean of the episodes per day (lines) and ± 1 SD (bands) of GPP, TER and NEE, in percent of the mean GPP of
-the <Num k="method.windowDays" digits={0} /> days before the harvest. NEE % = TER % − GPP %, thus NEE above zero is a net
-release. The curves are drawn only where <Num k="method.compositeMinN" digits={0} /> or more episodes have a value.
+Each panel shows the mean of the episodes per day (lines) and ± 1 SD (bands) of GPP, TER and NEE, as a fraction of the mean
+GPP of the <Num k="method.windowDays" digits={0} /> days before the harvest. Day 0 is the last day of the harvest.
+NEE = TER − GPP, thus NEE above zero is a net release. The curves are drawn only where
+<Num k="method.compositeMinN" digits={0} /> or more episodes have a value. Figure 3 shows the curve of all episodes in {U}.
 
 ### Per site
 
@@ -271,13 +275,24 @@ release. The curves are drawn only where <Num k="method.compositeMinN" digits={0
 <Figure id="figure-2" svgFile="analysis/silage-harvest-response/figures/2-all-sites.svg" view={VIEW} />
 
 Over all used episodes, the mean of the days <Num k="method.afterDays.0" sign digits={0} /> to
-<Num k="method.afterDays.1" sign digits={0} /> was <Num k="composite.all.gpp.meanDays1to14" digits={0} unit="%" /> of the GPP
-before for GPP, <Num k="composite.all.reco.meanDays1to14" digits={0} unit="%" /> for TER and
-<Num k="composite.all.nee.meanDays1to14" sign digits={0} unit="%" /> for NEE. In the days
+<Num k="method.afterDays.1" sign digits={0} /> was <Num k="composite.all.gpp.meanDays1to14" digits={2} /> of the GPP
+before for GPP, <Num k="composite.all.reco.meanDays1to14" digits={2} /> for TER and
+<Num k="composite.all.nee.meanDays1to14" sign digits={2} /> for NEE. In the days
 <Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} /> the values were
-<Num k="composite.all.gpp.meanDays15to28" digits={0} unit="%" /> (GPP), <Num k="composite.all.reco.meanDays15to28" digits={0} unit="%" />
-(TER) and <Num k="composite.all.nee.meanDays15to28" sign digits={0} unit="%" /> (NEE). Each day has
+<Num k="composite.all.gpp.meanDays15to28" digits={2} /> (GPP), <Num k="composite.all.reco.meanDays15to28" digits={2} />
+(TER) and <Num k="composite.all.nee.meanDays15to28" sign digits={2} /> (NEE). Each day has
 <Num k="composite.all.gpp.minN" digits={0} /> to <Num k="composite.all.gpp.maxN" digits={0} /> episodes with a value.
+
+<Figure id="figure-3" svgFile="analysis/silage-harvest-response/figures/3-all-sites-absolute.svg" view={VIEW} />
+
+In absolute values, the mean of the days <Num k="method.afterDays.0" sign digits={0} /> to
+<Num k="method.afterDays.1" sign digits={0} /> was <Num k="composite.allAbs.gpp.meanDays1to14" digits={1} unit={U} /> for GPP,
+<Num k="composite.allAbs.reco.meanDays1to14" digits={1} /> for TER and
+<Num k="composite.allAbs.nee.meanDays1to14" sign digits={1} /> for NEE; in the days
+<Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} /> it was
+<Num k="composite.allAbs.gpp.meanDays15to28" digits={1} unit={U} /> (GPP),
+<Num k="composite.allAbs.reco.meanDays15to28" digits={1} /> (TER) and
+<Num k="composite.allAbs.nee.meanDays15to28" sign digits={1} /> (NEE).
 
 <div class="table-wrap">
 <table>
@@ -319,7 +334,7 @@ episode.
 ### Day by day
 
 <details class="dd-table">
-<summary>Composite values per day (five tables)</summary>
+<summary>Composite values per day (six tables)</summary>
 {BLOCKS.map((b) => (<Composite block={b} />))}
 </details>
 
@@ -350,6 +365,11 @@ episode.
   <Num k="summary.all.n" digits={0} /> episodes). The recovery share is empty when the next disturbance comes within
   <Num k="method.lateDays.1" digits={0} /> days (n = <Num k="summary.all.recoveryShare.n" digits={0} /> of
   <Num k="summary.all.n" digits={0} />).
+- **Day 0.** The composite curves count the days from the last day of the harvest. Three used episodes have more than one
+  day: Qvidja 2023-06-19 and 2023-08-21 (<Num k={`${E('qvidja-2023-06-19')}.durationDays`} digits={0} /> and
+  <Num k={`${E('qvidja-2023-08-21')}.durationDays`} digits={0} /> days) and Viikki 2023-08-17
+  (<Num k={`${E('viikki-2023-08-17')}.durationDays`} digits={0} /> days). Their harvest days are inside the days −14 to −1 of
+  the composite, and their reference stays the GPP of the <Num k="method.windowDays" digits={0} /> days before the first day.
 - **Association.** The changes are associated with the harvests. The weather, the season and the crop stage change in the
   same windows. The analysis does not show that a harvest caused a change.
 - **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
@@ -363,7 +383,7 @@ episode.
 
 The numbers on this page come from `analysis/silage-harvest-response/results.json`. The Python script
 <a href={`${REPO_URL}/blob/main/analysis/silage-harvest-response/silage-harvest-response.py`}><code>analysis/silage-harvest-response/silage-harvest-response.py</code></a>
-writes this file, `manifest.json` and the two SVG figures. It reads only the database snapshot built on
+writes this file, `manifest.json` and the three SVG figures. It reads only the database snapshot built on
 {d.dataVersion.snapshot.builtAt} and `data/calculated/daily.parquet` of the same build. Release:
 {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
 The table gives the SHA-256, the row count and the columns read of each file (the paths are relative to the `--db` and

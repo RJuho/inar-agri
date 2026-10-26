@@ -153,8 +153,10 @@ const DataSchema = v.object({
   composite: v.object({
     offsets: v.array(v.number()),
     yRange: v.tuple([v.number(), v.number()]),
+    yRangeAbs: v.tuple([v.number(), v.number()]),
     perSite: v.object({ anttila: CompositeBlock, sarkisuo: CompositeBlock, qvidja: CompositeBlock, viikki: CompositeBlock }),
     all: CompositeBlock,
+    allAbs: CompositeBlock,
   }),
   summary: v.object({
     perSite: v.object({ anttila: SummaryBlock, sarkisuo: SummaryBlock, qvidja: SummaryBlock, viikki: SummaryBlock }),
@@ -171,7 +173,8 @@ export type SilageData = v.InferOutput<typeof DataSchema>;
 type EpisodeOut = v.InferOutput<typeof Episode>;
 type StatOut = v.InferOutput<typeof Stat>;
 type SummaryOut = v.InferOutput<typeof SummaryBlock>;
-export type CompositeKey = PanelSite | 'all';
+/** `all` = all used episodes as a fraction of the GPP before; `allAbs` = the same in g C m⁻² d⁻¹. */
+export type CompositeKey = PanelSite | 'all' | 'allAbs';
 
 export function silageData(raw: unknown): SilageData {
   const d = v.parse(DataSchema, raw);
@@ -375,15 +378,23 @@ export interface CompositeRow {
   neeN: string;
 }
 
-/** The composite curve of one site or of all sites, one row per day from the first day of the harvest. */
+function compositeBlock(d: SilageData, block: CompositeKey) {
+  if (block === 'all') return d.composite.all;
+  if (block === 'allAbs') return d.composite.allAbs;
+  return d.composite.perSite[block];
+}
+
+/** The composite curve of one site or of all sites, one row per day from the last day of the harvest. */
 export function compositeRows(d: SilageData, block: CompositeKey): CompositeRow[] {
-  const c = block === 'all' ? d.composite.all : d.composite.perSite[block];
+  const c = compositeBlock(d, block);
+  // Fractions with 2 decimals, g C m⁻² d⁻¹ with 1 decimal.
+  const digits = block === 'allAbs' ? 1 : 2;
   // "mean ± SD" of the episodes on that day; empty when fewer than compositeMinN episodes have a value.
   const cell = (f: Flux, i: number) => {
     const m = c[f].mean[i];
     const s = c[f].sd[i];
     if (m === null || m === undefined) return '';
-    return s === null || s === undefined ? fmtNum(m, 0) : `${fmtNum(m, 0)} ± ${fmtNum(s, 0)}`;
+    return s === null || s === undefined ? fmtNum(m, digits) : `${fmtNum(m, digits)} ± ${fmtNum(s, digits)}`;
   };
   const nOf = (f: Flux, i: number) => fmtNum(c[f].n[i] ?? 0, 0);
   return d.composite.offsets.map((day, i) => ({
@@ -400,8 +411,8 @@ export function compositeRows(d: SilageData, block: CompositeKey): CompositeRow[
 
 /** Label of a composite block: the site name with n, or "All sites (n = 20)". */
 export function compositeLabel(d: SilageData, block: CompositeKey): string {
-  const c = block === 'all' ? d.composite.all : d.composite.perSite[block];
-  const name = block === 'all' ? 'All sites' : SITE_NAMES[block];
+  const c = compositeBlock(d, block);
+  const name = block === 'all' ? 'All sites' : block === 'allAbs' ? 'All sites, g C m⁻² d⁻¹' : SITE_NAMES[block];
   return `${name} (n = ${fmtNum(c.episodes, 0)})`;
 }
 

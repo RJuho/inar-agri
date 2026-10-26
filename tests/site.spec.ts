@@ -1872,16 +1872,16 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
-  test('the silage harvest response dive (Python) has two figures, the episode rows, the folded tables and SVG downloads', async ({ page, request }) => {
+  test('the silage harvest response dive (Python) has three figures, the episode rows, the folded tables and SVG downloads', async ({ page, request }) => {
     const slug = 'silage-harvest-response';
     await page.goto(`/deep-dive/${slug}/`);
     await expect(page.locator('h1')).toContainText('Silage harvest');
     await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #7');
     const h2 = await page.locator('main h2').allInnerTexts();
     expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
-    // Two matplotlib figures: per site and all sites.
+    // Three matplotlib figures: per site, all sites (fraction) and all sites (g C m-2 d-1).
     const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
-    expect(await figures.count()).toBe(2);
+    expect(await figures.count()).toBe(3);
     for (const svg of await figures.all()) {
       const info = await svg.evaluate((el) => {
         const [first, second] = [el.children[0], el.children[1]];
@@ -1904,7 +1904,7 @@ test.describe('deep dive pages', () => {
       expect(info.ariaLabel).toBeNull();
     }
     const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
-    expect(downloads.length).toBe(2);
+    expect(downloads.length).toBe(3);
     for (const href of downloads) {
       expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
       const res = await request.get(href);
@@ -1915,7 +1915,7 @@ test.describe('deep dive pages', () => {
     expect(await page.locator('tr[id^="episode-"]').count()).toBeGreaterThanOrEqual(25);
     await expect(page.locator('details.dd-table')).toHaveCount(2);
     expect(await page.locator('#method-rules ol li').count()).toBe(9);
-    expect(await page.locator('details.dd-table table').count()).toBe(5);
+    expect(await page.locator('details.dd-table table').count()).toBe(6);
     expect(await page.locator('.dd-num').count()).toBeGreaterThan(40);
     const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
     expect(hrefs.length).toBeGreaterThan(0);

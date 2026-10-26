@@ -281,20 +281,27 @@ def test_pre_drop() -> None:
 
 # ---------- Composite and y range ----------
 def test_nice_range() -> None:
-    assert sh.nice_range(-60.0, 130.0) == [-75.0, 150.0]
-    assert sh.nice_range(10.0, 90.0) == [0.0, 100.0]
-    assert sh.nice_range(-100.0, 225.0) == [-100.0, 225.0]
+    assert sh.nice_range(-0.6, 1.3) == [-0.75, 1.5]
+    assert sh.nice_range(0.1, 0.9) == [0.0, 1.0]
+    assert sh.nice_range(-1.0, 2.25) == [-1.0, 2.25]
+    # Absolute fluxes: a step of 2 and only 0 is held.
+    assert sh.nice_range(1.5, 13.1, 2, (0.0,)) == [0.0, 14.0]
+    assert sh.nice_range(-5.5, 13.1, sh.Y_STEP_ABS, sh.REF_LINES_ABS) == [-6.0, 14.0]
 
 
 def test_y_range_skips_null() -> None:
     comp = {
-        v: {"mean": [None, 50.0, 120.0], "sd": [None, 10.0, 20.0], "n": [1, 2, 2]}
+        v: {"mean": [None, 0.5, 1.2], "sd": [None, 0.1, 0.2], "n": [1, 2, 2]}
         for v in sh.FLUX_VARS
     }
-    assert sh.y_range([comp]) == [0.0, 150.0]
+    assert sh.y_range([comp]) == [0.0, 1.5]
+    assert sh.y_range([comp], sh.Y_STEP_ABS, sh.REF_LINES_ABS) == [0.0, 2.0]
+    # No value at all: the range holds only the reference lines.
+    empty = {v: {"mean": [None], "sd": [None], "n": [0]} for v in sh.FLUX_VARS}
+    assert sh.y_range([empty]) == [0.0, 1.0]
 
 
-def test_composite_percent_cutoff_and_min_n() -> None:
+def test_composite_fraction_cutoff_and_min_n() -> None:
     names = dict.fromkeys(sh.ALL_SITES, "")
     tables = {}
     t = sh.DayTable(0, 400)
@@ -305,21 +312,23 @@ def test_composite_percent_cutoff_and_min_n() -> None:
     tables["anttila"] = t
     data = sh.Data(names, {}, {}, {}, [], tables, {}, {})
 
-    def episode(start: int, nxt: int | None, ref: float) -> dict[str, Any]:
+    def episode(
+        start: int, nxt: int | None, ref: float, end: int | None = None
+    ) -> dict[str, Any]:
         return {
             "id": f"anttila-{start}",
             "site": "anttila",
             "start": sh.iso_day(start),
-            "end": sh.iso_day(start),
+            "end": sh.iso_day(start if end is None else end),
             "recovery": {"nextDisturbanceDays": nxt},
             "before": {"mean": {"gpp": ref}},
         }
 
     c = sh.composite(data, [episode(100, 10, 4.0), episode(200, None, 4.0)], "t")
     i0 = c["gpp"]["n"].index(2)
-    assert c["gpp"]["mean"][i0] == pytest.approx(50.0)
-    assert c["reco"]["mean"][i0] == pytest.approx(25.0)
-    assert c["nee"]["mean"][i0] == pytest.approx(-25.0)
+    assert c["gpp"]["mean"][i0] == pytest.approx(0.5)
+    assert c["reco"]["mean"][i0] == pytest.approx(0.25)
+    assert c["nee"]["mean"][i0] == pytest.approx(-0.25)
     # The first episode stops at day end + 10: offsets 10 .. 28 have n = 1 and null mean.
     offs = list(range(sh.COMPOSITE[0], sh.COMPOSITE[1] + 1))
     assert c["gpp"]["n"][offs.index(9)] == 2 and c["gpp"]["n"][offs.index(10)] == 1
@@ -330,6 +339,47 @@ def test_composite_percent_cutoff_and_min_n() -> None:
     # A reference below 0.5 gives no value.
     c2 = sh.composite(data, [episode(100, None, 0.4), episode(200, None, 4.0)], "t")
     assert max(c2["gpp"]["n"]) == 1
+    # Absolute: the daily values as they are, and the reference is not checked.
+    c3 = sh.composite(
+        data, [episode(100, None, 0.4), episode(200, None, 4.0)], "t", relative=False
+    )
+    assert max(c3["gpp"]["n"]) == 2
+    assert c3["gpp"]["mean"][i0] == pytest.approx(2.0)
+    assert c3["nee"]["mean"][i0] == pytest.approx(-1.0)
+
+
+def test_composite_offsets_count_from_the_last_day() -> None:
+    names = dict.fromkeys(sh.ALL_SITES, "")
+    t = sh.DayTable(0, 400)
+    days = np.arange(0, 401)
+    for v in sh.FLUX_VARS:
+        t.set(v, days, days.astype(float))  # value = day number
+    data = sh.Data(names, {}, {}, {}, [], {"anttila": t}, {}, {})
+    eps = [
+        {
+            "id": "anttila-100",
+            "site": "anttila",
+            "start": sh.iso_day(100),
+            "end": sh.iso_day(103),  # a 4-day harvest
+            "recovery": {"nextDisturbanceDays": 20},
+            "before": {"mean": {"gpp": 1.0}},
+        },
+        {
+            "id": "anttila-200",
+            "site": "anttila",
+            "start": sh.iso_day(200),
+            "end": sh.iso_day(200),
+            "recovery": {"nextDisturbanceDays": None},
+            "before": {"mean": {"gpp": 1.0}},
+        },
+    ]
+    c = sh.composite(data, eps, "t", relative=False)
+    offs = list(range(sh.COMPOSITE[0], sh.COMPOSITE[1] + 1))
+    # Day 0 = the last day (103 and 200): mean (103 + 200) / 2; day -14 = 89 and 186.
+    assert c["gpp"]["mean"][offs.index(0)] == pytest.approx(151.5)
+    assert c["gpp"]["mean"][offs.index(-14)] == pytest.approx(137.5)
+    # The next disturbance counts from the end: offsets 20 .. 28 have only the second episode.
+    assert c["gpp"]["n"][offs.index(19)] == 2 and c["gpp"]["n"][offs.index(20)] == 1
 
 
 # ---------- Statistics ----------
@@ -466,6 +516,7 @@ def test_scalar_keys() -> None:
         28,
     )
     assert m["axisNames"]["x"] == sh.X_LABEL and m["axisNames"]["y"] == sh.Y_LABEL
+    assert m["axisNames"]["yAbs"] == sh.Y_LABEL_ABS and m["yStepAbs"] == sh.Y_STEP_ABS
 
 
 @pytest.mark.skipif(not DIVE4_JSON.is_file(), reason="Deep Dive #4 JSON is absent")
@@ -503,14 +554,8 @@ def test_results_equal_deep_dive_4() -> None:
         # relPct of Reco is in percent of the GPP before here (Deep Dive #4: of the Reco before).
         for v in ("gpp", "nee"):
             assert close(e["relPct"][v], o["relPct"][v]), (e["id"], v)
-    # GPP composite of the used episodes.
-    g = d4["composite"]["groups"]["silageHarvest"]["gppSharePct"]
-    offs4 = d4["composite"]["offsets"]
-    c = r["composite"]["all"]["gpp"]
-    for i, off in enumerate(r["composite"]["offsets"]):
-        j = offs4.index(off)
-        assert c["n"][i] == g["n"][j]
-        assert close(c["mean"][i], g["mean"][j]) and close(c["sd"][i], g["sd"][j])
+    # The composite curves are not compared: Deep Dive #4 counts the offsets from the first day
+    # of the episode and gives percent; this dive counts from the last day and gives fractions.
     # Group means of Deep Dive #4 (bootstrap CIs differ by the generator).
     g4 = d4["groups"]["silageHarvest"]
     a = r["summary"]["all"]
@@ -586,7 +631,10 @@ def test_svg_text(path: Path) -> None:
     fig = next(f for f in results()["figures"] if f["n"] == n)
     assert fig["title"] == children[0].text
     assert fig["desc"] == children[1].text
-    assert str(int(results()["composite"]["yRange"][1])) in fig["desc"]
+    # The upper end of the y range of the figure is in the alt text.
+    comp = results()["composite"]
+    hi = comp["yRangeAbs"][1] if n == 3 else comp["yRange"][1]
+    assert sh.fmt(hi, 0 if n == 3 else 2) in fig["desc"]
     assert path.stat().st_size < 1_000_000
 
 

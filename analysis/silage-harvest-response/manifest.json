@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-25T17:54:27Z",
+  "generatedAt": "2026-10-26T11:54:53Z",
   "git": {
-    "commit": "0ace848",
+    "commit": "ac85498",
     "dirty": true
   },
   "script": {
     "path": "analysis/silage-harvest-response/silage-harvest-response.py",
-    "sha256": "43e0e9bdb80425ff3274ed17855f2cf92455af92c659df1a6dd3a6f3d6430406"
+    "sha256": "5d458a6a38d0e4acc970249bd3498c000ae99faa7bc5a1a60886d7566f42bf11"
   },
   "lock": {
     "path": "analysis/silage-harvest-response/silage-harvest-response.py.lock",
@@ -263,15 +263,19 @@
     }
   },
   "outputs": {
-    "results.json": "9504fdc68b96325d0e6b546c1cba2a751d4c6c8f3ad35555103a5c3589572b23",
+    "results.json": "8d179db247e7ab0211a319ef9a51390f8d9af4340e323042b1f30dac1cd954bd",
     "figures": {
       "figures/1-per-site.svg": {
-        "sha256": "21a787061c3285c235a628e0ab846bc8b28846ac19ed7f26113895828f2c3d15",
-        "sha256WithoutMetadata": "017a44f75bccd607f8d6887180093e380d22b0e1f842eaf57de8e640c52f73af"
+        "sha256": "bff4f5ed39d936ab5f7d66789dd21971358f35c54a01a34aeaaad6d9a6e43671",
+        "sha256WithoutMetadata": "694daaff4914760c25b3b7c5aa6bc1fcfc73bdd802ba8439cc865cdccc9741ee"
       },
       "figures/2-all-sites.svg": {
-        "sha256": "771654e385fc29f56fab1ca38d41f53bfbc9254d660a66d44e528697f6efd7d5",
-        "sha256WithoutMetadata": "6b5d1c699f042fed5a2a774bf39f013f6f4fb3a620b490440182701c0f0ad790"
+        "sha256": "ea345a8acece7b7d9b66a1e18e39ab6f891725c925875bd2815401c5e8be5037",
+        "sha256WithoutMetadata": "87f41c9268d349c36ac29f130fd7617a77a33fa3364a2fdb38dc834f83f5d566"
+      },
+      "figures/3-all-sites-absolute.svg": {
+        "sha256": "ba87b909caae2355198430a85afb72b7a79a44b02c11da8ff18e83a2e95e6d55",
+        "sha256WithoutMetadata": "30557d6231ea388eca79fa0e9705848b7752d5dca942df96ddab63b83bb27284"
       }
     }
   }

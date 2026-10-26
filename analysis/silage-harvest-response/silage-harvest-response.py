@@ -60,12 +60,14 @@ METHOD
        Pre-drop = 100 x (mean GPP of days -3 to -1 - mean of days -10 to -4) / mean of days -10 to
        -4 from the recorded date (far window 5 or more values and 1 g C m-2 d-1 or more, near
        window 2 or more values).
-    7. Composite curves per site and over all used episodes: offsets -14 to +28 from start; the
-       value of an episode is null from the day end + next disturbance on; GPP, TER and NEE in
-       percent of the mean GPP before of the episode (null when below 0.5). Per day: mean, sample
-       SD and n over the episodes; mean and SD are null when n < 2. The y range of both figures
-       is one range over all mean +- SD of all panels, rounded outwards to a multiple of 25 and
-       extended to hold 0 and 100.
+    7. Composite curves per site and over all used episodes: offsets -14 to +28 from end (the
+       last day of the harvest); the value of an episode is null from the day end + next
+       disturbance on; GPP, TER and NEE as a fraction of the mean GPP before of the episode (null
+       when below 0.5). Per day: mean, sample SD and n over the episodes; mean and SD are null
+       when n < 2. The y range of Figures 1 and 2 is one range over all mean +- SD of all panels,
+       rounded outwards to a multiple of 0.25 and extended to hold 0 and 1. A second composite
+       over all used episodes holds the fluxes in g C m-2 d-1 (no reference check); its y range
+       (Figure 3) is rounded outwards to a multiple of 2 and extended to hold 0.
     8. Summaries per site and over all used episodes: n, mean, SD, median, range of the changes
        (g C m-2 d-1 and %), the recovery share, the days to recover, the GPP drop offset (clear
        drops of the timing result) and the pre-drop; counts of drops before, on and after the
@@ -93,6 +95,7 @@ OUTPUTS
     manifest.json                provenance of the run and SHA-256 of the outputs
     figures/1-per-site.svg       GPP, TER and NEE around the silage harvest, one panel per site
     figures/2-all-sites.svg      the same for all used episodes together
+    figures/3-all-sites-absolute.svg  the same in g C m-2 d-1
     output/run.log               run log (not in git)
     output/episodes.csv          all silage harvest episodes with the numbers (not in git)
     With --check, all outputs go to output/ and the script compares them with the committed files.
@@ -274,7 +277,8 @@ COMPOSITE = (-14, 28)
 COMPOSITE_MIN_N = 2
 COMPOSITE_EARLY = (1, 14)
 COMPOSITE_LATE = (15, 28)
-Y_STEP = 25
+Y_STEP = 0.25
+Y_STEP_ABS = 2
 BOOTSTRAP_RESAMPLES = 10_000
 BOOTSTRAP_LEVEL = 0.95
 # Open findings ANT-01, SAR-01, VII-01: the stamps of Anttila, Sarkisuo and Viikki are 2 hours early.
@@ -467,16 +471,10 @@ EMOJI_GLYPH_WARNING = (
 )
 FONT_SCALE = 1.5  # fonts for slides: 1.5 x the dive default
 COLORS = {"gpp": "#ADD8E6", "reco": "#FFB6C1", "nee": "#4a708b"}
-DASHES: dict[str, tuple[float, ...] | None] = {
-    "gpp": None,
-    "reco": (6, 3),
-    "nee": (8, 3, 2, 3),
-}
 MARKERS = {"gpp": "o", "reco": "s", "nee": "^"}
 LEGEND_LABELS = {"gpp": "GPP", "reco": "TER (= Reco)", "nee": "NEE (< 0 = uptake)"}
 HARVEST_LINE = "#FFA500"
 INK = "#222222"
-GREY = "#8a8a8a"
 LINE_WIDTH = 2.2
 MARKER_SIZE = 6.5
 BAND_ALPHA = 0.25
@@ -487,14 +485,23 @@ FIG_WIDTH_IN = 180 * MM
 # (about 830 px at 96 px per inch), so that the four panels have room.
 FIG1_WIDTH_IN = 220 * MM
 FIG1_HEIGHT_IN = 85 * MM
-# Y major ticks of Figure 1 every 50 % (the panels are narrow); Figure 2 keeps Y_STEP.
-FIG1_Y_TICK_STEP = 50
+# Y major ticks of Figure 1 every 0.5 (the panels are narrow); Figures 2 and 3 use Y_STEP and
+# Y_STEP_ABS.
+FIG1_Y_TICK_STEP = 0.5
 FIG2_HEIGHT_IN = 100 * MM
-FIGURES = ((1, "per-site"), (2, "all-sites"))
-X_LABEL = "Days from the first day of the harvest (local days)"
-Y_LABEL = "GPP, TER, NEE (% of the mean GPP of days −14 to −1)"
-# The same name in three lines (the panels are not high enough for one line).
-Y_LABEL_LINES = "GPP, TER, NEE\n(% of the mean GPP\nof days −14 to −1)"
+FIGURES = ((1, "per-site"), (2, "all-sites"), (3, "all-sites-absolute"))
+ALL_SITES_TITLE = "All grass site average"
+X_LABEL = "Days from the last day of the harvest (local days)"
+# Figure 2: one line, no line break (the caption gives the full definition).
+Y_LABEL = "Fraction of GPP before harvest"
+# Figure 1: the same quantity in three lines (the panels are narrow).
+Y_LABEL_LINES = "GPP, TER, NEE\n(fraction of the mean GPP\nof days −14 to −1)"
+# Figure 3: the daily fluxes (mathtext, not Unicode superscripts).
+Y_LABEL_ABS = r"GPP, TER, NEE (g C m$^{-2}$ d$^{-1}$)"
+DAILY_UNIT_TEXT = "g C m⁻² d⁻¹"  # the unit in the captions and alt texts
+# Thin reference lines of the panels, also the values that the y range must hold.
+REF_LINES = (0.0, 1.0)
+REF_LINES_ABS = (0.0,)
 
 log = logging.getLogger(SLUG)
 
@@ -1027,10 +1034,12 @@ def short_text(s: str, n: int = DETAIL_SHORT) -> str:
     return cut + "…"
 
 
-def nice_range(lo: float, hi: float, step: float = Y_STEP) -> list[float]:
-    """[lo, hi] rounded outwards to a multiple of `step`, extended to hold 0 and 100."""
-    a = math.floor(min(lo, 0) / step) * step
-    b = math.ceil(max(hi, 100) / step) * step
+def nice_range(
+    lo: float, hi: float, step: float = Y_STEP, hold: tuple[float, ...] = REF_LINES
+) -> list[float]:
+    """[lo, hi] rounded outwards to a multiple of `step`, extended to hold the values in `hold`."""
+    a = math.floor(min(lo, *hold) / step) * step
+    b = math.ceil(max(hi, *hold) / step) * step
     return [float(a), float(b)]
 
 
@@ -1497,8 +1506,11 @@ def span_mean(
     return float(np.mean(vals)) if vals else None
 
 
-def composite(data: Data, eps: Sequence[dict[str, Any]], key: str) -> dict[str, Any]:
-    """Mean, sample SD and n per offset of GPP, TER and NEE in percent of the GPP before."""
+def composite(
+    data: Data, eps: Sequence[dict[str, Any]], key: str, relative: bool = True
+) -> dict[str, Any]:
+    """Mean, sample SD and n per offset from the last day of the harvest (end) of GPP, TER and
+    NEE, as a fraction of the GPP before of the episode (relative) or in g C m-2 d-1."""
     offsets = list(range(COMPOSITE[0], COMPOSITE[1] + 1))
     out: dict[str, Any] = {"episodes": len(eps), "ids": [e["id"] for e in eps]}
     for v in FLUX_VARS:
@@ -1508,15 +1520,19 @@ def composite(data: Data, eps: Sequence[dict[str, Any]], key: str) -> dict[str, 
         for off in offsets:
             xs: list[float] = []
             for e in eps:
-                start, end = day_number(e["start"]), day_number(e["end"])
+                end = day_number(e["end"])
                 nxt = e["recovery"]["nextDisturbanceDays"]
-                if nxt is not None and start + off >= end + nxt:
+                if nxt is not None and off >= nxt:
                     continue
-                x = data.tables[e["site"]].get(v, start + off)
-                ref = e["before"]["mean"]["gpp"]
-                if math.isnan(x) or ref is None or ref < MIN_GPP_BEFORE:
+                x = data.tables[e["site"]].get(v, end + off)
+                if math.isnan(x):
                     continue
-                xs.append(100 * x / ref)
+                if relative:
+                    ref = e["before"]["mean"]["gpp"]
+                    if ref is None or ref < MIN_GPP_BEFORE:
+                        continue
+                    x /= ref
+                xs.append(x)
             a = np.array(xs, dtype=float)
             n = len(a)
             ns.append(n)
@@ -1542,8 +1558,12 @@ def composite(data: Data, eps: Sequence[dict[str, Any]], key: str) -> dict[str, 
     return out
 
 
-def y_range(composites: Iterable[dict[str, Any]]) -> list[float]:
-    """One nice range over all mean +- SD of all panels (the same in both figures)."""
+def y_range(
+    composites: Iterable[dict[str, Any]],
+    step: float = Y_STEP,
+    hold: tuple[float, ...] = REF_LINES,
+) -> list[float]:
+    """One nice range over all mean +- SD of all given composites (the same in Figures 1 and 2)."""
     lo, hi = math.inf, -math.inf
     for c in composites:
         for v in FLUX_VARS:
@@ -1552,8 +1572,8 @@ def y_range(composites: Iterable[dict[str, Any]]) -> list[float]:
                     continue
                 lo, hi = min(lo, m - s), max(hi, m + s)
     if not math.isfinite(lo):
-        lo, hi = 0.0, 100.0
-    return nice_range(lo, hi)
+        lo, hi = min(hold), max(hold)
+    return nice_range(lo, hi, step, hold)
 
 
 def summary_block(
@@ -1655,8 +1675,12 @@ def analyse(data: Data) -> dict[str, Any]:
         s: composite(data, [e for e in used if e["site"] == s], s) for s in SITES
     }
     all_comp = composite(data, used, "all")
+    all_abs = composite(data, used, "allAbs", relative=False)
     yr = y_range([*per_site_comp.values(), all_comp])
-    log.info("y range of the figures: %s %%", yr)
+    yr_abs = y_range([all_abs], Y_STEP_ABS, REF_LINES_ABS)
+    log.info(
+        "y range of Figures 1 and 2: %s; of Figure 3: %s %s", yr, yr_abs, DAILY_UNIT
+    )
 
     summary = {
         "perSite": {
@@ -1718,8 +1742,10 @@ def analyse(data: Data) -> dict[str, Any]:
         "composite": {
             "offsets": list(range(COMPOSITE[0], COMPOSITE[1] + 1)),
             "yRange": yr,
+            "yRangeAbs": yr_abs,
             "perSite": per_site_comp,
             "all": all_comp,
+            "allAbs": all_abs,
         },
         "summary": summary,
     }
@@ -1738,9 +1764,9 @@ def fmt(x: float | None, digits: int = 2) -> str:
     return s.replace("-", "−")
 
 
-def fmt_sd(stat: dict[str, Any]) -> str:
-    """Per-episode statistic for the alt text: mean % (SD, n) of a summary block."""
-    return f"{fmt(stat['mean'], 0)} % (SD {fmt(stat['sd'], 0)}, n {stat['n']})"
+def fmt_sd(stat: dict[str, Any], digits: int = 0, unit: str = "%") -> str:
+    """Per-episode statistic for the alt text: mean unit (SD, n) of a summary block."""
+    return f"{fmt(stat['mean'], digits)} {unit} (SD {fmt(stat['sd'], digits)}, n {stat['n']})"
 
 
 def setup_matplotlib() -> None:
@@ -1876,10 +1902,6 @@ def save_svg(
     add_svg_text(path, n, title, desc)
 
 
-def line_kw(dash: tuple[float, ...] | None) -> dict[str, Any]:
-    return {"linestyle": "-" if dash is None else (0, dash)}
-
-
 def arr(values: Sequence[float | None]) -> np.ndarray:
     return np.array([np.nan if q is None else q for q in values], dtype=float)
 
@@ -1890,12 +1912,12 @@ def draw_panel(
     offsets: np.ndarray,
     yr: Sequence[float],
     y_step: float = Y_STEP,
+    ref_lines: Sequence[float] = REF_LINES,
 ) -> None:
-    """Three curves with bands, the harvest line, the 100 %, 80 % and 0 lines, the axis ranges."""
+    """Three solid curves with bands, the harvest line, the thin reference lines, the axes."""
     ax.axvline(0, color=HARVEST_LINE, lw=1.2, alpha=0.5, zorder=1)
-    ax.axhline(100, color=INK, lw=0.6, zorder=1)
-    ax.axhline(0, color=INK, lw=0.6, zorder=1)
-    ax.axhline(RECOVERY_SHARE_PCT, color=GREY, lw=0.8, ls=(0, (1, 2)), zorder=1)
+    for y in ref_lines:
+        ax.axhline(y, color=INK, lw=0.6, zorder=1)
     for v in FLUX_VARS:
         m, s = arr(comp[v]["mean"]), arr(comp[v]["sd"])
         ax.fill_between(
@@ -1911,13 +1933,12 @@ def draw_panel(
             markevery=MARK_EVERY,
             zorder=3 if v != "nee" else 4,
             solid_capstyle="round",
-            **line_kw(DASHES[v]),
         )
     ax.set_xlim(COMPOSITE[0] - 0.5, COMPOSITE[1] + 0.5)
     ax.set_ylim(yr[0], yr[1])
-    # Ticks on the multiples of y_step inside the range (the range itself is a multiple of 25).
+    # Ticks on the multiples of y_step inside the range.
     first_tick = math.ceil(yr[0] / y_step) * y_step
-    ax.set_yticks(np.arange(first_tick, yr[1] + 1, y_step))
+    ax.set_yticks(np.arange(first_tick, yr[1] + y_step / 2, y_step))
 
 
 def legend_handles() -> list[Any]:
@@ -1930,40 +1951,65 @@ def legend_handles() -> list[Any]:
             marker=MARKERS[v],
             ms=MARKER_SIZE,
             label=LEGEND_LABELS[v],
-            **line_kw(DASHES[v]),
         )
         for v in FLUX_VARS
     ]
 
 
-def panel_desc(name: str, comp: dict[str, Any], block: dict[str, Any]) -> str:
+def panel_desc(
+    name: str, comp: dict[str, Any], block: dict[str, Any], absolute: bool = False
+) -> str:
     """Two sentences per panel: the per-episode changes (mean, SD, n, as the tables) and the
     means of the composite curve in two spans."""
+    if absolute:
+        unit = DAILY_UNIT_TEXT
+        changes = (
+            f"in {unit}: ΔGPP {fmt_sd(block['deltaGpp'], 1, unit)}, "
+            f"ΔTER {fmt_sd(block['deltaReco'], 1, unit)}, ΔNEE {fmt_sd(block['deltaNee'], 1, unit)}"
+        )
+        curve_unit, digits = f"in {unit}", 1
+    else:
+        changes = (
+            f"in percent of the GPP before: ΔGPP {fmt_sd(block['relGpp'])}, "
+            f"ΔTER {fmt_sd(block['relReco'])}, ΔNEE {fmt_sd(block['relNee'])}"
+        )
+        curve_unit, digits = "as a fraction of the GPP before", 2
+
+    def span(key: str) -> str:
+        return ", ".join(
+            f"{FLUX_LABELS[v]} {fmt(comp[v][key], digits)}" for v in FLUX_VARS
+        )
+
     return (
         f"{name} (n = {comp['episodes']}; {comp['gpp']['minN']} to {comp['gpp']['maxN']} "
-        "episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in "
-        f"percent of the GPP before: ΔGPP {fmt_sd(block['relGpp'])}, ΔTER {fmt_sd(block['relReco'])}, "
-        f"ΔNEE {fmt_sd(block['relNee'])}. Mean of the curve over days +1 to +14: GPP "
-        f"{fmt(comp['gpp']['meanDays1to14'], 0)} %, TER {fmt(comp['reco']['meanDays1to14'], 0)} %, "
-        f"NEE {fmt(comp['nee']['meanDays1to14'], 0)} %; days +15 to +28: GPP "
-        f"{fmt(comp['gpp']['meanDays15to28'], 0)} %, TER {fmt(comp['reco']['meanDays15to28'], 0)} %, "
-        f"NEE {fmt(comp['nee']['meanDays15to28'], 0)} %."
+        "episodes per day): change of days +1 to +14 against days −14 to −1 per episode, "
+        f"{changes}. Mean of the curve over days +1 to +14, {curve_unit}: {span('meanDays1to14')}; "
+        f"days +15 to +28: {span('meanDays15to28')}."
     )
 
 
-def common_desc(yr: Sequence[float]) -> str:
+def common_desc(yr: Sequence[float], absolute: bool = False) -> str:
+    if absolute:
+        y_axis = (
+            f"Y axis: GPP, TER and NEE in {DAILY_UNIT_TEXT}, from {fmt(yr[0], 0)} to "
+            f"{fmt(yr[1], 0)} (NEE < 0 = uptake, NEE = TER − GPP)."
+        )
+        ref = "a thin line marks 0"
+    else:
+        y_axis = (
+            "Y axis: GPP, TER and NEE as a fraction of the mean GPP of the days "
+            f"{fmt(BEFORE[0], 0)} to {fmt(BEFORE[1], 0)} before the first day of the harvest, "
+            f"from {fmt(yr[0], 2)} to {fmt(yr[1], 2)} (NEE as a fraction of the GPP before: "
+            "NEE < 0 = uptake, NEE = TER − GPP)."
+        )
+        ref = "thin lines mark 1 and 0"
     return (
-        f"X axis: days from the first day of the harvest ({fmt(COMPOSITE[0], 0)} to "
-        f"+{COMPOSITE[1]}, local days, UTC+{UTC_SHIFT_HOURS}). Y axis: GPP, TER and NEE in percent "
-        f"of the mean GPP of the days {fmt(BEFORE[0], 0)} to {fmt(BEFORE[1], 0)} before the "
-        f"harvest, from {fmt(yr[0], 0)} to "
-        f"{fmt(yr[1], 0)} % (NEE in percent of the GPP before: NEE < 0 = uptake, NEE % = TER % − "
-        "GPP %). Lines: GPP light blue solid with circles, TER light pink dashed with squares, NEE "
-        "steel blue dash-dotted with triangles; markers every 7 days. The band around each line is "
-        f"the mean ± 1 SD over the episodes; line and band are drawn only where {COMPOSITE_MIN_N} or "
-        "more episodes have a value. An orange vertical line marks day 0 (the first day of the "
-        f"harvest), thin lines mark 100 % and 0, a dotted grey line marks {RECOVERY_SHARE_PCT} % "
-        "(the recovery level)."
+        f"X axis: days from the last day of the harvest ({fmt(COMPOSITE[0], 0)} to "
+        f"+{COMPOSITE[1]}, local days, UTC+{UTC_SHIFT_HOURS}). {y_axis} Lines, all solid: GPP "
+        "light blue with circles, TER light pink with squares, NEE steel blue with triangles; "
+        "markers every 7 days. The band around each line is the mean ± 1 SD over the episodes; "
+        f"line and band are drawn only where {COMPOSITE_MIN_N} or more episodes have a value. An "
+        f"orange vertical line marks day 0 (the last day of the harvest), {ref}."
     )
 
 
@@ -2009,9 +2055,10 @@ def fig_per_site(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
     )
     last = SITES[-1]
     title = (
-        "Daily GPP, TER and NEE from 14 days before to 28 days after a silage harvest at "
-        f"{names} and {data.names[last]} (n = {comp['perSite'][last]['episodes']}), in percent of "
-        "the mean GPP of the 14 days before the harvest; mean and ± 1 SD over the episodes."
+        "Daily GPP, TER and NEE from 14 days before to 28 days after the last day of a silage "
+        f"harvest at {names} and {data.names[last]} (n = {comp['perSite'][last]['episodes']}), as "
+        "a fraction of the mean GPP of the 14 days before the harvest; mean and ± 1 SD over the "
+        "episodes."
     )
     parts = [
         f"Four panels side by side, one per site, with the same axes. {common_desc(yr)}"
@@ -2023,17 +2070,32 @@ def fig_per_site(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
     return fig, title, " ".join(parts)
 
 
-def fig_all_sites(res: dict[str, Any]) -> tuple[Any, str, str]:
+def fig_all_sites(res: dict[str, Any], absolute: bool = False) -> tuple[Any, str, str]:
+    """Figure 2 (fraction of the GPP before) or Figure 3 (g C m-2 d-1): all used episodes."""
     comp = res["composite"]
     offsets = np.array(comp["offsets"], dtype=float)
-    yr = comp["yRange"]
-    c = comp["all"]
+    if absolute:
+        yr, c = comp["yRangeAbs"], comp["allAbs"]
+        y_step, ref_lines, y_label = Y_STEP_ABS, REF_LINES_ABS, Y_LABEL_ABS
+    else:
+        yr, c = comp["yRange"], comp["all"]
+        y_step, ref_lines, y_label = Y_STEP, REF_LINES, Y_LABEL
     fig, ax = plt.subplots(figsize=(FIG_WIDTH_IN, FIG2_HEIGHT_IN))
-    draw_panel(ax, c, offsets, yr)
-    ax.set_title(f"All sites (n = {c['episodes']})", loc="left")
+    draw_panel(ax, c, offsets, yr, y_step, ref_lines)
+    ax.set_title(ALL_SITES_TITLE, loc="left")
+    # n at the right end of the title line (the title text was fixed by the user).
+    ax.text(
+        1,
+        1.02,
+        f"n = {c['episodes']} episodes",
+        transform=ax.transAxes,
+        ha="right",
+        va="bottom",
+        fontsize=plt.rcParams["legend.fontsize"],
+    )
     ax.set_xticks(range(COMPOSITE[0], COMPOSITE[1] + 1, 7))
     ax.set_xlabel(X_LABEL)
-    ax.set_ylabel(Y_LABEL_LINES)
+    ax.set_ylabel(y_label)
     ax.legend(
         handles=legend_handles(),
         loc="upper right",
@@ -2041,12 +2103,20 @@ def fig_all_sites(res: dict[str, Any]) -> tuple[Any, str, str]:
         handlelength=3.2,
     )
     fig.subplots_adjust(left=0.13, right=0.99, top=0.92, bottom=0.14)
-    title = (
-        f"Daily GPP, TER and NEE from 14 days before to 28 days after a silage harvest, all {c['episodes']} "
-        "used episodes of the four sites together, in percent of the mean GPP of the 14 days "
-        "before the harvest; mean and ± 1 SD over the episodes."
+    unit = (
+        f"in {DAILY_UNIT_TEXT}"
+        if absolute
+        else "as a fraction of the mean GPP of the 14 days before the harvest"
     )
-    desc = f"One panel. {common_desc(yr)} {panel_desc('All sites', c, res['summary']['all'])}"
+    title = (
+        "Daily GPP, TER and NEE from 14 days before to 28 days after the last day of a silage "
+        f"harvest, all {c['episodes']} used episodes of the four grass sites together, {unit}; "
+        "mean and ± 1 SD over the episodes."
+    )
+    desc = (
+        f"One panel. {common_desc(yr, absolute)} "
+        f"{panel_desc('All grass sites', c, res['summary']['all'], absolute)}"
+    )
     return fig, title, desc
 
 
@@ -2185,6 +2255,7 @@ def method_json() -> dict[str, Any]:
         "compositeEarly": list(COMPOSITE_EARLY),
         "compositeLate": list(COMPOSITE_LATE),
         "yStep": Y_STEP,
+        "yStepAbs": Y_STEP_ABS,
         "cutNoRule": "ordinal of the episode among the harvest and cut episodes of the site in that year",
         "bootstrapResamples": BOOTSTRAP_RESAMPLES,
         "bootstrapLevel": BOOTSTRAP_LEVEL,
@@ -2194,11 +2265,16 @@ def method_json() -> dict[str, Any]:
         "units": {
             "daily": DAILY_UNIT,
             "yield": "kg DW/ha",
-            "relative": "% of the mean GPP before",
+            "relative": "fraction of the mean GPP before",
             "offsets": "days",
         },
         "fluxLabels": FLUX_LABELS,
-        "axisNames": {"x": X_LABEL, "y": Y_LABEL},
+        "axisNames": {
+            "x": X_LABEL,
+            "y": Y_LABEL,
+            "yLines": Y_LABEL_LINES,
+            "yAbs": Y_LABEL_ABS,
+        },
         "rules": [
             line.strip()
             for line in (__doc__ or "")
@@ -2291,8 +2367,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     for n, name in FIGURES:
         if name == "per-site":
             fig, title, desc = fig_per_site(res, data)
-        else:
+        elif name == "all-sites":
             fig, title, desc = fig_all_sites(res)
+        else:
+            fig, title, desc = fig_all_sites(res, absolute=True)
         path = target / "figures" / f"{n}-{name}.svg"
         save_svg(fig, path, n, title, desc, meta)
         size = path.stat().st_size

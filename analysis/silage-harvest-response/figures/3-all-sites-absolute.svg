@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="283.464567pt" viewBox="0 0 510.23622 283.464567" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="silage-harvest-response-fig3-title silage-harvest-response-fig3-desc">
+ <title id="silage-harvest-response-fig3-title">Daily GPP, TER and NEE from 14 days before to 28 days after the last day of a silage harvest, all 20 used episodes of the four grass sites together, in g C m⁻² d⁻¹; mean and ± 1 SD over the episodes.</title>
+ <desc id="silage-harvest-response-fig3-desc">One panel. X axis: days from the last day of the harvest (−14 to +28, local days, UTC+2). Y axis: GPP, TER and NEE in g C m⁻² d⁻¹, from −8 to 14 (NEE &lt; 0 = uptake, NEE = TER − GPP). Lines, all solid: GPP light blue with circles, TER light pink with squares, NEE steel blue with triangles; markers every 7 days. The band around each line is the mean ± 1 SD over the episodes; line and band are drawn only where 2 or more episodes have a value. An orange vertical line marks day 0 (the last day of the harvest), a thin line marks 0. All grass sites (n = 20; 19 to 20 episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in g C m⁻² d⁻¹: ΔGPP −4.6 g C m⁻² d⁻¹ (SD 3.1, n 20), ΔTER −0.3 g C m⁻² d⁻¹ (SD 1.7, n 20), ΔNEE 4.2 g C m⁻² d⁻¹ (SD 2.9, n 20). Mean of the curve over days +1 to +14, in g C m⁻² d⁻¹: GPP 4.5, TER 5.0, NEE 0.5; days +15 to +28: GPP 6.4, TER 5.1, NEE −1.3.</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Daily GPP, TER and NEE from 14 days before to 28 days after the last day of a silage harvest, all 20 used episodes of the four grass sites together, in g C m⁻² d⁻¹; mean and ± 1 SD over the episodes.</dc:title>
+    <dc:description>One panel. X axis: days from the last day of the harvest (−14 to +28, local days, UTC+2). Y axis: GPP, TER and NEE in g C m⁻² d⁻¹, from −8 to 14 (NEE &lt; 0 = uptake, NEE = TER − GPP). Lines, all solid: GPP light blue with circles, TER light pink with squares, NEE steel blue with triangles; markers every 7 days. The band around each line is the mean ± 1 SD over the episodes; line and band are drawn only where 2 or more episodes have a value. An orange vertical line marks day 0 (the last day of the harvest), a thin line marks 0. All grass sites (n = 20; 19 to 20 episodes per day): change of days +1 to +14 against days −14 to −1 per episode, in g C m⁻² d⁻¹: ΔGPP −4.6 g C m⁻² d⁻¹ (SD 3.1, n 20), ΔTER −0.3 g C m⁻² d⁻¹ (SD 1.7, n 20), ΔNEE 4.2 g C m⁻² d⁻¹ (SD 2.9, n 20). Mean of the curve over days +1 to +14, in g C m⁻² d⁻¹: GPP 4.5, TER 5.0, NEE 0.5; days +15 to +28: GPP 6.4, TER 5.1, NEE −1.3.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9</dc:relation>
+    <dc:source>analysis/silage-harvest-response/silage-harvest-response.py (git ac85498, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="sh3-figure_1">
+  <g id="sh3-patch_1">
+   <path d="M 0 283.464567 
+L 510.23622 283.464567 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="sh3-axes_1">
+   <g id="sh3-patch_2">
+    <path d="M 66.330709 243.779528 
+L 505.133858 243.779528 
+L 505.133858 22.677165 
+L 66.330709 22.677165 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="sh3-line2d_1">
+    <path d="M 214.299213 243.779528 
+L 214.299213 22.677165 
+" clip-path="url(#sh3-pfc08e97ba7)" style="fill: none; stroke: #ffa500; stroke-opacity: 0.5; stroke-width: 1.2; stroke-linecap: square"/>
+   </g>
+   <g id="sh3-line2d_2">
+    <path d="M 66.330709 163.378669 
+L 505.133858 163.378669 
+" clip-path="url(#sh3-pfc08e97ba7)" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="sh3-matplotlib.axis_1">
+    <g id="sh3-xtick_1">
+     <g id="sh3-line2d_3">
+      <defs>
+       <path id="sh3-m2e4e087d17" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#sh3-m2e4e087d17" x="71.433071" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_1">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="71.433071" y="258.757067" transform="rotate(-0 71.433071 258.757067)">−14</text>
+     </g>
+    </g>
+    <g id="sh3-xtick_2">
+     <g id="sh3-line2d_4">
+      <g>
+       <use xlink:href="#sh3-m2e4e087d17" x="142.866142" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_2">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="142.866142" y="258.757067" transform="rotate(-0 142.866142 258.757067)">−7</text>
+     </g>
+    </g>
+    <g id="sh3-xtick_3">
+     <g id="sh3-line2d_5">
+      <g>
+       <use xlink:href="#sh3-m2e4e087d17" x="214.299213" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_3">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="214.299213" y="258.757067" transform="rotate(-0 214.299213 258.757067)">0</text>
+     </g>
+    </g>
+    <g id="sh3-xtick_4">
+     <g id="sh3-line2d_6">
+      <g>
+       <use xlink:href="#sh3-m2e4e087d17" x="285.732283" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_4">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="285.732283" y="258.757067" transform="rotate(-0 285.732283 258.757067)">7</text>
+     </g>
+    </g>
+    <g id="sh3-xtick_5">
+     <g id="sh3-line2d_7">
+      <g>
+       <use xlink:href="#sh3-m2e4e087d17" x="357.165354" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_5">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="357.165354" y="258.757067" transform="rotate(-0 357.165354 258.757067)">14</text>
+     </g>
+    </g>
+    <g id="sh3-xtick_6">
+     <g id="sh3-line2d_8">
+      <g>
+       <use xlink:href="#sh3-m2e4e087d17" x="428.598425" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_6">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="428.598425" y="258.757067" transform="rotate(-0 428.598425 258.757067)">21</text>
+     </g>
+    </g>
+    <g id="sh3-xtick_7">
+     <g id="sh3-line2d_9">
+      <g>
+       <use xlink:href="#sh3-m2e4e087d17" x="500.031496" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_7">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="500.031496" y="258.757067" transform="rotate(-0 500.031496 258.757067)">28</text>
+     </g>
+    </g>
+    <g id="sh3-text_8">
+     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="285.732283" y="273.82777" transform="rotate(-0 285.732283 273.82777)">Days from the last day of the harvest (local days)</text>
+    </g>
+   </g>
+   <g id="sh3-matplotlib.axis_2">
+    <g id="sh3-ytick_1">
+     <g id="sh3-line2d_10">
+      <defs>
+       <path id="sh3-mbca24b9ada" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="243.779528" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_9">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="247.768297" transform="rotate(-0 59.330709 247.768297)">−8</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_2">
+     <g id="sh3-line2d_11">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="223.679313" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_10">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="227.668082" transform="rotate(-0 59.330709 227.668082)">−6</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_3">
+     <g id="sh3-line2d_12">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="203.579098" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_11">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="207.567868" transform="rotate(-0 59.330709 207.567868)">−4</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_4">
+     <g id="sh3-line2d_13">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="183.478883" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_12">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="187.467653" transform="rotate(-0 59.330709 187.467653)">−2</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_5">
+     <g id="sh3-line2d_14">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="163.378669" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_13">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="167.367438" transform="rotate(-0 59.330709 167.367438)">0</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_6">
+     <g id="sh3-line2d_15">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="143.278454" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_14">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="147.267223" transform="rotate(-0 59.330709 147.267223)">2</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_7">
+     <g id="sh3-line2d_16">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="123.178239" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_15">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="127.167009" transform="rotate(-0 59.330709 127.167009)">4</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_8">
+     <g id="sh3-line2d_17">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="103.078024" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_16">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="107.066794" transform="rotate(-0 59.330709 107.066794)">6</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_9">
+     <g id="sh3-line2d_18">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="82.97781" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_17">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="86.966579" transform="rotate(-0 59.330709 86.966579)">8</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_10">
+     <g id="sh3-line2d_19">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="62.877595" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_18">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="66.866364" transform="rotate(-0 59.330709 66.866364)">10</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_11">
+     <g id="sh3-line2d_20">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="42.77738" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_19">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="46.76615" transform="rotate(-0 59.330709 46.76615)">12</text>
+     </g>
+    </g>
+    <g id="sh3-ytick_12">
+     <g id="sh3-line2d_21">
+      <g>
+       <use xlink:href="#sh3-mbca24b9ada" x="66.330709" y="22.677165" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="sh3-text_20">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="59.330709" y="26.665935" transform="rotate(-0 59.330709 26.665935)">14</text>
+     </g>
+    </g>
+    <g id="sh3-text_21">
+     <!-- GPP, TER, NEE (g C m$^{-2}$ d$^{-1}$) -->
+     <g style="fill: #222222" transform="translate(37.148775 213.890846) rotate(-90)">
+      <text style="font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-variant-numeric: tabular-nums">
+       <tspan x="0" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">G</tspan>
+       <tspan x="8.717651" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="15.501709" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="22.285767" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">,</tspan>
+       <tspan x="25.861816" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="29.437866" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">T</tspan>
+       <tspan x="36.309814" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">E</tspan>
+       <tspan x="43.417969" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">R</tspan>
+       <tspan x="51.234741" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">,</tspan>
+       <tspan x="54.810791" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="58.386841" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">N</tspan>
+       <tspan x="66.802368" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">E</tspan>
+       <tspan x="73.910522" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">E</tspan>
+       <tspan x="81.018677" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="84.594727" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">(</tspan>
+       <tspan x="88.983765" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">g</tspan>
+       <tspan x="96.124878" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="99.700928" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+       <tspan x="107.556152" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="111.132202" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+       <tspan x="134.115051" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="137.691101" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+       <tspan x="156.856201" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">)</tspan>
+       <tspan x="122.19873" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="128.797119" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">2</tspan>
+       <tspan x="144.93988" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="151.538269" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+   <g id="sh3-FillBetweenPolyCollection_1">
+    <defs>
+     <path id="sh3-m03ca42ce33" d="M 71.433071 -250.319707 
+L 71.433071 -166.915549 
+L 81.637795 -171.969519 
+L 91.84252 -171.624297 
+L 102.047244 -173.975931 
+L 112.251969 -179.655394 
+L 122.456693 -167.31178 
+L 132.661417 -172.88312 
+L 142.866142 -172.266008 
+L 153.070866 -161.24835 
+L 163.275591 -167.142589 
+L 173.480315 -168.925807 
+L 183.685039 -158.838742 
+L 193.889764 -155.194918 
+L 204.094488 -155.027413 
+L 214.299213 -135.875868 
+L 224.503937 -125.549329 
+L 234.708661 -123.890498 
+L 244.913386 -130.019984 
+L 255.11811 -132.955948 
+L 265.322835 -143.182897 
+L 275.527559 -134.504366 
+L 285.732283 -135.047489 
+L 295.937008 -137.653333 
+L 306.141732 -137.605731 
+L 316.346457 -137.805765 
+L 326.551181 -138.878089 
+L 336.755906 -147.334489 
+L 346.96063 -140.139105 
+L 357.165354 -146.598075 
+L 367.370079 -142.738547 
+L 377.574803 -143.511266 
+L 387.779528 -151.931959 
+L 397.984252 -146.467617 
+L 408.188976 -138.128559 
+L 418.393701 -136.61057 
+L 428.598425 -140.227422 
+L 438.80315 -148.476555 
+L 449.007874 -150.614063 
+L 459.212598 -148.055814 
+L 469.417323 -148.190731 
+L 479.622047 -145.839698 
+L 489.826772 -150.535575 
+L 500.031496 -148.054022 
+L 500.031496 -221.409886 
+L 500.031496 -221.409886 
+L 489.826772 -219.261678 
+L 479.622047 -227.096976 
+L 469.417323 -235.426082 
+L 459.212598 -235.147582 
+L 449.007874 -219.057233 
+L 438.80315 -213.013121 
+L 428.598425 -228.95267 
+L 418.393701 -225.64881 
+L 408.188976 -222.700463 
+L 397.984252 -222.821991 
+L 387.779528 -220.404263 
+L 377.574803 -214.1071 
+L 367.370079 -214.511452 
+L 357.165354 -208.544119 
+L 346.96063 -210.839165 
+L 336.755906 -208.380676 
+L 326.551181 -202.157275 
+L 316.346457 -193.571322 
+L 306.141732 -188.042616 
+L 295.937008 -195.73533 
+L 285.732283 -195.114937 
+L 275.527559 -187.627305 
+L 265.322835 -180.097654 
+L 255.11811 -191.791272 
+L 244.913386 -173.422889 
+L 234.708661 -181.464737 
+L 224.503937 -192.251215 
+L 214.299213 -208.200928 
+L 204.094488 -250.617651 
+L 193.889764 -239.816963 
+L 183.685039 -250.97853 
+L 173.480315 -256.176983 
+L 163.275591 -256.374866 
+L 153.070866 -249.421032 
+L 142.866142 -257.050288 
+L 132.661417 -258.828399 
+L 122.456693 -250.461109 
+L 112.251969 -254.196375 
+L 102.047244 -240.081797 
+L 91.84252 -247.250893 
+L 81.637795 -230.893443 
+L 71.433071 -250.319707 
+z
+"/>
+    </defs>
+    <g clip-path="url(#sh3-pfc08e97ba7)">
+     <use xlink:href="#sh3-m03ca42ce33" x="0" y="283.464567" style="fill: #add8e6; fill-opacity: 0.25"/>
+    </g>
+   </g>
+   <g id="sh3-FillBetweenPolyCollection_2">
+    <defs>
+     <path id="sh3-md136062036" d="M 71.433071 -199.3275 
+L 71.433071 -148.597244 
+L 81.637795 -148.659082 
+L 91.84252 -148.273351 
+L 102.047244 -147.027256 
+L 112.251969 -146.546566 
+L 122.456693 -147.697045 
+L 132.661417 -148.040963 
+L 142.866142 -148.72093 
+L 153.070866 -150.977701 
+L 163.275591 -151.959192 
+L 173.480315 -152.999729 
+L 183.685039 -152.117596 
+L 193.889764 -151.445701 
+L 204.094488 -151.71489 
+L 214.299213 -152.51376 
+L 224.503937 -152.180603 
+L 234.708661 -152.686151 
+L 244.913386 -152.173594 
+L 255.11811 -151.387971 
+L 265.322835 -150.316448 
+L 275.527559 -149.806684 
+L 285.732283 -152.075496 
+L 295.937008 -151.706821 
+L 306.141732 -150.007876 
+L 316.346457 -148.47343 
+L 326.551181 -148.677877 
+L 336.755906 -151.361736 
+L 346.96063 -149.30592 
+L 357.165354 -146.498602 
+L 367.370079 -147.652389 
+L 377.574803 -147.985391 
+L 387.779528 -145.90827 
+L 397.984252 -145.236905 
+L 408.188976 -146.599256 
+L 418.393701 -148.029256 
+L 428.598425 -150.310274 
+L 438.80315 -151.920637 
+L 449.007874 -152.490425 
+L 459.212598 -152.554943 
+L 469.417323 -152.002382 
+L 479.622047 -153.277461 
+L 489.826772 -154.175852 
+L 500.031496 -154.929548 
+L 500.031496 -192.008004 
+L 500.031496 -192.008004 
+L 489.826772 -193.815251 
+L 479.622047 -195.654769 
+L 469.417323 -197.146352 
+L 459.212598 -193.471816 
+L 449.007874 -192.246714 
+L 438.80315 -194.372884 
+L 428.598425 -195.303472 
+L 418.393701 -194.424487 
+L 408.188976 -194.848297 
+L 397.984252 -191.177978 
+L 387.779528 -189.828187 
+L 377.574803 -188.428748 
+L 367.370079 -189.047122 
+L 357.165354 -192.090453 
+L 346.96063 -193.664187 
+L 336.755906 -193.237807 
+L 326.551181 -191.433028 
+L 316.346457 -189.513492 
+L 306.141732 -188.17402 
+L 295.937008 -185.954092 
+L 285.732283 -185.041874 
+L 275.527559 -186.675129 
+L 265.322835 -187.440918 
+L 255.11811 -187.943074 
+L 244.913386 -188.491211 
+L 234.708661 -190.355351 
+L 224.503937 -193.534341 
+L 214.299213 -193.148155 
+L 204.094488 -191.517503 
+L 193.889764 -193.56661 
+L 183.685039 -196.956068 
+L 173.480315 -195.249021 
+L 163.275591 -193.9371 
+L 153.070866 -193.676333 
+L 142.866142 -195.777458 
+L 132.661417 -194.532961 
+L 122.456693 -194.350618 
+L 112.251969 -193.567696 
+L 102.047244 -192.452005 
+L 91.84252 -193.856436 
+L 81.637795 -196.048915 
+L 71.433071 -199.3275 
+z
+"/>
+    </defs>
+    <g clip-path="url(#sh3-pfc08e97ba7)">
+     <use xlink:href="#sh3-md136062036" x="0" y="283.464567" style="fill: #ffb6c1; fill-opacity: 0.25"/>
+    </g>
+   </g>
+   <g id="sh3-FillBetweenPolyCollection_3">
+    <defs>
+     <path id="sh3-m4ae00ec133" d="M 71.433071 -118.529635 
+L 71.433071 -52.33165 
+L 81.637795 -68.565768 
+L 91.84252 -52.731327 
+L 102.047244 -56.801037 
+L 112.251969 -47.160755 
+L 122.456693 -48.080859 
+L 132.661417 -42.953719 
+L 142.866142 -45.288181 
+L 153.070866 -51.309716 
+L 163.275591 -46.815273 
+L 173.480315 -47.098395 
+L 183.685039 -53.316248 
+L 193.889764 -61.847131 
+L 204.094488 -48.760269 
+L 214.299213 -86.594161 
+L 224.503937 -104.714709 
+L 234.708661 -113.665337 
+L 244.913386 -116.477899 
+L 255.11811 -97.907855 
+L 265.322835 -105.783632 
+L 275.527559 -100.145514 
+L 285.732283 -95.265816 
+L 295.937008 -95.356982 
+L 306.141732 -103.907066 
+L 316.346457 -104.49929 
+L 326.551181 -96.218707 
+L 336.755906 -95.304067 
+L 346.96063 -92.521652 
+L 357.165354 -90.290275 
+L 367.370079 -84.993136 
+L 377.574803 -84.244402 
+L 387.779528 -75.504126 
+L 397.984252 -73.637277 
+L 408.188976 -73.705124 
+L 418.393701 -70.168196 
+L 428.598425 -71.849806 
+L 438.80315 -85.63036 
+L 449.007874 -80.317132 
+L 459.212598 -69.704416 
+L 469.417323 -68.17739 
+L 479.622047 -78.966008 
+L 489.826772 -86.830891 
+L 500.031496 -77.305827 
+L 500.031496 -140.339613 
+L 500.031496 -140.339613 
+L 489.826772 -131.534756 
+L 479.622047 -137.201344 
+L 469.417323 -137.526328 
+L 459.212598 -133.290744 
+L 449.007874 -134.920508 
+L 438.80315 -139.345282 
+L 428.598425 -144.755645 
+L 418.393701 -150.197965 
+L 408.188976 -147.085203 
+L 397.984252 -133.659794 
+L 387.779528 -128.067907 
+L 377.574803 -134.723169 
+L 367.370079 -134.628174 
+L 357.165354 -133.328382 
+L 346.96063 -139.641981 
+L 336.755906 -133.752107 
+L 326.551181 -143.028631 
+L 316.346457 -142.282343 
+L 306.141732 -148.798279 
+L 295.937008 -149.087063 
+L 285.732283 -151.860925 
+L 275.527559 -154.376426 
+L 265.322835 -148.86498 
+L 255.11811 -156.847767 
+L 244.913386 -160.91583 
+L 234.708661 -164.192727 
+L 224.503937 -163.371488 
+L 214.299213 -155.162755 
+L 204.094488 -128.998857 
+L 193.889764 -128.325096 
+L 183.685039 -126.111941 
+L 173.480315 -116.219361 
+L 163.275591 -115.735361 
+L 153.070866 -122.846732 
+L 142.866142 -110.065707 
+L 132.661417 -108.080483 
+L 122.456693 -116.365713 
+L 112.251969 -99.273534 
+L 102.047244 -108.792293 
+L 91.84252 -110.695066 
+L 81.637795 -113.451063 
+L 71.433071 -118.529635 
+z
+"/>
+    </defs>
+    <g clip-path="url(#sh3-pfc08e97ba7)">
+     <use xlink:href="#sh3-m4ae00ec133" x="0" y="283.464567" style="fill: #4a708b; fill-opacity: 0.25"/>
+    </g>
+   </g>
+   <g id="sh3-patch_3">
+    <path d="M 66.330709 243.779528 
+L 66.330709 22.677165 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="sh3-patch_4">
+    <path d="M 66.330709 243.779528 
+L 505.133858 243.779528 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="sh3-line2d_22">
+    <path d="M 71.433071 74.846939 
+L 81.637795 82.033086 
+L 91.84252 74.026972 
+L 102.047244 76.435703 
+L 112.251969 66.538682 
+L 122.456693 74.578122 
+L 132.661417 67.608807 
+L 142.866142 68.806419 
+L 153.070866 78.129876 
+L 163.275591 71.705839 
+L 173.480315 70.913172 
+L 183.685039 78.555931 
+L 193.889764 85.958626 
+L 204.094488 80.642035 
+L 214.299213 111.426169 
+L 224.503937 124.564295 
+L 234.708661 130.78695 
+L 244.913386 131.743131 
+L 255.11811 121.090957 
+L 265.322835 121.824292 
+L 275.527559 122.398732 
+L 285.732283 118.383354 
+L 295.937008 116.770235 
+L 306.141732 120.640393 
+L 316.346457 117.776024 
+L 326.551181 112.946885 
+L 336.755906 105.606984 
+L 346.96063 107.975432 
+L 357.165354 105.89347 
+L 367.370079 104.839568 
+L 377.574803 104.655384 
+L 387.779528 97.296456 
+L 397.984252 98.819763 
+L 408.188976 103.050056 
+L 418.393701 102.334877 
+L 428.598425 98.874521 
+L 438.80315 102.719729 
+L 449.007874 98.628919 
+L 459.212598 91.862869 
+L 469.417323 91.656161 
+L 479.622047 96.99623 
+L 489.826772 98.565941 
+L 500.031496 98.732613 
+" clip-path="url(#sh3-pfc08e97ba7)" style="fill: none; stroke: #add8e6; stroke-width: 2.2; stroke-linecap: round"/>
+    <defs>
+     <path id="sh3-m96dc04945c" d="M 0 3.25 
+C 0.86191 3.25 1.688635 2.907559 2.298097 2.298097 
+C 2.907559 1.688635 3.25 0.86191 3.25 0 
+C 3.25 -0.86191 2.907559 -1.688635 2.298097 -2.298097 
+C 1.688635 -2.907559 0.86191 -3.25 0 -3.25 
+C -0.86191 -3.25 -1.688635 -2.907559 -2.298097 -2.298097 
+C -2.907559 -1.688635 -3.25 -0.86191 -3.25 0 
+C -3.25 0.86191 -2.907559 1.688635 -2.298097 2.298097 
+C -1.688635 2.907559 -0.86191 3.25 0 3.25 
+z
+" style="stroke: #add8e6"/>
+    </defs>
+    <g clip-path="url(#sh3-pfc08e97ba7)">
+     <use xlink:href="#sh3-m96dc04945c" x="71.433071" y="74.846939" style="fill: #add8e6; stroke: #add8e6"/>
+     <use xlink:href="#sh3-m96dc04945c" x="142.866142" y="68.806419" style="fill: #add8e6; stroke: #add8e6"/>
+     <use xlink:href="#sh3-m96dc04945c" x="214.299213" y="111.426169" style="fill: #add8e6; stroke: #add8e6"/>
+     <use xlink:href="#sh3-m96dc04945c" x="285.732283" y="118.383354" style="fill: #add8e6; stroke: #add8e6"/>
+     <use xlink:href="#sh3-m96dc04945c" x="357.165354" y="105.89347" style="fill: #add8e6; stroke: #add8e6"/>
+     <use xlink:href="#sh3-m96dc04945c" x="428.598425" y="98.874521" style="fill: #add8e6; stroke: #add8e6"/>
+     <use xlink:href="#sh3-m96dc04945c" x="500.031496" y="98.732613" style="fill: #add8e6; stroke: #add8e6"/>
+    </g>
+   </g>
+   <g id="sh3-line2d_23">
+    <path d="M 71.433071 109.502195 
+L 81.637795 111.110569 
+L 91.84252 112.399674 
+L 102.047244 113.724936 
+L 112.251969 113.407436 
+L 122.456693 112.440735 
+L 132.661417 112.177605 
+L 142.866142 111.215373 
+L 153.070866 111.13755 
+L 163.275591 110.516421 
+L 173.480315 109.340192 
+L 183.685039 108.927735 
+L 193.889764 110.958411 
+L 204.094488 111.84837 
+L 214.299213 110.63361 
+L 224.503937 110.607095 
+L 234.708661 111.943816 
+L 244.913386 113.132165 
+L 255.11811 113.799044 
+L 265.322835 114.585884 
+L 275.527559 115.223661 
+L 285.732283 114.905882 
+L 295.937008 114.634111 
+L 306.141732 114.373619 
+L 316.346457 114.471106 
+L 326.551181 113.409114 
+L 336.755906 111.164796 
+L 346.96063 111.979514 
+L 357.165354 114.170039 
+L 367.370079 115.114811 
+L 377.574803 115.257497 
+L 387.779528 115.596338 
+L 397.984252 115.257126 
+L 408.188976 112.740791 
+L 418.393701 112.237695 
+L 428.598425 110.657694 
+L 438.80315 110.317806 
+L 449.007874 111.095997 
+L 459.212598 110.451187 
+L 469.417323 108.8902 
+L 479.622047 108.998452 
+L 489.826772 109.469015 
+L 500.031496 109.995791 
+" clip-path="url(#sh3-pfc08e97ba7)" style="fill: none; stroke: #ffb6c1; stroke-width: 2.2; stroke-linecap: round"/>
+    <defs>
+     <path id="sh3-m091f8554aa" d="M -3.25 3.25 
+L 3.25 3.25 
+L 3.25 -3.25 
+L -3.25 -3.25 
+z
+" style="stroke: #ffb6c1; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#sh3-pfc08e97ba7)">
+     <use xlink:href="#sh3-m091f8554aa" x="71.433071" y="109.502195" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m091f8554aa" x="142.866142" y="111.215373" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m091f8554aa" x="214.299213" y="110.63361" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m091f8554aa" x="285.732283" y="114.905882" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m091f8554aa" x="357.165354" y="114.170039" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m091f8554aa" x="428.598425" y="110.657694" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m091f8554aa" x="500.031496" y="109.995791" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="sh3-text_22">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="505.133858" y="15.732657" transform="rotate(-0 505.133858 15.732657)">n = 20 episodes</text>
+   </g>
+   <g id="sh3-text_23">
+    <text style="font-weight: 700; font-size: 12px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="66.330709" y="16.677165" transform="rotate(-0 66.330709 16.677165)">All grass site average</text>
+   </g>
+   <g id="sh3-line2d_24">
+    <path d="M 71.433071 198.033924 
+L 81.637795 192.456151 
+L 91.84252 201.75137 
+L 102.047244 200.667902 
+L 112.251969 210.247422 
+L 122.456693 201.241281 
+L 132.661417 207.947466 
+L 142.866142 205.787623 
+L 153.070866 196.386343 
+L 163.275591 202.18925 
+L 173.480315 201.805689 
+L 183.685039 193.750472 
+L 193.889764 188.378453 
+L 204.094488 194.585004 
+L 214.299213 162.586109 
+L 224.503937 149.421469 
+L 234.708661 144.535535 
+L 244.913386 144.767703 
+L 255.11811 156.086756 
+L 265.322835 156.140261 
+L 275.527559 156.203597 
+L 285.732283 159.901197 
+L 295.937008 161.242544 
+L 306.141732 157.111894 
+L 316.346457 160.073751 
+L 326.551181 163.840898 
+L 336.755906 168.93648 
+L 346.96063 167.382751 
+L 357.165354 171.655238 
+L 367.370079 173.653912 
+L 377.574803 173.980782 
+L 387.779528 181.678551 
+L 397.984252 179.816031 
+L 408.188976 173.069403 
+L 418.393701 173.281487 
+L 428.598425 175.161842 
+L 438.80315 170.976746 
+L 449.007874 175.845747 
+L 459.212598 181.966987 
+L 469.417323 180.612708 
+L 479.622047 175.380891 
+L 489.826772 174.281743 
+L 500.031496 174.641847 
+" clip-path="url(#sh3-pfc08e97ba7)" style="fill: none; stroke: #4a708b; stroke-width: 2.2; stroke-linecap: round"/>
+    <defs>
+     <path id="sh3-m62b56b9608" d="M 0 -3.25 
+L -3.25 3.25 
+L 3.25 3.25 
+z
+" style="stroke: #4a708b; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#sh3-pfc08e97ba7)">
+     <use xlink:href="#sh3-m62b56b9608" x="71.433071" y="198.033924" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m62b56b9608" x="142.866142" y="205.787623" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m62b56b9608" x="214.299213" y="162.586109" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m62b56b9608" x="285.732283" y="159.901197" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m62b56b9608" x="357.165354" y="171.655238" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m62b56b9608" x="428.598425" y="175.161842" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+     <use xlink:href="#sh3-m62b56b9608" x="500.031496" y="174.641847" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="sh3-legend_1">
+    <g id="sh3-line2d_25">
+     <path d="M 350.701827 36.430525 
+L 367.501827 36.430525 
+L 384.301827 36.430525 
+" style="fill: none; stroke: #add8e6; stroke-width: 2.2; stroke-linecap: square"/>
+     <g>
+      <use xlink:href="#sh3-m96dc04945c" x="367.501827" y="36.430525" style="fill: #add8e6; stroke: #add8e6"/>
+     </g>
+    </g>
+    <g id="sh3-text_24">
+     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="392.701827" y="40.105525" transform="rotate(-0 392.701827 40.105525)">GPP</text>
+    </g>
+    <g id="sh3-line2d_26">
+     <path d="M 350.701827 52.181345 
+L 367.501827 52.181345 
+L 384.301827 52.181345 
+" style="fill: none; stroke: #ffb6c1; stroke-width: 2.2; stroke-linecap: square"/>
+     <g>
+      <use xlink:href="#sh3-m091f8554aa" x="367.501827" y="52.181345" style="fill: #ffb6c1; stroke: #ffb6c1; stroke-linejoin: miter"/>
+     </g>
+    </g>
+    <g id="sh3-text_25">
+     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="392.701827" y="55.856345" transform="rotate(-0 392.701827 55.856345)">TER (= Reco)</text>
+    </g>
+    <g id="sh3-line2d_27">
+     <path d="M 350.701827 67.932165 
+L 367.501827 67.932165 
+L 384.301827 67.932165 
+" style="fill: none; stroke: #4a708b; stroke-width: 2.2; stroke-linecap: square"/>
+     <g>
+      <use xlink:href="#sh3-m62b56b9608" x="367.501827" y="67.932165" style="fill: #4a708b; stroke: #4a708b; stroke-linejoin: miter"/>
+     </g>
+    </g>
+    <g id="sh3-text_26">
+     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="392.701827" y="71.607165" transform="rotate(-0 392.701827 71.607165)">NEE (&lt; 0 = uptake)</text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="sh3-pfc08e97ba7">
+   <rect x="66.330709" y="22.677165" width="438.80315" height="221.102362"/>
+  </clipPath>
+ </defs>
+</svg>
