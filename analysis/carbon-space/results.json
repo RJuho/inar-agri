@@ -1,0 +1,2356 @@
+{
+  "slug": "carbon-space",
+  "script": "analysis/carbon-space/carbon-space.py",
+  "question": "How do the management and the crop of a site-year show in the annual carbon balance (annual GPP against annual Reco) and in the share of days with net uptake?",
+  "method": {
+    "sites": [
+      "anttila",
+      "sarkisuo",
+      "haltiala",
+      "qvidja",
+      "viikki",
+      "maktau"
+    ],
+    "minFrac": 0.2,
+    "maxGapDays": 30.0,
+    "jjaMonths": [
+      6,
+      7,
+      8
+    ],
+    "uptakeDay": "local day with daily NEE (nee_f_gc) < 0",
+    "groups": [
+      "grassland",
+      "annual crop"
+    ],
+    "reasons": [
+      "no flux data",
+      "partial year",
+      "measured fraction < 0.2",
+      "longest gap > 30 d",
+      "no annual GPP or Reco sum"
+    ],
+    "crops": [
+      {
+        "site": "anttila",
+        "year": 2022,
+        "crop": "legume grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "anttila",
+        "year": 2023,
+        "crop": "legume grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "sarkisuo",
+        "year": 2022,
+        "crop": "mixed grasses",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "sarkisuo",
+        "year": 2023,
+        "crop": "mixed grasses",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "haltiala",
+        "year": 2021,
+        "crop": "barley",
+        "group": "annual crop",
+        "cropLabel": "barley"
+      },
+      {
+        "site": "haltiala",
+        "year": 2022,
+        "crop": "oats",
+        "group": "annual crop",
+        "cropLabel": "oats"
+      },
+      {
+        "site": "haltiala",
+        "year": 2023,
+        "crop": "grass (failed)",
+        "group": "grassland",
+        "cropLabel": "grass (failed)"
+      },
+      {
+        "site": "haltiala",
+        "year": 2024,
+        "crop": "sunflower",
+        "group": "annual crop",
+        "cropLabel": "sunflower"
+      },
+      {
+        "site": "haltiala",
+        "year": 2025,
+        "crop": "oats",
+        "group": "annual crop",
+        "cropLabel": "oats"
+      },
+      {
+        "site": "qvidja",
+        "year": 2018,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "qvidja",
+        "year": 2019,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "qvidja",
+        "year": 2020,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "qvidja",
+        "year": 2021,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "qvidja",
+        "year": 2022,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "qvidja",
+        "year": 2023,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "qvidja",
+        "year": 2024,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "qvidja",
+        "year": 2025,
+        "crop": "forage grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "viikki",
+        "year": 2022,
+        "crop": "timothy",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "viikki",
+        "year": 2023,
+        "crop": "barley / mixed grass / red clover",
+        "group": "annual crop",
+        "cropLabel": "barley"
+      },
+      {
+        "site": "viikki",
+        "year": 2024,
+        "crop": "grassland",
+        "group": "grassland",
+        "cropLabel": null
+      },
+      {
+        "site": "viikki",
+        "year": 2025,
+        "crop": "faba bean",
+        "group": "annual crop",
+        "cropLabel": "faba bean"
+      },
+      {
+        "site": "maktau",
+        "year": 2014,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2015,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2016,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2017,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2018,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2019,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2020,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2021,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2022,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2023,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2024,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      },
+      {
+        "site": "maktau",
+        "year": 2025,
+        "crop": "maize",
+        "group": "annual crop",
+        "cropLabel": "maize"
+      }
+    ],
+    "failedGrassNote": "Haltiala 2023 (grass sown, failed) is in the group grassland with the crop label 'grass (failed)'",
+    "nee_guides": [
+      -200.0,
+      -400.0
+    ],
+    "sumRtol": 1e-06,
+    "units": {
+      "daily": "g C m-2 d-1",
+      "annual": "g C m-2 yr-1",
+      "share": "fraction 0 to 1"
+    },
+    "axisNames": {
+      "fig1x": "Annual GPP (g C m-2 yr-1)",
+      "fig1y": "Annual Reco (g C m-2 yr-1)",
+      "fig2y": "Days with net uptake (%)"
+    },
+    "rules": [
+      "Sites: Anttila, Sarkisuo, Haltiala, Qvidja, Viikki and Maktau (order of db/sites.parquet;",
+      "the order gives the colour and the marker). A site-year is one site and one calendar year in",
+      "local time (the years of data/calculated/annual.csv).",
+      "1. Inclusion (the same rule in both figures): full_year and reliable are true in annual.csv.",
+      "reliable = measured fraction >= 0.2 and longest gap <= 30 days (docs/calculated.md); the",
+      "script checks that the flag agrees with these two limits. Figure 1 also needs an annual",
+      "GPP and Reco sum (a sum is NULL when one half hour of the year has no value). The script",
+      "derives the reason of each excluded site-year from the flags, in this order: \"no flux",
+      "data\" (measured fraction 0); else each failed flag: \"partial year\", \"measured fraction <",
+      "0.2\", \"longest gap > 30 d\"; else (Figure 1 only) \"no annual GPP or Reco sum\".",
+      "2. Annual sums (g C m-2 yr-1) from annual.csv: GPP, Reco and NEE (gap-filled NEE, nee_f_gc).",
+      "Reco/GPP = Reco / GPP. The script checks that each annual sum equals the sum of the daily",
+      "values of data/calculated/daily.parquet over the local days of the year (relative",
+      "difference <= 1e-6), and that a NULL annual sum has a daily gap.",
+      "3. Uptake day = a local day with daily NEE (nee_f_gc) < 0. Share = uptake days / days with a",
+      "daily NEE value, for the whole year and for June to August (JJA, calendar months 6 to 8 in",
+      "local time, also at Maktau, where JJA is not the main growing season).",
+      "4. Land use (CROPS, typed from the project notes in CLAUDE.md): group \"grassland\" or \"annual",
+      "crop\". Haltiala 2023 (sown grass that failed) has the crop label \"grass (failed)\" and is in",
+      "the group grassland. Events per site-year: the count per type of db/events.parquet in the",
+      "calendar year of the event date.",
+      "5. OLS line Reco = slope x GPP + intercept over the Figure 1 site-years (numpy.polyfit, degree",
+      "1), with Pearson r and n; the same without Maktau. Descriptive only, n is small.",
+      "6. Group summaries (grassland, annual crop): n, mean, SD (n - 1), min and max of NEE and",
+      "Reco/GPP over the Figure 1 site-years, and of the uptake shares over the Figure 2",
+      "site-years. A third summary gives the annual crops without Maktau (Finnish crops only).",
+      "7. Each step that removes rows logs a count (results.json dataVersion.steps).",
+      "8. Open findings of docs/anomaly-data-report.md that touch this dive are printed",
+      "(OPEN_FINDINGS). The script uses no literature value, thus it has no LITERATURE table."
+    ],
+    "openFindings": [
+      "ANT-01, SAR-01, VII-01 (open, waits for the providers): the raw stamps of Anttila, Sarkisuo and Viikki are UTC, but the build reads them as UTC+2. A local day of these sites thus holds the hours 02:00 to 02:00 true local time. The annual sums change by the 2 hours at the ends of the year only; a daily NEE near 0 can change its sign, so the uptake-day share can change a little.",
+      "QVI-11 (open question): the Qvidja annual NEE of the file is 40 to 110 g C m-2 more negative than Heimsch 2024 Table 1 (May-to-May years). The Qvidja markers can thus sit a little too far below the 1:1 line.",
+      "VII-05 (open): Viikki 2024 nee_f is not equal to nee in 1 540 periods. The daily NEE of Viikki 2024 can thus differ from the measured values."
+    ],
+    "literature": "none: the script uses no literature value"
+  },
+  "siteYears": [
+    {
+      "key": "anttila-2022",
+      "site": "anttila",
+      "siteName": "Anttila",
+      "year": 2022,
+      "crop": "legume grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.6273972603,
+      "longestGapDays": 20.02083333,
+      "gpp": 1270.462302,
+      "reco": 1021.404814,
+      "nee": -249.0574874,
+      "recoGppRatio": 0.803963103,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 130,
+          "share": 0.3561643836
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 72,
+          "share": 0.7826086957
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "anttila-2023",
+      "site": "anttila",
+      "siteName": "Anttila",
+      "year": 2023,
+      "crop": "legume grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.6488584475,
+      "longestGapDays": 3.604166667,
+      "gpp": 1374.380444,
+      "reco": 1091.392774,
+      "nee": -282.9876699,
+      "recoGppRatio": 0.7940980088,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 131,
+          "share": 0.3589041096
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 65,
+          "share": 0.7065217391
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "sarkisuo-2022",
+      "site": "sarkisuo",
+      "siteName": "Särkisuo",
+      "year": 2022,
+      "crop": "mixed grasses",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.5760844749,
+      "longestGapDays": 4.208333333,
+      "gpp": 929.7602982,
+      "reco": 876.6987455,
+      "nee": -53.0615527,
+      "recoGppRatio": 0.9429298575,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 105,
+          "share": 0.2876712329
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 66,
+          "share": 0.7173913043
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 1,
+        "other": 2
+      },
+      "eventsTotal": 7
+    },
+    {
+      "key": "sarkisuo-2023",
+      "site": "sarkisuo",
+      "siteName": "Särkisuo",
+      "year": 2023,
+      "crop": "mixed grasses",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": false,
+      "inFig2": true,
+      "exclusionFig1": "no annual GPP or Reco sum",
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.5453767123,
+      "longestGapDays": 5.875,
+      "gpp": null,
+      "reco": null,
+      "nee": -158.8660158,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 114,
+          "share": 0.3123287671
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 61,
+          "share": 0.6630434783
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "haltiala-2021",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "year": 2021,
+      "crop": "barley",
+      "group": "annual crop",
+      "cropLabel": "barley",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "partial year",
+      "exclusionFig2": "partial year",
+      "fullYear": false,
+      "reliable": true,
+      "fracMeasured": 0.6459205021,
+      "longestGapDays": 4.791666667,
+      "gpp": 518.991117,
+      "reco": 578.7439551,
+      "nee": 59.75283811,
+      "recoGppRatio": 1.11513268,
+      "uptake": {
+        "year": {
+          "days": 239,
+          "uptakeDays": 55,
+          "share": 0.230125523
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 53,
+          "share": 0.5760869565
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 1,
+        "fertilisation": 1,
+        "spraying": 2,
+        "other": 1
+      },
+      "eventsTotal": 7
+    },
+    {
+      "key": "haltiala-2022",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "year": 2022,
+      "crop": "oats",
+      "group": "annual crop",
+      "cropLabel": "oats",
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.5698059361,
+      "longestGapDays": 3.041666667,
+      "gpp": 1018.221182,
+      "reco": 746.9810572,
+      "nee": -271.2401251,
+      "recoGppRatio": 0.7336137473,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 88,
+          "share": 0.2410958904
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 57,
+          "share": 0.6195652174
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 2,
+        "sowing": 2,
+        "fertilisation": 1,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 6
+    },
+    {
+      "key": "haltiala-2023",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "year": 2023,
+      "crop": "grass (failed)",
+      "group": "grassland",
+      "cropLabel": "grass (failed)",
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.6033105023,
+      "longestGapDays": 9.916666667,
+      "gpp": 660.0153216,
+      "reco": 791.3545946,
+      "nee": 131.339273,
+      "recoGppRatio": 1.198994279,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 91,
+          "share": 0.2493150685
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 55,
+          "share": 0.597826087
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 3,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 5
+    },
+    {
+      "key": "haltiala-2024",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "year": 2024,
+      "crop": "sunflower",
+      "group": "annual crop",
+      "cropLabel": "sunflower",
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.5503187614,
+      "longestGapDays": 10.08333333,
+      "gpp": 979.5987452,
+      "reco": 932.6089097,
+      "nee": -46.9898355,
+      "recoGppRatio": 0.9520315479,
+      "uptake": {
+        "year": {
+          "days": 366,
+          "uptakeDays": 88,
+          "share": 0.2404371585
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 67,
+          "share": 0.7282608696
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 4,
+        "sowing": 1,
+        "fertilisation": 1,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 6
+    },
+    {
+      "key": "haltiala-2025",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "year": 2025,
+      "crop": "oats",
+      "group": "annual crop",
+      "cropLabel": "oats",
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.7103881279,
+      "longestGapDays": 0.9166666667,
+      "gpp": 1087.437249,
+      "reco": 1083.543072,
+      "nee": -3.894176861,
+      "recoGppRatio": 0.9964189411,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 66,
+          "share": 0.1808219178
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 62,
+          "share": 0.6739130435
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 2,
+        "sowing": 2,
+        "fertilisation": 1,
+        "spraying": 2,
+        "other": 0
+      },
+      "eventsTotal": 8
+    },
+    {
+      "key": "qvidja-2018",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2018,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "partial year",
+      "exclusionFig2": "partial year",
+      "fullYear": false,
+      "reliable": true,
+      "fracMeasured": 0.293088287,
+      "longestGapDays": 7.208333333,
+      "gpp": 763.0478476,
+      "reco": 633.1069878,
+      "nee": -129.9408599,
+      "recoGppRatio": 0.8297081104,
+      "uptake": {
+        "year": {
+          "days": 237,
+          "uptakeDays": 126,
+          "share": 0.5316455696
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 70,
+          "share": 0.7608695652
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 1,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 1,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 6
+    },
+    {
+      "key": "qvidja-2019",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2019,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "longest gap > 30 d",
+      "exclusionFig2": "longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.2232305936,
+      "longestGapDays": 62.04166667,
+      "gpp": 1106.311193,
+      "reco": 859.5885891,
+      "nee": -246.7226036,
+      "recoGppRatio": 0.7769862537,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 166,
+          "share": 0.4547945205
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 78,
+          "share": 0.847826087
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "qvidja-2020",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2020,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.318647541,
+      "longestGapDays": 6.020833333,
+      "gpp": 1218.359112,
+      "reco": 1100.252062,
+      "nee": -118.1070502,
+      "recoGppRatio": 0.9030605598,
+      "uptake": {
+        "year": {
+          "days": 366,
+          "uptakeDays": 137,
+          "share": 0.3743169399
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 72,
+          "share": 0.7826086957
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "qvidja-2021",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2021,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "measured fraction < 0.2; longest gap > 30 d",
+      "exclusionFig2": "measured fraction < 0.2; longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.196347032,
+      "longestGapDays": 55.0,
+      "gpp": 947.3169117,
+      "reco": 834.8505727,
+      "nee": -112.466339,
+      "recoGppRatio": 0.8812790761,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 112,
+          "share": 0.3068493151
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 44,
+          "share": 0.4782608696
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 0,
+        "grazing": 1,
+        "tillage": 1,
+        "sowing": 0,
+        "fertilisation": 2,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 5
+    },
+    {
+      "key": "qvidja-2022",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2022,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.2498287671,
+      "longestGapDays": 20.875,
+      "gpp": 737.2175571,
+      "reco": 772.4888718,
+      "nee": 35.27131474,
+      "recoGppRatio": 1.047843834,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 106,
+          "share": 0.2904109589
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 67,
+          "share": 0.7282608696
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 1,
+        "grazing": 1,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 1,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "qvidja-2023",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2023,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.2503995434,
+      "longestGapDays": 22.14583333,
+      "gpp": 921.3579653,
+      "reco": 1010.374988,
+      "nee": 89.01702264,
+      "recoGppRatio": 1.096615025,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 98,
+          "share": 0.2684931507
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 52,
+          "share": 0.5652173913
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 2,
+        "grazing": 0,
+        "tillage": 1,
+        "sowing": 0,
+        "fertilisation": 1,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 6
+    },
+    {
+      "key": "qvidja-2024",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2024,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.2907559199,
+      "longestGapDays": 11.41666667,
+      "gpp": 1053.146512,
+      "reco": 1086.99016,
+      "nee": 33.84364828,
+      "recoGppRatio": 1.032135745,
+      "uptake": {
+        "year": {
+          "days": 366,
+          "uptakeDays": 117,
+          "share": 0.3196721311
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 66,
+          "share": 0.7173913043
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 2,
+        "grazing": 1,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "qvidja-2025",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2025,
+      "crop": "forage grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.2814497717,
+      "longestGapDays": 15.89583333,
+      "gpp": 1478.677501,
+      "reco": 1464.778754,
+      "nee": -13.89874674,
+      "recoGppRatio": 0.9906005557,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 103,
+          "share": 0.2821917808
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 51,
+          "share": 0.5543478261
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 2,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 2
+    },
+    {
+      "key": "viikki-2022",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "year": 2022,
+      "crop": "timothy",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "measured fraction < 0.2",
+      "exclusionFig2": "measured fraction < 0.2",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.1954908676,
+      "longestGapDays": 22.20833333,
+      "gpp": 1107.497651,
+      "reco": 1033.160935,
+      "nee": -74.33671634,
+      "recoGppRatio": 0.9328786691,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 95,
+          "share": 0.2602739726
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 83,
+          "share": 0.902173913
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 1,
+        "sowing": 0,
+        "fertilisation": 1,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 4
+    },
+    {
+      "key": "viikki-2023",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "year": 2023,
+      "crop": "barley / mixed grass / red clover",
+      "group": "annual crop",
+      "cropLabel": "barley",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "measured fraction < 0.2",
+      "exclusionFig2": "measured fraction < 0.2",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.1924086758,
+      "longestGapDays": 16.0625,
+      "gpp": 948.8006924,
+      "reco": 1119.255992,
+      "nee": 170.4552996,
+      "recoGppRatio": 1.179653431,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 79,
+          "share": 0.2164383562
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 55,
+          "share": 0.597826087
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 2,
+        "sowing": 1,
+        "fertilisation": 2,
+        "spraying": 1,
+        "other": 0
+      },
+      "eventsTotal": 8
+    },
+    {
+      "key": "viikki-2024",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "year": 2024,
+      "crop": "grassland",
+      "group": "grassland",
+      "cropLabel": null,
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.2394125683,
+      "longestGapDays": 11.35416667,
+      "gpp": 777.3549213,
+      "reco": 797.7214681,
+      "nee": 20.36654684,
+      "recoGppRatio": 1.026199804,
+      "uptake": {
+        "year": {
+          "days": 366,
+          "uptakeDays": 131,
+          "share": 0.3579234973
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 84,
+          "share": 0.9130434783
+        }
+      },
+      "events": {
+        "harvest": 2,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 1,
+        "sowing": 0,
+        "fertilisation": 3,
+        "spraying": 1,
+        "other": 0
+      },
+      "eventsTotal": 7
+    },
+    {
+      "key": "viikki-2025",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "year": 2025,
+      "crop": "faba bean",
+      "group": "annual crop",
+      "cropLabel": "faba bean",
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.2252853881,
+      "longestGapDays": 7.75,
+      "gpp": 890.9050558,
+      "reco": 911.0946971,
+      "nee": 20.1896413,
+      "recoGppRatio": 1.022661945,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 100,
+          "share": 0.2739726027
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 77,
+          "share": 0.8369565217
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 1,
+        "sowing": 0,
+        "fertilisation": 1,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 3
+    },
+    {
+      "key": "maktau-2014",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2014,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "no flux data",
+      "exclusionFig2": "no flux data",
+      "fullYear": false,
+      "reliable": false,
+      "fracMeasured": 0.0,
+      "longestGapDays": 130.3125,
+      "gpp": null,
+      "reco": null,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        },
+        "jja": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2015",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2015,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "no flux data",
+      "exclusionFig2": "no flux data",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.0,
+      "longestGapDays": 365.0,
+      "gpp": null,
+      "reco": null,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        },
+        "jja": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2016",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2016,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "no flux data",
+      "exclusionFig2": "no flux data",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.0,
+      "longestGapDays": 366.0,
+      "gpp": null,
+      "reco": null,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        },
+        "jja": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2017",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2017,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "no flux data",
+      "exclusionFig2": "no flux data",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.0,
+      "longestGapDays": 365.0,
+      "gpp": null,
+      "reco": null,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        },
+        "jja": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2018",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2018,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "measured fraction < 0.2; longest gap > 30 d",
+      "exclusionFig2": "measured fraction < 0.2; longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.0345890411,
+      "longestGapDays": 350.5,
+      "gpp": null,
+      "reco": 684.6764714,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 14,
+          "uptakeDays": 14,
+          "share": 1.0
+        },
+        "jja": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2019",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2019,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": true,
+      "inFig2": true,
+      "exclusionFig1": null,
+      "exclusionFig2": null,
+      "fullYear": true,
+      "reliable": true,
+      "fracMeasured": 0.8606164384,
+      "longestGapDays": 0.6875,
+      "gpp": 1004.524363,
+      "reco": 612.2293908,
+      "nee": -392.2949718,
+      "recoGppRatio": 0.6094719188,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 318,
+          "share": 0.8712328767
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 91,
+          "share": 0.9891304348
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 1,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 2
+    },
+    {
+      "key": "maktau-2020",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2020,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "longest gap > 30 d",
+      "exclusionFig2": "longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.4069899818,
+      "longestGapDays": 80.45833333,
+      "gpp": 889.3123713,
+      "reco": 639.4872538,
+      "nee": -249.8251176,
+      "recoGppRatio": 0.7190805777,
+      "uptake": {
+        "year": {
+          "days": 366,
+          "uptakeDays": 312,
+          "share": 0.8524590164
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 88,
+          "share": 0.9565217391
+        }
+      },
+      "events": {
+        "harvest": 1,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 1
+    },
+    {
+      "key": "maktau-2021",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2021,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "measured fraction < 0.2; longest gap > 30 d",
+      "exclusionFig2": "measured fraction < 0.2; longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.1412100457,
+      "longestGapDays": 285.2916667,
+      "gpp": 493.5847554,
+      "reco": 238.372789,
+      "nee": -255.2119664,
+      "recoGppRatio": 0.4829419596,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 330,
+          "share": 0.904109589
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 92,
+          "share": 1.0
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2022",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2022,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "longest gap > 30 d",
+      "exclusionFig2": "longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.3873287671,
+      "longestGapDays": 97.83333333,
+      "gpp": 413.6940711,
+      "reco": 247.8712155,
+      "nee": -165.8228556,
+      "recoGppRatio": 0.5991655014,
+      "uptake": {
+        "year": {
+          "days": 365,
+          "uptakeDays": 306,
+          "share": 0.8383561644
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 92,
+          "share": 1.0
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2023",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2023,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "measured fraction < 0.2; longest gap > 30 d",
+      "exclusionFig2": "measured fraction < 0.2; longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.1215182648,
+      "longestGapDays": 199.375,
+      "gpp": null,
+      "reco": null,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 183,
+          "uptakeDays": 128,
+          "share": 0.6994535519
+        },
+        "jja": {
+          "days": 32,
+          "uptakeDays": 32,
+          "share": 1.0
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2024",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2024,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "longest gap > 30 d",
+      "exclusionFig2": "longest gap > 30 d",
+      "fullYear": true,
+      "reliable": false,
+      "fracMeasured": 0.2283697632,
+      "longestGapDays": 118.5208333,
+      "gpp": null,
+      "reco": null,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 244,
+          "uptakeDays": 195,
+          "share": 0.7991803279
+        },
+        "jja": {
+          "days": 92,
+          "uptakeDays": 92,
+          "share": 1.0
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    },
+    {
+      "key": "maktau-2025",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2025,
+      "crop": "maize",
+      "group": "annual crop",
+      "cropLabel": "maize",
+      "inFig1": false,
+      "inFig2": false,
+      "exclusionFig1": "no flux data",
+      "exclusionFig2": "no flux data",
+      "fullYear": false,
+      "reliable": false,
+      "fracMeasured": 0.0,
+      "longestGapDays": 9.6875,
+      "gpp": null,
+      "reco": null,
+      "nee": null,
+      "recoGppRatio": null,
+      "uptake": {
+        "year": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        },
+        "jja": {
+          "days": 0,
+          "uptakeDays": 0,
+          "share": null
+        }
+      },
+      "events": {
+        "harvest": 0,
+        "cut": 0,
+        "grazing": 0,
+        "tillage": 0,
+        "sowing": 0,
+        "fertilisation": 0,
+        "spraying": 0,
+        "other": 0
+      },
+      "eventsTotal": 0
+    }
+  ],
+  "fig1Keys": [
+    "anttila-2022",
+    "anttila-2023",
+    "sarkisuo-2022",
+    "haltiala-2022",
+    "haltiala-2023",
+    "haltiala-2024",
+    "haltiala-2025",
+    "qvidja-2020",
+    "qvidja-2022",
+    "qvidja-2023",
+    "qvidja-2024",
+    "qvidja-2025",
+    "viikki-2024",
+    "viikki-2025",
+    "maktau-2019"
+  ],
+  "fig2Keys": [
+    "anttila-2022",
+    "anttila-2023",
+    "sarkisuo-2022",
+    "sarkisuo-2023",
+    "haltiala-2022",
+    "haltiala-2023",
+    "haltiala-2024",
+    "haltiala-2025",
+    "qvidja-2020",
+    "qvidja-2022",
+    "qvidja-2023",
+    "qvidja-2024",
+    "qvidja-2025",
+    "viikki-2024",
+    "viikki-2025",
+    "maktau-2019"
+  ],
+  "excluded": [
+    {
+      "key": "sarkisuo-2023",
+      "site": "sarkisuo",
+      "siteName": "Särkisuo",
+      "year": 2023,
+      "reason": "no annual GPP or Reco sum",
+      "inFig2": true
+    },
+    {
+      "key": "haltiala-2021",
+      "site": "haltiala",
+      "siteName": "Haltiala",
+      "year": 2021,
+      "reason": "partial year",
+      "inFig2": false
+    },
+    {
+      "key": "qvidja-2018",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2018,
+      "reason": "partial year",
+      "inFig2": false
+    },
+    {
+      "key": "qvidja-2019",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2019,
+      "reason": "longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "qvidja-2021",
+      "site": "qvidja",
+      "siteName": "Qvidja",
+      "year": 2021,
+      "reason": "measured fraction < 0.2; longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "viikki-2022",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "year": 2022,
+      "reason": "measured fraction < 0.2",
+      "inFig2": false
+    },
+    {
+      "key": "viikki-2023",
+      "site": "viikki",
+      "siteName": "Viikki",
+      "year": 2023,
+      "reason": "measured fraction < 0.2",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2014",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2014,
+      "reason": "no flux data",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2015",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2015,
+      "reason": "no flux data",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2016",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2016,
+      "reason": "no flux data",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2017",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2017,
+      "reason": "no flux data",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2018",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2018,
+      "reason": "measured fraction < 0.2; longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2020",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2020,
+      "reason": "longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2021",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2021,
+      "reason": "measured fraction < 0.2; longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2022",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2022,
+      "reason": "longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2023",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2023,
+      "reason": "measured fraction < 0.2; longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2024",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2024,
+      "reason": "longest gap > 30 d",
+      "inFig2": false
+    },
+    {
+      "key": "maktau-2025",
+      "site": "maktau",
+      "siteName": "Maktau",
+      "year": 2025,
+      "reason": "no flux data",
+      "inFig2": false
+    }
+  ],
+  "regression": {
+    "all": {
+      "slope": 0.6730596052,
+      "intercept": 262.2561123,
+      "r": 0.7545106639,
+      "r2": 0.5692863419,
+      "n": 15
+    },
+    "withoutMaktau": {
+      "slope": 0.6626623097,
+      "intercept": 296.2432734,
+      "r": 0.8352028865,
+      "r2": 0.6975638616,
+      "n": 14
+    }
+  },
+  "groups": {
+    "grassland": {
+      "fig1SiteYears": [
+        "anttila-2022",
+        "anttila-2023",
+        "sarkisuo-2022",
+        "haltiala-2023",
+        "qvidja-2020",
+        "qvidja-2022",
+        "qvidja-2023",
+        "qvidja-2024",
+        "qvidja-2025",
+        "viikki-2024"
+      ],
+      "fig2SiteYears": [
+        "anttila-2022",
+        "anttila-2023",
+        "sarkisuo-2022",
+        "sarkisuo-2023",
+        "haltiala-2023",
+        "qvidja-2020",
+        "qvidja-2022",
+        "qvidja-2023",
+        "qvidja-2024",
+        "qvidja-2025",
+        "viikki-2024"
+      ],
+      "nee": {
+        "n": 10,
+        "mean": -40.72747015,
+        "sd": 137.6229363,
+        "min": -282.9876699,
+        "max": 131.339273
+      },
+      "recoGppRatio": {
+        "n": 10,
+        "mean": 0.9836440773,
+        "sd": 0.1264185698,
+        "min": 0.7940980088,
+        "max": 1.198994279
+      },
+      "uptakeYear": {
+        "n": 11,
+        "mean": 0.3143083655,
+        "sd": 0.04232252899,
+        "min": 0.2493150685,
+        "max": 0.3743169399
+      },
+      "uptakeJja": {
+        "n": 11,
+        "mean": 0.70256917,
+        "sd": 0.1056388352,
+        "min": 0.5543478261,
+        "max": 0.9130434783
+      }
+    },
+    "annual crop": {
+      "fig1SiteYears": [
+        "haltiala-2022",
+        "haltiala-2024",
+        "haltiala-2025",
+        "viikki-2025",
+        "maktau-2019"
+      ],
+      "fig2SiteYears": [
+        "haltiala-2022",
+        "haltiala-2024",
+        "haltiala-2025",
+        "viikki-2025",
+        "maktau-2019"
+      ],
+      "nee": {
+        "n": 5,
+        "mean": -138.8458936,
+        "sd": 182.8294769,
+        "min": -392.2949718,
+        "max": 20.1896413
+      },
+      "recoGppRatio": {
+        "n": 5,
+        "mean": 0.86283962,
+        "sd": 0.1818215669,
+        "min": 0.6094719188,
+        "max": 1.022661945
+      },
+      "uptakeYear": {
+        "n": 5,
+        "mean": 0.3615120892,
+        "sd": 0.2869174885,
+        "min": 0.1808219178,
+        "max": 0.8712328767
+      },
+      "uptakeJja": {
+        "n": 5,
+        "mean": 0.7695652174,
+        "sd": 0.1467190002,
+        "min": 0.6195652174,
+        "max": 0.9891304348
+      }
+    },
+    "annual crop without Maktau": {
+      "fig1SiteYears": [
+        "haltiala-2022",
+        "haltiala-2024",
+        "haltiala-2025",
+        "viikki-2025"
+      ],
+      "fig2SiteYears": [
+        "haltiala-2022",
+        "haltiala-2024",
+        "haltiala-2025",
+        "viikki-2025"
+      ],
+      "nee": {
+        "n": 4,
+        "mean": -75.48362404,
+        "sd": 133.4302894,
+        "min": -271.2401251,
+        "max": 20.1896413
+      },
+      "recoGppRatio": {
+        "n": 4,
+        "mean": 0.9261815453,
+        "sd": 0.1316464188,
+        "min": 0.7336137473,
+        "max": 1.022661945
+      },
+      "uptakeYear": {
+        "n": 4,
+        "mean": 0.2340818924,
+        "sd": 0.03880497923,
+        "min": 0.1808219178,
+        "max": 0.2739726027
+      },
+      "uptakeJja": {
+        "n": 4,
+        "mean": 0.714673913,
+        "sd": 0.09281658302,
+        "min": 0.6195652174,
+        "max": 0.8369565217
+      }
+    }
+  },
+  "summary": {
+    "nFig1": 15,
+    "nFig2": 16,
+    "nSink": 9,
+    "nSource": 6,
+    "fig1": {
+      "gpp": {
+        "n": 15,
+        "mean": 1026.761235,
+        "sd": 231.123715,
+        "min": 660.0153216,
+        "max": 1478.677501
+      },
+      "reco": {
+        "n": 15,
+        "mean": 953.3276239,
+        "sd": 206.1734099,
+        "min": 612.2293908,
+        "max": 1464.778754
+      },
+      "nee": {
+        "n": 15,
+        "mean": -73.4336113,
+        "sd": 154.9787713,
+        "min": -392.2949718,
+        "max": 131.339273
+      },
+      "recoGppRatio": {
+        "n": 15,
+        "mean": 0.9433759249,
+        "sd": 0.1522959864,
+        "min": 0.6094719188,
+        "max": 1.198994279
+      }
+    },
+    "finnishUptakeYear": {
+      "n": 15,
+      "mean": 0.2929146393,
+      "sd": 0.05431996411,
+      "min": 0.1808219178,
+      "max": 0.3743169399
+    },
+    "finnishUptakeJja": {
+      "n": 15,
+      "mean": 0.7057971014,
+      "sd": 0.09923644036,
+      "min": 0.5543478261,
+      "max": 0.9130434783
+    },
+    "minNee": "maktau-2019",
+    "maxNee": "haltiala-2023"
+  },
+  "figures": [
+    {
+      "n": 1,
+      "file": "figures/1-carbon-space.svg",
+      "title": "Annual ecosystem respiration (Reco) against annual gross primary production (GPP), one marker per site-year; below the 1:1 line the site-year was a net CO2 sink.",
+      "desc": "Scatter plot of 15 site-years (full and reliable years with annual GPP and Reco): x axis annual GPP (g C m−2 yr−1), y axis annual Reco (g C m−2 yr−1), both from 400 to 1600 on the same scale. A dotted 1:1 line divides net source years (above, NEE > 0) from net sink years (below, NEE < 0); light dotted lines mark NEE = −200 and −400 g C m−2 yr−1. Annual GPP is 660 to 1479, Reco 612 to 1465 g C m−2 yr−1. 9 site-years are below the line and 6 above it. NEE is −73 ± 155 (mean ± SD, range −392 to 131, n = 15) g C m−2 yr−1; the strongest sink is Maktau 2019 maize with NEE −392, the strongest source Haltiala 2023 grass (failed) with NEE 131. OLS line: Reco = 0.67 × GPP + 262, r = 0.75 (n = 15); without Maktau slope 0.66, r = 0.84 (n = 14). Each site has its own colour and marker; labels give the year and, for annual crops and the failed grass, the crop."
+    },
+    {
+      "n": 2,
+      "file": "figures/2-uptake-days.svg",
+      "title": "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year and over June to August.",
+      "desc": "Grouped bar chart of 16 site-years (full and reliable years), grouped by site. Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 over the whole year, the right bar (lighter, hatched) the share over June to August; y axis days with net uptake (%), 0 to 100, dotted line at 50 %. At the Finnish sites the share is 18 % to 37 % of the year (n = 15) and 55 % to 91 % of June to August; Maktau 2019: 87 % and 99 %. Mean ± SD (range) of the whole year: grassland 31 % ± 4 % (25 % to 37 %, n = 11), annual crops 36 % ± 29 % (18 % to 87 %, n = 5); of June to August: grassland 70 % ± 11 % (55 % to 91 %, n = 11), annual crops 77 % ± 15 % (62 % to 99 %, n = 5). Whole year and June to August per site-year: Anttila 2022: 36 % and 78 %; Anttila 2023: 36 % and 71 %; Särkisuo 2022: 29 % and 72 %; Särkisuo 2023: 31 % and 66 %; Haltiala 2022 oats: 24 % and 62 %; Haltiala 2023 grass (failed): 25 % and 60 %; Haltiala 2024 sunflower: 24 % and 73 %; Haltiala 2025 oats: 18 % and 67 %; Qvidja 2020: 37 % and 78 %; Qvidja 2022: 29 % and 73 %; Qvidja 2023: 27 % and 57 %; Qvidja 2024: 32 % and 72 %; Qvidja 2025: 28 % and 55 %; Viikki 2024: 36 % and 91 %; Viikki 2025 faba bean: 27 % and 84 %; Maktau 2019 maize: 87 % and 99 %."
+    }
+  ],
+  "dataVersion": {
+    "generatedAt": "2026-10-27T17:17:56Z",
+    "git": {
+      "commit": "fea1565",
+      "dirty": true
+    },
+    "script": {
+      "path": "analysis/carbon-space/carbon-space.py",
+      "sha256": "5b57b2ad817174a181285165cdf1204677e51f7f003a5db7447fd7ab71f51024"
+    },
+    "lock": {
+      "path": "analysis/carbon-space/carbon-space.py.lock",
+      "sha256": "501b2fc809730f5189d75098e1201b8eed1d8f0aab30fbaea1f7a17b9351a72e"
+    },
+    "python": "3.13.5",
+    "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+    "packages": {
+      "annotated-types": "0.8.0",
+      "contourpy": "1.4.0",
+      "cycler": "0.12.1",
+      "fonttools": "4.68.0",
+      "kiwisolver": "1.5.1",
+      "matplotlib": "3.11.2",
+      "mypy_extensions": "1.1.0",
+      "numpy": "2.5.4",
+      "packaging": "26.3",
+      "pandas": "3.1.0",
+      "pandera": "0.34.1",
+      "pillow": "13.0.0",
+      "pyarrow": "26.0.0",
+      "pydantic": "2.14.1",
+      "pydantic_core": "2.50.1",
+      "pyparsing": "3.3.3",
+      "python-dateutil": "3.0.0",
+      "six": "1.17.0",
+      "typeguard": "4.6.0",
+      "typing-inspect": "0.9.0",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "tzdata": "2026.5"
+    },
+    "seeds": {},
+    "seedNote": "no random numbers",
+    "args": {
+      "db": "db",
+      "calculated": "data/calculated",
+      "out": null,
+      "check": false
+    },
+    "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "snapshot": {
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+      "commit": "44ec98f",
+      "commitNote": "HEAD at build time; db/report.json does not record a commit",
+      "url": null,
+      "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+      "inputs": [
+        {
+          "path": "db/sites.parquet",
+          "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+          "rows": 6
+        },
+        {
+          "path": "db/events.parquet",
+          "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+          "rows": 114
+        },
+        {
+          "path": "calculated/annual.csv",
+          "sha256": "27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe",
+          "rows": 33
+        },
+        {
+          "path": "calculated/daily.parquet",
+          "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+          "rows": 11209
+        }
+      ]
+    },
+    "inputs": [
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "site_id",
+          "code",
+          "name"
+        ]
+      },
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114,
+        "builtAt": "2026-10-23T19:03:07.928Z",
+        "columns": [
+          "site_code",
+          "date",
+          "type",
+          "crop"
+        ]
+      },
+      {
+        "path": "calculated/annual.csv",
+        "sha256": "27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe",
+        "rows": 33,
+        "builtAt": null,
+        "columns": [
+          "site_code",
+          "year",
+          "full_year",
+          "reliable",
+          "frac_measured",
+          "longest_gap_days",
+          "n_gpp",
+          "nee_f_gc",
+          "gpp_gc",
+          "reco_gc"
+        ]
+      },
+      {
+        "path": "calculated/daily.parquet",
+        "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+        "rows": 11209,
+        "builtAt": "2026-10-23T19:03:09.003Z",
+        "columns": [
+          "site_code",
+          "date_local",
+          "nee_f_gc",
+          "gpp_gc",
+          "reco_gc",
+          "frac_measured"
+        ]
+      }
+    ],
+    "steps": {
+      "events": {
+        "rowsRead": 114,
+        "rule": "all events; counted per site, calendar year of the event date and type"
+      },
+      "annual": {
+        "rowsRead": 33,
+        "rule": "one row per site and local calendar year; the reliable flag agrees with frac_measured >= 0.2 and longest_gap_days <= 30"
+      },
+      "daily": {
+        "rowsRead": 11209,
+        "rowsWithoutNee": 1892,
+        "rule": "one row per site and local day; a day without daily NEE is not counted in the uptake share"
+      },
+      "sumCheck": {
+        "comparisons": 74,
+        "maxRelDiff": 1.268117035e-13,
+        "rtol": 1e-06,
+        "rule": "annual sum = sum of the daily values of the local year; a NULL annual sum has a daily gap"
+      },
+      "inclusion": {
+        "siteYears": 33,
+        "fig2": 16,
+        "fig1": 15,
+        "excludedFig2": 17,
+        "onlyFig2": [
+          "sarkisuo-2023"
+        ],
+        "reasonCounts": {
+          "no flux data": 5,
+          "partial year": 2,
+          "measured fraction < 0.2": 6,
+          "longest gap > 30 d": 8
+        },
+        "rule": "full_year and reliable; Figure 1 also needs annual GPP and Reco"
+      }
+    }
+  }
+}

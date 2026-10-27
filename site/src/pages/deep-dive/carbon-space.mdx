@@ -1,0 +1,281 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 9
+title: 'Site-years in carbon space: annual GPP, Reco and the share of uptake days'
+question: How do the management and the crop of a site-year show in the annual carbon balance and in the share of days with net uptake?
+shortAnswer: 'Grassland years lie near the line Reco = GPP. A failed grass year was a net source, an oat year a sink. In Finland, uptake days were a minority of the year but a majority of June to August.'
+sites: [anttila, sarkisuo, haltiala, qvidja, viikki, maktau]
+variables: [nee_f, gpp, reco]
+period: { from: 2019, to: 2025 }
+date: '2026-10-27'
+status: draft
+models:
+  - model: Claude Fable 5.1
+    role: question, plan, final text
+  - model: Claude Opus 5.5
+    role: Python analysis script, figures
+  - model: Claude Opus 5.5
+    role: article draft and site integration
+  - model: Claude Sonnet 5.5
+    role: independent recompute of the numbers (own code, without the script and the JSON)
+  - model: Claude Haiku 5.5
+    role: language (STE) and reference review
+script: analysis/carbon-space/carbon-space.py
+references: [calculated-doc, anomaly-report, heimsch2024, shurpali2025, rasanen2026, haltiala-management, qvidja-management, viikki-management]
+checks:
+  - kind: recompute
+    by: Claude Sonnet 5.5
+    date: '2026-10-27'
+    result: pass
+    note: Own code from the built page and the snapshot, without the script and the JSON. All site-years, exclusions, per-site-year values, uptake shares, event counts, the OLS line, the group statistics and the Finnish ranges agree to rounding. The agent listed eight rules it had to guess; the method text now states them.
+  - kind: review
+    by: Claude Haiku 5.5
+    date: '2026-10-27'
+    result: partial
+    note: One pass. All citations check out. Must items fixed by Claude Fable 5.1 - n and range next to every group mean, the Shurpali site list, the recompute rules in the method, the QVI-07 bullet, three decimals in the excluded table, the short answer body shortened, the STE sentence splits.
+---
+
+import raw from '../../../../analysis/carbon-space/results.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+import { carbonSpaceData, excludedRows, fig1Count, inputRows, listText, siteYearRows, sourceList, syKey } from '../../lib/deepDives/carbonSpace';
+
+export const d = carbonSpaceData(raw);
+export const base = baseUrl();
+export const SITES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'];
+export const VIEW1 = { name: 'Carbon space', sites: SITES, variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2019, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['budget'] };
+export const VIEW2 = { name: 'Uptake days', sites: SITES, variables: ['nee_f'], yearFrom: 2019, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] };
+export const S = (key) => syKey(d, key);
+export const rows = siteYearRows(d);
+export const excl = excludedRows(d);
+export const inputs = inputRows(d);
+export const qvidjaSources = sourceList(d, 'qvidja');
+export const allSources = sourceList(d);
+export const UA = 'g C m⁻² yr⁻¹';
+export const G = d.groups;
+export const annualCropList = listText(d, d.groups['annual crop'].fig2SiteYears);
+export const nQvidjaFig1 = fig1Count(d, 'qvidja');
+
+## Short answer
+
+Figure 1 plots annual ecosystem respiration (Reco) against annual gross primary production (GPP). Below the 1:1 line, a
+site-year was a net CO₂ sink. The grassland site-years lie near the line. At Haltiala, the oat year 2022 was a sink and
+the failed grass year 2023 was a source. NEE does not include the harvest carbon, and n is small.
+
+## Data and method
+
+**Snapshot and script.** The script `analysis/carbon-space/carbon-space.py` reads the harmonised database snapshot built
+on {d.dataVersion.snapshot.builtAt}. It reads `db/sites.parquet` and `db/events.parquet`. It also reads the calculated
+products of the same build, `data/calculated/annual.csv` and `data/calculated/daily.parquet` <Cite ids={['calculated-doc']} />.
+It checks the SHA-256 and the row count of each file before it reads data (section "Reproduce"). GPP and Reco come from
+the night-time partitioning of the calculated products. NEE is the gap-filled NEE. At Maktau, GPP, Reco and NEE come from
+the u* filter and the MDS gap filling of the calculated products <Cite ids={['calculated-doc']} />. All sums use local
+calendar years and local days.
+
+**Inclusion.** A site-year is one site and one calendar year. All site-years of the snapshot are candidates. The figures
+show site-years from 2019 to 2025. A site-year is in the figures when the annual table marks it as a full year and as
+reliable. Reliable means a measured fraction of the half hours of <Num k="method.minFrac" digits={1} /> or more. It also
+means a longest gap of <Num k="method.maxGapDays" digits={0} /> days or less <Cite ids={['calculated-doc']} />. Figure 1
+also needs an annual GPP and Reco sum. A sum is empty when one half hour has no value. The script gives the reason for
+each excluded site-year from these flags (table "Site-years not shown"). The reasons have an order. "No flux data"
+(measured fraction 0) comes first. Then come "partial year", "measured fraction" and "longest gap"; a site-year can have
+more than one of these. "No annual GPP or Reco sum" applies only to a site-year that is otherwise full and reliable.
+Figure 1 has <Num k="summary.nFig1" digits={0} /> site-years and Figure 2 has <Num k="summary.nFig2" digits={0} />.
+
+**Uptake days.** A day is a row of `daily.parquet` with a local date. An uptake day is a day with a daily NEE below zero.
+The rule is strict: a daily NEE of exactly zero is not an uptake day. The share is the uptake days divided by the days
+with a daily NEE value. Gap-filled days count in full. There is no weighting by the measured fraction and no rule on
+the coverage of a day. June to August are the local calendar months 6, 7 and 8 (92 days), also at Maktau.
+
+**Land use and events.** Each site-year has a crop and a group, grassland or annual crop. The script constant `CROPS`
+gives them, from the project notes. The annual-crop group is {annualCropList}. All other site-years are grassland. This
+includes Haltiala 2023 (sown grass that failed) and Viikki 2024. The event counts per type are the events of
+`db/events.parquet` in the calendar year of the event start date. "Harvest or cut" is the sum of the harvest and cut
+events. "Other" is the sum of the spraying and other events. The events come from the management files
+<Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} /> and the other sources of the database.
+
+**Line and groups.** The script fits an OLS line, Reco = slope × GPP + intercept, to the Figure 1 site-years. It fits
+with and without Maktau. It also gives the Pearson r. The groups give n, mean, sample SD (n − 1), minimum and maximum.
+The NEE and Reco/GPP groups use the Figure 1 site-years. The uptake-share groups use the Figure 2 site-years, with
+Särkisuo 2023. There is no test. The n is small, and the site-years of one site are not independent.
+
+## Results
+
+<Figure id="figure-1" svgFile="analysis/carbon-space/figures/1-carbon-space.svg" view={VIEW1} />
+
+<Num k="summary.nSink" digits={0} /> of the <Num k="summary.nFig1" digits={0} /> site-years were below the 1:1 line (net
+sink). <Num k="summary.nSource" digits={0} /> were above it (net source): {allSources}. The grassland site-years lie near
+the line. Their Reco/GPP was <Num k="groups.grassland.recoGppRatio.mean" /> ± <Num k="groups.grassland.recoGppRatio.sd" />
+(mean ± SD, n = <Num k="groups.grassland.recoGppRatio.n" digits={0} />, range <Num k="groups.grassland.recoGppRatio.min" />
+to <Num k="groups.grassland.recoGppRatio.max" />).
+
+At Qvidja, the site-years above the line were {qvidjaSources}. Their NEE was <Num k={`${S('qvidja-2022')}.nee`} digits={0} sign />,
+<Num k={`${S('qvidja-2023')}.nee`} digits={0} sign /> and <Num k={`${S('qvidja-2024')}.nee`} digits={0} sign /> {UA}.
+The event table gives harvests or cuts in each of these years. The harvested biomass leaves the field and is not in NEE.
+Heimsch et al. 2024 report that, in the first four years (May to May), management at Qvidja exported more carbon in the
+yield than it imported in organic fertilisers <Cite ids={['heimsch2024']} note="PDF p. 7" />. Qvidja 2025 had the highest
+annual GPP (<Num k={`${S('qvidja-2025')}.gpp`} digits={0} unit={UA} />). Its events in the database are grazing only
+(<Num k={`${S('qvidja-2025')}.events.grazing`} digits={0} /> events).
+
+At Haltiala the crop changed each year. The oat year 2022 was a sink (NEE <Num k={`${S('haltiala-2022')}.nee`} digits={0} unit={UA} />,
+Reco/GPP <Num k={`${S('haltiala-2022')}.recoGppRatio`} />). In 2023, the sown grass failed, and GPP was the lowest of all
+site-years (<Num k={`${S('haltiala-2023')}.gpp`} digits={0} unit={UA} />). The database has
+<Num k={`${S('haltiala-2023')}.events.tillage`} digits={0} /> tillage events and no harvest in that year. Reco was more
+than GPP (Reco/GPP <Num k={`${S('haltiala-2023')}.recoGppRatio`} />), and the site-year was the strongest source
+(NEE <Num k={`${S('haltiala-2023')}.nee`} digits={0} sign unit={UA} />). The sunflower year 2024 and the oat year 2025
+were near the line (NEE <Num k={`${S('haltiala-2024')}.nee`} digits={0} /> and <Num k={`${S('haltiala-2025')}.nee`} digits={0} /> {UA}).
+Maktau 2019 (maize) was the strongest sink (NEE <Num k={`${S('maktau-2019')}.nee`} digits={0} unit={UA} />, Reco/GPP
+<Num k={`${S('maktau-2019')}.recoGppRatio`} />).
+
+The OLS line is Reco = <Num k="regression.all.slope" /> × GPP + <Num k="regression.all.intercept" digits={0} />
+(r = <Num k="regression.all.r" />, n = <Num k="regression.all.n" digits={0} />). Without Maktau, the slope is
+<Num k="regression.withoutMaktau.slope" />, the intercept <Num k="regression.withoutMaktau.intercept" digits={0} /> and
+r = <Num k="regression.withoutMaktau.r" /> (n = <Num k="regression.withoutMaktau.n" digits={0} />). The slope is below 1
+and the intercept is positive. The fitted line therefore lies below the 1:1 line at high GPP. This line describes these
+site-years only.
+
+<Figure id="figure-2" svgFile="analysis/carbon-space/figures/2-uptake-days.svg" view={VIEW2} />
+
+At the Finnish sites, the share of uptake days was <Num k="summary.finnishUptakeYear.mean" percent digits={0} /> ±
+<Num k="summary.finnishUptakeYear.sd" percent digits={0} /> of the year (mean ± SD, n = <Num k="summary.finnishUptakeYear.n" digits={0} />,
+range <Num k="summary.finnishUptakeYear.min" percent digits={0} /> to <Num k="summary.finnishUptakeYear.max" percent digits={0} />).
+It was <Num k="summary.finnishUptakeJja.mean" percent digits={0} /> ± <Num k="summary.finnishUptakeJja.sd" percent digits={0} />
+of June to August (range <Num k="summary.finnishUptakeJja.min" percent digits={0} /> to <Num k="summary.finnishUptakeJja.max" percent digits={0} />).
+Haltiala 2025 (oats) had the lowest share of the year (<Num k={`${S('haltiala-2025')}.uptake.year.share`} percent digits={0} />).
+At Viikki, the grassland year 2024 had <Num k={`${S('viikki-2024')}.uptake.year.share`} percent digits={0} /> of the year
+and <Num k={`${S('viikki-2024')}.uptake.jja.share`} percent digits={0} /> of June to August. The faba bean year 2025 had
+<Num k={`${S('viikki-2025')}.uptake.year.share`} percent digits={0} /> and <Num k={`${S('viikki-2025')}.uptake.jja.share`} percent digits={0} />.
+At Qvidja, the June-to-August share was <Num k={`${S('qvidja-2020')}.uptake.jja.share`} percent digits={0} /> in 2020. It was
+<Num k={`${S('qvidja-2025')}.uptake.jja.share`} percent digits={0} /> in 2025, the lowest of all site-years.
+Maktau 2019 had <Num k={`${S('maktau-2019')}.uptake.year.share`} percent digits={0} /> of the year and
+<Num k={`${S('maktau-2019')}.uptake.jja.share`} percent digits={0} /> of June to August.
+
+**Groups.** Each value is mean ± SD, with n and the range.
+
+- Grassland: NEE <Num k="groups.grassland.nee.mean" digits={0} /> ± <Num k="groups.grassland.nee.sd" digits={0} /> {UA}
+  (n = <Num k="groups.grassland.nee.n" digits={0} />, range <Num k="groups.grassland.nee.min" digits={0} /> to
+  <Num k="groups.grassland.nee.max" digits={0} sign />). Uptake days <Num k="groups.grassland.uptakeYear.mean" percent digits={0} /> ±
+  <Num k="groups.grassland.uptakeYear.sd" percent digits={0} /> of the year (n = <Num k="groups.grassland.uptakeYear.n" digits={0} />,
+  range <Num k="groups.grassland.uptakeYear.min" percent digits={0} /> to <Num k="groups.grassland.uptakeYear.max" percent digits={0} />).
+- Annual crops: NEE <Num k="groups.annual crop.nee.mean" digits={0} /> ± <Num k="groups.annual crop.nee.sd" digits={0} /> {UA}
+  (n = <Num k="groups.annual crop.nee.n" digits={0} />, range <Num k="groups.annual crop.nee.min" digits={0} /> to
+  <Num k="groups.annual crop.nee.max" digits={0} sign />). Reco/GPP <Num k="groups.annual crop.recoGppRatio.mean" /> ±
+  <Num k="groups.annual crop.recoGppRatio.sd" /> (n = <Num k="groups.annual crop.recoGppRatio.n" digits={0} />, range
+  <Num k="groups.annual crop.recoGppRatio.min" /> to <Num k="groups.annual crop.recoGppRatio.max" />). Uptake days
+  <Num k="groups.annual crop.uptakeYear.mean" percent digits={0} /> ± <Num k="groups.annual crop.uptakeYear.sd" percent digits={0} />
+  of the year (n = <Num k="groups.annual crop.uptakeYear.n" digits={0} />, range <Num k="groups.annual crop.uptakeYear.min" percent digits={0} />
+  to <Num k="groups.annual crop.uptakeYear.max" percent digits={0} />).
+- Annual crops without Maktau: NEE <Num k="groups.annual crop without Maktau.nee.mean" digits={0} /> ±
+  <Num k="groups.annual crop without Maktau.nee.sd" digits={0} /> {UA} (n = <Num k="groups.annual crop without Maktau.nee.n" digits={0} />,
+  range <Num k="groups.annual crop without Maktau.nee.min" digits={0} /> to <Num k="groups.annual crop without Maktau.nee.max" digits={0} sign />).
+  Reco/GPP <Num k="groups.annual crop without Maktau.recoGppRatio.mean" /> ± <Num k="groups.annual crop without Maktau.recoGppRatio.sd" />
+  (n = <Num k="groups.annual crop without Maktau.recoGppRatio.n" digits={0} />, range <Num k="groups.annual crop without Maktau.recoGppRatio.min" />
+  to <Num k="groups.annual crop without Maktau.recoGppRatio.max" />). Uptake days
+  <Num k="groups.annual crop without Maktau.uptakeYear.mean" percent digits={0} /> ± <Num k="groups.annual crop without Maktau.uptakeYear.sd" percent digits={0} />
+  of the year (n = <Num k="groups.annual crop without Maktau.uptakeYear.n" digits={0} />, range
+  <Num k="groups.annual crop without Maktau.uptakeYear.min" percent digits={0} /> to <Num k="groups.annual crop without Maktau.uptakeYear.max" percent digits={0} />).
+
+The group means do not differ clearly. The SDs are large and the ranges overlap. Maktau 2019 changes the annual-crop
+mean: NEE is <Num k="groups.annual crop.nee.mean" digits={0} /> with it and <Num k="groups.annual crop without Maktau.nee.mean" digits={0} />
+without it ({UA}).
+
+### Tables
+
+<div class="table-wrap">
+<table>
+<caption>Site-years in the figures, in the site order of db/sites.parquet. GPP, Reco and NEE in {UA} (annual sums; GPP, Reco and Reco/GPP are empty for Särkisuo 2023, which is in Figure 2 only). Uptake days = share of the days with daily NEE &lt; 0 (%), whole year and June to August. Measured = measured fraction of the half hours. Event counts per calendar year from db/events.parquet: harvest or cut, grazing, tillage, sowing, fertilisation, other (spraying and other).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col" class="num">Year</th><th scope="col">Crop</th><th scope="col" class="num">GPP</th><th scope="col" class="num">Reco</th><th scope="col" class="num">NEE</th><th scope="col" class="num">Reco/GPP</th><th scope="col" class="num">Uptake days, year</th><th scope="col" class="num">Uptake days, Jun–Aug</th><th scope="col" class="num">Measured</th><th scope="col" class="num">Harvest or cut</th><th scope="col" class="num">Grazing</th><th scope="col" class="num">Tillage</th><th scope="col" class="num">Sowing</th><th scope="col" class="num">Fert.</th><th scope="col" class="num">Other</th><th scope="col">Figures</th></tr>
+</thead>
+<tbody>
+{rows.map((r) => (<tr id={r.id}><td>{r.site}</td><td class="num">{r.year}</td><td class="wrap">{r.crop}</td><td class="num">{r.gpp}</td><td class="num">{r.reco}</td><td class="num">{r.nee}</td><td class="num">{r.ratio}</td><td class="num">{r.uptakeYear}</td><td class="num">{r.uptakeJja}</td><td class="num">{r.frac}</td><td class="num">{r.harvestCut}</td><td class="num">{r.grazing}</td><td class="num">{r.tillage}</td><td class="num">{r.sowing}</td><td class="num">{r.fertilisation}</td><td class="num">{r.other}</td><td>{r.figures}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Site-years not shown in Figure 1, with the reason from the flags of the annual table. Limits: measured fraction {d.method.minFrac} or more, longest gap {d.method.maxGapDays} days or less. "In Figure 2" = the site-year is in Figure 2. Measured = measured fraction of the half hours; gap = longest gap in days.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col" class="num">Year</th><th scope="col">Reason</th><th scope="col">In Figure 2</th><th scope="col" class="num">Measured</th><th scope="col" class="num">Gap (d)</th></tr>
+</thead>
+<tbody>
+{excl.map((r) => (<tr id={r.id}><td>{r.site}</td><td class="num">{r.year}</td><td class="wrap">{r.reason}</td><td>{r.figure2}</td><td class="num">{r.frac}</td><td class="num">{r.gap}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+## Limits and uncertainty
+
+- **NEE is not the full carbon balance.** The harvest takes carbon from the field, and manure brings carbon in. NEE does
+  not include these flows. The net ecosystem carbon balance (NECB) with the harvest carbon is on the
+  <a href={`${base}calculated/`}>Calculated page</a> <Cite ids={['calculated-doc']} />. Shurpali et al. 2025 add the carbon
+  of the harvested biomass to the annual CO₂ flux of 2022. With it, all three sites of that study (Anttila, Särkisuo and
+  Pappilansuo) were annual CO₂ sources <Cite ids={['shurpali2025']} note="Table 4, PDF p. 8; PDF p. 9" />. A grassland year
+  below the 1:1 line can therefore be a carbon loss of the field.
+- **Most half hours are gap-filled at Qvidja and Viikki.** The measured fraction of their site-years in the figures is
+  <Num k={`${S('viikki-2025')}.fracMeasured`} /> to <Num k={`${S('qvidja-2020')}.fracMeasured`} />. The annual sums and
+  the daily signs depend on the gap-filling model. The effect is not quantified.
+- **Qvidja partitioning.** The Qvidja GPP and Reco on this page come from our night-time partitioning. The provider used
+  a daytime method. In the provider data, NEE is not equal to Reco − GPP in 26 to 48 % of the periods (finding
+  <a href={`${base}data-report/#finding-QVI-07`}>QVI-07</a>; status: resolved) <Cite ids={['anomaly-report']} />. Our
+  Qvidja GPP and Reco are 15 to 31 % below the provider values <Cite ids={['calculated-doc']} />. The {nQvidjaFig1} Qvidja
+  site-years of Figure 1 depend on this choice.
+- **Time stamps.** The raw stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as UTC+2 (findings
+  <a href={`${base}data-report/#finding-ANT-01`}>ANT-01</a>, <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a> and
+  <a href={`${base}data-report/#finding-VII-01`}>VII-01</a>; status: waits for provider) <Cite ids={['anomaly-report']} />.
+  A local day of these sites therefore starts 2 hours late (ANT-01). We expect that the annual sums change only by the
+  hours at the ends of the year; this is not tested. A daily NEE near zero can change sign. The uptake share can then
+  change. The script does not give the size.
+- **Qvidja NEE.** The Qvidja annual NEE of the database is more negative than in Heimsch et al. 2024 (open question,
+  <a href={`${base}data-report/#finding-QVI-11`}>QVI-11</a>; Data Report status: waits for provider) <Cite ids={['anomaly-report']} />.
+  The Qvidja site-years can lie too far below the 1:1 line. Viikki 2024 gap-filled NEE differs from the measured NEE in
+  some half hours (<a href={`${base}data-report/#finding-VII-05`}>VII-05</a>; status: waits for provider).
+- **Maktau has one year.** Only Maktau 2019 passes the inclusion rule. In Maktau, the long rains are from March to May
+  and the short rains from October to December <Cite ids={['rasanen2026']} note="PDF p. 2" />. In 2019 the maize was
+  sown on 12 April and harvested on 13 August <Cite ids={['rasanen2026']} note="PDF p. 3" />. June to August is not the
+  main growing season of Maktau. Its June-to-August share does not compare directly with the Finnish sites.
+- **Few events.** A site-year has few management events, and each site has a different set of years. The dive
+  therefore makes no statistical test of the events. The links between the events and the position of a site-year are
+  descriptive. The event table can be incomplete for a site-year.
+- **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
+  identify it.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `analysis/carbon-space/results.json`. The Python script
+<a href={`${REPO_URL}/blob/main/analysis/carbon-space/carbon-space.py`}><code>analysis/carbon-space/carbon-space.py</code></a>
+writes this file, `manifest.json` and the two SVG figures. It reads only the database snapshot built on
+{d.dataVersion.snapshot.builtAt} and `data/calculated/annual.csv` and `data/calculated/daily.parquet` of the same build.
+Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
+The table gives the SHA-256, the row count and the columns read of each file (the paths are relative to the `--db` and
+`--calculated` folders); the script stops when a hash does not agree. The folder
+<a href={`${REPO_URL}/tree/main/analysis/carbon-space`}><code>analysis/carbon-space/</code></a> has the lock file, the
+unit tests and a README.
+
+<div class="table-wrap">
+<table>
+<caption>Input files of the snapshot (database built {d.dataVersion.snapshot.builtAt}, calculated data built {d.dataVersion.snapshot.calcBuiltAt}).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col">SHA-256</th><th scope="col" class="num">Rows</th><th scope="col">Columns read</th></tr>
+</thead>
+<tbody>
+{inputs.map((r) => (<tr><td>{r.path}</td><td class="wrap"><code>{r.sha256}</code></td><td class="num">{r.rows}</td><td class="wrap"><code>{r.columns}</code></td></tr>))}
+</tbody>
+</table>
+</div>
+
+```sh
+npm run build:db && npm run calc                 # make the inputs (the hashes must agree with the script)
+uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated
+uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated --check
+npm run deep-dives -- --check                    # all dives, TypeScript and Python
+```

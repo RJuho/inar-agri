@@ -1981,6 +1981,52 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
+  test('the carbon space dive (Python) has two figures, the site-year tables and SVG downloads', async ({ page, request }) => {
+    const slug = 'carbon-space';
+    await page.goto(`/deep-dive/${slug}/`);
+    await expect(page.locator('h1')).toContainText('carbon space');
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #9');
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    // Two matplotlib figures: annual Reco against GPP, and the share of uptake days.
+    const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
+    expect(await figures.count()).toBe(2);
+    for (const svg of await figures.all()) {
+      const info = await svg.evaluate((el) => ({
+        labelledby: el.getAttribute('aria-labelledby') ?? '',
+        first: el.children[0]?.tagName.toLowerCase(),
+        second: el.children[1]?.tagName.toLowerCase(),
+        titleId: el.children[0]?.id ?? '',
+        descId: el.children[1]?.id ?? '',
+        title: el.children[0]?.textContent?.trim() ?? '',
+        desc: el.children[1]?.textContent?.trim() ?? '',
+      }));
+      expect([info.first, info.second]).toEqual(['title', 'desc']);
+      expect(info.title.length).toBeGreaterThan(0);
+      expect(info.desc.length).toBeGreaterThan(0);
+      expect(info.labelledby.split(/\s+/)).toEqual([info.titleId, info.descId]);
+    }
+    const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(downloads.length).toBe(2);
+    for (const href of downloads) {
+      expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
+      const res = await request.get(href);
+      expect(res.status(), href).toBe(200);
+      expect(res.headers()['content-type'] ?? '', href).toContain('svg');
+    }
+    // 16 site-years in the figures (15 in Figure 1 and Särkisuo 2023 in Figure 2 only), 18 site-years not in Figure 1.
+    await expect(page.locator('tr[id^="sy-"]')).toHaveCount(16);
+    await expect(page.locator('tr[id^="excluded-"]')).toHaveCount(18);
+    await expect(page.locator('tr#excluded-sarkisuo-2023 td').nth(3)).toHaveText('yes');
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(50);
+    const text = await page.locator('main').innerText();
+    expect(text).not.toMatch(/\bundefined\b|\bNaN\b/);
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    await expectOnlyUpdateScript(page);
+  });
+
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -1998,7 +2044,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/', '/deep-dive/carbon-space/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);

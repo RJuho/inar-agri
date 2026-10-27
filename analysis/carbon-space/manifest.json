@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-10-27T17:17:56Z",
+  "git": {
+    "commit": "fea1565",
+    "dirty": true
+  },
+  "script": {
+    "path": "analysis/carbon-space/carbon-space.py",
+    "sha256": "5b57b2ad817174a181285165cdf1204677e51f7f003a5db7447fd7ab71f51024"
+  },
+  "lock": {
+    "path": "analysis/carbon-space/carbon-space.py.lock",
+    "sha256": "501b2fc809730f5189d75098e1201b8eed1d8f0aab30fbaea1f7a17b9351a72e"
+  },
+  "python": "3.13.5",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+  "packages": {
+    "annotated-types": "0.8.0",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "fonttools": "4.68.0",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.11.2",
+    "mypy_extensions": "1.1.0",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pandas": "3.1.0",
+    "pandera": "0.34.1",
+    "pillow": "13.0.0",
+    "pyarrow": "26.0.0",
+    "pydantic": "2.14.1",
+    "pydantic_core": "2.50.1",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "3.0.0",
+    "six": "1.17.0",
+    "typeguard": "4.6.0",
+    "typing-inspect": "0.9.0",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.5"
+  },
+  "seeds": {},
+  "seedNote": "no random numbers",
+  "args": {
+    "db": "db",
+    "calculated": "data/calculated",
+    "out": null,
+    "check": false
+  },
+  "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+  "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+  "snapshot": {
+    "builtAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "commit": "44ec98f",
+    "commitNote": "HEAD at build time; db/report.json does not record a commit",
+    "url": null,
+    "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+    "inputs": [
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6
+      },
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114
+      },
+      {
+        "path": "calculated/annual.csv",
+        "sha256": "27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe",
+        "rows": 33
+      },
+      {
+        "path": "calculated/daily.parquet",
+        "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+        "rows": 11209
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "path": "db/sites.parquet",
+      "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+      "rows": 6,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "code",
+        "name"
+      ]
+    },
+    {
+      "path": "db/events.parquet",
+      "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+      "rows": 114,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_code",
+        "date",
+        "type",
+        "crop"
+      ]
+    },
+    {
+      "path": "calculated/annual.csv",
+      "sha256": "27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe",
+      "rows": 33,
+      "builtAt": null,
+      "columns": [
+        "site_code",
+        "year",
+        "full_year",
+        "reliable",
+        "frac_measured",
+        "longest_gap_days",
+        "n_gpp",
+        "nee_f_gc",
+        "gpp_gc",
+        "reco_gc"
+      ]
+    },
+    {
+      "path": "calculated/daily.parquet",
+      "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+      "rows": 11209,
+      "builtAt": "2026-10-23T19:03:09.003Z",
+      "columns": [
+        "site_code",
+        "date_local",
+        "nee_f_gc",
+        "gpp_gc",
+        "reco_gc",
+        "frac_measured"
+      ]
+    }
+  ],
+  "steps": {
+    "events": {
+      "rowsRead": 114,
+      "rule": "all events; counted per site, calendar year of the event date and type"
+    },
+    "annual": {
+      "rowsRead": 33,
+      "rule": "one row per site and local calendar year; the reliable flag agrees with frac_measured >= 0.2 and longest_gap_days <= 30"
+    },
+    "daily": {
+      "rowsRead": 11209,
+      "rowsWithoutNee": 1892,
+      "rule": "one row per site and local day; a day without daily NEE is not counted in the uptake share"
+    },
+    "sumCheck": {
+      "comparisons": 74,
+      "maxRelDiff": 1.2681170347140436e-13,
+      "rtol": 1e-06,
+      "rule": "annual sum = sum of the daily values of the local year; a NULL annual sum has a daily gap"
+    },
+    "inclusion": {
+      "siteYears": 33,
+      "fig2": 16,
+      "fig1": 15,
+      "excludedFig2": 17,
+      "onlyFig2": [
+        "sarkisuo-2023"
+      ],
+      "reasonCounts": {
+        "no flux data": 5,
+        "partial year": 2,
+        "measured fraction < 0.2": 6,
+        "longest gap > 30 d": 8
+      },
+      "rule": "full_year and reliable; Figure 1 also needs annual GPP and Reco"
+    }
+  },
+  "outputs": {
+    "results.json": "46634f743d7359c9c88deb29b13ba208086fbb94261108353e915e723eed44d1",
+    "figures": {
+      "figures/1-carbon-space.svg": {
+        "sha256": "d907dece9122e4a5b02645e9ab14b2933930a69adcdd5b62ee059f610d5fc213",
+        "sha256WithoutMetadata": "02414d8c381d4b04d790aee6d4fca0b6c52b65c84408ac1eb990338b8a6f50a9"
+      },
+      "figures/2-uptake-days.svg": {
+        "sha256": "2b1bdd81d895588f618f333bb967b7f5b76b7c88ea9614e064e8980755742169",
+        "sha256WithoutMetadata": "a17a38295dc6c89fc61ad3eb0a088dcc2780c5e4c43308d9ac2976db89ce5e78"
+      }
+    }
+  }
+}
