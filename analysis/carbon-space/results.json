@@ -18,6 +18,9 @@
       7,
       8
     ],
+    "peakDays": 90,
+    "peakMinGppDays": 80,
+    "peakRule": "90 consecutive local days inside the calendar year (no crossing of the year end); score = sum of daily gpp_gc over the window days with a value; valid when 80 or more days have GPP; largest score wins, a tie goes to the earliest start; share = uptake days / days with daily NEE in the window; null when no window is valid",
     "uptakeDay": "local day with daily NEE (nee_f_gc) < 0",
     "groups": [
       "grassland",
@@ -297,6 +300,14 @@
       "3. Uptake day = a local day with daily NEE (nee_f_gc) < 0. Share = uptake days / days with a",
       "daily NEE value, for the whole year and for June to August (JJA, calendar months 6 to 8 in",
       "local time, also at Maktau, where JJA is not the main growing season).",
+      "3b. Peak-GPP window (Figure 3): 90 consecutive local days inside the calendar year of the",
+      "site-year (the window does not cross the year end). Score = sum of the daily GPP (gpp_gc)",
+      "over the days of the window with a value. A window is valid only when 80 or more of its 90",
+      "days have a GPP value (PEAK_MIN_GPP_DAYS); the valid window with the largest score wins,",
+      "and a tie goes to the earliest start. Share = uptake days / days with a daily NEE value in",
+      "the window. Also stored: start and end date, GPP sum, GPP days, NEE days and the mean",
+      "frac_measured of the window days. Without a valid window the value is null and Figure 3",
+      "shows the whole-year bar only.",
       "4. Land use (CROPS, typed from the project notes in CLAUDE.md): group \"grassland\" or \"annual",
       "crop\". Haltiala 2023 (sown grass that failed) has the crop label \"grass (failed)\" and is in",
       "the group grassland. Events per site-year: the count per type of db/events.parquet in the",
@@ -305,7 +316,7 @@
       "1), with Pearson r and n; the same without Maktau. Descriptive only, n is small.",
       "6. Group summaries (grassland, annual crop): n, mean, SD (n - 1), min and max of NEE and",
       "Reco/GPP over the Figure 1 site-years, and of the uptake shares over the Figure 2",
-      "site-years. A third summary gives the annual crops without Maktau (Finnish crops only).",
+      "site-years (whole year, June to August, peak-GPP window). A third summary gives the annual crops without Maktau (Finnish crops only).",
       "7. Each step that removes rows logs a count (results.json dataVersion.steps).",
       "8. Open findings of docs/anomaly-data-report.md that touch this dive are printed",
       "(OPEN_FINDINGS). The script uses no literature value, thus it has no LITERATURE table."
@@ -348,6 +359,16 @@
           "days": 92,
           "uptakeDays": 72,
           "share": 0.7826086957
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 71,
+          "share": 0.7888888889,
+          "start": "2022-05-24",
+          "end": "2022-08-21",
+          "gppSum": 952.9373619,
+          "gppDays": 90,
+          "fracMeasured": 0.6423611111
         }
       },
       "events": {
@@ -392,6 +413,16 @@
           "days": 92,
           "uptakeDays": 65,
           "share": 0.7065217391
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 77,
+          "share": 0.8555555556,
+          "start": "2023-05-10",
+          "end": "2023-08-07",
+          "gppSum": 980.7291982,
+          "gppDays": 90,
+          "fracMeasured": 0.7013888889
         }
       },
       "events": {
@@ -436,6 +467,16 @@
           "days": 92,
           "uptakeDays": 66,
           "share": 0.7173913043
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 67,
+          "share": 0.7444444444,
+          "start": "2022-06-10",
+          "end": "2022-09-07",
+          "gppSum": 721.7382112,
+          "gppDays": 90,
+          "fracMeasured": 0.5606481481
         }
       },
       "events": {
@@ -480,6 +521,16 @@
           "days": 92,
           "uptakeDays": 61,
           "share": 0.6630434783
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 61,
+          "share": 0.6777777778,
+          "start": "2023-07-10",
+          "end": "2023-10-07",
+          "gppSum": 563.1582826,
+          "gppDays": 90,
+          "fracMeasured": 0.5386574074
         }
       },
       "events": {
@@ -524,6 +575,16 @@
           "days": 92,
           "uptakeDays": 53,
           "share": 0.5760869565
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 53,
+          "share": 0.5888888889,
+          "start": "2021-05-09",
+          "end": "2021-08-06",
+          "gppSum": 474.2092051,
+          "gppDays": 90,
+          "fracMeasured": 0.6416666667
         }
       },
       "events": {
@@ -568,6 +629,16 @@
           "days": 92,
           "uptakeDays": 57,
           "share": 0.6195652174
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 62,
+          "share": 0.6888888889,
+          "start": "2022-05-19",
+          "end": "2022-08-16",
+          "gppSum": 988.6789808,
+          "gppDays": 90,
+          "fracMeasured": 0.693287037
         }
       },
       "events": {
@@ -612,6 +683,16 @@
           "days": 92,
           "uptakeDays": 55,
           "share": 0.597826087
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 77,
+          "share": 0.8555555556,
+          "start": "2023-05-09",
+          "end": "2023-08-06",
+          "gppSum": 594.2792704,
+          "gppDays": 90,
+          "fracMeasured": 0.6837962963
         }
       },
       "events": {
@@ -656,6 +737,16 @@
           "days": 92,
           "uptakeDays": 67,
           "share": 0.7282608696
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 75,
+          "share": 0.8333333333,
+          "start": "2024-06-27",
+          "end": "2024-09-24",
+          "gppSum": 876.2733237,
+          "gppDays": 90,
+          "fracMeasured": 0.6502314815
         }
       },
       "events": {
@@ -700,6 +791,16 @@
           "days": 92,
           "uptakeDays": 62,
           "share": 0.6739130435
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 62,
+          "share": 0.6888888889,
+          "start": "2025-05-28",
+          "end": "2025-08-25",
+          "gppSum": 1014.902813,
+          "gppDays": 90,
+          "fracMeasured": 0.7282407407
         }
       },
       "events": {
@@ -744,6 +845,16 @@
           "days": 92,
           "uptakeDays": 70,
           "share": 0.7608695652
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 67,
+          "share": 0.7444444444,
+          "start": "2018-06-26",
+          "end": "2018-09-23",
+          "gppSum": 472.0518577,
+          "gppDays": 90,
+          "fracMeasured": 0.3261574074
         }
       },
       "events": {
@@ -788,6 +899,16 @@
           "days": 92,
           "uptakeDays": 78,
           "share": 0.847826087
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 79,
+          "share": 0.8777777778,
+          "start": "2019-05-18",
+          "end": "2019-08-15",
+          "gppSum": 650.0094193,
+          "gppDays": 90,
+          "fracMeasured": 0.3011574074
         }
       },
       "events": {
@@ -832,6 +953,16 @@
           "days": 92,
           "uptakeDays": 72,
           "share": 0.7826086957
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 75,
+          "share": 0.8333333333,
+          "start": "2020-05-07",
+          "end": "2020-08-04",
+          "gppSum": 846.0010963,
+          "gppDays": 90,
+          "fracMeasured": 0.2747685185
         }
       },
       "events": {
@@ -876,6 +1007,16 @@
           "days": 92,
           "uptakeDays": 44,
           "share": 0.4782608696
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 47,
+          "share": 0.5222222222,
+          "start": "2021-05-09",
+          "end": "2021-08-06",
+          "gppSum": 542.1553292,
+          "gppDays": 90,
+          "fracMeasured": 0.2733796296
         }
       },
       "events": {
@@ -920,6 +1061,16 @@
           "days": 92,
           "uptakeDays": 67,
           "share": 0.7282608696
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 69,
+          "share": 0.7666666667,
+          "start": "2022-05-18",
+          "end": "2022-08-15",
+          "gppSum": 475.4276532,
+          "gppDays": 90,
+          "fracMeasured": 0.3965277778
         }
       },
       "events": {
@@ -964,6 +1115,16 @@
           "days": 92,
           "uptakeDays": 52,
           "share": 0.5652173913
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 64,
+          "share": 0.7111111111,
+          "start": "2023-05-18",
+          "end": "2023-08-15",
+          "gppSum": 535.1641318,
+          "gppDays": 90,
+          "fracMeasured": 0.3615740741
         }
       },
       "events": {
@@ -1008,6 +1169,16 @@
           "days": 92,
           "uptakeDays": 66,
           "share": 0.7173913043
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 66,
+          "share": 0.7333333333,
+          "start": "2024-06-01",
+          "end": "2024-08-29",
+          "gppSum": 645.8475706,
+          "gppDays": 90,
+          "fracMeasured": 0.4335648148
         }
       },
       "events": {
@@ -1052,6 +1223,16 @@
           "days": 92,
           "uptakeDays": 51,
           "share": 0.5543478261
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 75,
+          "share": 0.8333333333,
+          "start": "2025-05-07",
+          "end": "2025-08-04",
+          "gppSum": 1051.067358,
+          "gppDays": 90,
+          "fracMeasured": 0.2877314815
         }
       },
       "events": {
@@ -1096,6 +1277,16 @@
           "days": 92,
           "uptakeDays": 83,
           "share": 0.902173913
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 83,
+          "share": 0.9222222222,
+          "start": "2022-05-28",
+          "end": "2022-08-25",
+          "gppSum": 944.2682117,
+          "gppDays": 90,
+          "fracMeasured": 0.3076388889
         }
       },
       "events": {
@@ -1140,6 +1331,16 @@
           "days": 92,
           "uptakeDays": 55,
           "share": 0.597826087
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 55,
+          "share": 0.6111111111,
+          "start": "2023-05-21",
+          "end": "2023-08-18",
+          "gppSum": 801.1749826,
+          "gppDays": 90,
+          "fracMeasured": 0.2293981481
         }
       },
       "events": {
@@ -1184,6 +1385,16 @@
           "days": 92,
           "uptakeDays": 84,
           "share": 0.9130434783
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 82,
+          "share": 0.9111111111,
+          "start": "2024-06-15",
+          "end": "2024-09-12",
+          "gppSum": 616.8611426,
+          "gppDays": 90,
+          "fracMeasured": 0.275
         }
       },
       "events": {
@@ -1228,6 +1439,16 @@
           "days": 92,
           "uptakeDays": 77,
           "share": 0.8369565217
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 72,
+          "share": 0.8,
+          "start": "2025-06-14",
+          "end": "2025-09-11",
+          "gppSum": 723.3528663,
+          "gppDays": 90,
+          "fracMeasured": 0.1453703704
         }
       },
       "events": {
@@ -1272,7 +1493,8 @@
           "days": 0,
           "uptakeDays": 0,
           "share": null
-        }
+        },
+        "peak": null
       },
       "events": {
         "harvest": 0,
@@ -1316,7 +1538,8 @@
           "days": 0,
           "uptakeDays": 0,
           "share": null
-        }
+        },
+        "peak": null
       },
       "events": {
         "harvest": 0,
@@ -1360,7 +1583,8 @@
           "days": 0,
           "uptakeDays": 0,
           "share": null
-        }
+        },
+        "peak": null
       },
       "events": {
         "harvest": 0,
@@ -1404,7 +1628,8 @@
           "days": 0,
           "uptakeDays": 0,
           "share": null
-        }
+        },
+        "peak": null
       },
       "events": {
         "harvest": 0,
@@ -1448,7 +1673,8 @@
           "days": 0,
           "uptakeDays": 0,
           "share": null
-        }
+        },
+        "peak": null
       },
       "events": {
         "harvest": 0,
@@ -1492,6 +1718,16 @@
           "days": 92,
           "uptakeDays": 91,
           "share": 0.9891304348
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 73,
+          "share": 0.8111111111,
+          "start": "2019-10-03",
+          "end": "2019-12-31",
+          "gppSum": 438.8428493,
+          "gppDays": 90,
+          "fracMeasured": 0.7481481481
         }
       },
       "events": {
@@ -1536,6 +1772,16 @@
           "days": 92,
           "uptakeDays": 88,
           "share": 0.9565217391
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 60,
+          "share": 0.6666666667,
+          "start": "2020-01-01",
+          "end": "2020-03-30",
+          "gppSum": 329.2402832,
+          "gppDays": 90,
+          "fracMeasured": 0.7886574074
         }
       },
       "events": {
@@ -1580,6 +1826,16 @@
           "days": 92,
           "uptakeDays": 92,
           "share": 1.0
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 55,
+          "share": 0.6111111111,
+          "start": "2021-10-03",
+          "end": "2021-12-31",
+          "gppSum": 141.4307109,
+          "gppDays": 90,
+          "fracMeasured": 0.5726851852
         }
       },
       "events": {
@@ -1624,6 +1880,16 @@
           "days": 92,
           "uptakeDays": 92,
           "share": 1.0
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 43,
+          "share": 0.4777777778,
+          "start": "2022-10-03",
+          "end": "2022-12-31",
+          "gppSum": 138.9700156,
+          "gppDays": 90,
+          "fracMeasured": 0.6145833333
         }
       },
       "events": {
@@ -1668,7 +1934,8 @@
           "days": 32,
           "uptakeDays": 32,
           "share": 1.0
-        }
+        },
+        "peak": null
       },
       "events": {
         "harvest": 0,
@@ -1712,6 +1979,16 @@
           "days": 92,
           "uptakeDays": 92,
           "share": 1.0
+        },
+        "peak": {
+          "days": 90,
+          "uptakeDays": 47,
+          "share": 0.5222222222,
+          "start": "2024-01-09",
+          "end": "2024-04-07",
+          "gppSum": 557.669264,
+          "gppDays": 90,
+          "fracMeasured": 0.03194444444
         }
       },
       "events": {
@@ -1756,7 +2033,8 @@
           "days": 0,
           "uptakeDays": 0,
           "share": null
-        }
+        },
+        "peak": null
       },
       "events": {
         "harvest": 0,
@@ -2022,6 +2300,13 @@
         "sd": 0.1056388352,
         "min": 0.5543478261,
         "max": 0.9130434783
+      },
+      "uptakePeak": {
+        "n": 11,
+        "mean": 0.7919191919,
+        "sd": 0.07185219896,
+        "min": 0.6777777778,
+        "max": 0.9111111111
       }
     },
     "annual crop": {
@@ -2066,6 +2351,13 @@
         "sd": 0.1467190002,
         "min": 0.6195652174,
         "max": 0.9891304348
+      },
+      "uptakePeak": {
+        "n": 5,
+        "mean": 0.7644444444,
+        "sd": 0.07000881779,
+        "min": 0.6888888889,
+        "max": 0.8333333333
       }
     },
     "annual crop without Maktau": {
@@ -2108,6 +2400,13 @@
         "sd": 0.09281658302,
         "min": 0.6195652174,
         "max": 0.8369565217
+      },
+      "uptakePeak": {
+        "n": 4,
+        "mean": 0.7527777778,
+        "sd": 0.07501714482,
+        "min": 0.6888888889,
+        "max": 0.8333333333
       }
     }
   },
@@ -2160,6 +2459,13 @@
       "min": 0.5543478261,
       "max": 0.9130434783
     },
+    "finnishUptakePeak": {
+      "n": 15,
+      "mean": 0.7814814815,
+      "sd": 0.0722120465,
+      "min": 0.6777777778,
+      "max": 0.9111111111
+    },
     "minNee": "maktau-2019",
     "maxNee": "haltiala-2023"
   },
@@ -2175,17 +2481,23 @@
       "file": "figures/2-uptake-days.svg",
       "title": "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year and over June to August.",
       "desc": "Grouped bar chart of 16 site-years (full and reliable years), grouped by site. Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 over the whole year, the right bar (lighter, hatched) the share over June to August; y axis days with net uptake (%), 0 to 100, dotted line at 50 %. At the Finnish sites the share is 18 % to 37 % of the year (n = 15) and 55 % to 91 % of June to August; Maktau 2019: 87 % and 99 %. Mean ± SD (range) of the whole year: grassland 31 % ± 4 % (25 % to 37 %, n = 11), annual crops 36 % ± 29 % (18 % to 87 %, n = 5); of June to August: grassland 70 % ± 11 % (55 % to 91 %, n = 11), annual crops 77 % ± 15 % (62 % to 99 %, n = 5). Whole year and June to August per site-year: Anttila 2022: 36 % and 78 %; Anttila 2023: 36 % and 71 %; Särkisuo 2022: 29 % and 72 %; Särkisuo 2023: 31 % and 66 %; Haltiala 2022 oats: 24 % and 62 %; Haltiala 2023 grass (failed): 25 % and 60 %; Haltiala 2024 sunflower: 24 % and 73 %; Haltiala 2025 oats: 18 % and 67 %; Qvidja 2020: 37 % and 78 %; Qvidja 2022: 29 % and 73 %; Qvidja 2023: 27 % and 57 %; Qvidja 2024: 32 % and 72 %; Qvidja 2025: 28 % and 55 %; Viikki 2024: 36 % and 91 %; Viikki 2025 faba bean: 27 % and 84 %; Maktau 2019 maize: 87 % and 99 %."
+    },
+    {
+      "n": 3,
+      "file": "figures/3-uptake-days-peak.svg",
+      "title": "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year and over the 90-day window with the largest GPP sum of the year.",
+      "desc": "Grouped bar chart of 16 site-years (full and reliable years), grouped by site, the same layout as Figure 2. Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 over the whole year, the right bar (lighter, hatched) the share inside the 90 consecutive local days with the largest GPP sum of the year (80 or more days with GPP); y axis days with net uptake (%), 0 to 100, dotted line at 50 %. Mean ± SD (range) of the peak window: Finnish sites 78 % ± 7 % (68 % to 91 %, n = 15), grassland 79 % ± 7 % (68 % to 91 %, n = 11), annual crops 76 % ± 7 % (69 % to 83 %, n = 5), annual crops without Maktau 75 % ± 8 % (69 % to 83 %, n = 4). Per site-year: Anttila 2022: 36 % of the year, window 2022-05-24 to 2022-08-21 79 % (mean measured fraction 0.64); Anttila 2023: 36 % of the year, window 2023-05-10 to 2023-08-07 86 % (mean measured fraction 0.70); Särkisuo 2022: 29 % of the year, window 2022-06-10 to 2022-09-07 74 % (mean measured fraction 0.56); Särkisuo 2023: 31 % of the year, window 2023-07-10 to 2023-10-07 68 % (mean measured fraction 0.54); Haltiala 2022 oats: 24 % of the year, window 2022-05-19 to 2022-08-16 69 % (mean measured fraction 0.69); Haltiala 2023 grass (failed): 25 % of the year, window 2023-05-09 to 2023-08-06 86 % (mean measured fraction 0.68); Haltiala 2024 sunflower: 24 % of the year, window 2024-06-27 to 2024-09-24 83 % (mean measured fraction 0.65); Haltiala 2025 oats: 18 % of the year, window 2025-05-28 to 2025-08-25 69 % (mean measured fraction 0.73); Qvidja 2020: 37 % of the year, window 2020-05-07 to 2020-08-04 83 % (mean measured fraction 0.27); Qvidja 2022: 29 % of the year, window 2022-05-18 to 2022-08-15 77 % (mean measured fraction 0.40); Qvidja 2023: 27 % of the year, window 2023-05-18 to 2023-08-15 71 % (mean measured fraction 0.36); Qvidja 2024: 32 % of the year, window 2024-06-01 to 2024-08-29 73 % (mean measured fraction 0.43); Qvidja 2025: 28 % of the year, window 2025-05-07 to 2025-08-04 83 % (mean measured fraction 0.29); Viikki 2024: 36 % of the year, window 2024-06-15 to 2024-09-12 91 % (mean measured fraction 0.28); Viikki 2025 faba bean: 27 % of the year, window 2025-06-14 to 2025-09-11 80 % (mean measured fraction 0.15); Maktau 2019 maize: 87 % of the year, window 2019-10-03 to 2019-12-31 81 % (mean measured fraction 0.75)."
     }
   ],
   "dataVersion": {
-    "generatedAt": "2026-10-27T17:17:56Z",
+    "generatedAt": "2026-10-27T17:30:57Z",
     "git": {
-      "commit": "fea1565",
+      "commit": "fcbd8fd",
       "dirty": true
     },
     "script": {
       "path": "analysis/carbon-space/carbon-space.py",
-      "sha256": "5b57b2ad817174a181285165cdf1204677e51f7f003a5db7447fd7ab71f51024"
+      "sha256": "b0313d9c0b2156e90dc74c2d89b49b6689e2e7e3e3fad0f121ff6f17d784ea78"
     },
     "lock": {
       "path": "analysis/carbon-space/carbon-space.py.lock",

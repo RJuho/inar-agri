@@ -42,7 +42,7 @@ import Figure from '../../components/deep-dive/Figure.astro';
 import References from '../../components/deep-dive/References.astro';
 import { baseUrl } from '../../lib/deepDive';
 import { REPO_URL } from '../../lib/dataReport';
-import { carbonSpaceData, excludedRows, fig1Count, inputRows, listText, siteYearRows, sourceList, syKey } from '../../lib/deepDives/carbonSpace';
+import { carbonSpaceData, excludedRows, fig1Count, inputRows, listText, peakStartRange, peakWindowText, siteYearRows, sourceList, syKey, syLabel } from '../../lib/deepDives/carbonSpace';
 
 export const d = carbonSpaceData(raw);
 export const base = baseUrl();
@@ -59,6 +59,9 @@ export const UA = 'g C m⁻² yr⁻¹';
 export const G = d.groups;
 export const annualCropList = listText(d, d.groups['annual crop'].fig2SiteYears);
 export const nQvidjaFig1 = fig1Count(d, 'qvidja');
+export const PS = peakStartRange(d);
+export const NAME = (key) => syLabel(d, key);
+export const VIEW3 = { name: 'Uptake days and GPP', sites: SITES, variables: ['nee_f', 'gpp'], yearFrom: 2019, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] };
 
 ## Short answer
 
@@ -84,12 +87,19 @@ also needs an annual GPP and Reco sum. A sum is empty when one half hour has no 
 each excluded site-year from these flags (table "Site-years not shown"). The reasons have an order. "No flux data"
 (measured fraction 0) comes first. Then come "partial year", "measured fraction" and "longest gap"; a site-year can have
 more than one of these. "No annual GPP or Reco sum" applies only to a site-year that is otherwise full and reliable.
-Figure 1 has <Num k="summary.nFig1" digits={0} /> site-years and Figure 2 has <Num k="summary.nFig2" digits={0} />.
+Figure 1 has <Num k="summary.nFig1" digits={0} /> site-years. Figures 2 and 3 have <Num k="summary.nFig2" digits={0} />.
 
 **Uptake days.** A day is a row of `daily.parquet` with a local date. An uptake day is a day with a daily NEE below zero.
 The rule is strict: a daily NEE of exactly zero is not an uptake day. The share is the uptake days divided by the days
 with a daily NEE value. Gap-filled days count in full. There is no weighting by the measured fraction and no rule on
 the coverage of a day. June to August are the local calendar months 6, 7 and 8 (92 days), also at Maktau.
+
+**Peak window (Figure 3).** June to August is a fixed window. It does not follow the growing season of each site, and
+at Maktau it is not the main season. Figure 3 therefore uses a second window: the <Num k="method.peakDays" digits={0} />
+consecutive local days with the largest GPP sum of the site-year. The window stays inside the calendar year; it cannot
+cross the year end. A window is valid when <Num k="method.peakMinGppDays" digits={0} /> or more of its days have a daily
+GPP value. The GPP sum uses the days with a value. When two windows have the same sum, the first window wins. The share
+is the uptake days divided by the days with a daily NEE value in the window.
 
 **Land use and events.** Each site-year has a crop and a group, grassland or annual crop. The script constant `CROPS`
 gives them, from the project notes. The annual-crop group is {annualCropList}. All other site-years are grassland. This
@@ -154,6 +164,33 @@ At Qvidja, the June-to-August share was <Num k={`${S('qvidja-2020')}.uptake.jja.
 Maktau 2019 had <Num k={`${S('maktau-2019')}.uptake.year.share`} percent digits={0} /> of the year and
 <Num k={`${S('maktau-2019')}.uptake.jja.share`} percent digits={0} /> of June to August.
 
+<Figure id="figure-3" svgFile="analysis/carbon-space/figures/3-uptake-days-peak.svg" view={VIEW3} />
+
+At the Finnish sites, the peak window starts between {PS.first} ({NAME(PS.firstKey)}) and {PS.last} ({NAME(PS.lastKey)}).
+The share of uptake days in the window was <Num k="summary.finnishUptakePeak.mean" percent digits={0} /> ±
+<Num k="summary.finnishUptakePeak.sd" percent digits={0} /> (mean ± SD, n = <Num k="summary.finnishUptakePeak.n" digits={0} />,
+range <Num k="summary.finnishUptakePeak.min" percent digits={0} /> to <Num k="summary.finnishUptakePeak.max" percent digits={0} />).
+Against June to August, the share rose most at Qvidja 2025 (from <Num k={`${S('qvidja-2025')}.uptake.jja.share`} percent digits={0} />
+to <Num k={`${S('qvidja-2025')}.uptake.peak.share`} percent digits={0} />) and at Haltiala 2023 (from
+<Num k={`${S('haltiala-2023')}.uptake.jja.share`} percent digits={0} /> to <Num k={`${S('haltiala-2023')}.uptake.peak.share`} percent digits={0} />).
+Their peak windows start in early May ({peakWindowText(d, 'qvidja-2025')} and {peakWindowText(d, 'haltiala-2023')}).
+The grassland share in the window was <Num k="groups.grassland.uptakePeak.mean" percent digits={0} /> ±
+<Num k="groups.grassland.uptakePeak.sd" percent digits={0} /> (n = <Num k="groups.grassland.uptakePeak.n" digits={0} />, range
+<Num k="groups.grassland.uptakePeak.min" percent digits={0} /> to <Num k="groups.grassland.uptakePeak.max" percent digits={0} />). The
+annual-crop share was <Num k="groups.annual crop.uptakePeak.mean" percent digits={0} /> ± <Num k="groups.annual crop.uptakePeak.sd" percent digits={0} />
+(n = <Num k="groups.annual crop.uptakePeak.n" digits={0} />, range <Num k="groups.annual crop.uptakePeak.min" percent digits={0} /> to
+<Num k="groups.annual crop.uptakePeak.max" percent digits={0} />), and <Num k="groups.annual crop without Maktau.uptakePeak.mean" percent digits={0} /> ±
+<Num k="groups.annual crop without Maktau.uptakePeak.sd" percent digits={0} /> without Maktau (n = <Num k="groups.annual crop without Maktau.uptakePeak.n" digits={0} />,
+range <Num k="groups.annual crop without Maktau.uptakePeak.min" percent digits={0} /> to <Num k="groups.annual crop without Maktau.uptakePeak.max" percent digits={0} />).
+
+At Maktau 2019, the peak window is {peakWindowText(d, 'maktau-2019')}. This is the season of the short rains
+<Cite ids={['rasanen2026']} note="PDF p. 2" />. The window cannot cross the year end, so it stops on 31 December. The share
+of uptake days in the window was <Num k={`${S('maktau-2019')}.uptake.peak.share`} percent digits={0} />. In June to August
+it was <Num k={`${S('maktau-2019')}.uptake.jja.share`} percent digits={0} />. The measured fraction in the window was
+<Num k={`${S('maktau-2019')}.uptake.peak.fracMeasured`} />. For the whole year it was <Num k={`${S('maktau-2019')}.fracMeasured`} />.
+The peak window of Maktau 2019 therefore does not have more measured data than the whole year. The results of the script give no
+measured fraction for June to August, so this page does not compare with it.
+
 **Groups.** Each value is mean ± SD, with n and the range.
 
 - Grassland: NEE <Num k="groups.grassland.nee.mean" digits={0} /> ± <Num k="groups.grassland.nee.sd" digits={0} /> {UA}
@@ -187,12 +224,12 @@ without it ({UA}).
 
 <div class="table-wrap">
 <table>
-<caption>Site-years in the figures, in the site order of db/sites.parquet. GPP, Reco and NEE in {UA} (annual sums; GPP, Reco and Reco/GPP are empty for Särkisuo 2023, which is in Figure 2 only). Uptake days = share of the days with daily NEE &lt; 0 (%), whole year and June to August. Measured = measured fraction of the half hours. Event counts per calendar year from db/events.parquet: harvest or cut, grazing, tillage, sowing, fertilisation, other (spraying and other).</caption>
+<caption>Site-years in the figures, in the site order of db/sites.parquet. GPP, Reco and NEE in {UA} (annual sums; GPP, Reco and Reco/GPP are empty for Särkisuo 2023, which is in Figure 2 only). Uptake days = share of the days with daily NEE &lt; 0 (%), whole year, June to August and peak window. Peak window = the {d.method.peakDays} days with the largest GPP sum (month-day, start to end); measured, peak = measured fraction of the half hours in the window. Measured = measured fraction of the half hours. Event counts per calendar year from db/events.parquet: harvest or cut, grazing, tillage, sowing, fertilisation, other (spraying and other).</caption>
 <thead>
-<tr><th scope="col">Site</th><th scope="col" class="num">Year</th><th scope="col">Crop</th><th scope="col" class="num">GPP</th><th scope="col" class="num">Reco</th><th scope="col" class="num">NEE</th><th scope="col" class="num">Reco/GPP</th><th scope="col" class="num">Uptake days, year</th><th scope="col" class="num">Uptake days, Jun–Aug</th><th scope="col" class="num">Measured</th><th scope="col" class="num">Harvest or cut</th><th scope="col" class="num">Grazing</th><th scope="col" class="num">Tillage</th><th scope="col" class="num">Sowing</th><th scope="col" class="num">Fert.</th><th scope="col" class="num">Other</th><th scope="col">Figures</th></tr>
+<tr><th scope="col">Site</th><th scope="col" class="num">Year</th><th scope="col">Crop</th><th scope="col" class="num">GPP</th><th scope="col" class="num">Reco</th><th scope="col" class="num">NEE</th><th scope="col" class="num">Reco/GPP</th><th scope="col" class="num">Uptake days, year</th><th scope="col" class="num">Uptake days, Jun–Aug</th><th scope="col">Peak window</th><th scope="col" class="num">Uptake days, peak</th><th scope="col" class="num">Measured, peak</th><th scope="col" class="num">Measured</th><th scope="col" class="num">Harvest or cut</th><th scope="col" class="num">Grazing</th><th scope="col" class="num">Tillage</th><th scope="col" class="num">Sowing</th><th scope="col" class="num">Fert.</th><th scope="col" class="num">Other</th><th scope="col">Figures</th></tr>
 </thead>
 <tbody>
-{rows.map((r) => (<tr id={r.id}><td>{r.site}</td><td class="num">{r.year}</td><td class="wrap">{r.crop}</td><td class="num">{r.gpp}</td><td class="num">{r.reco}</td><td class="num">{r.nee}</td><td class="num">{r.ratio}</td><td class="num">{r.uptakeYear}</td><td class="num">{r.uptakeJja}</td><td class="num">{r.frac}</td><td class="num">{r.harvestCut}</td><td class="num">{r.grazing}</td><td class="num">{r.tillage}</td><td class="num">{r.sowing}</td><td class="num">{r.fertilisation}</td><td class="num">{r.other}</td><td>{r.figures}</td></tr>))}
+{rows.map((r) => (<tr id={r.id}><td>{r.site}</td><td class="num">{r.year}</td><td class="wrap">{r.crop}</td><td class="num">{r.gpp}</td><td class="num">{r.reco}</td><td class="num">{r.nee}</td><td class="num">{r.ratio}</td><td class="num">{r.uptakeYear}</td><td class="num">{r.uptakeJja}</td><td class="wrap">{r.peakWindow}</td><td class="num">{r.uptakePeak}</td><td class="num">{r.fracPeak}</td><td class="num">{r.frac}</td><td class="num">{r.harvestCut}</td><td class="num">{r.grazing}</td><td class="num">{r.tillage}</td><td class="num">{r.sowing}</td><td class="num">{r.fertilisation}</td><td class="num">{r.other}</td><td>{r.figures}</td></tr>))}
 </tbody>
 </table>
 </div>
@@ -242,6 +279,8 @@ without it ({UA}).
 - **Few events.** A site-year has few management events, and each site has a different set of years. The dive
   therefore makes no statistical test of the events. The links between the events and the position of a site-year are
   descriptive. The event table can be incomplete for a site-year.
+- **Figure 3 after the checks.** Figure 3 was added after the independent checks. Its numbers are not independently
+  recomputed.
 - **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
   identify it.
 

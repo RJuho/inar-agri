@@ -1981,16 +1981,16 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
-  test('the carbon space dive (Python) has two figures, the site-year tables and SVG downloads', async ({ page, request }) => {
+  test('the carbon space dive (Python) has three figures, the site-year tables and SVG downloads', async ({ page, request }) => {
     const slug = 'carbon-space';
     await page.goto(`/deep-dive/${slug}/`);
     await expect(page.locator('h1')).toContainText('carbon space');
     await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #9');
     const h2 = await page.locator('main h2').allInnerTexts();
     expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
-    // Two matplotlib figures: annual Reco against GPP, and the share of uptake days.
+    // Three matplotlib figures: annual Reco against GPP, the share of uptake days (June to August), and the same in the peak GPP window.
     const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
-    expect(await figures.count()).toBe(2);
+    expect(await figures.count()).toBe(3);
     for (const svg of await figures.all()) {
       const info = await svg.evaluate((el) => ({
         labelledby: el.getAttribute('aria-labelledby') ?? '',
@@ -2007,13 +2007,17 @@ test.describe('deep dive pages', () => {
       expect(info.labelledby.split(/\s+/)).toEqual([info.titleId, info.descId]);
     }
     const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
-    expect(downloads.length).toBe(2);
+    expect(downloads.length).toBe(3);
     for (const href of downloads) {
       expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
       const res = await request.get(href);
       expect(res.status(), href).toBe(200);
       expect(res.headers()['content-type'] ?? '', href).toContain('svg');
     }
+    // The site-year table has the peak window columns.
+    const heads = await page.locator('tr#sy-maktau-2019').locator('xpath=ancestor::table').locator('thead th').allInnerTexts();
+    expect(heads).toEqual(expect.arrayContaining(['Peak window', 'Uptake days, peak', 'Measured, peak']));
+    await expect(page.locator('tr#sy-maktau-2019 td').nth(9)).toHaveText(/^\d\d-\d\d to \d\d-\d\d$/);
     // 16 site-years in the figures (15 in Figure 1 and Särkisuo 2023 in Figure 2 only), 18 site-years not in Figure 1.
     await expect(page.locator('tr[id^="sy-"]')).toHaveCount(16);
     await expect(page.locator('tr[id^="excluded-"]')).toHaveCount(18);

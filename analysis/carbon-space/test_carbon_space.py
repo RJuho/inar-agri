@@ -87,6 +87,40 @@ def test_sum_check() -> None:
     assert not cs.sum_check(3.0, [1.0, None])["ok"]
 
 
+def test_peak_window_rule() -> None:
+    from datetime import date, timedelta
+
+    days = [date(2022, 1, 1) + timedelta(days=i) for i in range(365)]
+    gpp: list[float | None] = [1.0] * 365
+    for i in range(100, 190):
+        gpp[i] = 5.0  # the peak: days 100 to 189
+    for i in range(120, 131):
+        gpp[i] = None  # 11 gaps: a window that holds all of them has only 79 GPP days
+    nee: list[float | None] = [1.0] * 365
+    for i in range(150, 180):
+        nee[i] = -1.0
+    frac: list[float | None] = [0.5] * 365
+    p = cs.peak_window(days, gpp, nee, frac)
+    assert p is not None
+    # With 80 days required, a window that holds all 11 gaps is not valid. The best window
+    # starts after the gaps: index 131 (2022-05-12), 59 peak days x 5 + 31 days x 1 = 326.
+    assert p["start"] == "2022-05-12" and p["end"] == "2022-08-09"
+    assert p["gppDays"] == 90 and math.isclose(p["gppSum"], 59 * 5 + 31)
+    # With 79 days allowed, the window over the gaps wins: index 100, 79 peak days x 5 = 395.
+    p79 = cs.peak_window(days, gpp, nee, frac, min_days=79)
+    assert (
+        p79 is not None and p79["start"] == "2022-04-11" and p79["end"] == "2022-07-09"
+    )
+    assert p79["gppDays"] == 79 and math.isclose(p79["gppSum"], 79 * 5)
+    assert p["days"] == 90 and p["uptakeDays"] == 30
+    assert math.isclose(p["share"], 30 / 90) and math.isclose(p["fracMeasured"], 0.5)
+    # Ties: a flat series gives the first window.
+    flat = cs.peak_window(days, [1.0] * 365, nee, frac)
+    assert flat is not None and flat["start"] == "2022-01-01"
+    # No valid window: too many gaps.
+    assert cs.peak_window(days, [None] * 300 + [1.0] * 65, nee, frac) is None
+
+
 def test_ols() -> None:
     o = cs.ols([1.0, 2.0, 3.0], [3.0, 5.0, 7.0])
     assert math.isclose(o["slope"], 2.0) and math.isclose(o["intercept"], 1.0)
@@ -215,6 +249,11 @@ def test_results_consistent() -> None:
         if r["inFig1"]:
             assert math.isclose(r["nee"], r["reco"] - r["gpp"], abs_tol=1e-6)
     assert {e["key"] for e in res["excluded"]} == set(rows) - set(res["fig1Keys"])
+    for key in res["fig2Keys"]:
+        p = rows[key]["uptake"]["peak"]
+        if p is not None:
+            assert p["gppDays"] >= cs.PEAK_MIN_GPP_DAYS
+            assert p["start"][:4] == p["end"][:4] == str(rows[key]["year"])
     n = sum(res["groups"][g]["nee"]["n"] for g in cs.GROUPS)
     assert n == res["summary"]["nFig1"]
 

@@ -32,6 +32,14 @@ METHOD
     3. Uptake day = a local day with daily NEE (nee_f_gc) < 0. Share = uptake days / days with a
        daily NEE value, for the whole year and for June to August (JJA, calendar months 6 to 8 in
        local time, also at Maktau, where JJA is not the main growing season).
+    3b. Peak-GPP window (Figure 3): 90 consecutive local days inside the calendar year of the
+       site-year (the window does not cross the year end). Score = sum of the daily GPP (gpp_gc)
+       over the days of the window with a value. A window is valid only when 80 or more of its 90
+       days have a GPP value (PEAK_MIN_GPP_DAYS); the valid window with the largest score wins,
+       and a tie goes to the earliest start. Share = uptake days / days with a daily NEE value in
+       the window. Also stored: start and end date, GPP sum, GPP days, NEE days and the mean
+       frac_measured of the window days. Without a valid window the value is null and Figure 3
+       shows the whole-year bar only.
     4. Land use (CROPS, typed from the project notes in CLAUDE.md): group "grassland" or "annual
        crop". Haltiala 2023 (sown grass that failed) has the crop label "grass (failed)" and is in
        the group grassland. Events per site-year: the count per type of db/events.parquet in the
@@ -40,7 +48,7 @@ METHOD
        1), with Pearson r and n; the same without Maktau. Descriptive only, n is small.
     6. Group summaries (grassland, annual crop): n, mean, SD (n - 1), min and max of NEE and
        Reco/GPP over the Figure 1 site-years, and of the uptake shares over the Figure 2
-       site-years. A third summary gives the annual crops without Maktau (Finnish crops only).
+       site-years (whole year, June to August, peak-GPP window). A third summary gives the annual crops without Maktau (Finnish crops only).
     7. Each step that removes rows logs a count (results.json dataVersion.steps).
     8. Open findings of docs/anomaly-data-report.md that touch this dive are printed
        (OPEN_FINDINGS). The script uses no literature value, thus it has no LITERATURE table.
@@ -62,6 +70,7 @@ OUTPUTS
     manifest.json                provenance of the run and SHA-256 of the outputs
     figures/1-carbon-space.svg   annual Reco against annual GPP, one marker per site-year
     figures/2-uptake-days.svg    share of uptake days per site-year, whole year and JJA
+    figures/3-uptake-days-peak.svg  as Figure 2, second bar = the 90-day window with the largest GPP
     output/run.log               run log (not in git)
     output/site-years.csv        all site-years with the numbers (not in git)
     With --check, all outputs go to output/ and the script compares them with the committed files.
@@ -91,7 +100,7 @@ import subprocess
 import sys
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -213,6 +222,8 @@ EVENT_TYPES = (
 MIN_FRAC = 0.2  # reliable: measured fraction >= MIN_FRAC (docs/calculated.md)
 MAX_GAP_DAYS = 30.0  # reliable: longest gap <= MAX_GAP_DAYS
 JJA = (6, 7, 8)
+PEAK_DAYS = 90  # length of the peak-GPP window (local days)
+PEAK_MIN_GPP_DAYS = 80  # a valid window has GPP on this many of its days or more
 GROUPS = ("grassland", "annual crop")
 REASONS = (
     "no flux data",
@@ -329,7 +340,7 @@ FIG2_HEIGHT_IN = 100 * MM
 SLOT_CHARS = 5
 SLOT_PER_CHAR = 0.2
 SITE_GAP = 0.4
-FIGURES = ((1, "carbon-space"), (2, "uptake-days"))
+FIGURES = ((1, "carbon-space"), (2, "uptake-days"), (3, "uptake-days-peak"))
 AXIS_STEP = 100.0  # g C m-2 yr-1; the axis range of Figure 1 is a multiple of this
 AXIS_PAD = 120.0  # g C m-2 yr-1 of free space around the markers
 NEE_GUIDES = (-200.0, -400.0)
@@ -339,6 +350,10 @@ Y_LABEL_2 = "Days with net uptake (%)"
 FIG1_TITLE = (
     "Annual ecosystem respiration (Reco) against annual gross primary production (GPP), "
     "one marker per site-year; below the 1:1 line the site-year was a net CO2 sink."
+)
+FIG3_TITLE = (
+    "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year "
+    "and over the 90-day window with the largest GPP sum of the year."
 )
 FIG2_TITLE = (
     "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year "
@@ -572,6 +587,53 @@ def sum_check(annual: float | None, daily: Sequence[float | None]) -> dict[str, 
     return {"ok": rel <= SUM_RTOL, "relDiff": rel, "dailyGap": False}
 
 
+def peak_window(
+    dates: Sequence[date],
+    gpp: Sequence[float | None],
+    nee: Sequence[float | None],
+    frac: Sequence[float | None],
+    window: int = PEAK_DAYS,
+    min_days: int = PEAK_MIN_GPP_DAYS,
+) -> dict[str, Any] | None:
+    """The `window`-day run of consecutive days with the largest GPP sum (days with a value).
+
+    The input is one calendar year, one value per consecutive day. A window is valid when
+    `min_days` or more of its days have a GPP value; a tie goes to the earliest start.
+    Returns None when no window is valid."""
+    g = np.array([np.nan if x is None else x for x in gpp], dtype=float)
+    n_days = g.size
+    best: tuple[float, int] | None = None
+    for i in range(n_days - window + 1):
+        w = g[i : i + window]
+        ok = np.isfinite(w)
+        if int(ok.sum()) < min_days:
+            continue
+        score = float(w[ok].sum())
+        if best is None or score > best[0]:
+            best = (score, i)
+    if best is None:
+        return None
+    score, i = best
+    sl = slice(i, i + window)
+    share = uptake_share(list(nee[sl]))
+    fr = np.array([np.nan if x is None else x for x in frac[sl]], dtype=float)
+    return {
+        **share,
+        "start": dates[i].isoformat(),
+        "end": dates[i + window - 1].isoformat(),
+        "gppSum": score,
+        "gppDays": int(np.isfinite(g[sl]).sum()),
+        "fracMeasured": float(np.nanmean(fr)) if np.isfinite(fr).any() else None,
+    }
+
+
+def year_days(d: pd.DataFrame, year: int) -> pd.DataFrame:
+    """The daily rows of one site-year on all calendar days (a missing day has NaN values)."""
+    days = pd.date_range(f"{year}-01-01", f"{year}-12-31", freq="D").date
+    idx = d.set_index("date_local")
+    return frame(idx.reindex(list(days)).rename_axis("date_local").reset_index())
+
+
 def ols(x: Sequence[float], y: Sequence[float]) -> dict[str, Any]:
     """OLS line y = slope x + intercept, Pearson r and n."""
     xa, ya = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
@@ -782,6 +844,11 @@ def nn(x: Any) -> float | None:
     return num_or_none(x)
 
 
+def peak_share(r: dict[str, Any]) -> float | None:
+    p = r["uptake"]["peak"]
+    return None if p is None else p["share"]
+
+
 def analyse(data: Data) -> dict[str, Any]:
     steps = data.steps
     rows: list[dict[str, Any]] = []
@@ -829,6 +896,13 @@ def analyse(data: Data) -> dict[str, Any]:
                 )
             ]
         )
+        full = year_days(d, year)
+        peak = peak_window(
+            list(col(full, "date_local")),
+            [nn(x) for x in col(full, "gpp_gc")],
+            [nn(x) for x in col(full, "nee_f_gc")],
+            [nn(x) for x in col(full, "frac_measured")],
+        )
         ev = frame(
             data.events[
                 (col(data.events, "site_code") == site)
@@ -861,6 +935,7 @@ def analyse(data: Data) -> dict[str, Any]:
                 "uptake": {
                     "year": whole,
                     "jja": jja,
+                    "peak": peak,
                 },
                 "events": counts,
                 "eventsTotal": int(sum(counts.values())),
@@ -925,6 +1000,7 @@ def analyse(data: Data) -> dict[str, Any]:
             "recoGppRatio": plain_stats(r["recoGppRatio"] for r in g1),
             "uptakeYear": plain_stats(r["uptake"]["year"]["share"] for r in g2),
             "uptakeJja": plain_stats(r["uptake"]["jja"]["share"] for r in g2),
+            "uptakePeak": plain_stats(peak_share(r) for r in g2),
         }
     # Annual crops without Maktau: the Finnish annual crops only (Maktau is a tropical maize field).
     c1 = [r for r in fig1 if r["group"] == "annual crop" and r["site"] != "maktau"]
@@ -936,6 +1012,7 @@ def analyse(data: Data) -> dict[str, Any]:
         "recoGppRatio": plain_stats(r["recoGppRatio"] for r in c1),
         "uptakeYear": plain_stats(r["uptake"]["year"]["share"] for r in c2),
         "uptakeJja": plain_stats(r["uptake"]["jja"]["share"] for r in c2),
+        "uptakePeak": plain_stats(peak_share(r) for r in c2),
     }
     finnish = [r for r in fig2 if r["site"] != "maktau"]
     summary = {
@@ -951,6 +1028,7 @@ def analyse(data: Data) -> dict[str, Any]:
         },
         "finnishUptakeYear": plain_stats(r["uptake"]["year"]["share"] for r in finnish),
         "finnishUptakeJja": plain_stats(r["uptake"]["jja"]["share"] for r in finnish),
+        "finnishUptakePeak": plain_stats(peak_share(r) for r in finnish),
         "minNee": min(fig1, key=lambda r: r["nee"])["key"],
         "maxNee": max(fig1, key=lambda r: r["nee"])["key"],
     }
@@ -1309,8 +1387,10 @@ def bar_positions(rows: Sequence[dict[str, Any]]) -> list[float]:
     return xs
 
 
-def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
-    rows = [r for r in res["siteYears"] if r["inFig2"]]
+def uptake_bars(
+    rows: Sequence[dict[str, Any]], data: Data, key: str, label: str
+) -> Any:
+    """Figures 2 and 3: bar pairs per site-year; the second bar is uptake[key] (hatched)."""
     xs = bar_positions(rows)
     fig = plt.figure(figsize=(FIG_WIDTH_IN, FIG2_HEIGHT_IN))
     ax = fig.add_axes((0.1, 0.2, 0.87, 0.68))
@@ -1326,9 +1406,12 @@ def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
             lw=0.8,
             zorder=2,
         )
+        second = r["uptake"][key]
+        if second is None:
+            continue
         ax.bar(
             xi + width / 2,
-            r["uptake"]["jja"]["share"] * 100,
+            second["share"] * 100,
             width,
             color=lighter(color),
             edgecolor=INK if r["site"] == "viikki" else color,
@@ -1379,7 +1462,7 @@ def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
             edgecolor="#888888",
             hatch="///",
             lw=0.8,
-            label="June to August",
+            label=label,
         ),
     ]
     fig.legend(
@@ -1391,6 +1474,13 @@ def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         handlelength=2.2,
         handleheight=1.1,
     )
+
+    return fig
+
+
+def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
+    rows = [r for r in res["siteYears"] if r["inFig2"]]
+    fig = uptake_bars(rows, data, "jja", "June to August")
 
     s = res["summary"]
     groups = res["groups"]
@@ -1422,6 +1512,47 @@ def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         f"site-year: {per}."
     )
     return fig, FIG2_TITLE, desc
+
+
+def fig_uptake_days_peak(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
+    rows = [r for r in res["siteYears"] if r["inFig2"]]
+    fig = uptake_bars(rows, data, "peak", "Peak-GPP 90 days")
+    s = res["summary"]
+    groups = res["groups"]
+
+    def one(r: dict[str, Any]) -> str:
+        p = r["uptake"]["peak"]
+        head = f"{r['siteName']} {point_label(r)}: {pct(r['uptake']['year']['share'])} of the year"
+        if p is None:
+            return head + ", no valid 90-day window (no second bar)"
+        return (
+            f"{head}, window {p['start']} to {p['end']} {pct(p['share'])} (mean measured "
+            f"fraction {fmt(p['fracMeasured'], 2)})"
+        )
+
+    missing = [r for r in rows if r["uptake"]["peak"] is None]
+    desc = (
+        f"Grouped bar chart of {s['nFig2']} site-years (full and reliable years), grouped by "
+        "site, the same layout as Figure 2. Per site-year, the left bar (full site colour) is the "
+        "share of days with daily NEE < 0 over the whole year, the right bar (lighter, hatched) "
+        f"the share inside the {PEAK_DAYS} consecutive local days with the largest GPP sum of the "
+        f"year ({PEAK_MIN_GPP_DAYS} or more days with GPP); y axis days with net uptake (%), 0 to "
+        "100, dotted line at 50 %. "
+        + (
+            "Site-years without a valid window (whole-year bar only): "
+            + ", ".join(f"{r['siteName']} {r['year']}" for r in missing)
+            + ". "
+            if missing
+            else ""
+        )
+        + f"Mean ± SD (range) of the peak window: Finnish sites {share_stat(s['finnishUptakePeak'])}, "
+        f"grassland {share_stat(groups['grassland']['uptakePeak'])}, annual crops "
+        f"{share_stat(groups['annual crop']['uptakePeak'])}, annual crops without Maktau "
+        f"{share_stat(groups['annual crop without Maktau']['uptakePeak'])}. Per site-year: "
+        + "; ".join(one(r) for r in rows)
+        + "."
+    )
+    return fig, FIG3_TITLE, desc
 
 
 # ======================================================================================
@@ -1519,6 +1650,15 @@ def method_json() -> dict[str, Any]:
         "minFrac": MIN_FRAC,
         "maxGapDays": MAX_GAP_DAYS,
         "jjaMonths": list(JJA),
+        "peakDays": PEAK_DAYS,
+        "peakMinGppDays": PEAK_MIN_GPP_DAYS,
+        "peakRule": (
+            f"{PEAK_DAYS} consecutive local days inside the calendar year (no crossing of the "
+            "year end); score = sum of daily gpp_gc over the window days with a value; valid when "
+            f"{PEAK_MIN_GPP_DAYS} or more days have GPP; largest score wins, a tie goes to the "
+            "earliest start; share = uptake days / days with daily NEE in the window; null when "
+            "no window is valid"
+        ),
         "uptakeDay": "local day with daily NEE (nee_f_gc) < 0",
         "groups": list(GROUPS),
         "reasons": list(REASONS),
@@ -1638,8 +1778,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     for n, name in FIGURES:
         if name == "carbon-space":
             fig, title, desc = fig_carbon_space(res, data)
-        else:
+        elif name == "uptake-days":
             fig, title, desc = fig_uptake_days(res, data)
+        else:
+            fig, title, desc = fig_uptake_days_peak(res, data)
         path = target / "figures" / f"{n}-{name}.svg"
         save_svg(fig, path, n, title, desc, meta)
         size = path.stat().st_size
@@ -1665,6 +1807,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "recoGppRatio": r["recoGppRatio"],
                 "uptakeYear": r["uptake"]["year"]["share"],
                 "uptakeJja": r["uptake"]["jja"]["share"],
+                "uptakePeak": peak_share(r),
+                "peakStart": None
+                if r["uptake"]["peak"] is None
+                else r["uptake"]["peak"]["start"],
                 "fracMeasured": r["fracMeasured"],
                 "longestGapDays": r["longestGapDays"],
                 **{f"n_{t}": r["events"][t] for t in EVENT_TYPES},

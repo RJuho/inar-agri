@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-27T17:17:56Z",
+  "generatedAt": "2026-10-27T17:30:57Z",
   "git": {
-    "commit": "fea1565",
+    "commit": "fcbd8fd",
     "dirty": true
   },
   "script": {
     "path": "analysis/carbon-space/carbon-space.py",
-    "sha256": "5b57b2ad817174a181285165cdf1204677e51f7f003a5db7447fd7ab71f51024"
+    "sha256": "b0313d9c0b2156e90dc74c2d89b49b6689e2e7e3e3fad0f121ff6f17d784ea78"
   },
   "lock": {
     "path": "analysis/carbon-space/carbon-space.py.lock",
@@ -174,15 +174,19 @@
     }
   },
   "outputs": {
-    "results.json": "46634f743d7359c9c88deb29b13ba208086fbb94261108353e915e723eed44d1",
+    "results.json": "7fb22def4ae733b0ba119e7d1c316e9811e432ecf1eca7232ca03221766fc145",
     "figures": {
       "figures/1-carbon-space.svg": {
-        "sha256": "d907dece9122e4a5b02645e9ab14b2933930a69adcdd5b62ee059f610d5fc213",
+        "sha256": "a0fd2a623de3b6f19fe79be2a862d6e2f621614a8d3ae076861a4f9539d6609d",
         "sha256WithoutMetadata": "02414d8c381d4b04d790aee6d4fca0b6c52b65c84408ac1eb990338b8a6f50a9"
       },
       "figures/2-uptake-days.svg": {
-        "sha256": "2b1bdd81d895588f618f333bb967b7f5b76b7c88ea9614e064e8980755742169",
+        "sha256": "362a98c25623a78f002f3db6861c63b6e74ffff63b4cfb1a16eb1cac5f2aeb69",
         "sha256WithoutMetadata": "a17a38295dc6c89fc61ad3eb0a088dcc2780c5e4c43308d9ac2976db89ce5e78"
+      },
+      "figures/3-uptake-days-peak.svg": {
+        "sha256": "2b898998bb15cefd560e0122dafad323fec266af4da857bb5ef39255946648e2",
+        "sha256WithoutMetadata": "bb4aa4c1e82c3ee874bc46f2816ccbdb2f58eac0e59869a2f67632177074b0b1"
       }
     }
   }

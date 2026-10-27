@@ -6,7 +6,7 @@ Data: the harmonised database snapshot of 2026-10-23 (`builtAt` 2026-10-23T19:03
 
 Inclusion: a site-year is in the figures when `full_year` and `reliable` are true in `annual.csv` (measured fraction ≥ 0.2, longest gap ≤ 30 days). Figure 1 also needs an annual GPP and Reco sum. The script derives the reason of each excluded site-year from the flags (`excluded` in `results.json`). Uptake day = a local day with daily NEE < 0.
 
-Figures (`figures/`): 1 `1-carbon-space.svg` annual Reco against annual GPP, one marker per site-year, 1:1 line and NEE = −200 and −400 guide lines; 2 `2-uptake-days.svg` share of uptake days per site-year, whole year and June to August.
+Figures (`figures/`): 1 `1-carbon-space.svg` annual Reco against annual GPP, one marker per site-year, 1:1 line and NEE = −200 and −400 guide lines; 2 `2-uptake-days.svg` share of uptake days per site-year, whole year and June to August; 3 `3-uptake-days-peak.svg` as Figure 2, but the second bar is the share of uptake days in the 90 consecutive days with the largest GPP sum of the year (80 or more days with GPP).
 
 Run (from the repository root): `uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated`; check against the committed results: add `--check`.
 

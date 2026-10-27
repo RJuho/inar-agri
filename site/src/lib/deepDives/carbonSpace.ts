@@ -11,6 +11,17 @@ const SITE = v.picklist(Object.keys(SITE_NAMES) as SiteCode[]);
 const GROUPS = ['grassland', 'annual crop'] as const;
 
 const Share = v.object({ days: v.number(), uptakeDays: v.number(), share: N });
+/** The 90-day window with the largest GPP sum of the site-year (Figure 3). */
+const Peak = v.object({
+  days: v.number(),
+  uptakeDays: v.number(),
+  share: v.number(),
+  start: v.pipe(v.string(), v.isoDate()),
+  end: v.pipe(v.string(), v.isoDate()),
+  gppSum: v.number(),
+  gppDays: v.number(),
+  fracMeasured: v.number(),
+});
 const SiteYear = v.object({
   key: v.string(),
   site: SITE,
@@ -29,7 +40,7 @@ const SiteYear = v.object({
   reco: N,
   nee: N,
   recoGppRatio: N,
-  uptake: v.nullable(v.object({ year: Share, jja: Share })),
+  uptake: v.nullable(v.object({ year: Share, jja: Share, peak: v.nullable(Peak) })),
   events: v.object({
     harvest: v.number(),
     cut: v.number(),
@@ -51,11 +62,12 @@ const Group = v.object({
   recoGppRatio: Stat,
   uptakeYear: Stat,
   uptakeJja: Stat,
+  uptakePeak: Stat,
 });
 const Fit = v.object({ slope: v.number(), intercept: v.number(), r: v.number(), r2: v.number(), n: v.number() });
 
 const DataSchema = v.object({
-  method: v.object({ minFrac: v.number(), maxGapDays: v.number(), jjaMonths: v.array(v.number()) }),
+  method: v.object({ minFrac: v.number(), maxGapDays: v.number(), jjaMonths: v.array(v.number()), peakDays: v.number(), peakMinGppDays: v.number() }),
   siteYears: v.array(SiteYear),
   fig1Keys: v.array(v.string()),
   fig2Keys: v.array(v.string()),
@@ -69,6 +81,7 @@ const DataSchema = v.object({
     nSource: v.number(),
     minNee: v.string(),
     maxNee: v.string(),
+    finnishUptakePeak: Stat,
   }),
   figures: v.array(v.object({ n: v.number(), file: v.string(), title: v.string(), desc: v.string() })),
   dataVersion: v.object({
@@ -94,7 +107,9 @@ export function carbonSpaceData(raw: unknown): CarbonSpaceData {
   check(d.fig2Keys, 'inFig2', d.summary.nFig2);
   for (const k of d.fig2Keys) {
     const s = byKey.get(k)!;
-    if (s.uptake?.year.share == null || s.uptake.jja.share === null) throw new Error(`carbon-space: ${k} is in Figure 2 without uptake shares`);
+    if (s.uptake?.year.share == null || s.uptake.jja.share === null || s.uptake.peak === null) {
+      throw new Error(`carbon-space: ${k} is in Figure 2 without uptake shares or a peak window`);
+    }
   }
   for (const e of d.excluded) {
     const s = byKey.get(e.key);
@@ -146,6 +161,33 @@ export function fig1Count(d: CarbonSpaceData, site: SiteCode): number {
   return d.fig1Keys.filter((k) => d.siteYears.find((x) => x.key === k)!.site === site).length;
 }
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** "7 May" from an ISO date. */
+export function dayMonth(iso: string): string {
+  const [, m, day] = iso.split('-').map(Number);
+  return `${day} ${MONTHS[m! - 1]}`;
+}
+
+/** Earliest and latest start of the peak window over the Finnish Figure 2 site-years. */
+export function peakStartRange(d: CarbonSpaceData): { first: string; firstKey: string; last: string; lastKey: string } {
+  const fin = d.fig2Keys
+    .map((k) => d.siteYears.find((x) => x.key === k)!)
+    .filter((s) => s.site !== 'maktau')
+    .map((s) => ({ key: s.key, md: s.uptake!.peak!.start.slice(5), start: s.uptake!.peak!.start }));
+  fin.sort((a, b) => a.md.localeCompare(b.md));
+  const a = fin[0]!;
+  const b = fin[fin.length - 1]!;
+  return { first: dayMonth(a.start), firstKey: a.key, last: dayMonth(b.start), lastKey: b.key };
+}
+
+/** "7 May to 4 August" of the peak window of one site-year. */
+export function peakWindowText(d: CarbonSpaceData, key: string): string {
+  const p = d.siteYears.find((x) => x.key === key)?.uptake?.peak;
+  if (!p) throw new Error(`carbon-space: no peak window for ${key}`);
+  return `${dayMonth(p.start)} to ${dayMonth(p.end)}`;
+}
+
 // ---------- Rows ----------
 
 const dash = '–';
@@ -164,6 +206,9 @@ export interface SiteYearRow {
   ratio: string;
   uptakeYear: string;
   uptakeJja: string;
+  peakWindow: string;
+  uptakePeak: string;
+  fracPeak: string;
   frac: string;
   harvestCut: number;
   grazing: number;
@@ -187,6 +232,9 @@ function siteYearRow(s: SiteYearOut): SiteYearRow {
     ratio: f2(s.recoGppRatio),
     uptakeYear: pct(s.uptake?.year.share),
     uptakeJja: pct(s.uptake?.jja.share),
+    peakWindow: s.uptake?.peak ? `${s.uptake.peak.start.slice(5)} to ${s.uptake.peak.end.slice(5)}` : dash,
+    uptakePeak: pct(s.uptake?.peak?.share),
+    fracPeak: f2(s.uptake?.peak?.fracMeasured ?? null),
     frac: f2(s.fracMeasured),
     harvestCut: e.harvest + e.cut,
     grazing: e.grazing,
@@ -194,7 +242,7 @@ function siteYearRow(s: SiteYearOut): SiteYearRow {
     sowing: e.sowing,
     fertilisation: e.fertilisation,
     other: e.spraying + e.other,
-    figures: s.inFig1 ? '1 and 2' : '2',
+    figures: s.inFig1 ? '1, 2 and 3' : '2 and 3',
   };
 }
 
