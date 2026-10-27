@@ -1,0 +1,582 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 8
+title: 'Regrowth after a silage harvest in a dry month: light use efficiency'
+question: Does drought in the month of a silage harvest change the regrowth of the grassland, measured as light use efficiency, within the same cut number?
+shortAnswer: 'No clear difference. The light use efficiency after a first cut in a dry month did not clearly differ from the normal cuts. The intervals are wide. In the main rule, all dry episodes are at Qvidja.'
+sites: [anttila, sarkisuo, qvidja, viikki]
+variables: [gpp, ppfd, sw_in, swc]
+period: { from: 2018, to: 2024 }
+date: '2026-10-27'
+status: draft
+models:
+  - model: Claude Fable 5.1
+    role: question, plan, final text
+  - model: Claude Opus 5.5
+    role: Python analysis script, figures
+  - model: Claude Opus 5.5
+    role: article draft and site integration
+  - model: Claude Sonnet 5.5
+    role: independent recompute of the numbers (own code, without the script and the JSON)
+  - model: Claude Haiku 5.5
+    role: language (STE) and reference review
+script: analysis/regrowth-drought/regrowth-drought.py
+references: [heimsch2021, heimsch2024, shurpali2025, spi-data, qvidja-management, calculated-doc, anomaly-report, peltokasvien-tuotanto]
+checks:
+  - kind: recompute
+    by: Claude Sonnet 5.5
+    date: '2026-10-27'
+    result: pass
+    note: Own code from the built page and the snapshot, without the script and the JSON. The episodes, exclusions, cut numbers, k, the per-episode window values, the SPI values and dry flags, the SWC anomalies, all group means, SDs, differences and permutation p values, and the sensitivity groups agree to rounding; bootstrap bounds not compared. The agent listed eight rules it had to guess (grain-crop words, the flux-day and measured-fraction columns, the cut-number year, the late-window overlap test, the swc day rule, the window day sets, the episode set of the sensitivity rules); the method text now states them.
+  - kind: review
+    by: Claude Haiku 5.5
+    date: '2026-10-27'
+    result: partial
+    note: One pass. All citations and the episode facts check out. Must items fixed by Claude Fable 5.1 - SD and range next to every group mean, the light-versus-canopy sentence hedged, the short answer limited to the main rule, the PAR conversion named an assumption, the unquantified time-stamp effect, and the long sentences of rules 1, 3 and 8 split.
+---
+
+import raw from '../../../../analysis/regrowth-drought/results.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+import { epKey, episodeRows, fertInWindowCount, groupRows, inputRows, kRows, litNote, overrideTexts, regrowthData, sensitivityRows, sitesOf } from '../../lib/deepDives/regrowthDrought';
+
+export const d = regrowthData(raw);
+export const base = baseUrl();
+export const SITES = ['anttila', 'sarkisuo', 'qvidja', 'viikki'];
+export const VARS = ['gpp', 'ppfd', 'sw_in', 'swc'];
+export const VIEW = { name: 'Regrowth and drought', sites: SITES, variables: VARS, yearFrom: 2018, yearTo: 2024, aggregation: 'day', events: true, diagrams: ['timeseries'] };
+export const E = (id) => epKey(d, id);
+export const Y = (id) => id.split('-')[1]; // the year of an episode id, a label and not a result number
+export const L = (key) => litNote(d, key);
+export const episodes = episodeRows(d);
+export const groups = groupRows(d);
+export const sens = sensitivityRows(d);
+export const kTable = kRows(d);
+export const inputs = inputRows(d);
+export const overrides = overrideTexts(d);
+export const dryFirstSites = sitesOf(d, d.groups.first.ids.dry);
+export const normalFirstSites = sitesOf(d, d.groups.first.ids.normal);
+export const dryLaterSites = sitesOf(d, d.groups.later.ids.dry);
+export const normalLaterSites = sitesOf(d, d.groups.later.ids.normal);
+export const fertCount = fertInWindowCount(d);
+export const ULUE = 'g C mol⁻¹';
+export const UPAR = 'mol m⁻² d⁻¹';
+
+## Short answer
+
+This dive compares the regrowth of four grasslands after a silage harvest. A harvest in a dry month is compared with
+a harvest in a normal month. The measure is the light use efficiency LUE = GPP / PAR per local day ({ULUE}), as a fraction
+of the LUE of the <Num k="method.windowDays" digits={0} /> days before the harvest. GPP is the daily GPP of the
+night-time partitioning <Cite ids={['calculated-doc']} />. PAR is the daily photosynthetic photon flux ({UPAR}). A dry month
+has SPI-1 ≤ <Num k="method.spiDry" digits={1} /> at the FMI station of the site <Cite ids={['spi-data']} />. The comparison
+stays within the same cut number: first cuts against first cuts, later cuts against later cuts. Day 0 is the last day of
+the harvest. All values below are fractions of the LUE, GPP or PAR before the harvest.
+
+- **First cuts, days <Num k="method.afterDays.0" sign digits={0} /> to <Num k="method.afterDays.1" sign digits={0} />.**
+  The relative LUE of the dry group was <Num k="groups.first.after.relLue.dry.mean" />
+  (n = <Num k="groups.first.after.relLue.dry.n" digits={0} />, SD <Num k="groups.first.after.relLue.dry.sd" />,
+  <Num k="method.ciLevelPct" digits={0} /> % interval <Num k="groups.first.after.relLue.dry.ciLo" /> to
+  <Num k="groups.first.after.relLue.dry.ciHi" />) and of the normal group <Num k="groups.first.after.relLue.normal.mean" />
+  (n = <Num k="groups.first.after.relLue.normal.n" digits={0} />, SD <Num k="groups.first.after.relLue.normal.sd" />,
+  interval <Num k="groups.first.after.relLue.normal.ciLo" /> to <Num k="groups.first.after.relLue.normal.ciHi" />). The
+  difference dry − normal is <Num k="groups.first.after.relLue.diff.diff" sign /> (interval
+  <Num k="groups.first.after.relLue.diff.ci.0" sign /> to <Num k="groups.first.after.relLue.diff.ci.1" sign />; exact
+  permutation p = <Num k="groups.first.after.relLue.diff.permutationP" />). The interval includes zero.
+- **First cuts, days <Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} />.**
+  The relative LUE was <Num k="groups.first.late.relLue.dry.mean" /> in the dry group
+  (n = <Num k="groups.first.late.relLue.dry.n" digits={0} />, SD <Num k="groups.first.late.relLue.dry.sd" />, interval
+  <Num k="groups.first.late.relLue.dry.ciLo" /> to <Num k="groups.first.late.relLue.dry.ciHi" />) and
+  <Num k="groups.first.late.relLue.normal.mean" /> in the normal group
+  (n = <Num k="groups.first.late.relLue.normal.n" digits={0} />, SD <Num k="groups.first.late.relLue.normal.sd" />,
+  interval <Num k="groups.first.late.relLue.normal.ciLo" /> to <Num k="groups.first.late.relLue.normal.ciHi" />); the
+  difference is <Num k="groups.first.late.relLue.diff.diff" sign /> (interval <Num k="groups.first.late.relLue.diff.ci.0" sign />
+  to <Num k="groups.first.late.relLue.diff.ci.1" sign />, p = <Num k="groups.first.late.relLue.diff.permutationP" />). The
+  relative GPP was <Num k="groups.first.late.relGpp.dry.mean" /> in the dry group (SD <Num k="groups.first.late.relGpp.dry.sd" />,
+  interval <Num k="groups.first.late.relGpp.dry.ciLo" /> to <Num k="groups.first.late.relGpp.dry.ciHi" />) and
+  <Num k="groups.first.late.relGpp.normal.mean" /> in the normal group (SD <Num k="groups.first.late.relGpp.normal.sd" />,
+  interval <Num k="groups.first.late.relGpp.normal.ciLo" /> to <Num k="groups.first.late.relGpp.normal.ciHi" />); the
+  difference is <Num k="groups.first.late.relGpp.diff.diff" sign /> (interval <Num k="groups.first.late.relGpp.diff.ci.0" sign />
+  to <Num k="groups.first.late.relGpp.diff.ci.1" sign />, p = <Num k="groups.first.late.relGpp.diff.permutationP" />). The
+  relative PAR was <Num k="groups.first.late.relPar.dry.mean" /> in the dry group (SD <Num k="groups.first.late.relPar.dry.sd" />,
+  interval <Num k="groups.first.late.relPar.dry.ciLo" /> to <Num k="groups.first.late.relPar.dry.ciHi" />) and
+  <Num k="groups.first.late.relPar.normal.mean" /> in the normal group (SD <Num k="groups.first.late.relPar.normal.sd" />,
+  interval <Num k="groups.first.late.relPar.normal.ciLo" /> to <Num k="groups.first.late.relPar.normal.ciHi" />); the
+  difference is <Num k="groups.first.late.relPar.diff.diff" sign /> (interval <Num k="groups.first.late.relPar.diff.ci.0" sign />
+  to <Num k="groups.first.late.relPar.diff.ci.1" sign />, p = <Num k="groups.first.late.relPar.diff.permutationP" />). The
+  lower GPP of the dry episodes in this window fits less light. The LUE shows no clear difference, so a canopy effect is
+  not excluded.
+- **Later cuts.** The dry group has one episode, Qvidja {Y('qvidja-2020-08-28')} (the cut of
+  28 August; SPI-1 <Num k={`${E('qvidja-2020-08-28')}.spi1`} />). Its relative LUE was
+  <Num k="groups.later.after.relLue.dry.mean" /> in the days <Num k="method.afterDays.0" sign digits={0} /> to
+  <Num k="method.afterDays.1" sign digits={0} /> and <Num k="groups.later.late.relLue.dry.mean" /> in the days
+  <Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} />. The normal group had
+  <Num k="groups.later.after.relLue.normal.mean" /> (n = <Num k="groups.later.after.relLue.normal.n" digits={0} />,
+  SD <Num k="groups.later.after.relLue.normal.sd" />, range <Num k="groups.later.after.relLue.normal.min" /> to
+  <Num k="groups.later.after.relLue.normal.max" />) and <Num k="groups.later.late.relLue.normal.mean" />
+  (n = <Num k="groups.later.late.relLue.normal.n" digits={0} />, SD <Num k="groups.later.late.relLue.normal.sd" />, range
+  <Num k="groups.later.late.relLue.normal.min" /> to <Num k="groups.later.late.relLue.normal.max" />). The dry episode is
+  above the normal range in the late window. There is no test with one dry episode.
+- **Site and dryness are confounded.** All dry first cuts are at {dryFirstSites}, and the dry later cut is at
+  {dryLaterSites}. The normal first cuts are at {normalFirstSites}. A difference between the groups can be a difference
+  between the sites. This is the main limit of the dive.
+
+With these data, a dry harvest month gives no clear LUE penalty for the regrowth. The intervals are wide, and the dry
+group is small.
+
+## Data and method
+
+**Snapshot and script.** The script `analysis/regrowth-drought/regrowth-drought.py` reads the harmonised database snapshot
+built on {d.dataVersion.snapshot.builtAt} (`db/events.parquet`, `db/sites.parquet`, `db/variables.parquet` and the
+columns `ppfd`, `sw_in` and `swc` of `db/observations.parquet`), `data/calculated/daily.parquet` of the same build
+<Cite ids={['calculated-doc']} /> and the SPI table `data/SPI/SPI_all_stations.csv` <Cite ids={['spi-data']} />. It
+checks the SHA-256 and the row count of each file before it reads data (section "Reproduce"). The episodes and the
+windows are those of Deep Dive #7 (<a href={`${base}deep-dive/silage-harvest-response/`}>Silage harvest and grassland
+CO₂ fluxes</a>). All windows include both end days. The nine rules below give each constant; open them to reproduce the
+numbers.
+
+<details class="dd-table" id="method-rules">
+<summary>Rules of the analysis (nine rules and the overrides)</summary>
+
+1. **Data and local day.** The daily GPP (g C m⁻² d⁻¹), TER, gap-filled NEE and the measured fraction of NEE per local
+   day come from `data/calculated/daily.parquet`. GPP and TER are model values of the night-time partitioning
+   <Cite ids={['calculated-doc']} />. The 30-minute `ppfd`, `sw_in` and `swc` of the four sites come from
+   `db/observations.parquet`. The local day of a 30-minute row is the period start in UTC plus the UTC offset of the site
+   (`utc_offset_min`, UTC+2 for all four sites). A day counts when <Num k="method.minHalfHours" digits={0} /> or more of
+   its <Num k="method.halfHoursPerDay" digits={0} /> half hours have a value. The mean of the values that exist fills the
+   gap. The events come from `db/events.parquet`. Day 0 is the last day of the harvest (*end*).
+2. **Episodes.** The episodes are those of Deep Dive #7. The events of `type` `harvest` and `cut` of the five Finnish
+   sites are sorted by date. An event spans the days `date` to `date_end`, or `date` only. An event that starts not more
+   than <Num k="method.mergeDays" digits={0} /> days after the last day of the current episode joins it. Then the
+   <Num k="counts.overrides" digits={0} /> overrides of Deep Dive #4 apply (list below). A `harvest` is a grain harvest
+   when its `crop` or `detail` matches one of the words thresh, grain, faba, oats or barley (the regular expression
+   `thresh|grain|faba|\boats\b|barley`, case-insensitive) and does not match cut, silage or grass
+   (`\bcut\b|silage|grass`). A grain harvest is not an episode of this dive. Thus the Haltiala barley and oats harvests
+   and the Viikki faba bean harvest of 10 September 2025 are not episodes. A `cut` is a cleaning cut. The dive keeps the
+   <Num k="counts.silageEpisodes" digits={0} /> silage harvest episodes. The *cut number* of an episode is its ordinal
+   among the harvest and cut episodes of the site in that year, cleaning cuts included. The year of an episode is the
+   year of *start*. *First cut* = cut number 1 (the Viikki cut of 1 July 2022 is a first cut); *later cuts* = cut number
+   2 or more.
+3. **Windows and exclusions.** The windows count from the first day (*start*) and the last day (*end*) of the episode.
+   Before = start <Num k="method.beforeDays.0" sign digits={0} /> to start <Num k="method.beforeDays.1" sign digits={0} />.
+   After = end <Num k="method.afterDays.0" sign digits={0} /> to end <Num k="method.afterDays.1" sign digits={0} />.
+   Late = end <Num k="method.lateDays.0" sign digits={0} /> to end <Num k="method.lateDays.1" sign digits={0} />. The
+   exclusions of Deep Dive #7 apply in this order. (1) *Overlap*: another harvest or cut episode of the site, or a
+   grazing or tillage event, has a day in common with the days start <Num k="method.beforeDays.0" sign digits={0} /> to
+   end <Num k="method.afterDays.1" sign digits={0} /> (<Num k="counts.excluded.overlap" digits={0} /> episodes). (2) *Too
+   few flux days*: GPP, TER or NEE has fewer than <Num k="method.minDays" digits={0} /> days with a value in the before or
+   the after window (<Num k="counts.excluded.too-few-days" digits={0} />). A day with a value is a day with a non-null
+   daily `gpp_gc`, `reco_gc` (TER) or `nee_f_gc` (NEE) in `daily.parquet`. (3) *Low measured fraction*: the mean measured
+   fraction of NEE is below <Num k="method.minFracPct" digits={0} /> % in the before or the after window
+   (<Num k="counts.excluded.low-measured-fraction" digits={0} />). This mean is the plain mean of `frac_measured` over
+   the days of the window with a non-null value. A window without such a day counts as below the limit.
+   <Num k="counts.usedFlux" digits={0} /> episodes pass these rules, the same as in Deep Dive #7. The late window has the
+   same overlap test as (1), applied to the days end <Num k="method.lateDays.0" sign digits={0} /> to end
+   <Num k="method.lateDays.1" sign digits={0} />. When another harvest or cut episode, or a grazing or tillage event, has
+   a day in common with them, the late window is empty. A fertilisation in the days start
+   <Num k="method.beforeDays.0" sign digits={0} /> to end <Num k="method.afterDays.1" sign digits={0} /> only sets a flag. Two Viikki episodes are *flagged*: 17 August 2023
+   (establishment year: barley undersown with clover and grasses, cut green on two days) and 14 June 2024 (partial harvest
+   of about one hectare). They are not a regrowth of an established grass stand after a full harvest. They stay in Table A
+   and in Figure 3 with open markers, but they are not in the groups and not in the curves of Figures 1 and 2
+   (<Num k="counts.flagged" digits={0} /> episodes).
+4. **Daily PAR and global radiation.** Daily PAR ({UPAR}) = the mean of the 30-minute `ppfd` (µmol m⁻² s⁻¹) of the
+   local day × <Num k="method.dayFactor" digits={4} /> (86 400 s × 10⁻⁶). Daily global radiation SW_in (MJ m⁻² d⁻¹) = the
+   mean `sw_in` (W m⁻²) × the same factor. Both use the day rule of rule 1.
+5. **Qvidja PAR from global radiation.** Qvidja has no `ppfd`. Its daily PAR = SW_in × k. k (mol MJ⁻¹) is the pooled
+   median of the daily ratio PAR / SW_in of the sites with both columns, over the days with PAR of
+   <Num k="method.minPar" digits={0} /> {UPAR} or more: Anttila and Viikki always, and Särkisuo because it has
+   <Num k="method.kMinDays" digits={0} /> or more such days. k = <Num k="par.k" digits={3} /> (<Num k="par.pooled.nDays" digits={0} />
+   days; 10 to 90 % range <Num k="par.pooled.p10" digits={3} /> to <Num k="par.pooled.p90" digits={3} />). The per-site
+   medians are <Num k="par.perSite.anttila.median" digits={3} /> (Anttila), <Num k="par.perSite.sarkisuo.median" digits={3} />
+   (Särkisuo) and <Num k="par.perSite.viikki.median" digits={3} /> (Viikki); Table D gives the ranges. The energy fraction
+   of PAR in the global radiation is k / <Num k="method.parUmolPerJ" digits={2} /> = <Num k="par.energyFractionPct" digits={1} /> %.
+   The conversion <Num k="method.parUmolPerJ" digits={2} /> µmol J⁻¹ is an assumption of this project. No page is cited
+   for it. Heimsch et al. 2024 estimate PAR as <Num k="literatureByKey.parFractionOfGlobal.value" digits={0} /> % of the
+   global radiation <Cite ids={['heimsch2024']} note={L('parFractionOfGlobal')} />. The relative LUE, GPP and PAR
+   of a Qvidja episode do not depend on k, because k cancels in value / reference; k only changes which Qvidja days have
+   a PAR below <Num k="method.minPar" digits={0} /> {UPAR} and the absolute LUE before the harvest. The runs with the
+   smallest and the largest per-site median (<Num k="sensitivity.k.kMin" digits={3} /> and
+   <Num k="sensitivity.k.kMax" digits={3} />) gave the same group results.
+6. **LUE and the relative values.** LUE of a day = GPP of the day / PAR of the day ({ULUE}). A day with a PAR below
+   <Num k="method.minPar" digits={0} /> {UPAR} has no LUE (<Num k="counts.daysParBelowMin" digits={0} /> site days of all
+   data). The *reference* of an episode is the days start <Num k="method.beforeDays.0" sign digits={0} /> to start
+   <Num k="method.beforeDays.1" sign digits={0} /> with a LUE value: GPP before and PAR before are the means over these
+   days, and LUE before = GPP before / PAR before. This is a ratio of means, thus on each day the relative GPP = the
+   relative LUE × the relative PAR. An episode with fewer than <Num k="method.minDays" digits={0} /> reference LUE days is
+   excluded (*too few LUE days before*, <Num k="counts.excluded.too-few-par-days" digits={0} /> episode: Särkisuo
+   15 August 2023, a PPFD gap). The relative LUE, GPP and PAR of a day = the value / the reference. A window mean is the
+   mean over the days of the window with a LUE value. The window means of the relative LUE, GPP and PAR use the same
+   days. A window mean is empty with fewer than <Num k="method.minDays" digits={0} /> such days. The late window is also
+   empty when the overlap test of rule 3 finds an event in it. The product of the window means of the relative LUE and PAR is not the window mean of
+   the relative GPP, because a mean of products is not the product of the means; the tables give the window mean of the
+   relative GPP. <Num k="counts.used" digits={0} /> episodes have a reference, and <Num k="counts.inGroups" digits={0} />
+   of them are in the groups.
+7. **Dryness.** The SPI-1 of the FMI station of the site <Cite ids={['spi-data']} /> in the calendar month that holds
+   *end*: Vantaa for Viikki, Kaarina Yltöinen for Qvidja, Kuopio Maaninka for Anttila and Särkisuo. *Dry* = SPI-1 ≤
+   <Num k="method.spiDry" digits={1} />. This limit is the lower bound of "severely dry" in the SPEI classes that Heimsch
+   et al. 2024 use <Cite ids={['heimsch2024']} note={L('speiSeverelyDry')} />. Deep Dive #3
+   (<a href={`${base}deep-dive/nee-without-harvest-drought/`}>NEE without harvest or drought</a>) uses SPI-1 ≤
+   <Num k="method.spiDryOtherDive" digits={1} />. June 2018 at Kaarina Yltöinen has SPI-1
+   <Num k="summary.extra.june2018.spi1" /> and SPI-3 <Num k="summary.extra.june2018.spi3" />; thus the Qvidja cut of
+   12 June 2018 is not dry by the rule of this dive, although Heimsch et al. 2024 classify May, June and July 2018 as
+   extremely dry by SPEI <Cite ids={['heimsch2024']} note={L('qvidja2018Drought')} />. Three sensitivity rules apply to the same <Num k="counts.inGroups" digits={0} /> episodes as the main rule. (1) SPI-3 ≤
+   <Num k="method.spiDry" digits={1} /> of the same month. (2) SWC anomaly below zero. The daily `swc` is the mean of the
+   30-minute `swc` of the local day, with the day rule of rule 1. The anomaly = the mean daily `swc` of the local days
+   end <Num k="method.swcWindow.0" sign digits={0} /> to end <Num k="method.swcWindow.1" sign digits={0} /> minus the mean
+   of the same site on the same calendar dates in all its data years. Each data year with at least one daily `swc` in
+   these dates counts, the episode year included. The Särkisuo cuts of 2022 have one year with `swc`, thus an anomaly of
+   0. (3) SPI-1 ≤ <Num k="sensitivity.spiMinus1.threshold" digits={1} />. The sensitivity rules give group means only.
+8. **Groups and statistics.** The statistics are per cut group (first, later), dryness (dry, normal) and window (after,
+   late), for the relative LUE, GPP and PAR. Each group gives n, mean, sample SD (n − 1), median and range. A percentile
+   bootstrap gives the <Num k="method.ciLevelPct" digits={0} /> % interval of the mean when n is
+   <Num k="method.bootstrapMinN" digits={0} /> or more (<Num k="method.bootstrapResamples" digits={0} /> resamples with
+   replacement, the 2.5 and 97.5 percentiles, `numpy` PCG64 with fixed seeds in the manifest). The difference dry −
+   normal has a bootstrap interval that resamples both groups (both n of <Num k="method.bootstrapMinN" digits={0} /> or
+   more). An exact two-sided permutation test compares the difference of means over all C(n, n dry) splits of the group.
+   p = the share of splits with an absolute difference at or above the observed one. With one dry episode (later cuts)
+   there is no test and no interval. The single value is then given against the mean, SD and range of the normal group,
+   also in SD units. Composite curves per group cover the days <Num k="method.compositeFrom" sign digits={0} /> to
+   <Num k="method.compositeTo" sign digits={0} /> from end. The value of an episode is empty from the day of the next
+   harvest, cut or grazing of the site on. Per day the curve gives the mean, SD, n and the bootstrap interval. A line
+   needs <Num k="method.compositeMinN" digits={0} /> or more episodes with a value, a band
+   <Num k="method.bootstrapMinN" digits={0} /> or more. A group of one episode shows the episode itself. The y range of
+   Figures 1 and 2 is one range over all drawn means and bands. It is rounded outwards to a multiple of
+   <Num k="method.yStep" digits={2} /> and extended to hold 0 and 1: <Num k="composite.yRange.0" digits={2} /> to
+   <Num k="composite.yRange.1" digits={2} />.
+9. **Counts and findings.** Each step that removes rows or changes values logs a count in `dataVersion.steps` of
+   `results.json`. The script prints the open findings of the data report that touch this dive.
+
+The overrides of Deep Dive #4 are:
+
+<ul>
+{overrides.map((t) => (<li>{t}</li>))}
+</ul>
+
+</details>
+
+### Sites
+
+<div class="table-wrap">
+<table>
+<caption>The four grass sites: data years, the source of the daily PAR, the FMI station of the SPI, and the counts of silage harvest episodes (all, with a reference LUE, in the groups).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Data years</th><th scope="col">PAR source</th><th scope="col">SPI station</th><th scope="col" class="num">Episodes</th><th scope="col" class="num">With reference</th><th scope="col" class="num">In groups</th></tr>
+</thead>
+<tbody>
+{d.sites.map((s) => (<tr id={`site-${s.code}`}><td>{s.name}</td><td>{s.dataYears[0]} to {s.dataYears[s.dataYears.length - 1]}</td><td>{s.parSource === 'ppfd' ? 'ppfd' : 'sw_in × k'}</td><td>{s.station}</td><td class="num">{s.episodes}</td><td class="num">{s.used}</td><td class="num">{s.inGroups}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+The grass stands and the harvests of each site are described in Deep Dive #7. Qvidja is a forage grassland since 2017
+and its harvests, cleaning cuts and fertilisations come from the management file <Cite ids={['qvidja-management']} />.
+Heimsch et al. 2021 report a higher mean daily PAR and a lower precipitation sum at Qvidja in 2018 than in 2019 (May to
+September) <Cite ids={['heimsch2021']} note={L('heimsch2021Par')} />.
+
+## Results
+
+Shurpali et al. 2025 report that after each harvest all their ecosystems turned into CO₂ sources, until the regrowth and
+the increasing GPP exceeded the ecosystem respiration <Cite ids={['shurpali2025']} note="PDF p. 11" />. Deep Dive #7
+measured this drop and rise of GPP. This dive looks at the regrowth through the LUE, so that a difference in light after
+the harvest is taken out. The textbook states that the speed of the regrowth after a cut is a property of the species and
+the cultivar, changed by the cutting height, the number of cuts and the nutrient supply, and that a large leaf area left in
+the stubble can speed up the regrowth, especially in dry conditions <Cite ids={['peltokasvien-tuotanto']} note={L('regrowthAfterCut')} />.
+It also states that the regrowth yield develops more slowly, and that its feed value does not change as fast as in spring <Cite ids={['peltokasvien-tuotanto']} note={L('laterCutSlower')} />.
+Thus the dive compares within the same cut number.
+
+Figures 1 and 2 show the relative LUE per day from <Num k="method.compositeFrom" digits={0} abs /> days before to
+<Num k="method.compositeTo" digits={0} /> days after the last day of the harvest. A line is the mean of the episodes of
+the group; the band is the bootstrap <Num k="method.ciLevelPct" digits={0} /> % interval of the mean. Figure 3 shows the
+LUE of the late window of each episode against the SPI-1 of its harvest month.
+
+### First cuts
+
+<Figure id="figure-1" svgFile="analysis/regrowth-drought/figures/1-first-cut.svg" view={VIEW} />
+
+The dry group holds <Num k="groups.first.n.dry" digits={0} /> first cuts, all at {dryFirstSites}: June
+{Y('qvidja-2019-06-11')} (SPI-1 <Num k={`${E('qvidja-2019-06-11')}.spi1`} />), June
+{Y('qvidja-2022-06-21')} (<Num k={`${E('qvidja-2022-06-21')}.spi1`} />) and June
+{Y('qvidja-2023-06-19')} (<Num k={`${E('qvidja-2023-06-19')}.spi1`} />). The normal group
+holds <Num k="groups.first.n.normal" digits={0} /> first cuts at {normalFirstSites}; <Num k="counts.perCutGroup.first.lateWindows.normal" digits={0} />
+of them have a late window (the Anttila cut of 21 June 2023 has the next cut inside its late window). In the days
+<Num k="method.afterDays.0" sign digits={0} /> to <Num k="method.afterDays.1" sign digits={0} />, the relative LUE of the
+dry group was <Num k="groups.first.after.relLue.dry.mean" /> (SD <Num k="groups.first.after.relLue.dry.sd" />, interval
+<Num k="groups.first.after.relLue.dry.ciLo" /> to <Num k="groups.first.after.relLue.dry.ciHi" />) and of the normal group
+<Num k="groups.first.after.relLue.normal.mean" /> (SD <Num k="groups.first.after.relLue.normal.sd" />, interval
+<Num k="groups.first.after.relLue.normal.ciLo" /> to <Num k="groups.first.after.relLue.normal.ciHi" />); the difference
+<Num k="groups.first.after.relLue.diff.diff" sign /> has the interval <Num k="groups.first.after.relLue.diff.ci.0" sign />
+to <Num k="groups.first.after.relLue.diff.ci.1" sign /> and p = <Num k="groups.first.after.relLue.diff.permutationP" />
+(<Num k="groups.first.after.relLue.diff.nSplits" digits={0} /> splits). The relative GPP was
+<Num k="groups.first.after.relGpp.dry.mean" /> (dry, SD <Num k="groups.first.after.relGpp.dry.sd" />, interval
+<Num k="groups.first.after.relGpp.dry.ciLo" /> to <Num k="groups.first.after.relGpp.dry.ciHi" />) against
+<Num k="groups.first.after.relGpp.normal.mean" /> (normal, SD <Num k="groups.first.after.relGpp.normal.sd" />, interval
+<Num k="groups.first.after.relGpp.normal.ciLo" /> to <Num k="groups.first.after.relGpp.normal.ciHi" />); the difference
+<Num k="groups.first.after.relGpp.diff.diff" sign /> has the interval <Num k="groups.first.after.relGpp.diff.ci.0" sign />
+to <Num k="groups.first.after.relGpp.diff.ci.1" sign /> and p = <Num k="groups.first.after.relGpp.diff.permutationP" />.
+The relative PAR was <Num k="groups.first.after.relPar.dry.mean" /> (dry, SD <Num k="groups.first.after.relPar.dry.sd" />,
+interval <Num k="groups.first.after.relPar.dry.ciLo" /> to <Num k="groups.first.after.relPar.dry.ciHi" />) against
+<Num k="groups.first.after.relPar.normal.mean" /> (normal, SD <Num k="groups.first.after.relPar.normal.sd" />, interval
+<Num k="groups.first.after.relPar.normal.ciLo" /> to <Num k="groups.first.after.relPar.normal.ciHi" />); the difference
+<Num k="groups.first.after.relPar.diff.diff" sign /> has the interval <Num k="groups.first.after.relPar.diff.ci.0" sign />
+to <Num k="groups.first.after.relPar.diff.ci.1" sign /> and p = <Num k="groups.first.after.relPar.diff.permutationP" />.
+
+In the days <Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} /> the relative
+LUE was <Num k="groups.first.late.relLue.dry.mean" /> (dry, SD <Num k="groups.first.late.relLue.dry.sd" />, interval
+<Num k="groups.first.late.relLue.dry.ciLo" /> to <Num k="groups.first.late.relLue.dry.ciHi" />) against
+<Num k="groups.first.late.relLue.normal.mean" /> (normal, SD <Num k="groups.first.late.relLue.normal.sd" />, interval
+<Num k="groups.first.late.relLue.normal.ciLo" /> to <Num k="groups.first.late.relLue.normal.ciHi" />), difference
+<Num k="groups.first.late.relLue.diff.diff" sign /> (interval <Num k="groups.first.late.relLue.diff.ci.0" sign /> to
+<Num k="groups.first.late.relLue.diff.ci.1" sign />, p = <Num k="groups.first.late.relLue.diff.permutationP" />,
+<Num k="groups.first.late.relLue.diff.nSplits" digits={0} /> splits). The relative GPP of the dry group was lower,
+<Num k="groups.first.late.relGpp.dry.mean" /> (SD <Num k="groups.first.late.relGpp.dry.sd" />, interval
+<Num k="groups.first.late.relGpp.dry.ciLo" /> to <Num k="groups.first.late.relGpp.dry.ciHi" />) against
+<Num k="groups.first.late.relGpp.normal.mean" /> (SD <Num k="groups.first.late.relGpp.normal.sd" />, interval
+<Num k="groups.first.late.relGpp.normal.ciLo" /> to <Num k="groups.first.late.relGpp.normal.ciHi" />); the difference is
+<Num k="groups.first.late.relGpp.diff.diff" sign /> (interval <Num k="groups.first.late.relGpp.diff.ci.0" sign /> to
+<Num k="groups.first.late.relGpp.diff.ci.1" sign />, p = <Num k="groups.first.late.relGpp.diff.permutationP" />). The
+relative PAR of the dry group was also lower, <Num k="groups.first.late.relPar.dry.mean" /> (SD
+<Num k="groups.first.late.relPar.dry.sd" />, interval <Num k="groups.first.late.relPar.dry.ciLo" /> to
+<Num k="groups.first.late.relPar.dry.ciHi" />) against <Num k="groups.first.late.relPar.normal.mean" /> (SD
+<Num k="groups.first.late.relPar.normal.sd" />, interval <Num k="groups.first.late.relPar.normal.ciLo" /> to
+<Num k="groups.first.late.relPar.normal.ciHi" />); the difference is <Num k="groups.first.late.relPar.diff.diff" sign />
+(interval <Num k="groups.first.late.relPar.diff.ci.0" sign /> to <Num k="groups.first.late.relPar.diff.ci.1" sign />,
+p = <Num k="groups.first.late.relPar.diff.permutationP" />). The dry episodes had less light in the late window than the
+normal episodes. The lower GPP of the dry episodes in this window fits less light. The LUE shows no clear difference, so
+a canopy effect is not excluded.
+
+Within the dry group the episodes differ. Qvidja June 2019 had a relative LUE of
+<Num k={`${E('qvidja-2019-06-11')}.windows.after.relLue`} /> in the after window and
+<Num k={`${E('qvidja-2019-06-11')}.windows.late.relLue`} /> in the late window, the lowest of the group; June 2022 had
+<Num k={`${E('qvidja-2022-06-21')}.windows.after.relLue`} /> and <Num k={`${E('qvidja-2022-06-21')}.windows.late.relLue`} />,
+and June 2023 <Num k={`${E('qvidja-2023-06-19')}.windows.after.relLue`} /> and
+<Num k={`${E('qvidja-2023-06-19')}.windows.late.relLue`} />. Heimsch et al. 2021 report a clearly lower leaf-area-based
+photosynthetic capacity at Qvidja in 2018 than in 2019 and give drought stress as the probable reason
+<Cite ids={['heimsch2021']} note={L('heimsch2021Gp1200')} />; the June 2018 cut is in the normal group of this dive, because
+its SPI-1 is <Num k={`${E('qvidja-2018-06-12')}.spi1`} /> (rule 7). Its relative LUE was
+<Num k={`${E('qvidja-2018-06-12')}.windows.after.relLue`} /> and <Num k={`${E('qvidja-2018-06-12')}.windows.late.relLue`} />.
+
+### Later cuts
+
+<Figure id="figure-2" svgFile="analysis/regrowth-drought/figures/2-later-cuts.svg" view={VIEW} />
+
+The later cuts have <Num k="groups.later.n.dry" digits={0} /> dry episode, Qvidja 28 August
+{Y('qvidja-2020-08-28')} (SPI-1 <Num k={`${E('qvidja-2020-08-28')}.spi1`} />, SPI-3
+<Num k={`${E('qvidja-2020-08-28')}.spi3`} />), and <Num k="groups.later.n.normal" digits={0} /> normal episodes at
+{normalLaterSites}, of which <Num k="counts.perCutGroup.later.lateWindows.normal" digits={0} /> have a late window (the
+Qvidja cut of 21 August 2023 has a tillage event in its late window, and the Qvidja cut of 23 September 2018 has
+<Num k={`${E('qvidja-2018-09-23')}.windows.late.nDays`} digits={0} /> LUE days). The dry episode had a relative LUE of
+<Num k="groups.later.after.relLue.dry.mean" /> in the after window, <Num k="groups.later.after.relLue.diff.single.sdUnits" digits={1} />
+SD units above the normal mean <Num k="groups.later.after.relLue.normal.mean" /> (SD
+<Num k="groups.later.after.relLue.normal.sd" />, range <Num k="groups.later.after.relLue.normal.min" /> to
+<Num k="groups.later.after.relLue.normal.max" />), and <Num k="groups.later.late.relLue.dry.mean" /> in the late window,
+<Num k="groups.later.late.relLue.diff.single.sdUnits" digits={1} /> SD units above the normal mean
+<Num k="groups.later.late.relLue.normal.mean" /> (SD <Num k="groups.later.late.relLue.normal.sd" />, range
+<Num k="groups.later.late.relLue.normal.min" /> to <Num k="groups.later.late.relLue.normal.max" />). The high LUE of the
+dry episode goes with little light. Its relative PAR was <Num k="groups.later.after.relPar.dry.mean" /> in the after
+window, <Num k="groups.later.after.relPar.diff.single.sdUnits" digits={1} abs /> SD units below the normal mean
+<Num k="groups.later.after.relPar.normal.mean" /> (SD <Num k="groups.later.after.relPar.normal.sd" />, range
+<Num k="groups.later.after.relPar.normal.min" /> to <Num k="groups.later.after.relPar.normal.max" />), and
+<Num k="groups.later.late.relPar.dry.mean" /> in the late window, <Num k="groups.later.late.relPar.diff.single.sdUnits" digits={1} abs />
+SD units below the normal mean <Num k="groups.later.late.relPar.normal.mean" /> (SD <Num k="groups.later.late.relPar.normal.sd" />,
+range <Num k="groups.later.late.relPar.normal.min" /> to <Num k="groups.later.late.relPar.normal.max" />). Its relative
+GPP was <Num k="groups.later.after.relGpp.dry.mean" /> in the after window,
+<Num k="groups.later.after.relGpp.diff.single.sdUnits" digits={1} /> SD units above the normal mean
+<Num k="groups.later.after.relGpp.normal.mean" /> (SD <Num k="groups.later.after.relGpp.normal.sd" />, range
+<Num k="groups.later.after.relGpp.normal.min" /> to <Num k="groups.later.after.relGpp.normal.max" />), and
+<Num k="groups.later.late.relGpp.dry.mean" /> in the late window, <Num k="groups.later.late.relGpp.diff.single.sdUnits" digits={1} />
+SD units above the normal mean <Num k="groups.later.late.relGpp.normal.mean" /> (SD <Num k="groups.later.late.relGpp.normal.sd" />,
+range <Num k="groups.later.late.relGpp.normal.min" /> to <Num k="groups.later.late.relGpp.normal.max" />). The normal
+GPP range of the late window is narrow, and the dry value is above it. A ratio of two daily values is sensitive to a
+low PAR. The dashed curve of Figure 2 is one episode: it shows the day-to-day variation of
+the weather and of the gap-filled GPP, which the mean of a group averages out. One episode gives no estimate of the
+spread, and there is no test.
+
+### The late LUE against the SPI-1 of the harvest month
+
+<Figure id="figure-3" svgFile="analysis/regrowth-drought/figures/3-late-lue-vs-spi.svg" view={VIEW} />
+
+Figure 3 shows the <Num k="counts.used" digits={0} /> episodes with a reference LUE and a late window, the two flagged
+Viikki episodes with open markers. The two lowest first-cut points are Qvidja June
+{Y('qvidja-2019-06-11')} (SPI-1 <Num k={`${E('qvidja-2019-06-11')}.spi1`} />, late LUE
+<Num k={`${E('qvidja-2019-06-11')}.windows.late.relLue`} />) and Qvidja June {Y('qvidja-2021-06-14')}
+(SPI-1 <Num k={`${E('qvidja-2021-06-14')}.spi1`} />, late LUE <Num k={`${E('qvidja-2021-06-14')}.windows.late.relLue`} />);
+the second is not dry by the limit of <Num k="method.spiDry" digits={1} />. The two other dry first cuts are inside the
+range of the normal first cuts (<Num k="groups.first.late.relLue.normal.min" /> to
+<Num k="groups.first.late.relLue.normal.max" />): June {Y('qvidja-2022-06-21')} at
+<Num k={`${E('qvidja-2022-06-21')}.windows.late.relLue`} /> and June {Y('qvidja-2023-06-19')}
+at <Num k={`${E('qvidja-2023-06-19')}.windows.late.relLue`} />.
+The flagged Viikki episodes are at <Num k={`${E('viikki-2024-06-14')}.windows.late.relLue`} /> (14 June 2024, SPI-1
+<Num k={`${E('viikki-2024-06-14')}.spi1`} />) and <Num k={`${E('viikki-2023-08-17')}.windows.late.relLue`} /> (17 August
+2023, SPI-1 <Num k={`${E('viikki-2023-08-17')}.spi1`} />). The figure shows no monotonic relation between the SPI-1 and
+the late LUE.
+
+### Sensitivity to the dryness rule
+
+With SPI-3 ≤ <Num k="method.spiDry" digits={1} />, the dry first-cut group has <Num k="sensitivity.dryness.drySpi3.first.n.dry" digits={0} />
+episodes (June 2019 and June 2023) and the later cuts have <Num k="sensitivity.dryness.drySpi3.later.n.dry" digits={0} />.
+With the SWC anomaly below zero, <Num k="sensitivity.dryness.drySwc.first.n.dry" digits={0} /> of the
+<Num k="counts.perCutGroup.first.inGroups" digits={0} /> first cuts and <Num k="sensitivity.dryness.drySwc.later.n.dry" digits={0} />
+of the <Num k="counts.perCutGroup.later.inGroups" digits={0} /> later cuts are dry; this rule adds the Anttila cut of
+June 2022, the Qvidja cuts of June 2018 and June 2024 and the Viikki cut of July 2022 to the dry group of first cuts. With SPI-1 ≤
+<Num k="sensitivity.spiMinus1.threshold" digits={1} /> (the rule of Deep Dive #3), the first cuts split
+<Num k="sensitivity.spiMinus1.first.n.dry" digits={0} /> dry and <Num k="sensitivity.spiMinus1.first.n.normal" digits={0} />
+normal; all dry episodes are again at Qvidja, now with June 2018 and June 2021. The late relative LUE is then
+<Num k="sensitivity.spiMinus1.first.late.relLue.dry.mean" /> (dry, SD <Num k="sensitivity.spiMinus1.first.late.relLue.dry.sd" />)
+against <Num k="sensitivity.spiMinus1.first.late.relLue.normal.mean" /> (normal, SD
+<Num k="sensitivity.spiMinus1.first.late.relLue.normal.sd" />), difference <Num k="sensitivity.spiMinus1.first.late.relLue.diff" sign />;
+the late relative GPP differs by <Num k="sensitivity.spiMinus1.first.late.relGpp.diff" sign /> and the late relative PAR by
+<Num k="sensitivity.spiMinus1.first.late.relPar.diff" sign />. The sensitivity rules give no interval and no test.
+Table C gives all values. The two alternative values of k gave the same group results (rule 5).
+
+### Tables
+
+<div class="table-wrap">
+<table>
+<caption>Table A. All {d.counts.silageEpisodes} silage harvest episodes, in the site order of db/sites.parquet. Cut no. = ordinal among the harvest and cut episodes of the site in the year; group = first cut or later cuts. Use: "used" = in a group; "flagged" = a flagged Viikki episode (in Figure 3 only); "not used" with the reason of rule 3 or 6. Dry = SPI-1 ≤ {d.method.spiDry} of the station month that holds the last harvest day. SWC anom. = mean swc of the days {d.method.swcWindow[0]} to {d.method.swcWindow[1]} after the end minus the mean of the same dates in all data years (m³ m⁻³; the number of years in brackets). PAR before in {UPAR}, LUE before in {ULUE} (reference window). After = days {d.method.afterDays[0]} to {d.method.afterDays[1]}, late = days {d.method.lateDays[0]} to {d.method.lateDays[1]}: the window means of the relative LUE, GPP and PAR; "overlap" = another event overlaps the late window; "n days" = fewer than {d.method.minDays} LUE days. Fert. = a fertilisation in the days −{d.method.windowDays} to +{d.method.windowDays}.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Dates</th><th scope="col" class="num">Cut no.</th><th scope="col">Group</th><th scope="col">Use</th><th scope="col">Dry</th><th scope="col" class="num">SPI-1</th><th scope="col" class="num">SPI-3</th><th scope="col" class="num">SWC anom.</th><th scope="col" class="num">PAR before</th><th scope="col" class="num">LUE before</th><th scope="col" class="num">LUE after</th><th scope="col" class="num">GPP after</th><th scope="col" class="num">PAR after</th><th scope="col" class="num">LUE late</th><th scope="col" class="num">GPP late</th><th scope="col" class="num">PAR late</th><th scope="col">Fert.</th><th scope="col">Flag</th></tr>
+</thead>
+<tbody>
+{episodes.map((r) => (<tr id={`episode-${r.id}`}><td>{r.site}</td><td class="wrap">{r.dates}</td><td class="num">{r.cutNo}</td><td>{r.group}</td><td class="wrap">{r.use}</td><td>{r.dryness}</td><td class="num">{r.spi1}</td><td class="num">{r.spi3}</td><td class="num">{r.swcAnomaly}</td><td class="num">{r.parBefore}</td><td class="num">{r.lueBefore}</td><td class="num">{r.afterLue}</td><td class="num">{r.afterGpp}</td><td class="num">{r.afterPar}</td><td class="num">{r.lateLue}</td><td class="num">{r.lateGpp}</td><td class="num">{r.latePar}</td><td>{r.fert}</td><td class="wrap">{r.flag}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Table B. Groups: mean ± sample SD [{d.method.ciLevelPct} % bootstrap interval] of the relative LUE, GPP and PAR when n is {d.method.bootstrapMinN} or more, else the values; n per group; the difference dry − normal with its bootstrap interval, or, with one dry episode, the difference in SD units of the normal group; p = exact two-sided permutation test (number of splits).</caption>
+<thead>
+<tr><th scope="col">Cut group</th><th scope="col">Window</th><th scope="col">Quantity</th><th scope="col" class="num">Dry</th><th scope="col" class="num">n</th><th scope="col" class="num">Normal</th><th scope="col" class="num">n</th><th scope="col" class="num">Difference</th><th scope="col" class="num">p</th></tr>
+</thead>
+<tbody>
+{groups.map((r) => (<tr id={r.id}><td>{r.group}</td><td class="wrap">{r.window}</td><td>{r.quantity}</td><td class="num">{r.dry}</td><td class="num">{r.nDry}</td><td class="num">{r.normal}</td><td class="num">{r.nNormal}</td><td class="num wrap">{r.diff}</td><td class="num wrap">{r.p}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Table C. Sensitivity to the dryness rule: the main rule and the three alternative rules, per cut group and window. n = dry / normal. LUE, GPP and PAR = mean ± sample SD of the relative values when n is {d.method.bootstrapMinN} or more, else the values. Diff. = dry mean − normal mean of the relative LUE. No interval and no test for the alternative rules.</caption>
+<thead>
+<tr><th scope="col">Rule</th><th scope="col">Cut group</th><th scope="col">Window</th><th scope="col" class="num">n</th><th scope="col" class="num">LUE dry</th><th scope="col" class="num">LUE normal</th><th scope="col" class="num">Diff.</th><th scope="col" class="num">GPP dry</th><th scope="col" class="num">GPP normal</th><th scope="col" class="num">PAR dry</th><th scope="col" class="num">PAR normal</th></tr>
+</thead>
+<tbody>
+{sens.map((r) => (<tr id={r.id}><td class="wrap">{r.rule}</td><td>{r.group}</td><td class="wrap">{r.window}</td><td class="num">{r.n}</td><td class="num">{r.lueDry}</td><td class="num">{r.lueNormal}</td><td class="num">{r.lueDiff}</td><td class="num">{r.gppDry}</td><td class="num">{r.gppNormal}</td><td class="num">{r.parDry}</td><td class="num">{r.parNormal}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Table D. The daily ratio PAR / SW_in (mol MJ⁻¹) per site and pooled, over the days with a PAR of {d.method.minPar} {UPAR} or more: number of days, median, 10 and 90 % values, minimum and maximum. The pooled median is k, the factor of the Qvidja PAR.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col" class="num">Days</th><th scope="col" class="num">Median</th><th scope="col" class="num">10 %</th><th scope="col" class="num">90 %</th><th scope="col" class="num">Min</th><th scope="col" class="num">Max</th></tr>
+</thead>
+<tbody>
+{kTable.map((r) => (<tr id={r.id}><td>{r.site}</td><td class="num">{r.nDays}</td><td class="num">{r.median}</td><td class="num">{r.p10}</td><td class="num">{r.p90}</td><td class="num">{r.min}</td><td class="num">{r.max}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+## Limits and uncertainty
+
+- **Site and dryness are confounded.** All <Num k="groups.first.n.dry" digits={0} /> dry first cuts and the
+  <Num k="groups.later.n.dry" digits={0} /> dry later cut are at Qvidja (Kaarina Yltöinen station). The normal groups hold
+  episodes of {normalFirstSites} (first cuts) and {normalLaterSites} (later cuts). Qvidja differs from the other sites in its location, its data years, its grass stand and its
+  PAR source (table "Sites"). A difference between the dry and the normal group can be a difference
+  between Qvidja and the other sites. The analysis does not show that drought caused a change.
+- **Small n.** The dry first-cut group has n = <Num k="groups.first.n.dry" digits={0} />, the dry later-cut group
+  n = <Num k="groups.later.n.dry" digits={0} />. A bootstrap interval of n = <Num k="method.bootstrapMinN" digits={0} />
+  is close to the range of the three values. The permutation test has <Num k="groups.first.after.relLue.diff.nSplits" digits={0} />
+  (after) and <Num k="groups.first.late.relLue.diff.nSplits" digits={0} /> (late) possible splits; the smallest possible p
+  is thus not small. The dashed curve of Figure 2 is one episode and shows no group behaviour.
+- **Qvidja PAR from global radiation.** The Qvidja PAR is SW_in × k with one k for all days (rule 5). The ratio PAR /
+  SW_in of the other sites varies from day to day (10 to 90 % range <Num k="par.pooled.p10" digits={2} /> to
+  <Num k="par.pooled.p90" digits={2} /> mol MJ⁻¹, Table D). The relative values of a Qvidja episode do not depend on k, but
+  a day-to-day change of the true ratio is not in the Qvidja PAR. The energy fraction k / <Num k="method.parUmolPerJ" digits={2} />
+  = <Num k="par.energyFractionPct" digits={1} /> % rests on an assumed conversion. Heimsch et al. 2024 estimate PAR as
+  <Num k="literatureByKey.parFractionOfGlobal.value" digits={0} /> % of the global radiation
+  <Cite ids={['heimsch2024']} note={L('parFractionOfGlobal')} />.
+- **SPI is a station value of a calendar month.** The SPI-1 comes from the FMI station of the site, not from the site
+  <Cite ids={['spi-data']} />, and it describes the calendar month that holds the last harvest day, not the windows of the
+  episode. A harvest early in the month gets the SPI of a month that is mostly after it. The SWC anomaly (Table A) is a
+  site value, but its reference has few years at Anttila, Särkisuo and Viikki.
+- **SPI against SPEI in 2018.** The dry rule of this dive uses SPI-1 ≤ <Num k="method.spiDry" digits={1} />. June 2018 at
+  Kaarina Yltöinen has SPI-1 <Num k="summary.extra.june2018.spi1" />, thus the Qvidja cut of 12 June 2018 is a normal
+  episode here, although Heimsch et al. 2024 classify May, June and July 2018 as extremely dry by SPEI <Cite ids={['heimsch2024']} note={L('qvidja2018Drought')} />. With SPI-1 ≤
+  <Num k="sensitivity.spiMinus1.threshold" digits={1} />, it is a dry episode (Table C).
+- **Model values and negative days.** GPP is a model value of the night-time partitioning of the gap-filled NEE
+  <Cite ids={['calculated-doc']} />. On some days the daily GPP is below zero, and the relative LUE of that day is then
+  below zero; the y range of Figures 1 and 2 therefore starts at <Num k="composite.yRange.0" digits={2} />. A window
+  mean of <Num k="method.minDays" digits={0} /> or more days reduces this effect but does not remove it. A day with a PAR
+  below <Num k="method.minPar" digits={0} /> {UPAR} has no LUE.
+- **LUE is a ratio.** A low PAR raises the relative LUE at the same GPP. The dry later cut had a relative PAR of
+  <Num k="groups.later.after.relPar.dry.mean" /> (after) and <Num k="groups.later.late.relPar.dry.mean" /> (late), below
+  the normal means <Num k="groups.later.after.relPar.normal.mean" /> (SD <Num k="groups.later.after.relPar.normal.sd" />,
+  range <Num k="groups.later.after.relPar.normal.min" /> to <Num k="groups.later.after.relPar.normal.max" />) and
+  <Num k="groups.later.late.relPar.normal.mean" /> (SD <Num k="groups.later.late.relPar.normal.sd" />, range
+  <Num k="groups.later.late.relPar.normal.min" /> to <Num k="groups.later.late.relPar.normal.max" />). Its relative LUE
+  was above the normal range in the late window. Its relative GPP was <Num k="groups.later.after.relGpp.dry.mean" />
+  (after, <Num k="groups.later.after.relGpp.diff.single.sdUnits" digits={1} /> SD units above the normal mean
+  <Num k="groups.later.after.relGpp.normal.mean" />, SD <Num k="groups.later.after.relGpp.normal.sd" />, range
+  <Num k="groups.later.after.relGpp.normal.min" /> to <Num k="groups.later.after.relGpp.normal.max" />) and
+  <Num k="groups.later.late.relGpp.dry.mean" /> (late, <Num k="groups.later.late.relGpp.diff.single.sdUnits" digits={1} />
+  SD units above the normal mean <Num k="groups.later.late.relGpp.normal.mean" />, SD
+  <Num k="groups.later.late.relGpp.normal.sd" />, range <Num k="groups.later.late.relGpp.normal.min" /> to
+  <Num k="groups.later.late.relGpp.normal.max" />). GPP may respond to light in a non-linear way. The ratio GPP / PAR is
+  then an approximation.
+- **Fertilisation.** {fertCount} of the <Num k="counts.inGroups" digits={0} /> episodes in the groups have a fertilisation
+  in the days −<Num k="method.windowDays" digits={0} /> to +<Num k="method.windowDays" digits={0} /> (Table A). The dive
+  does not separate its effect.
+- **Time stamps.** The raw time stamps of Anttila, Särkisuo and Viikki are UTC. The build reads them as UTC+2
+  (<a href={`${base}data-report/#finding-ANT-01`}>ANT-01</a>, <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a>,
+  <a href={`${base}data-report/#finding-VII-01`}>VII-01</a>; status: open, waits for provider) <Cite ids={['anomaly-report']} />.
+  A local day of these sites thus holds the true local time from <Num k="method.utcShiftHours" digits={0} />:00 on that
+  date to <Num k="method.utcShiftHours" digits={0} />:00 on the next date. The daily PAR and GPP of these sites hold
+  <Num k="method.utcShiftHours" digits={0} /> hours of the next true day. The effect is not quantified here. The Qvidja
+  stamps are not part of these findings.
+- **Viikki 2024.** The gap-filled NEE of Viikki 2024 is not equal to the measured NEE where a measured value exists
+  (<a href={`${base}data-report/#finding-VII-05`}>VII-05</a>; status: known, verified, waits for provider)
+  <Cite ids={['anomaly-report']} />. The GPP of the partitioning around the 2024 Viikki harvests can thus differ from the
+  measured values. Both Viikki 2024 episodes are outside the groups: 14 June is flagged, and 31 July has a low measured
+  fraction.
+- **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
+  identify it.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `analysis/regrowth-drought/results.json`. The Python script
+<a href={`${REPO_URL}/blob/main/analysis/regrowth-drought/regrowth-drought.py`}><code>analysis/regrowth-drought/regrowth-drought.py</code></a>
+writes this file, `manifest.json` and the three SVG figures. It reads only the database snapshot built on
+{d.dataVersion.snapshot.builtAt}, `data/calculated/daily.parquet` of the same build and `data/SPI/SPI_all_stations.csv`.
+Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
+The table gives the SHA-256, the row count and the columns read of each file (the paths are relative to the `--db`,
+`--calculated` and `--spi` folders); the script stops when a hash does not agree. The folder
+<a href={`${REPO_URL}/tree/main/analysis/regrowth-drought`}><code>analysis/regrowth-drought/</code></a> has the lock
+file, the unit tests and a README.
+
+<div class="table-wrap">
+<table>
+<caption>Input files of the snapshot (database built {d.dataVersion.snapshot.builtAt}, calculated data built {d.dataVersion.snapshot.calcBuiltAt}).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col">SHA-256</th><th scope="col" class="num">Rows</th><th scope="col">Columns read</th></tr>
+</thead>
+<tbody>
+{inputs.map((r) => (<tr><td>{r.path}</td><td class="wrap"><code>{r.sha256}</code></td><td class="num">{r.rows}</td><td class="wrap"><code>{r.columns}</code></td></tr>))}
+</tbody>
+</table>
+</div>
+
+```sh
+npm run build:db && npm run calc                 # make the inputs (the hashes must agree with the script)
+uv run analysis/regrowth-drought/regrowth-drought.py --db db --calculated data/calculated --spi data/SPI
+uv run analysis/regrowth-drought/regrowth-drought.py --db db --calculated data/calculated --spi data/SPI --check
+npm run deep-dives -- --check                    # all dives, TypeScript and Python
+```

@@ -1,0 +1,398 @@
+{
+  "generatedAt": "2026-10-27T08:50:13Z",
+  "git": {
+    "commit": "546df32",
+    "dirty": true
+  },
+  "script": {
+    "path": "analysis/regrowth-drought/regrowth-drought.py",
+    "sha256": "a024fbe812544b7aa65185d7086517d7b6ded83c0ec31495bf93de93d28846d7"
+  },
+  "lock": {
+    "path": "analysis/regrowth-drought/regrowth-drought.py.lock",
+    "sha256": "4c972466e84d58d4b9c2fedc28d91830865d71af372476ab6e50b0251cb3b175"
+  },
+  "python": "3.13.5",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+  "packages": {
+    "annotated-types": "0.8.0",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "fonttools": "4.67.0",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.11.2",
+    "mypy_extensions": "1.1.0",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pandas": "3.1.0",
+    "pandera": "0.34.1",
+    "pillow": "13.0.0",
+    "pyarrow": "26.0.0",
+    "pydantic": "2.14.1",
+    "pydantic_core": "2.50.1",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "3.0.0",
+    "six": "1.17.0",
+    "typeguard": "4.6.0",
+    "typing-inspect": "0.9.0",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.5"
+  },
+  "seeds": {
+    "composite.first.dry.relGpp": 21100,
+    "composite.first.dry.relLue": 21000,
+    "composite.first.dry.relPar": 21200,
+    "composite.first.normal.relGpp": 22100,
+    "composite.first.normal.relLue": 22000,
+    "composite.first.normal.relPar": 22200,
+    "composite.later.dry.relGpp": 23100,
+    "composite.later.dry.relLue": 23000,
+    "composite.later.dry.relPar": 23200,
+    "composite.later.normal.relGpp": 24100,
+    "composite.later.normal.relLue": 24000,
+    "composite.later.normal.relPar": 24200,
+    "first.dry.after.relGpp.diff": 11102,
+    "first.dry.after.relGpp.dry": 11100,
+    "first.dry.after.relGpp.normal": 11101,
+    "first.dry.after.relLue.diff": 11002,
+    "first.dry.after.relLue.dry": 11000,
+    "first.dry.after.relLue.normal": 11001,
+    "first.dry.after.relPar.diff": 11202,
+    "first.dry.after.relPar.dry": 11200,
+    "first.dry.after.relPar.normal": 11201,
+    "first.dry.late.relGpp.diff": 11112,
+    "first.dry.late.relGpp.dry": 11110,
+    "first.dry.late.relGpp.normal": 11111,
+    "first.dry.late.relLue.diff": 11012,
+    "first.dry.late.relLue.dry": 11010,
+    "first.dry.late.relLue.normal": 11011,
+    "first.dry.late.relPar.diff": 11212,
+    "first.dry.late.relPar.dry": 11210,
+    "first.dry.late.relPar.normal": 11211,
+    "later.dry.after.relGpp.diff": 12102,
+    "later.dry.after.relGpp.dry": 12100,
+    "later.dry.after.relGpp.normal": 12101,
+    "later.dry.after.relLue.diff": 12002,
+    "later.dry.after.relLue.dry": 12000,
+    "later.dry.after.relLue.normal": 12001,
+    "later.dry.after.relPar.diff": 12202,
+    "later.dry.after.relPar.dry": 12200,
+    "later.dry.after.relPar.normal": 12201,
+    "later.dry.late.relGpp.diff": 12112,
+    "later.dry.late.relGpp.dry": 12110,
+    "later.dry.late.relGpp.normal": 12111,
+    "later.dry.late.relLue.diff": 12012,
+    "later.dry.late.relLue.dry": 12010,
+    "later.dry.late.relLue.normal": 12011,
+    "later.dry.late.relPar.diff": 12212,
+    "later.dry.late.relPar.dry": 12210,
+    "later.dry.late.relPar.normal": 12211
+  },
+  "seedRule": {
+    "seedBase": 11000,
+    "groups": "SEED_BASE + 1000 x cut group + 100 x quantity + 10 x window + dryness (0 dry, 1 normal, 2 difference)",
+    "compositeSeedBase": 21000,
+    "composite": "COMPOSITE_SEED_BASE + 2000 x cut group + 1000 x dryness + 100 x quantity + day index (0 = day -14); the seeds list gives the first seed of each curve"
+  },
+  "bootstrap": {
+    "resamples": 10000,
+    "level": 0.95,
+    "minN": 3,
+    "generator": "numpy.random.default_rng (PCG64)"
+  },
+  "args": {
+    "db": "db",
+    "calculated": "data/calculated",
+    "spi": "data/SPI",
+    "out": null,
+    "check": false
+  },
+  "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+  "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+  "snapshot": {
+    "builtAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "commit": "44ec98f",
+    "commitNote": "HEAD at build time; db/report.json does not record a commit",
+    "url": null,
+    "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+    "inputs": [
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114
+      },
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+        "rows": 26
+      },
+      {
+        "path": "db/observations.parquet",
+        "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+        "rows": 537980
+      },
+      {
+        "path": "calculated/daily.parquet",
+        "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+        "rows": 11209
+      },
+      {
+        "path": "spi/SPI_all_stations.csv",
+        "sha256": "fd61c06114fc3a59a331de89f2cd39464587db2f7df0f33df52df883c72d53b1",
+        "rows": 1683
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "path": "db/events.parquet",
+      "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+      "rows": 114,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_code",
+        "date",
+        "date_end",
+        "type",
+        "detail",
+        "crop",
+        "dry_mass_kg_ha"
+      ]
+    },
+    {
+      "path": "db/sites.parquet",
+      "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+      "rows": 6,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "code",
+        "name",
+        "utc_offset_min"
+      ]
+    },
+    {
+      "path": "db/variables.parquet",
+      "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+      "rows": 26,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "column_name",
+        "unit"
+      ]
+    },
+    {
+      "path": "db/observations.parquet",
+      "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+      "rows": 537980,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "ts_start",
+        "ppfd",
+        "sw_in",
+        "swc"
+      ]
+    },
+    {
+      "path": "calculated/daily.parquet",
+      "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
+      "rows": 11209,
+      "builtAt": "2026-10-23T19:03:09.003Z",
+      "columns": [
+        "site_code",
+        "date_local",
+        "gpp_gc",
+        "reco_gc",
+        "nee_f_gc",
+        "frac_measured"
+      ]
+    },
+    {
+      "path": "spi/SPI_all_stations.csv",
+      "sha256": "fd61c06114fc3a59a331de89f2cd39464587db2f7df0f33df52df883c72d53b1",
+      "rows": 1683,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "SPI1",
+        "SPI3",
+        "Station"
+      ]
+    }
+  ],
+  "steps": {
+    "sites": {
+      "rowsRead": 6,
+      "grassSites": [
+        "anttila",
+        "sarkisuo",
+        "qvidja",
+        "viikki"
+      ]
+    },
+    "events": {
+      "rowsRead": 114,
+      "rowsFinnishSites": 111,
+      "rowsDropped": 3,
+      "harvestCutEvents": 37,
+      "rule": "events of the five Finnish sites; harvest and cut events make the episodes"
+    },
+    "observations": {
+      "rowsRead": 274316,
+      "rowsGrassSites": 274316,
+      "perSite": {
+        "anttila": {
+          "rows": 35040,
+          "ppfdValues": 34390,
+          "swInValues": 34712,
+          "swcValues": 34880
+        },
+        "sarkisuo": {
+          "rows": 35040,
+          "ppfdValues": 30655,
+          "swInValues": 16612,
+          "swcValues": 30529
+        },
+        "qvidja": {
+          "rows": 134108,
+          "ppfdValues": 0,
+          "swInValues": 134108,
+          "swcValues": 124023
+        },
+        "viikki": {
+          "rows": 70128,
+          "ppfdValues": 66767,
+          "swInValues": 68214,
+          "swcValues": 62472
+        }
+      },
+      "rule": "30-min rows of the four grass sites (Parquet filter on site_id); local day = floor((ts_start + utc_offset_min) / 1 day), ts_start localised to UTC"
+    },
+    "daily": {
+      "rowsRead": 11209,
+      "rowsGrassSites": 5715,
+      "rowsDropped": 5494,
+      "rule": "daily rows of the four grass sites; no row is removed, a missing value is a gap"
+    },
+    "spi": {
+      "rowsRead": 1683,
+      "stations": [
+        "Kaarina Yltöinen",
+        "Kuopio Maaninka",
+        "Vantaa"
+      ],
+      "spi1Missing": 3,
+      "spi3Missing": 15,
+      "rule": "one row per station and month; no row is removed"
+    },
+    "dailyPar": {
+      "minHalfHours": 40,
+      "halfHoursPerDay": 48,
+      "dayFactor": 0.08639999999999999,
+      "minPar": 5.0,
+      "daysParBelowMin": 1806,
+      "perSite": {
+        "anttila": {
+          "dailyRows": 730,
+          "firstDay": "2022-01-01",
+          "lastDay": "2023-12-31",
+          "daysWithGpp": 730,
+          "localDays": 730,
+          "daysWithPar": 724,
+          "daysWithSwc": 724,
+          "parSource": "ppfd",
+          "daysWithGppAndPar": 724,
+          "daysParBelowMin": 253,
+          "daysWithLue": 471
+        },
+        "sarkisuo": {
+          "dailyRows": 730,
+          "firstDay": "2022-01-01",
+          "lastDay": "2023-12-31",
+          "daysWithGpp": 705,
+          "localDays": 730,
+          "daysWithPar": 632,
+          "daysWithSwc": 629,
+          "parSource": "ppfd",
+          "daysWithGppAndPar": 632,
+          "daysParBelowMin": 258,
+          "daysWithLue": 374
+        },
+        "qvidja": {
+          "dailyRows": 2794,
+          "firstDay": "2018-05-09",
+          "lastDay": "2025-12-31",
+          "daysWithGpp": 2794,
+          "localDays": 2794,
+          "daysWithPar": 2794,
+          "daysWithSwc": 2571,
+          "parSource": "sw_in x k",
+          "daysWithGppAndPar": 2794,
+          "daysParBelowMin": 877,
+          "daysWithLue": 1917
+        },
+        "viikki": {
+          "dailyRows": 1461,
+          "firstDay": "2022-01-01",
+          "lastDay": "2025-12-31",
+          "daysWithGpp": 1461,
+          "localDays": 1461,
+          "daysWithPar": 1405,
+          "daysWithSwc": 1294,
+          "parSource": "ppfd",
+          "daysWithGppAndPar": 1405,
+          "daysParBelowMin": 418,
+          "daysWithLue": 987
+        }
+      },
+      "rule": "daily PAR = mean ppfd x 0.0864 (mol m-2 d-1), daily SW_in = mean sw_in x 0.0864 (MJ m-2 d-1), daily swc = mean swc; a day counts with 40 or more of 48 half hours; LUE = GPP / PAR on the days with PAR >= 5 mol m-2 d-1"
+    },
+    "episodes": {
+      "harvestCutEpisodes": 33,
+      "perGroup": {
+        "silageHarvest": 25,
+        "cleaningCut": 4,
+        "grainHarvest": 4
+      },
+      "silageEpisodes": 25,
+      "usedFlux": 20,
+      "used": 19,
+      "excluded": {
+        "overlap": 0,
+        "too-few-days": 2,
+        "low-measured-fraction": 3,
+        "too-few-par-days": 1
+      },
+      "flagged": 2,
+      "inGroups": 17,
+      "overridesApplied": 5,
+      "rule": "silage harvest episodes; used when no overlap, 12 or more days per window, measured fraction 0.10 or more (Deep Dive #7) and 12 or more LUE days in the reference window; a flagged episode is not in the groups"
+    }
+  },
+  "outputs": {
+    "results.json": "dcdf891911fbb765245ceeed28bd4f07c0bf29a240e2fdeb7eb8e7f7e2d150fe",
+    "figures": {
+      "figures/1-first-cut.svg": {
+        "sha256": "4513bb471515e4b01197f82e58a93aa5ea342067176cd6aa0b67bb5f921a1345",
+        "sha256WithoutMetadata": "f99a0770503d8523dad086a8ea52dfade380c0eac9d53acd6f2ad17e0b4ea95f"
+      },
+      "figures/2-later-cuts.svg": {
+        "sha256": "5eacd39dea3a28a3a68822d12968e9038afc79c684340d363090e5e5ba596fd6",
+        "sha256WithoutMetadata": "3717c9603c2535b0e9fea19361f8c2b6a0193a71b2153a69581b5ff2f9aae785"
+      },
+      "figures/3-late-lue-vs-spi.svg": {
+        "sha256": "912aaed8bb69f4692b1942a92766dd2c80e69f85554598b164c988f92d0f94b6",
+        "sha256WithoutMetadata": "0efa2664b24ea7f85a66b2c4b2ef31ed66483d1e4a925b00160aa1499ce4e65d"
+      }
+    }
+  }
+}

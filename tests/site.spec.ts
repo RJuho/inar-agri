@@ -1923,6 +1923,63 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
+  test('the regrowth and drought dive (Python) has three figures, the episode rows, the four tables and SVG downloads', async ({ page, request }) => {
+    const slug = 'regrowth-drought';
+    await page.goto(`/deep-dive/${slug}/`);
+    await expect(page.locator('h1')).toContainText('Regrowth');
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #8');
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    // Three matplotlib figures: first cuts, later cuts, late LUE against SPI-1.
+    const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
+    expect(await figures.count()).toBe(3);
+    for (const svg of await figures.all()) {
+      const info = await svg.evaluate((el) => {
+        const [first, second] = [el.children[0], el.children[1]];
+        return {
+          labelledby: el.getAttribute('aria-labelledby') ?? '',
+          ariaLabel: el.getAttribute('aria-label'),
+          first: first?.tagName.toLowerCase(),
+          second: second?.tagName.toLowerCase(),
+          titleId: first?.id ?? '',
+          descId: second?.id ?? '',
+          title: first?.textContent?.trim() ?? '',
+          desc: second?.textContent?.trim() ?? '',
+        };
+      });
+      expect(info.first).toBe('title');
+      expect(info.second).toBe('desc');
+      expect(info.title.length).toBeGreaterThan(0);
+      expect(info.desc.length).toBeGreaterThan(0);
+      expect(info.labelledby.split(/\s+/)).toEqual([info.titleId, info.descId]);
+      expect(info.ariaLabel).toBeNull();
+    }
+    const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(downloads.length).toBe(3);
+    for (const href of downloads) {
+      expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
+      const res = await request.get(href);
+      expect(res.status(), href).toBe(200);
+      expect(res.headers()['content-type'] ?? '', href).toContain('svg');
+    }
+    // All 25 silage episodes, the folded method rules, the group, sensitivity, k and site tables, and the numbers from the JSON.
+    expect(await page.locator('tr[id^="episode-"]').count()).toBeGreaterThanOrEqual(25);
+    await expect(page.locator('details.dd-table')).toHaveCount(1);
+    expect(await page.locator('#method-rules ol li').count()).toBe(9);
+    expect(await page.locator('tr[id^="group-"]').count()).toBe(12);
+    expect(await page.locator('tr[id^="sens-"]').count()).toBe(16);
+    expect(await page.locator('tr[id^="k-"]').count()).toBe(4);
+    expect(await page.locator('tr[id^="site-"]').count()).toBe(4);
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(100);
+    // Every number resolved: no "undefined" or "NaN" in the page text.
+    const text = await page.locator('main').innerText();
+    expect(text).not.toMatch(/\bundefined\b|\bNaN\b/);
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    await expectOnlyUpdateScript(page);
+  });
+
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -1940,7 +1997,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);
