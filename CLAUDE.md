@@ -70,6 +70,11 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 - Key continuous columns: `FC` (-8.2375), `CO2` (395.027), `H2O` (21.2876), `H` (254.98), `LE` (-9999), `USTAR` (0.58), `WS`, `WD` (48.3), `TA_1_1_1` (27.43), `RH_1_1_1` (59.79), `PA_1_1_1` (89.7), `P_RAIN_1_1_1` (0), `SW_IN_1_1_1` (754.7), `NETRAD_1_1_1`, `NDVI_1_1_1` (0.3647), `SWC_1_1_1` (0.0845), `TS_1_1_1` (26.49), `G_1_1_1` (19.85), `SWP_2_1_1` (-933.4).
 - Site: -3.425833, 38.139444 (project team, 2026-10-22; earlier value -3.425859, 38.140663), UTC+3, maize 80 % and vegetables 20 %, EC height 3.3 m. `Ancillary_KE-Mkt.csv` is a key/value metadata file in Windows-1252 encoding. `BADM-Site-General-Info-KE-Mkt.xlsx` is the AmeriFlux BADM template.
 
+### SMEAR II Hyytiälä (`data/smear/hyytiala/`, reference forest of Deep Dive #9)
+
+- Not in git. Twelve CSV files, one per year 2020 to 2025, 30-minute step, 17 521 or 17 569 lines (header + rows), comma delimiter, columns `Year,Month,Day,Hour,Minute,Second` and the variable: `HYY_EDDY233_NEE_GPP_<year>.csv` (`HYY_EDDY233.GPP`, `HYY_EDDY233.NEE`, µmol CO2 m-2 s-1, gap-filled, NEE positive = emission, GPP positive, Reco = NEE + GPP, no missing values) and `HYY_EDDYMAST_F_c_270_<year>.csv` (`HYY_EDDYMAST.F_c_270`, measured CO2 flux at 27 m, missing value `NaN`; used only for the measured fraction). Times are UTC+2 all year.
+- Source: SMEAR API https://smear-backend-avaa-smear-prod.2.rahtiapp.fi/ (OpenAPI description `data/smear-openapi.yml`), station id 2 (Hyytiälä, 61.847463 N, 24.294795 E, 179 m), endpoint `/search/timeseries/csv?tablevariable=<table>.<variable>&from=...&to=...`. The download commands are in `data/smear/hyytiala/README.md`. Method of the gap filling and partitioning: Kulmala et al. 2019 (doi 10.1016/j.agrformet.2019.02.029), reference ids `smear-hyytiala` and `kulmala2019` in `EXTRA_REFERENCES`.
+
 ### Management events (`data/Agri_site_management_events 2018-2025.xlsx`)
 
 - Sheet1, 172 rows, 8 sites (Anttila, Jokioinen, Pappilansuo, Ruukki NorMi, Särkisuo, Qvidja, Ruukki Norpeat, Viikki), 2018 to 2025. Sheets 2 and 3 are empty. Read with the DuckDB `excel` extension: `read_xlsx(path, all_varchar=true, header=false, range='A1:J173')`.

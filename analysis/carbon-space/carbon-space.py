@@ -50,7 +50,21 @@ METHOD
        Reco/GPP over the Figure 1 site-years, and of the uptake shares over the Figure 2
        site-years (whole year, June to August, peak-GPP window). A third summary gives the annual crops without Maktau (Finnish crops only).
     7. Each step that removes rows logs a count (results.json dataVersion.steps).
-    8. Open findings of docs/anomaly-data-report.md that touch this dive are printed
+    8. Reference site SMEAR II Hyytiala (boreal Scots pine forest, rare management; Figures 4 and
+       5): files of the SMEAR API in --smear (data/smear/hyytiala/README.md), 2020 to 2025.
+       HYY_EDDY233.NEE (gap-filled, positive = emission) and HYY_EDDY233.GPP (positive) in
+       umol CO2 m-2 s-1, Reco = NEE + GPP. The time stamps are local time (UTC+2 all year) and
+       mark the start of the half hour (the first stamp of a file is 1 January 00:00, the last
+       31 December 23:30). Daily sums use the same factor as the other sites (1800 s x 12.011e-6
+       g C umol-1). A daily or annual sum is NULL when a half hour has no value. The measured
+       fraction comes from HYY_EDDYMAST.F_c_270 (measured CO2 flux at 27 m; "NaN" or empty =
+       missing): daily = measured half hours / 48, annual = measured half hours / all half
+       hours; longest gap = the longest run of half hours without a measured value, in days.
+       full year = all days of the year have 48 half hours; reliable = the rule of step 1. The
+       inclusion rule, the uptake shares and the peak window are the same as for the other
+       sites. Hyytiala is not in the groups grassland and annual crop; it is the group forest.
+       It has no events.
+    9. Open findings of docs/anomaly-data-report.md that touch this dive are printed
        (OPEN_FINDINGS). The script uses no literature value, thus it has no LITERATURE table.
 
 DATABASE
@@ -64,6 +78,18 @@ INPUTS
     db/events.parquet  sha256=b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b  rows=114  columns=site_code, date, type, crop
     calculated/annual.csv  sha256=27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe  rows=33  columns=site_code, year, full_year, reliable, frac_measured, longest_gap_days, n_gpp, nee_f_gc, gpp_gc, reco_gc
     calculated/daily.parquet  sha256=fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9  rows=11209  columns=site_code, date_local, nee_f_gc, gpp_gc, reco_gc, frac_measured
+    smear/HYY_EDDY233_NEE_GPP_2020.csv  sha256=75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
+    smear/HYY_EDDYMAST_F_c_270_2020.csv  sha256=fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
+    smear/HYY_EDDY233_NEE_GPP_2021.csv  sha256=468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
+    smear/HYY_EDDYMAST_F_c_270_2021.csv  sha256=5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
+    smear/HYY_EDDY233_NEE_GPP_2022.csv  sha256=4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
+    smear/HYY_EDDYMAST_F_c_270_2022.csv  sha256=c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
+    smear/HYY_EDDY233_NEE_GPP_2023.csv  sha256=cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
+    smear/HYY_EDDYMAST_F_c_270_2023.csv  sha256=95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
+    smear/HYY_EDDY233_NEE_GPP_2024.csv  sha256=2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
+    smear/HYY_EDDYMAST_F_c_270_2024.csv  sha256=b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
+    smear/HYY_EDDY233_NEE_GPP_2025.csv  sha256=55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
+    smear/HYY_EDDYMAST_F_c_270_2025.csv  sha256=39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
 
 OUTPUTS
     results.json                 all result numbers, figure captions and alt texts, dataVersion
@@ -71,12 +97,15 @@ OUTPUTS
     figures/1-carbon-space.svg   annual Reco against annual GPP, one marker per site-year
     figures/2-uptake-days.svg    share of uptake days per site-year, whole year and JJA
     figures/3-uptake-days-peak.svg  as Figure 2, second bar = the 90-day window with the largest GPP
+    figures/4-carbon-space-forest.svg  Figure 1 plus the Hyytiala forest site-years
+    figures/5-uptake-days-peak-forest.svg  Figure 3 plus the Hyytiala forest site-years
     output/run.log               run log (not in git)
     output/site-years.csv        all site-years with the numbers (not in git)
     With --check, all outputs go to output/ and the script compares them with the committed files.
 
 RUN
-    uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated
+    uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated \
+        --smear data/smear/hyytiala
 
 NOTES
     The local days of Anttila, Sarkisuo and Viikki start at 02:00 true local time (open findings
@@ -133,7 +162,7 @@ DATABASE: dict[str, str | None] = {
 
 @dataclass(frozen=True)
 class InputFile:
-    """One input file. `root` is "db" or "calculated" (the folder of --db or --calculated).
+    """One input file. `root` is "db", "calculated" or "smear" (--db, --calculated, --smear).
     A CSV file has no built_at (None); its rows are the data lines after the header."""
 
     root: str
@@ -196,6 +225,156 @@ INPUTS: tuple[InputFile, ...] = (
         ("site_code", "date_local", "nee_f_gc", "gpp_gc", "reco_gc", "frac_measured"),
         "2026-10-23T19:03:09.003Z",
     ),
+    InputFile(
+        "smear",
+        "HYY_EDDY233_NEE_GPP_2020.csv",
+        "75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20",
+        17568,
+        (
+            "Year",
+            "Month",
+            "Day",
+            "Hour",
+            "Minute",
+            "Second",
+            "HYY_EDDY233.GPP",
+            "HYY_EDDY233.NEE",
+        ),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDYMAST_F_c_270_2020.csv",
+        "fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2",
+        17568,
+        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDY233_NEE_GPP_2021.csv",
+        "468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5",
+        17520,
+        (
+            "Year",
+            "Month",
+            "Day",
+            "Hour",
+            "Minute",
+            "Second",
+            "HYY_EDDY233.GPP",
+            "HYY_EDDY233.NEE",
+        ),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDYMAST_F_c_270_2021.csv",
+        "5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d",
+        17520,
+        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDY233_NEE_GPP_2022.csv",
+        "4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb",
+        17520,
+        (
+            "Year",
+            "Month",
+            "Day",
+            "Hour",
+            "Minute",
+            "Second",
+            "HYY_EDDY233.GPP",
+            "HYY_EDDY233.NEE",
+        ),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDYMAST_F_c_270_2022.csv",
+        "c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762",
+        17520,
+        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDY233_NEE_GPP_2023.csv",
+        "cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914",
+        17520,
+        (
+            "Year",
+            "Month",
+            "Day",
+            "Hour",
+            "Minute",
+            "Second",
+            "HYY_EDDY233.GPP",
+            "HYY_EDDY233.NEE",
+        ),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDYMAST_F_c_270_2023.csv",
+        "95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a",
+        17520,
+        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDY233_NEE_GPP_2024.csv",
+        "2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a",
+        17568,
+        (
+            "Year",
+            "Month",
+            "Day",
+            "Hour",
+            "Minute",
+            "Second",
+            "HYY_EDDY233.GPP",
+            "HYY_EDDY233.NEE",
+        ),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDYMAST_F_c_270_2024.csv",
+        "b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3",
+        17568,
+        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDY233_NEE_GPP_2025.csv",
+        "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
+        17520,
+        (
+            "Year",
+            "Month",
+            "Day",
+            "Hour",
+            "Minute",
+            "Second",
+            "HYY_EDDY233.GPP",
+            "HYY_EDDY233.NEE",
+        ),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDYMAST_F_c_270_2025.csv",
+        "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
+        17520,
+        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
+        None,
+    ),
 )
 
 # Units. daily.parquet and annual.csv have no unit field. The key/value metadata "constants" of
@@ -225,6 +404,18 @@ JJA = (6, 7, 8)
 PEAK_DAYS = 90  # length of the peak-GPP window (local days)
 PEAK_MIN_GPP_DAYS = 80  # a valid window has GPP on this many of its days or more
 GROUPS = ("grassland", "annual crop")
+# Reference site (not in the harmonised database): SMEAR II Hyytiala.
+REF_SITE = "hyytiala"
+REF_NAME = "Hyytiälä"
+REF_SOURCE = "SMEAR II, HYY_EDDY233"
+REF_GROUP = "forest"
+REF_CROP = ("boreal forest", REF_GROUP, None)
+REF_YEARS = tuple(range(2020, 2026))
+REF_FLUX_COLS = ("HYY_EDDY233.GPP", "HYY_EDDY233.NEE")
+REF_MEAS_COL = "HYY_EDDYMAST.F_c_270"
+REF_TIME_COLS = ("Year", "Month", "Day", "Hour", "Minute", "Second")
+HH_TO_GC = 1800 * 12.011e-6  # g C m-2 per 30-min value of 1 umol CO2 m-2 s-1
+HALF_HOURS_PER_DAY = 48
 REASONS = (
     "no flux data",
     "partial year",
@@ -335,12 +526,24 @@ MM = 1 / 25.4
 FIG_WIDTH_IN = 180 * MM
 FIG1_HEIGHT_IN = 150 * MM
 FIG2_HEIGHT_IN = 100 * MM
+FIG5_HEIGHT_IN = 110 * MM
 # Figure 2 slots: a crop word longer than SLOT_CHARS widens its slot by SLOT_PER_CHAR per
 # character, so that the crop words below the years do not overlap. SITE_GAP = space between sites.
 SLOT_CHARS = 5
 SLOT_PER_CHAR = 0.2
 SITE_GAP = 0.4
-FIGURES = ((1, "carbon-space"), (2, "uptake-days"), (3, "uptake-days-peak"))
+FIGURES = (
+    (1, "carbon-space"),
+    (2, "uptake-days"),
+    (3, "uptake-days-peak"),
+    (4, "carbon-space-forest"),
+    (5, "uptake-days-peak-forest"),
+)
+# Style of the reference site: Okabe-Ito bluish green and a star (not a slot of sites.parquet).
+REF_COLOR = "#009e73"
+REF_MARKER = "*"
+REF_MARKER_SIZE = 19
+REF_LEGEND = "Hyytiälä\n(forest)"
 AXIS_STEP = 100.0  # g C m-2 yr-1; the axis range of Figure 1 is a multiple of this
 AXIS_PAD = 120.0  # g C m-2 yr-1 of free space around the markers
 NEE_GUIDES = (-200.0, -400.0)
@@ -350,6 +553,16 @@ Y_LABEL_2 = "Days with net uptake (%)"
 FIG1_TITLE = (
     "Annual ecosystem respiration (Reco) against annual gross primary production (GPP), "
     "one marker per site-year; below the 1:1 line the site-year was a net CO2 sink."
+)
+FIG4_TITLE = (
+    "Annual Reco against annual GPP, one marker per site-year, with the SMEAR II Hyytiälä "
+    "forest (rare management) as a reference; below the 1:1 line the site-year was a net CO2 "
+    "sink."
+)
+FIG5_TITLE = (
+    "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year "
+    "and over the 90-day window with the largest GPP sum, with the SMEAR II Hyytiälä forest "
+    "as a reference."
 )
 FIG3_TITLE = (
     "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year "
@@ -378,6 +591,17 @@ LABEL_OFFSETS: dict[str, tuple[float, float, str]] = {
     "viikki-2025": (-11, 0, "right"),
     "maktau-2019": (11, 0, "left"),
 }
+# Figure 4: the Hyytiala markers form a cluster near Anttila. Offsets of Figure 4 that differ
+# from LABEL_OFFSETS, and the Hyytiala labels.
+# Only 2020 (the source year) and the cluster 2021 to 2025 get a label; the other Hyytiala
+# markers have none (the values are in the alt text and in results.json).
+LABEL_OFFSETS_FOREST: dict[str, tuple[float, float, str]] = {
+    "hyytiala-2020": (-10, 12, "right"),
+    "hyytiala-2025": (12, -14, "left"),
+}
+LABEL_TEXT_FOREST = {"hyytiala-2025": "2021–2025"}
+# The Hyytiala stars are drawn below the markers of the six sites (they are the reference).
+REF_ZORDER = 2.5
 # Labels in two lines (break before the bracket).
 WRAP_LABELS = frozenset({"haltiala-2023"})
 
@@ -405,15 +629,15 @@ def csv_data_rows(path: Path) -> int:
         return sum(1 for _ in f) - 1
 
 
-def input_path(inp: InputFile, db: Path, calculated: Path) -> Path:
-    return {"db": db, "calculated": calculated}[inp.root] / inp.file
+def input_path(inp: InputFile, db: Path, calculated: Path, smear: Path) -> Path:
+    return {"db": db, "calculated": calculated, "smear": smear}[inp.root] / inp.file
 
 
-def check_inputs(db: Path, calculated: Path) -> list[str]:
+def check_inputs(db: Path, calculated: Path, smear: Path) -> list[str]:
     """Check each input: exists, SHA-256, Parquet built_at, row count. Returns the error list."""
     errors: list[str] = []
     for inp in INPUTS:
-        path = input_path(inp, db, calculated)
+        path = input_path(inp, db, calculated, smear)
         if not path.is_file():
             errors.append(f"{inp.key}: file not found at {path}")
             continue
@@ -731,6 +955,8 @@ class Data:
     events: pd.DataFrame
     annual: pd.DataFrame
     daily: pd.DataFrame
+    ref_daily: pd.DataFrame
+    ref_annual: pd.DataFrame
     steps: dict[str, Any]
 
 
@@ -827,14 +1053,160 @@ def read_daily(calculated: Path, steps: dict[str, Any]) -> pd.DataFrame:
     return daily
 
 
-def read_data(db: Path, calculated: Path) -> Data:
+def longest_run(missing: np.ndarray) -> int:
+    """Length of the longest run of True values."""
+    best = run = 0
+    for m in missing:
+        run = run + 1 if m else 0
+        best = max(best, run)
+    return best
+
+
+def hyytiala_tables(
+    flux: pd.DataFrame, meas: pd.DataFrame, year: int
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Daily table and annual row of one Hyytiala year from the 30-min rows of the two files.
+
+    `flux` has the columns ts, nee, gpp (umol m-2 s-1); `meas` has ts, fc. ts = local period
+    start. A daily or annual sum is NaN when a half hour has no value."""
+    hh = flux.merge(meas, on="ts", how="outer", validate="one_to_one").sort_values("ts")
+    hh["reco"] = hh["nee"] + hh["gpp"]
+    hh["date_local"] = hh["ts"].dt.date
+    days = pd.date_range(f"{year}-01-01", f"{year}-12-31", freq="D").date
+
+    def day_sum(c: pd.Series) -> float:
+        return float(c.sum()) * HH_TO_GC if c.notna().all() else math.nan
+
+    g = hh.groupby("date_local")
+    daily = pd.DataFrame(
+        {
+            "nee_f_gc": g["nee"].agg(day_sum),
+            "gpp_gc": g["gpp"].agg(day_sum),
+            "reco_gc": g["reco"].agg(day_sum),
+            "frac_measured": g["fc"].agg(
+                lambda c: c.notna().sum() / HALF_HOURS_PER_DAY
+            ),
+            "n": g["nee"].size(),
+        }
+    ).reindex(list(days))
+    daily = daily.rename_axis("date_local").reset_index()
+    daily["site_code"] = REF_SITE
+    daily["year"] = year
+    daily["month"] = [d.month for d in col(daily, "date_local")]
+    full_year = (
+        bool((col(daily, "n") == HALF_HOURS_PER_DAY).all())
+        and len(hh) == len(days) * HALF_HOURS_PER_DAY
+    )
+
+    def year_sum(c: str) -> float | None:
+        v = col(daily, c)
+        return float(v.sum()) if v.notna().all() else None
+
+    measured = col(hh, "fc").notna().to_numpy()
+    frac = float(measured.sum() / len(hh))
+    gap = longest_run(~measured) / HALF_HOURS_PER_DAY
+    annual = {
+        "site_code": REF_SITE,
+        "year": year,
+        "full_year": full_year,
+        "reliable": reliable_rule(frac, gap),
+        "frac_measured": frac,
+        "longest_gap_days": gap,
+        "n_gpp": int(col(hh, "gpp").notna().sum()),
+        "nee_f_gc": year_sum("nee_f_gc"),
+        "gpp_gc": year_sum("gpp_gc"),
+        "reco_gc": year_sum("reco_gc"),
+    }
+    return frame(daily.drop(columns=["n"])), annual
+
+
+def read_smear_csv(path: Path, value_cols: tuple[str, ...]) -> pd.DataFrame:
+    """One SMEAR API CSV with the local time stamp `ts`. Checks the header and the 30-min axis."""
+    df = pd.read_csv(path, na_values=["NaN", ""], keep_default_na=False)
+    if tuple(df.columns) != REF_TIME_COLS + value_cols:
+        raise InputError(f"{path.name}: header {tuple(df.columns)}")
+    t = df[list(REF_TIME_COLS)].to_numpy(dtype=np.int64)
+    ymd = t[:, 0] * 10000 + t[:, 1] * 100 + t[:, 2]
+    secs = t[:, 3] * 3600 + t[:, 4] * 60 + t[:, 5]
+    ts = pd.Series(
+        pd.to_datetime(ymd.astype(str), format="%Y%m%d")
+        + pd.to_timedelta(secs, unit="s")
+    )
+    year = int(t[0, 0])
+    expected = pd.date_range(f"{year}-01-01 00:00", f"{year}-12-31 23:30", freq="30min")
+    if len(ts) != len(expected) or not (ts.to_numpy() == expected.to_numpy()).all():
+        raise InputError(
+            f"{path.name}: the time axis is not 30-min steps over the year"
+        )
+    out = pd.DataFrame({"ts": ts})
+    for c in value_cols:
+        out[c] = pd.Series(pd.to_numeric(col(df, c), errors="raise"), dtype=float)
+    return out
+
+
+def read_hyytiala(
+    smear: Path, steps: dict[str, Any]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    dailies: list[pd.DataFrame] = []
+    annual: list[dict[str, Any]] = []
+    per_year: dict[str, Any] = {}
+    for y in REF_YEARS:
+        f = read_smear_csv(smear / f"HYY_EDDY233_NEE_GPP_{y}.csv", REF_FLUX_COLS)
+        m = read_smear_csv(smear / f"HYY_EDDYMAST_F_c_270_{y}.csv", (REF_MEAS_COL,))
+        n_nee = int(col(f, "HYY_EDDY233.NEE").isna().sum())
+        n_gpp = int(col(f, "HYY_EDDY233.GPP").isna().sum())
+        n_meas = int(col(m, REF_MEAS_COL).notna().sum())
+        flux = pd.DataFrame(
+            {"ts": f["ts"], "nee": f["HYY_EDDY233.NEE"], "gpp": f["HYY_EDDY233.GPP"]}
+        )
+        meas = pd.DataFrame({"ts": m["ts"], "fc": m[REF_MEAS_COL]})
+        d, a = hyytiala_tables(flux, meas, y)
+        dailies.append(d)
+        annual.append(a)
+        per_year[str(y)] = {
+            "halfHours": len(f),
+            "neeMissing": n_nee,
+            "gppMissing": n_gpp,
+            "measuredHalfHours": n_meas,
+        }
+        log.info(
+            "hyytiala %d: %d half hours, NEE missing %d, GPP missing %d, measured F_c %d "
+            "(%.3f); GPP %s, NEE %s g C m-2 yr-1",
+            y,
+            len(f),
+            n_nee,
+            n_gpp,
+            n_meas,
+            a["frac_measured"],
+            fmt(a["gpp_gc"]),
+            fmt(a["nee_f_gc"]),
+        )
+        if a["nee_f_gc"] is not None and a["nee_f_gc"] > 0:
+            log.info(
+                "note: Hyytiala %d is a net source (NEE %s g C m-2 yr-1), unusual for this "
+                "forest; the script keeps the values of the SMEAR API",
+                y,
+                fmt(a["nee_f_gc"]),
+            )
+    steps["hyytiala"] = {
+        "source": REF_SOURCE,
+        "years": per_year,
+        "rule": "no row is removed; a half hour without NEE or GPP makes the daily and annual "
+        "sum NULL; NaN or empty F_c_270 = not measured",
+    }
+    return frame(pd.concat(dailies, ignore_index=True)), pd.DataFrame(annual)
+
+
+def read_data(db: Path, calculated: Path, smear: Path) -> Data:
     steps: dict[str, Any] = {}
     names = read_sites(db)
+    names[REF_SITE] = REF_NAME
     slots = {s: i for i, s in enumerate(ALL_SITES)}
     events = read_events(db, steps)
     annual = read_annual(calculated, steps)
     daily = read_daily(calculated, steps)
-    return Data(names, slots, events, annual, daily, steps)
+    ref_daily, ref_annual = read_hyytiala(smear, steps)
+    return Data(names, slots, events, annual, daily, ref_daily, ref_annual, steps)
 
 
 # ======================================================================================
@@ -849,59 +1221,106 @@ def peak_share(r: dict[str, Any]) -> float | None:
     return None if p is None else p["share"]
 
 
+def site_year_row(
+    r: dict[str, Any],
+    d: pd.DataFrame,
+    name: str,
+    crop_info: tuple[str, str, str | None],
+    counts: dict[str, int] | None,
+) -> tuple[dict[str, Any], list[float]]:
+    """One site-year: flags, annual sums, uptake shares; `r` = annual row, `d` = its daily rows.
+    `counts` = None for the reference site (no events). Also returns the relative differences
+    of the annual-daily sum check."""
+    site, year = str(r["site_code"]), int(r["year"])
+    rels: list[float] = []
+    gpp, reco, nee = nn(r["gpp_gc"]), nn(r["reco_gc"]), nn(r["nee_f_gc"])
+    for var, ann, dcol in (
+        ("nee", nee, "nee_f_gc"),
+        ("gpp", gpp, "gpp_gc"),
+        ("reco", reco, "reco_gc"),
+    ):
+        chk = sum_check(ann, [nn(x) for x in col(d, dcol)])
+        if not chk["ok"]:
+            raise InputError(
+                f"{site} {year} {var}: annual sum {ann} does not agree with the daily values"
+            )
+        if chk["relDiff"] is not None:
+            rels.append(chk["relDiff"])
+    frac = float(r["frac_measured"])
+    gap = float(r["longest_gap_days"])
+    has_sums = gpp is not None and reco is not None
+    reasons = {
+        f: exclusion_reasons(frac, bool(r["full_year"]), gap, has_sums, f)
+        for f in (1, 2)
+    }
+    whole = uptake_share([nn(x) for x in col(d, "nee_f_gc")])
+    jja = uptake_share(
+        [
+            nn(x)
+            for x in col(
+                frame(d[col(d, "month").isin(JJA)]),
+                "nee_f_gc",
+            )
+        ]
+    )
+    full = year_days(d, year)
+    peak = peak_window(
+        list(col(full, "date_local")),
+        [nn(x) for x in col(full, "gpp_gc")],
+        [nn(x) for x in col(full, "nee_f_gc")],
+        [nn(x) for x in col(full, "frac_measured")],
+    )
+    crop, group, label = crop_info
+    row: dict[str, Any] = {
+        "key": site_year_key(site, year),
+        "site": site,
+        "siteName": name,
+        "year": year,
+        "crop": crop,
+        "group": group,
+        "cropLabel": label,
+        "inFig1": not reasons[1],
+        "inFig2": not reasons[2],
+        "exclusionFig1": "; ".join(reasons[1]) or None,
+        "exclusionFig2": "; ".join(reasons[2]) or None,
+        "fullYear": bool(r["full_year"]),
+        "reliable": bool(r["reliable"]),
+        "fracMeasured": frac,
+        "longestGapDays": gap,
+        "gpp": gpp,
+        "reco": reco,
+        "nee": nee,
+        "recoGppRatio": (reco / gpp) if reco is not None and gpp else None,
+        "uptake": {
+            "year": whole,
+            "jja": jja,
+            "peak": peak,
+        },
+    }
+    if counts is None:
+        row["source"] = REF_SOURCE
+    else:
+        row["events"] = counts
+        row["eventsTotal"] = int(sum(counts.values()))
+    return row, rels
+
+
 def analyse(data: Data) -> dict[str, Any]:
     steps = data.steps
     rows: list[dict[str, Any]] = []
     max_rel = 0.0
     n_sum_checks = 0
-    for r in data.annual.sort_values(
+    sorted_annual = data.annual.sort_values(
         ["site_code", "year"],
         key=lambda c: c.map(ALL_SITES.index) if c.name == "site_code" else c,
-    ).to_dict("records"):
+    )
+    for r in sorted_annual.to_dict("records"):
         site, year = str(r["site_code"]), int(r["year"])
         d = frame(
             data.daily[
                 (col(data.daily, "site_code") == site)
                 & (col(data.daily, "year") == year)
             ]
-        )
-        gpp, reco, nee = nn(r["gpp_gc"]), nn(r["reco_gc"]), nn(r["nee_f_gc"])
-        for name, ann, dcol in (
-            ("nee", nee, "nee_f_gc"),
-            ("gpp", gpp, "gpp_gc"),
-            ("reco", reco, "reco_gc"),
-        ):
-            chk = sum_check(ann, [nn(x) for x in col(d, dcol)])
-            if not chk["ok"]:
-                raise InputError(
-                    f"{site} {year} {name}: annual sum {ann} does not agree with the daily values"
-                )
-            if chk["relDiff"] is not None:
-                n_sum_checks += 1
-                max_rel = max(max_rel, chk["relDiff"])
-        frac = float(r["frac_measured"])
-        gap = float(r["longest_gap_days"])
-        has_sums = gpp is not None and reco is not None
-        reasons = {
-            f: exclusion_reasons(frac, bool(r["full_year"]), gap, has_sums, f)
-            for f in (1, 2)
-        }
-        whole = uptake_share([nn(x) for x in col(d, "nee_f_gc")])
-        jja = uptake_share(
-            [
-                nn(x)
-                for x in col(
-                    frame(d[col(d, "month").isin(JJA)]),
-                    "nee_f_gc",
-                )
-            ]
-        )
-        full = year_days(d, year)
-        peak = peak_window(
-            list(col(full, "date_local")),
-            [nn(x) for x in col(full, "gpp_gc")],
-            [nn(x) for x in col(full, "nee_f_gc")],
-            [nn(x) for x in col(full, "frac_measured")],
         )
         ev = frame(
             data.events[
@@ -910,37 +1329,10 @@ def analyse(data: Data) -> dict[str, Any]:
             ]
         )
         counts = {t: int((col(ev, "type") == t).sum()) for t in EVENT_TYPES}
-        crop, group, label = CROPS[(site, year)]
-        rows.append(
-            {
-                "key": site_year_key(site, year),
-                "site": site,
-                "siteName": data.names[site],
-                "year": year,
-                "crop": crop,
-                "group": group,
-                "cropLabel": label,
-                "inFig1": not reasons[1],
-                "inFig2": not reasons[2],
-                "exclusionFig1": "; ".join(reasons[1]) or None,
-                "exclusionFig2": "; ".join(reasons[2]) or None,
-                "fullYear": bool(r["full_year"]),
-                "reliable": bool(r["reliable"]),
-                "fracMeasured": frac,
-                "longestGapDays": gap,
-                "gpp": gpp,
-                "reco": reco,
-                "nee": nee,
-                "recoGppRatio": (reco / gpp) if reco is not None and gpp else None,
-                "uptake": {
-                    "year": whole,
-                    "jja": jja,
-                    "peak": peak,
-                },
-                "events": counts,
-                "eventsTotal": int(sum(counts.values())),
-            }
-        )
+        row, rels = site_year_row(r, d, data.names[site], CROPS[(site, year)], counts)
+        rows.append(row)
+        n_sum_checks += len(rels)
+        max_rel = max([max_rel, *rels])
     steps["sumCheck"] = {
         "comparisons": n_sum_checks,
         "maxRelDiff": max_rel,
@@ -1032,8 +1424,72 @@ def analyse(data: Data) -> dict[str, Any]:
         "minNee": min(fig1, key=lambda r: r["nee"])["key"],
         "maxNee": max(fig1, key=lambda r: r["nee"])["key"],
     }
+    # ----- reference site Hyytiala -----
+    ref_rows: list[dict[str, Any]] = []
+    for r in data.ref_annual.to_dict("records"):
+        year = int(r["year"])
+        d = frame(data.ref_daily[col(data.ref_daily, "year") == year])
+        row, rels = site_year_row(r, d, REF_NAME, REF_CROP, None)
+        ref_rows.append(row)
+        steps["sumCheck"]["comparisons"] += len(rels)
+        steps["sumCheck"]["maxRelDiff"] = max([steps["sumCheck"]["maxRelDiff"], *rels])
+    ref4 = [r for r in ref_rows if r["inFig1"]]
+    ref5 = [r for r in ref_rows if r["inFig2"]]
+    for r in ref_rows:
+        if not r["inFig2"]:
+            log.info("excluded %s: %s", r["key"], r["exclusionFig2"])
+    log.info(
+        "hyytiala: %d site-years; %d in Figure 5, %d in Figure 4",
+        len(ref_rows),
+        len(ref5),
+        len(ref4),
+    )
+    steps["inclusion"]["hyytiala"] = {
+        "siteYears": len(ref_rows),
+        "fig5": len(ref5),
+        "fig4": len(ref4),
+    }
+    groups[REF_GROUP] = {
+        "fig4SiteYears": [r["key"] for r in ref4],
+        "fig5SiteYears": [r["key"] for r in ref5],
+        "nee": plain_stats(r["nee"] for r in ref4),
+        "recoGppRatio": plain_stats(r["recoGppRatio"] for r in ref4),
+        "uptakeYear": plain_stats(r["uptake"]["year"]["share"] for r in ref5),
+        "uptakeJja": plain_stats(r["uptake"]["jja"]["share"] for r in ref5),
+        "uptakePeak": plain_stats(peak_share(r) for r in ref5),
+    }
+    regression["withHyytiala"] = fit(fig1 + ref4)
+    reference = {
+        "hyytiala": {
+            "site": REF_SITE,
+            "siteName": REF_NAME,
+            "source": REF_SOURCE,
+            "siteYears": ref_rows,
+            "fig4Keys": [r["key"] for r in ref4],
+            "fig5Keys": [r["key"] for r in ref5],
+            "excluded": [
+                {
+                    "key": r["key"],
+                    "site": r["site"],
+                    "siteName": r["siteName"],
+                    "year": r["year"],
+                    "reason": r["exclusionFig1"],
+                    "inFig5": r["inFig2"],
+                }
+                for r in ref_rows
+                if not r["inFig1"]
+            ],
+        }
+    }
+    summary["fig4"] = {
+        "n": len(fig1) + len(ref4),
+        "nSink": sum(1 for r in fig1 + ref4 if r["nee"] < 0),
+        "nSource": sum(1 for r in fig1 + ref4 if r["nee"] >= 0),
+    }
+    summary["nFig5"] = len(fig2) + len(ref5)
     return {
         "siteYears": rows,
+        "reference": reference,
         "fig1Keys": [r["key"] for r in fig1],
         "fig2Keys": [r["key"] for r in fig2],
         "excluded": [
@@ -1222,8 +1678,34 @@ def point_label(r: dict[str, Any]) -> str:
     return f"{r['year']} {r['cropLabel']}" if r["cropLabel"] else str(r["year"])
 
 
+def site_style(site: str, data: Data) -> tuple[str, str, float, float, str]:
+    """Colour, marker, marker size, zorder and legend text of a site."""
+    if site == REF_SITE:
+        return REF_COLOR, REF_MARKER, REF_MARKER_SIZE, REF_ZORDER, REF_LEGEND
+    slot = data.slots[site]
+    return (
+        SITE_COLORS[slot],
+        SITE_MARKERS[slot],
+        MARKER_SIZE,
+        MARKER_ZORDER.get(site, 3),
+        data.names[site],
+    )
+
+
 def fig_carbon_space(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
     rows = [r for r in res["siteYears"] if r["inFig1"]]
+    fig, lo, hi = carbon_space_plot(rows, data, LABEL_OFFSETS, {})
+    desc = carbon_space_desc(res, rows, lo, hi)
+    return fig, FIG1_TITLE, desc
+
+
+def carbon_space_plot(
+    rows: Sequence[dict[str, Any]],
+    data: Data,
+    offsets: dict[str, tuple[float, float, str]],
+    texts: dict[str, str],
+) -> tuple[Any, float, float]:
+    """Figures 1 and 4: Reco against GPP. A site-year without an entry in `offsets` has no label."""
     vals = [r["gpp"] for r in rows] + [r["reco"] for r in rows]
     lo, hi = nice_range(min(vals), max(vals))
     fig = plt.figure(figsize=(FIG_WIDTH_IN, FIG1_HEIGHT_IN))
@@ -1267,26 +1749,27 @@ def fig_carbon_space(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         fontweight="bold",
     )
     handles: list[Any] = []
-    for site in ALL_SITES:
+    for site in (*ALL_SITES, REF_SITE):
         sr = [r for r in rows if r["site"] == site]
         if not sr:
             continue
-        slot = data.slots[site]
-        color, marker = SITE_COLORS[slot], SITE_MARKERS[slot]
+        color, marker, ms, zorder, legend = site_style(site, data)
         ax.plot(
             [r["gpp"] for r in sr],
             [r["reco"] for r in sr],
             ls="none",
             marker=marker,
-            ms=MARKER_SIZE,
+            ms=ms,
             mfc=color,
             mec="white",
             mew=MARKER_EDGE,
-            zorder=MARKER_ZORDER.get(site, 3),
+            zorder=zorder,
         )
         for r in sr:
-            dx, dy, ha = LABEL_OFFSETS[r["key"]]
-            text = point_label(r)
+            if r["key"] not in offsets:
+                continue
+            dx, dy, ha = offsets[r["key"]]
+            text = texts.get(r["key"], point_label(r))
             if r["key"] in WRAP_LABELS:
                 text = text.replace(" (", "\n(")
             ax.annotate(
@@ -1307,11 +1790,11 @@ def fig_carbon_space(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
                 [],
                 ls="none",
                 marker=marker,
-                ms=MARKER_SIZE * 0.85,
+                ms=ms * 0.85,
                 mfc=color,
                 mec="white",
                 mew=MARKER_EDGE,
-                label=data.names[site],
+                label=legend,
             )
         )
     ax.set_xlabel(X_LABEL_1)
@@ -1331,7 +1814,12 @@ def fig_carbon_space(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         labelspacing=0.7,
         borderaxespad=0,
     )
+    return fig, lo, hi
 
+
+def carbon_space_desc(
+    res: dict[str, Any], rows: Sequence[dict[str, Any]], lo: float, hi: float
+) -> str:
     reg = res["regression"]
     s = res["summary"]
     by_key = {r["key"]: r for r in rows}
@@ -1355,7 +1843,52 @@ def fig_carbon_space(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         "own colour and marker; labels give the year and, for annual crops and the failed grass, "
         "the crop."
     )
-    return fig, FIG1_TITLE, desc
+    return desc
+
+
+def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
+    ref = res["reference"]["hyytiala"]
+    db_rows = [r for r in res["siteYears"] if r["inFig1"]]
+    ref_rows = [r for r in ref["siteYears"] if r["inFig1"]]
+    rows = db_rows + ref_rows
+    fig, lo, hi = carbon_space_plot(
+        rows, data, {**LABEL_OFFSETS, **LABEL_OFFSETS_FOREST}, LABEL_TEXT_FOREST
+    )
+    reg = res["regression"]
+    g = res["groups"]
+    s4 = res["summary"]["fig4"]
+    per = "; ".join(
+        f"{r['year']}: GPP {fmt(r['gpp'])}, Reco {fmt(r['reco'])}, NEE {fmt(r['nee'])}"
+        for r in ref_rows
+    )
+    excl = [e for e in ref["excluded"]]
+    desc = (
+        f"The scatter plot of Figure 1 ({len(db_rows)} site-years of the six sites) with "
+        f"{len(ref_rows)} site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, "
+        f"a reference with rare management): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, "
+        f"both from {fmt(lo)} to {fmt(hi)} on the same scale, dotted 1:1 line, light dotted "
+        "lines at NEE = −200 and −400 g C m−2 yr−1. Labels: Hyytiälä 2020 and the cluster "
+        f"2021–2025. Hyytiälä (g C m−2 yr−1) {per}. Hyytiälä NEE "
+        f"{fmt(g[REF_GROUP]['nee']['mean'])} ± {fmt(g[REF_GROUP]['nee']['sd'])} (mean ± SD, "
+        f"range {fmt(g[REF_GROUP]['nee']['min'])} to {fmt(g[REF_GROUP]['nee']['max'])}, n = "
+        f"{g[REF_GROUP]['nee']['n']}); grassland "
+        f"{fmt(g['grassland']['nee']['mean'])} ± {fmt(g['grassland']['nee']['sd'])} (range "
+        f"{fmt(g['grassland']['nee']['min'])} to {fmt(g['grassland']['nee']['max'])}, n = "
+        f"{g['grassland']['nee']['n']}); annual crops {fmt(g['annual crop']['nee']['mean'])} ± "
+        f"{fmt(g['annual crop']['nee']['sd'])} (range {fmt(g['annual crop']['nee']['min'])} to "
+        f"{fmt(g['annual crop']['nee']['max'])}, n = {g['annual crop']['nee']['n']}). "
+        f"{s4['nSink']} of {s4['n']} site-years are below the line. OLS line over all "
+        f"{reg['withHyytiala']['n']} site-years: Reco = {fmt(reg['withHyytiala']['slope'], 2)} × "
+        f"GPP + {fmt(reg['withHyytiala']['intercept'])}, r = {fmt(reg['withHyytiala']['r'], 2)}."
+        + (
+            " Hyytiälä years not shown: "
+            + ", ".join(f"{e['year']} ({e['reason']})" for e in excl)
+            + "."
+            if excl
+            else ""
+        )
+    )
+    return fig, FIG4_TITLE, desc
 
 
 X_AXIS_TEXT_1 = "annual GPP (g C m−2 yr−1)"
@@ -1388,15 +1921,23 @@ def bar_positions(rows: Sequence[dict[str, Any]]) -> list[float]:
 
 
 def uptake_bars(
-    rows: Sequence[dict[str, Any]], data: Data, key: str, label: str
+    rows: Sequence[dict[str, Any]],
+    data: Data,
+    key: str,
+    label: str,
+    compact: bool = False,
 ) -> Any:
-    """Figures 2 and 3: bar pairs per site-year; the second bar is uptake[key] (hatched)."""
-    xs = bar_positions(rows)
-    fig = plt.figure(figsize=(FIG_WIDTH_IN, FIG2_HEIGHT_IN))
-    ax = fig.add_axes((0.1, 0.2, 0.87, 0.68))
+    """Figures 2, 3 and 5: bar pairs per site-year; the second bar is uptake[key] (hatched).
+
+    compact (Figure 5, 22 site-years): vertical year labels, no crop lines (the crops are in
+    the alt text and in Figure 3), site names in two staggered rows."""
+    xs = bar_positions([dict(r, cropLabel=None) for r in rows] if compact else rows)
+    height = FIG5_HEIGHT_IN if compact else FIG2_HEIGHT_IN
+    fig = plt.figure(figsize=(FIG_WIDTH_IN, height))
+    ax = fig.add_axes((0.1, 0.22, 0.87, 0.66) if compact else (0.1, 0.2, 0.87, 0.68))
     width = 0.4
     for xi, r in zip(xs, rows, strict=True):
-        color = SITE_COLORS[data.slots[r["site"]]]
+        color = site_style(r["site"], data)[0]
         ax.bar(
             xi - width / 2,
             r["uptake"]["year"]["share"] * 100,
@@ -1425,10 +1966,14 @@ def uptake_bars(
     ax.set_xlim(xs[0] - 0.6, xs[-1] + 0.75)
     ax.set_ylabel(Y_LABEL_2)
     ax.set_xticks(xs)
-    ax.set_xticklabels([str(r["year"]) for r in rows], fontsize=5.25 * FONT_SCALE)
+    ax.set_xticklabels(
+        [str(r["year"]) for r in rows],
+        fontsize=5.25 * FONT_SCALE,
+        rotation=90 if compact else 0,
+    )
     ax.tick_params(axis="x", length=0, pad=3)
     for xi, r in zip(xs, rows, strict=True):
-        lines = crop_lines(r)
+        lines = [] if compact else crop_lines(r)
         if lines:
             ax.annotate(
                 "\n".join(lines),
@@ -1442,13 +1987,13 @@ def uptake_bars(
                 fontstyle="italic",
                 linespacing=1.0,
             )
-    for site in dict.fromkeys(r["site"] for r in rows):
+    for i, site in enumerate(dict.fromkeys(r["site"] for r in rows)):
         sx = [xi for xi, r in zip(xs, rows, strict=True) if r["site"] == site]
         ax.annotate(
             data.names[site],
             ((min(sx) + max(sx)) / 2, 0),
             xycoords=("data", "axes fraction"),
-            xytext=(0, -38),
+            xytext=(0, (-36 - 15 * (i % 2)) if compact else -38),
             textcoords="offset points",
             ha="center",
             va="top",
@@ -1512,6 +2057,52 @@ def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         f"site-year: {per}."
     )
     return fig, FIG2_TITLE, desc
+
+
+def peak_text(r: dict[str, Any]) -> str:
+    """Alt text of one site-year: whole-year share, peak window and its share."""
+    p = r["uptake"]["peak"]
+    head = f"{r['siteName']} {point_label(r)}: {pct(r['uptake']['year']['share'])} of the year"
+    if p is None:
+        return head + ", no valid 90-day window (no second bar)"
+    return (
+        f"{head}, window {p['start']} to {p['end']} {pct(p['share'])} (mean measured "
+        f"fraction {fmt(p['fracMeasured'], 2)})"
+    )
+
+
+def fig_uptake_days_peak_forest(
+    res: dict[str, Any], data: Data
+) -> tuple[Any, str, str]:
+    db_rows = [r for r in res["siteYears"] if r["inFig2"]]
+    ref_rows = [r for r in res["reference"]["hyytiala"]["siteYears"] if r["inFig2"]]
+    rows = db_rows + ref_rows
+    fig = uptake_bars(rows, data, "peak", "Peak-GPP 90 days", compact=True)
+    s = res["summary"]
+    g = res["groups"]
+    mk = [r for r in db_rows if r["site"] == "maktau"]
+    desc = (
+        f"Grouped bar chart of {len(rows)} site-years: the {len(db_rows)} site-years of Figure 3 "
+        f"and {len(ref_rows)} site-years of the SMEAR II Hyytiälä forest (reference, last group). "
+        "Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 "
+        "over the whole year, the right bar (lighter, hatched) the share inside the "
+        f"{PEAK_DAYS} consecutive local days with the largest GPP sum of the year; y axis days "
+        "with net uptake (%), 0 to 100, dotted line at 50 %. Mean ± SD (range) of the whole "
+        f"year: forest {share_stat(g[REF_GROUP]['uptakeYear'])}, grassland "
+        f"{share_stat(g['grassland']['uptakeYear'])}, annual crops "
+        f"{share_stat(g['annual crop']['uptakeYear'])}; of the peak window: forest "
+        f"{share_stat(g[REF_GROUP]['uptakePeak'])}, grassland "
+        f"{share_stat(g['grassland']['uptakePeak'])}, annual crops "
+        f"{share_stat(g['annual crop']['uptakePeak'])}, Finnish sites of the database "
+        f"{share_stat(s['finnishUptakePeak'])}. "
+        + "".join(f"{peak_text(r)}. " for r in mk)
+        + "Hyytiälä: "
+        + "; ".join(peak_text(r) for r in ref_rows)
+        + ". Other site-years: "
+        + "; ".join(peak_text(r) for r in db_rows if r["site"] != "maktau")
+        + "."
+    )
+    return fig, FIG5_TITLE, desc
 
 
 def fig_uptake_days_peak(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
@@ -1618,6 +2209,7 @@ def data_version(
         "args": {
             "db": str(args.db),
             "calculated": str(args.calculated),
+            "smear": str(args.smear),
             "out": str(args.out) if args.out else None,
             "check": args.check,
         },
@@ -1650,6 +2242,30 @@ def method_json() -> dict[str, Any]:
         "minFrac": MIN_FRAC,
         "maxGapDays": MAX_GAP_DAYS,
         "jjaMonths": list(JJA),
+        "reference": {
+            "site": REF_SITE,
+            "name": REF_NAME,
+            "group": REF_GROUP,
+            "source": (
+                "SMEAR II Hyytiälä (station 2), SMEAR API, downloaded 2026-10-27 "
+                "(data/smear/hyytiala/README.md): HYY_EDDY233.NEE and HYY_EDDY233.GPP, "
+                "HYY_EDDYMAST.F_c_270"
+            ),
+            "signConvention": (
+                "NEE gap-filled, positive = emission; GPP positive = uptake; Reco = NEE + GPP "
+                "(umol CO2 m-2 s-1)"
+            ),
+            "timeBase": (
+                "local time UTC+2 all year; the stamp is the start of the half hour (first "
+                "stamp 1 January 00:00, last 31 December 23:30); local day = calendar day"
+            ),
+            "measuredFractionProxy": (
+                "share of half hours with a measured HYY_EDDYMAST.F_c_270 value (NaN or empty "
+                "= missing); longest gap = longest run without it"
+            ),
+            "factor": HH_TO_GC,
+            "years": list(REF_YEARS),
+        },
         "peakDays": PEAK_DAYS,
         "peakMinGppDays": PEAK_MIN_GPP_DAYS,
         "peakRule": (
@@ -1721,6 +2337,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="folder of the calculated products (default: data/calculated)",
     )
     p.add_argument(
+        "--smear",
+        type=Path,
+        default=Path("data/smear/hyytiala"),
+        help="folder of the SMEAR II Hyytiala files (default: data/smear/hyytiala)",
+    )
+    p.add_argument(
         "--out",
         type=Path,
         default=None,
@@ -1748,7 +2370,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         h.setFormatter(fmt_)
         log.addHandler(h)
 
-    errors = check_inputs(args.db, args.calculated)
+    errors = check_inputs(args.db, args.calculated, args.smear)
     if errors:
         for e in errors:
             log.error("input check: %s", e)
@@ -1761,7 +2383,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         log.info("note: %s", note)
 
     try:
-        data = read_data(args.db, args.calculated)
+        data = read_data(args.db, args.calculated, args.smear)
         res = analyse(data)
     except InputError as e:
         log.error("input check: %s", e)
@@ -1780,8 +2402,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             fig, title, desc = fig_carbon_space(res, data)
         elif name == "uptake-days":
             fig, title, desc = fig_uptake_days(res, data)
-        else:
+        elif name == "uptake-days-peak":
             fig, title, desc = fig_uptake_days_peak(res, data)
+        elif name == "carbon-space-forest":
+            fig, title, desc = fig_carbon_space_forest(res, data)
+        else:
+            fig, title, desc = fig_uptake_days_peak_forest(res, data)
         path = target / "figures" / f"{n}-{name}.svg"
         save_svg(fig, path, n, title, desc, meta)
         size = path.stat().st_size

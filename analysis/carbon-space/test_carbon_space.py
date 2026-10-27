@@ -16,6 +16,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -23,6 +24,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 DB = REPO / "db"
 CALC = REPO / "data" / "calculated"
+SMEAR = REPO / "data" / "smear" / "hyytiala"
 SVG_NS = "{http://www.w3.org/2000/svg}"
 
 
@@ -46,7 +48,7 @@ def results() -> dict[str, Any]:
 
 
 def have_data() -> bool:
-    return not cs.check_inputs(DB, CALC)
+    return not cs.check_inputs(DB, CALC, SMEAR)
 
 
 needs_data = pytest.mark.skipif(
@@ -211,7 +213,13 @@ def test_annual_equals_daily_sums() -> None:
             chk = cs.sum_check(ann, [None if pd.isna(x) else float(x) for x in g[c]])
             assert chk["ok"], (r["site_code"], r["year"], c)
             n += chk["relDiff"] is not None
-    assert n == results()["dataVersion"]["steps"]["sumCheck"]["comparisons"]
+    res = results()
+    n_ref = sum(
+        r[k] is not None
+        for r in res["reference"]["hyytiala"]["siteYears"]
+        for k in ("nee", "gpp", "reco")
+    )
+    assert n + n_ref == res["dataVersion"]["steps"]["sumCheck"]["comparisons"]
 
 
 @needs_data
@@ -233,6 +241,63 @@ def test_inclusion_rule_from_annual_csv() -> None:
     res = results()
     assert sorted(res["fig2Keys"]) == sorted(fig2)
     assert sorted(res["fig1Keys"]) == sorted(fig1)
+
+
+@needs_data
+def test_hyytiala_sums_independent() -> None:
+    """Daily and annual Hyytiala sums of the script against a plain pandas recompute."""
+    tables: Any = cs.read_hyytiala(SMEAR, {})
+    daily, annual = tables
+    res = {r["year"]: r for r in results()["reference"]["hyytiala"]["siteYears"]}
+    factor = 1800 * 12.011e-6
+    for y in cs.REF_YEARS:
+        f: Any = pd.read_csv(SMEAR / f"HYY_EDDY233_NEE_GPP_{y}.csv")
+        m: Any = pd.read_csv(SMEAR / f"HYY_EDDYMAST_F_c_270_{y}.csv", na_values=["NaN"])
+        day: Any = pd.to_datetime(f[["Year", "Month", "Day"]]).dt.date
+        nee = f["HYY_EDDY233.NEE"].groupby(day).sum() * factor
+        gpp = f["HYY_EDDY233.GPP"].groupby(day).sum() * factor
+        meas = m["HYY_EDDYMAST.F_c_270"].notna()
+        d = daily[daily["year"] == y].set_index("date_local")
+        assert len(d) == len(nee)
+        for k in nee.index:
+            assert math.isclose(
+                d.loc[k, "nee_f_gc"], nee[k], rel_tol=1e-9, abs_tol=1e-12
+            )
+            assert math.isclose(d.loc[k, "gpp_gc"], gpp[k], rel_tol=1e-9, abs_tol=1e-12)
+            assert math.isclose(
+                d.loc[k, "reco_gc"], nee[k] + gpp[k], rel_tol=1e-9, abs_tol=1e-9
+            )
+        frac_day = meas.groupby(day).sum() / 48
+        assert np.allclose(d["frac_measured"].to_numpy(), frac_day.to_numpy())
+        a = annual[annual["year"] == y].iloc[0]
+        assert math.isclose(a["nee_f_gc"], nee.sum(), rel_tol=1e-9)
+        assert math.isclose(a["gpp_gc"], gpp.sum(), rel_tol=1e-9)
+        assert math.isclose(a["frac_measured"], meas.mean(), rel_tol=1e-12)
+        run = best = 0
+        for v in ~meas.to_numpy():
+            run = run + 1 if v else 0
+            best = max(best, run)
+        assert math.isclose(a["longest_gap_days"], best / 48)
+        r = res[y]
+        assert math.isclose(r["nee"], nee.sum(), rel_tol=1e-8)
+        assert math.isclose(r["gpp"], gpp.sum(), rel_tol=1e-8)
+        assert math.isclose(r["fracMeasured"], meas.mean(), rel_tol=1e-8)
+
+
+def test_hyytiala_results() -> None:
+    res = results()
+    ref = res["reference"]["hyytiala"]
+    assert [r["year"] for r in ref["siteYears"]] == list(cs.REF_YEARS)
+    for r in ref["siteYears"]:
+        assert r["group"] == "forest" and r["source"] == cs.REF_SOURCE
+        assert "events" not in r
+        if r["inFig1"]:
+            assert math.isclose(r["nee"], r["reco"] - r["gpp"], abs_tol=1e-6)
+    assert res["groups"]["forest"]["nee"]["n"] == len(ref["fig4Keys"])
+    assert res["regression"]["withHyytiala"]["n"] == len(res["fig1Keys"]) + len(
+        ref["fig4Keys"]
+    )
+    assert set(cs.LABEL_OFFSETS_FOREST) <= set(ref["fig4Keys"])
 
 
 # ---------- Results ----------

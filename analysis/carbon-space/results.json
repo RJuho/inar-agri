@@ -18,6 +18,24 @@
       7,
       8
     ],
+    "reference": {
+      "site": "hyytiala",
+      "name": "Hyytiälä",
+      "group": "forest",
+      "source": "SMEAR II Hyytiälä (station 2), SMEAR API, downloaded 2026-10-27 (data/smear/hyytiala/README.md): HYY_EDDY233.NEE and HYY_EDDY233.GPP, HYY_EDDYMAST.F_c_270",
+      "signConvention": "NEE gap-filled, positive = emission; GPP positive = uptake; Reco = NEE + GPP (umol CO2 m-2 s-1)",
+      "timeBase": "local time UTC+2 all year; the stamp is the start of the half hour (first stamp 1 January 00:00, last 31 December 23:30); local day = calendar day",
+      "measuredFractionProxy": "share of half hours with a measured HYY_EDDYMAST.F_c_270 value (NaN or empty = missing); longest gap = longest run without it",
+      "factor": 0.0216198,
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
     "peakDays": 90,
     "peakMinGppDays": 80,
     "peakRule": "90 consecutive local days inside the calendar year (no crossing of the year end); score = sum of daily gpp_gc over the window days with a value; valid when 80 or more days have GPP; largest score wins, a tie goes to the earliest start; share = uptake days / days with daily NEE in the window; null when no window is valid",
@@ -318,7 +336,21 @@
       "Reco/GPP over the Figure 1 site-years, and of the uptake shares over the Figure 2",
       "site-years (whole year, June to August, peak-GPP window). A third summary gives the annual crops without Maktau (Finnish crops only).",
       "7. Each step that removes rows logs a count (results.json dataVersion.steps).",
-      "8. Open findings of docs/anomaly-data-report.md that touch this dive are printed",
+      "8. Reference site SMEAR II Hyytiala (boreal Scots pine forest, rare management; Figures 4 and",
+      "5): files of the SMEAR API in --smear (data/smear/hyytiala/README.md), 2020 to 2025.",
+      "HYY_EDDY233.NEE (gap-filled, positive = emission) and HYY_EDDY233.GPP (positive) in",
+      "umol CO2 m-2 s-1, Reco = NEE + GPP. The time stamps are local time (UTC+2 all year) and",
+      "mark the start of the half hour (the first stamp of a file is 1 January 00:00, the last",
+      "31 December 23:30). Daily sums use the same factor as the other sites (1800 s x 12.011e-6",
+      "g C umol-1). A daily or annual sum is NULL when a half hour has no value. The measured",
+      "fraction comes from HYY_EDDYMAST.F_c_270 (measured CO2 flux at 27 m; \"NaN\" or empty =",
+      "missing): daily = measured half hours / 48, annual = measured half hours / all half",
+      "hours; longest gap = the longest run of half hours without a measured value, in days.",
+      "full year = all days of the year have 48 half hours; reliable = the rule of step 1. The",
+      "inclusion rule, the uptake shares and the peak window are the same as for the other",
+      "sites. Hyytiala is not in the groups grassland and annual crop; it is the group forest.",
+      "It has no events.",
+      "9. Open findings of docs/anomaly-data-report.md that touch this dive are printed",
       "(OPEN_FINDINGS). The script uses no literature value, thus it has no LITERATURE table."
     ],
     "openFindings": [
@@ -2049,6 +2081,296 @@
       "eventsTotal": 0
     }
   ],
+  "reference": {
+    "hyytiala": {
+      "site": "hyytiala",
+      "siteName": "Hyytiälä",
+      "source": "SMEAR II, HYY_EDDY233",
+      "siteYears": [
+        {
+          "key": "hyytiala-2020",
+          "site": "hyytiala",
+          "siteName": "Hyytiälä",
+          "year": 2020,
+          "crop": "boreal forest",
+          "group": "forest",
+          "cropLabel": null,
+          "inFig1": true,
+          "inFig2": true,
+          "exclusionFig1": null,
+          "exclusionFig2": null,
+          "fullYear": true,
+          "reliable": true,
+          "fracMeasured": 0.9598702186,
+          "longestGapDays": 3.8125,
+          "gpp": 968.1246989,
+          "reco": 1082.693078,
+          "nee": 114.5683792,
+          "recoGppRatio": 1.118340519,
+          "uptake": {
+            "year": {
+              "days": 366,
+              "uptakeDays": 133,
+              "share": 0.3633879781
+            },
+            "jja": {
+              "days": 92,
+              "uptakeDays": 75,
+              "share": 0.8152173913
+            },
+            "peak": {
+              "days": 90,
+              "uptakeDays": 74,
+              "share": 0.8222222222,
+              "start": "2020-06-01",
+              "end": "2020-08-29",
+              "gppSum": 611.6513397,
+              "gppDays": 90,
+              "fracMeasured": 0.962037037
+            }
+          },
+          "source": "SMEAR II, HYY_EDDY233"
+        },
+        {
+          "key": "hyytiala-2021",
+          "site": "hyytiala",
+          "siteName": "Hyytiälä",
+          "year": 2021,
+          "crop": "boreal forest",
+          "group": "forest",
+          "cropLabel": null,
+          "inFig1": true,
+          "inFig2": true,
+          "exclusionFig1": null,
+          "exclusionFig2": null,
+          "fullYear": true,
+          "reliable": true,
+          "fracMeasured": 0.709760274,
+          "longestGapDays": 26.75,
+          "gpp": 1114.708932,
+          "reco": 970.8527717,
+          "nee": -143.8561602,
+          "recoGppRatio": 0.8709473334,
+          "uptake": {
+            "year": {
+              "days": 365,
+              "uptakeDays": 166,
+              "share": 0.4547945205
+            },
+            "jja": {
+              "days": 92,
+              "uptakeDays": 81,
+              "share": 0.8804347826
+            },
+            "peak": {
+              "days": 90,
+              "uptakeDays": 80,
+              "share": 0.8888888889,
+              "start": "2021-05-27",
+              "end": "2021-08-24",
+              "gppSum": 712.4966374,
+              "gppDays": 90,
+              "fracMeasured": 0.9648148148
+            }
+          },
+          "source": "SMEAR II, HYY_EDDY233"
+        },
+        {
+          "key": "hyytiala-2022",
+          "site": "hyytiala",
+          "siteName": "Hyytiälä",
+          "year": 2022,
+          "crop": "boreal forest",
+          "group": "forest",
+          "cropLabel": null,
+          "inFig1": true,
+          "inFig2": true,
+          "exclusionFig1": null,
+          "exclusionFig2": null,
+          "fullYear": true,
+          "reliable": true,
+          "fracMeasured": 0.8539383562,
+          "longestGapDays": 12.08333333,
+          "gpp": 1206.186651,
+          "reco": 1018.965085,
+          "nee": -187.2215658,
+          "recoGppRatio": 0.8447822602,
+          "uptake": {
+            "year": {
+              "days": 365,
+              "uptakeDays": 158,
+              "share": 0.4328767123
+            },
+            "jja": {
+              "days": 92,
+              "uptakeDays": 80,
+              "share": 0.8695652174
+            },
+            "peak": {
+              "days": 90,
+              "uptakeDays": 78,
+              "share": 0.8666666667,
+              "start": "2022-06-04",
+              "end": "2022-09-01",
+              "gppSum": 791.6110309,
+              "gppDays": 90,
+              "fracMeasured": 0.9689814815
+            }
+          },
+          "source": "SMEAR II, HYY_EDDY233"
+        },
+        {
+          "key": "hyytiala-2023",
+          "site": "hyytiala",
+          "siteName": "Hyytiälä",
+          "year": 2023,
+          "crop": "boreal forest",
+          "group": "forest",
+          "cropLabel": null,
+          "inFig1": true,
+          "inFig2": true,
+          "exclusionFig1": null,
+          "exclusionFig2": null,
+          "fullYear": true,
+          "reliable": true,
+          "fracMeasured": 0.8171232877,
+          "longestGapDays": 17.41666667,
+          "gpp": 1207.588566,
+          "reco": 984.6805364,
+          "nee": -222.9080292,
+          "recoGppRatio": 0.8154106162,
+          "uptake": {
+            "year": {
+              "days": 365,
+              "uptakeDays": 155,
+              "share": 0.4246575342
+            },
+            "jja": {
+              "days": 92,
+              "uptakeDays": 82,
+              "share": 0.8913043478
+            },
+            "peak": {
+              "days": 90,
+              "uptakeDays": 86,
+              "share": 0.9555555556,
+              "start": "2023-05-23",
+              "end": "2023-08-20",
+              "gppSum": 771.5568071,
+              "gppDays": 90,
+              "fracMeasured": 0.9729166667
+            }
+          },
+          "source": "SMEAR II, HYY_EDDY233"
+        },
+        {
+          "key": "hyytiala-2024",
+          "site": "hyytiala",
+          "siteName": "Hyytiälä",
+          "year": 2024,
+          "crop": "boreal forest",
+          "group": "forest",
+          "cropLabel": null,
+          "inFig1": true,
+          "inFig2": true,
+          "exclusionFig1": null,
+          "exclusionFig2": null,
+          "fullYear": true,
+          "reliable": true,
+          "fracMeasured": 0.8409039162,
+          "longestGapDays": 22.02083333,
+          "gpp": 1249.15155,
+          "reco": 1001.153592,
+          "nee": -247.9979585,
+          "recoGppRatio": 0.8014668769,
+          "uptake": {
+            "year": {
+              "days": 366,
+              "uptakeDays": 162,
+              "share": 0.4426229508
+            },
+            "jja": {
+              "days": 92,
+              "uptakeDays": 87,
+              "share": 0.9456521739
+            },
+            "peak": {
+              "days": 90,
+              "uptakeDays": 87,
+              "share": 0.9666666667,
+              "start": "2024-05-23",
+              "end": "2024-08-20",
+              "gppSum": 788.9568978,
+              "gppDays": 90,
+              "fracMeasured": 0.9613425926
+            }
+          },
+          "source": "SMEAR II, HYY_EDDY233"
+        },
+        {
+          "key": "hyytiala-2025",
+          "site": "hyytiala",
+          "siteName": "Hyytiälä",
+          "year": 2025,
+          "crop": "boreal forest",
+          "group": "forest",
+          "cropLabel": null,
+          "inFig1": true,
+          "inFig2": true,
+          "exclusionFig1": null,
+          "exclusionFig2": null,
+          "fullYear": true,
+          "reliable": true,
+          "fracMeasured": 0.8658105023,
+          "longestGapDays": 8.0,
+          "gpp": 1259.389001,
+          "reco": 977.6228391,
+          "nee": -281.7661619,
+          "recoGppRatio": 0.7762675697,
+          "uptake": {
+            "year": {
+              "days": 365,
+              "uptakeDays": 183,
+              "share": 0.501369863
+            },
+            "jja": {
+              "days": 92,
+              "uptakeDays": 88,
+              "share": 0.9565217391
+            },
+            "peak": {
+              "days": 90,
+              "uptakeDays": 88,
+              "share": 0.9777777778,
+              "start": "2025-06-01",
+              "end": "2025-08-29",
+              "gppSum": 782.0910546,
+              "gppDays": 90,
+              "fracMeasured": 0.8724537037
+            }
+          },
+          "source": "SMEAR II, HYY_EDDY233"
+        }
+      ],
+      "fig4Keys": [
+        "hyytiala-2020",
+        "hyytiala-2021",
+        "hyytiala-2022",
+        "hyytiala-2023",
+        "hyytiala-2024",
+        "hyytiala-2025"
+      ],
+      "fig5Keys": [
+        "hyytiala-2020",
+        "hyytiala-2021",
+        "hyytiala-2022",
+        "hyytiala-2023",
+        "hyytiala-2024",
+        "hyytiala-2025"
+      ],
+      "excluded": []
+    }
+  },
   "fig1Keys": [
     "anttila-2022",
     "anttila-2023",
@@ -2244,6 +2566,13 @@
       "r": 0.8352028865,
       "r2": 0.6975638616,
       "n": 14
+    },
+    "withHyytiala": {
+      "slope": 0.580097439,
+      "intercept": 349.4233138,
+      "r": 0.6989060112,
+      "r2": 0.4884696125,
+      "n": 21
     }
   },
   "groups": {
@@ -2408,6 +2737,59 @@
         "min": 0.6888888889,
         "max": 0.8333333333
       }
+    },
+    "forest": {
+      "fig4SiteYears": [
+        "hyytiala-2020",
+        "hyytiala-2021",
+        "hyytiala-2022",
+        "hyytiala-2023",
+        "hyytiala-2024",
+        "hyytiala-2025"
+      ],
+      "fig5SiteYears": [
+        "hyytiala-2020",
+        "hyytiala-2021",
+        "hyytiala-2022",
+        "hyytiala-2023",
+        "hyytiala-2024",
+        "hyytiala-2025"
+      ],
+      "nee": {
+        "n": 6,
+        "mean": -161.5302494,
+        "sd": 143.4597094,
+        "min": -281.7661619,
+        "max": 114.5683792
+      },
+      "recoGppRatio": {
+        "n": 6,
+        "mean": 0.8712025292,
+        "sd": 0.1255099414,
+        "min": 0.7762675697,
+        "max": 1.118340519
+      },
+      "uptakeYear": {
+        "n": 6,
+        "mean": 0.4366182598,
+        "sd": 0.04489751702,
+        "min": 0.3633879781,
+        "max": 0.501369863
+      },
+      "uptakeJja": {
+        "n": 6,
+        "mean": 0.893115942,
+        "sd": 0.05209081547,
+        "min": 0.8152173913,
+        "max": 0.9565217391
+      },
+      "uptakePeak": {
+        "n": 6,
+        "mean": 0.912962963,
+        "sd": 0.06301740566,
+        "min": 0.8222222222,
+        "max": 0.9777777778
+      }
     }
   },
   "summary": {
@@ -2467,7 +2849,13 @@
       "max": 0.9111111111
     },
     "minNee": "maktau-2019",
-    "maxNee": "haltiala-2023"
+    "maxNee": "haltiala-2023",
+    "fig4": {
+      "n": 21,
+      "nSink": 14,
+      "nSource": 7
+    },
+    "nFig5": 22
   },
   "figures": [
     {
@@ -2487,17 +2875,29 @@
       "file": "figures/3-uptake-days-peak.svg",
       "title": "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year and over the 90-day window with the largest GPP sum of the year.",
       "desc": "Grouped bar chart of 16 site-years (full and reliable years), grouped by site, the same layout as Figure 2. Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 over the whole year, the right bar (lighter, hatched) the share inside the 90 consecutive local days with the largest GPP sum of the year (80 or more days with GPP); y axis days with net uptake (%), 0 to 100, dotted line at 50 %. Mean ± SD (range) of the peak window: Finnish sites 78 % ± 7 % (68 % to 91 %, n = 15), grassland 79 % ± 7 % (68 % to 91 %, n = 11), annual crops 76 % ± 7 % (69 % to 83 %, n = 5), annual crops without Maktau 75 % ± 8 % (69 % to 83 %, n = 4). Per site-year: Anttila 2022: 36 % of the year, window 2022-05-24 to 2022-08-21 79 % (mean measured fraction 0.64); Anttila 2023: 36 % of the year, window 2023-05-10 to 2023-08-07 86 % (mean measured fraction 0.70); Särkisuo 2022: 29 % of the year, window 2022-06-10 to 2022-09-07 74 % (mean measured fraction 0.56); Särkisuo 2023: 31 % of the year, window 2023-07-10 to 2023-10-07 68 % (mean measured fraction 0.54); Haltiala 2022 oats: 24 % of the year, window 2022-05-19 to 2022-08-16 69 % (mean measured fraction 0.69); Haltiala 2023 grass (failed): 25 % of the year, window 2023-05-09 to 2023-08-06 86 % (mean measured fraction 0.68); Haltiala 2024 sunflower: 24 % of the year, window 2024-06-27 to 2024-09-24 83 % (mean measured fraction 0.65); Haltiala 2025 oats: 18 % of the year, window 2025-05-28 to 2025-08-25 69 % (mean measured fraction 0.73); Qvidja 2020: 37 % of the year, window 2020-05-07 to 2020-08-04 83 % (mean measured fraction 0.27); Qvidja 2022: 29 % of the year, window 2022-05-18 to 2022-08-15 77 % (mean measured fraction 0.40); Qvidja 2023: 27 % of the year, window 2023-05-18 to 2023-08-15 71 % (mean measured fraction 0.36); Qvidja 2024: 32 % of the year, window 2024-06-01 to 2024-08-29 73 % (mean measured fraction 0.43); Qvidja 2025: 28 % of the year, window 2025-05-07 to 2025-08-04 83 % (mean measured fraction 0.29); Viikki 2024: 36 % of the year, window 2024-06-15 to 2024-09-12 91 % (mean measured fraction 0.28); Viikki 2025 faba bean: 27 % of the year, window 2025-06-14 to 2025-09-11 80 % (mean measured fraction 0.15); Maktau 2019 maize: 87 % of the year, window 2019-10-03 to 2019-12-31 81 % (mean measured fraction 0.75)."
+    },
+    {
+      "n": 4,
+      "file": "figures/4-carbon-space-forest.svg",
+      "title": "Annual Reco against annual GPP, one marker per site-year, with the SMEAR II Hyytiälä forest (rare management) as a reference; below the 1:1 line the site-year was a net CO2 sink.",
+      "desc": "The scatter plot of Figure 1 (15 site-years of the six sites) with 6 site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, a reference with rare management): x axis annual GPP (g C m−2 yr−1), y axis annual Reco (g C m−2 yr−1), both from 400 to 1600 on the same scale, dotted 1:1 line, light dotted lines at NEE = −200 and −400 g C m−2 yr−1. Labels: Hyytiälä 2020 and the cluster 2021–2025. Hyytiälä (g C m−2 yr−1) 2020: GPP 968, Reco 1083, NEE 115; 2021: GPP 1115, Reco 971, NEE −144; 2022: GPP 1206, Reco 1019, NEE −187; 2023: GPP 1208, Reco 985, NEE −223; 2024: GPP 1249, Reco 1001, NEE −248; 2025: GPP 1259, Reco 978, NEE −282. Hyytiälä NEE −162 ± 143 (mean ± SD, range −282 to 115, n = 6); grassland −41 ± 138 (range −283 to 131, n = 10); annual crops −139 ± 183 (range −392 to 20, n = 5). 14 of 21 site-years are below the line. OLS line over all 21 site-years: Reco = 0.58 × GPP + 349, r = 0.70."
+    },
+    {
+      "n": 5,
+      "file": "figures/5-uptake-days-peak-forest.svg",
+      "title": "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year and over the 90-day window with the largest GPP sum, with the SMEAR II Hyytiälä forest as a reference.",
+      "desc": "Grouped bar chart of 22 site-years: the 16 site-years of Figure 3 and 6 site-years of the SMEAR II Hyytiälä forest (reference, last group). Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 over the whole year, the right bar (lighter, hatched) the share inside the 90 consecutive local days with the largest GPP sum of the year; y axis days with net uptake (%), 0 to 100, dotted line at 50 %. Mean ± SD (range) of the whole year: forest 44 % ± 4 % (36 % to 50 %, n = 6), grassland 31 % ± 4 % (25 % to 37 %, n = 11), annual crops 36 % ± 29 % (18 % to 87 %, n = 5); of the peak window: forest 91 % ± 6 % (82 % to 98 %, n = 6), grassland 79 % ± 7 % (68 % to 91 %, n = 11), annual crops 76 % ± 7 % (69 % to 83 %, n = 5), Finnish sites of the database 78 % ± 7 % (68 % to 91 %, n = 15). Maktau 2019 maize: 87 % of the year, window 2019-10-03 to 2019-12-31 81 % (mean measured fraction 0.75). Hyytiälä: Hyytiälä 2020: 36 % of the year, window 2020-06-01 to 2020-08-29 82 % (mean measured fraction 0.96); Hyytiälä 2021: 45 % of the year, window 2021-05-27 to 2021-08-24 89 % (mean measured fraction 0.96); Hyytiälä 2022: 43 % of the year, window 2022-06-04 to 2022-09-01 87 % (mean measured fraction 0.97); Hyytiälä 2023: 42 % of the year, window 2023-05-23 to 2023-08-20 96 % (mean measured fraction 0.97); Hyytiälä 2024: 44 % of the year, window 2024-05-23 to 2024-08-20 97 % (mean measured fraction 0.96); Hyytiälä 2025: 50 % of the year, window 2025-06-01 to 2025-08-29 98 % (mean measured fraction 0.87). Other site-years: Anttila 2022: 36 % of the year, window 2022-05-24 to 2022-08-21 79 % (mean measured fraction 0.64); Anttila 2023: 36 % of the year, window 2023-05-10 to 2023-08-07 86 % (mean measured fraction 0.70); Särkisuo 2022: 29 % of the year, window 2022-06-10 to 2022-09-07 74 % (mean measured fraction 0.56); Särkisuo 2023: 31 % of the year, window 2023-07-10 to 2023-10-07 68 % (mean measured fraction 0.54); Haltiala 2022 oats: 24 % of the year, window 2022-05-19 to 2022-08-16 69 % (mean measured fraction 0.69); Haltiala 2023 grass (failed): 25 % of the year, window 2023-05-09 to 2023-08-06 86 % (mean measured fraction 0.68); Haltiala 2024 sunflower: 24 % of the year, window 2024-06-27 to 2024-09-24 83 % (mean measured fraction 0.65); Haltiala 2025 oats: 18 % of the year, window 2025-05-28 to 2025-08-25 69 % (mean measured fraction 0.73); Qvidja 2020: 37 % of the year, window 2020-05-07 to 2020-08-04 83 % (mean measured fraction 0.27); Qvidja 2022: 29 % of the year, window 2022-05-18 to 2022-08-15 77 % (mean measured fraction 0.40); Qvidja 2023: 27 % of the year, window 2023-05-18 to 2023-08-15 71 % (mean measured fraction 0.36); Qvidja 2024: 32 % of the year, window 2024-06-01 to 2024-08-29 73 % (mean measured fraction 0.43); Qvidja 2025: 28 % of the year, window 2025-05-07 to 2025-08-04 83 % (mean measured fraction 0.29); Viikki 2024: 36 % of the year, window 2024-06-15 to 2024-09-12 91 % (mean measured fraction 0.28); Viikki 2025 faba bean: 27 % of the year, window 2025-06-14 to 2025-09-11 80 % (mean measured fraction 0.15)."
     }
   ],
   "dataVersion": {
-    "generatedAt": "2026-10-27T17:30:57Z",
+    "generatedAt": "2026-10-27T17:49:52Z",
     "git": {
-      "commit": "fcbd8fd",
+      "commit": "5f54e25",
       "dirty": true
     },
     "script": {
       "path": "analysis/carbon-space/carbon-space.py",
-      "sha256": "b0313d9c0b2156e90dc74c2d89b49b6689e2e7e3e3fad0f121ff6f17d784ea78"
+      "sha256": "540a7ecfe4b2c0b82d23dc781979ed285f43ee79f836ee955c0f721cdb2c6a68"
     },
     "lock": {
       "path": "analysis/carbon-space/carbon-space.py.lock",
@@ -2535,6 +2935,7 @@
     "args": {
       "db": "db",
       "calculated": "data/calculated",
+      "smear": "data/smear/hyytiala",
       "out": null,
       "check": false
     },
@@ -2567,6 +2968,66 @@
           "path": "calculated/daily.parquet",
           "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
           "rows": 11209
+        },
+        {
+          "path": "smear/HYY_EDDY233_NEE_GPP_2020.csv",
+          "sha256": "75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20",
+          "rows": 17568
+        },
+        {
+          "path": "smear/HYY_EDDYMAST_F_c_270_2020.csv",
+          "sha256": "fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2",
+          "rows": 17568
+        },
+        {
+          "path": "smear/HYY_EDDY233_NEE_GPP_2021.csv",
+          "sha256": "468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5",
+          "rows": 17520
+        },
+        {
+          "path": "smear/HYY_EDDYMAST_F_c_270_2021.csv",
+          "sha256": "5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d",
+          "rows": 17520
+        },
+        {
+          "path": "smear/HYY_EDDY233_NEE_GPP_2022.csv",
+          "sha256": "4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb",
+          "rows": 17520
+        },
+        {
+          "path": "smear/HYY_EDDYMAST_F_c_270_2022.csv",
+          "sha256": "c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762",
+          "rows": 17520
+        },
+        {
+          "path": "smear/HYY_EDDY233_NEE_GPP_2023.csv",
+          "sha256": "cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914",
+          "rows": 17520
+        },
+        {
+          "path": "smear/HYY_EDDYMAST_F_c_270_2023.csv",
+          "sha256": "95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a",
+          "rows": 17520
+        },
+        {
+          "path": "smear/HYY_EDDY233_NEE_GPP_2024.csv",
+          "sha256": "2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a",
+          "rows": 17568
+        },
+        {
+          "path": "smear/HYY_EDDYMAST_F_c_270_2024.csv",
+          "sha256": "b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3",
+          "rows": 17568
+        },
+        {
+          "path": "smear/HYY_EDDY233_NEE_GPP_2025.csv",
+          "sha256": "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
+          "rows": 17520
+        },
+        {
+          "path": "smear/HYY_EDDYMAST_F_c_270_2025.csv",
+          "sha256": "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
+          "rows": 17520
         }
       ]
     },
@@ -2625,6 +3086,192 @@
           "reco_gc",
           "frac_measured"
         ]
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2020.csv",
+        "sha256": "75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20",
+        "rows": 17568,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDY233.GPP",
+          "HYY_EDDY233.NEE"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2020.csv",
+        "sha256": "fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2",
+        "rows": 17568,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDYMAST.F_c_270"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2021.csv",
+        "sha256": "468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDY233.GPP",
+          "HYY_EDDY233.NEE"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2021.csv",
+        "sha256": "5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDYMAST.F_c_270"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2022.csv",
+        "sha256": "4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDY233.GPP",
+          "HYY_EDDY233.NEE"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2022.csv",
+        "sha256": "c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDYMAST.F_c_270"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2023.csv",
+        "sha256": "cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDY233.GPP",
+          "HYY_EDDY233.NEE"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2023.csv",
+        "sha256": "95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDYMAST.F_c_270"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2024.csv",
+        "sha256": "2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a",
+        "rows": 17568,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDY233.GPP",
+          "HYY_EDDY233.NEE"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2024.csv",
+        "sha256": "b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3",
+        "rows": 17568,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDYMAST.F_c_270"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2025.csv",
+        "sha256": "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDY233.GPP",
+          "HYY_EDDY233.NEE"
+        ]
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2025.csv",
+        "sha256": "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
+        "rows": 17520,
+        "builtAt": null,
+        "columns": [
+          "Year",
+          "Month",
+          "Day",
+          "Hour",
+          "Minute",
+          "Second",
+          "HYY_EDDYMAST.F_c_270"
+        ]
       }
     ],
     "steps": {
@@ -2641,8 +3288,50 @@
         "rowsWithoutNee": 1892,
         "rule": "one row per site and local day; a day without daily NEE is not counted in the uptake share"
       },
+      "hyytiala": {
+        "source": "SMEAR II, HYY_EDDY233",
+        "years": {
+          "2020": {
+            "halfHours": 17568,
+            "neeMissing": 0,
+            "gppMissing": 0,
+            "measuredHalfHours": 16863
+          },
+          "2021": {
+            "halfHours": 17520,
+            "neeMissing": 0,
+            "gppMissing": 0,
+            "measuredHalfHours": 12435
+          },
+          "2022": {
+            "halfHours": 17520,
+            "neeMissing": 0,
+            "gppMissing": 0,
+            "measuredHalfHours": 14961
+          },
+          "2023": {
+            "halfHours": 17520,
+            "neeMissing": 0,
+            "gppMissing": 0,
+            "measuredHalfHours": 14316
+          },
+          "2024": {
+            "halfHours": 17568,
+            "neeMissing": 0,
+            "gppMissing": 0,
+            "measuredHalfHours": 14773
+          },
+          "2025": {
+            "halfHours": 17520,
+            "neeMissing": 0,
+            "gppMissing": 0,
+            "measuredHalfHours": 15169
+          }
+        },
+        "rule": "no row is removed; a half hour without NEE or GPP makes the daily and annual sum NULL; NaN or empty F_c_270 = not measured"
+      },
       "sumCheck": {
-        "comparisons": 74,
+        "comparisons": 92,
         "maxRelDiff": 1.268117035e-13,
         "rtol": 1e-06,
         "rule": "annual sum = sum of the daily values of the local year; a NULL annual sum has a daily gap"
@@ -2661,7 +3350,12 @@
           "measured fraction < 0.2": 6,
           "longest gap > 30 d": 8
         },
-        "rule": "full_year and reliable; Figure 1 also needs annual GPP and Reco"
+        "rule": "full_year and reliable; Figure 1 also needs annual GPP and Reco",
+        "hyytiala": {
+          "siteYears": 6,
+          "fig5": 6,
+          "fig4": 6
+        }
       }
     }
   }

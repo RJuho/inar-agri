@@ -78,6 +78,17 @@ export const EXTRA_REFERENCES = {
     text: 'Project team (2026). Standardized Precipitation Index (SPI) of the FMI stations Vantaa Helsinki-Vantaa airport, Kaarina Yltöinen and Kuopio Maaninka, 1980 to 2026. Computed from FMI monthly precipitation with the SPEI R package (spi(), gamma distribution, unbiased PWM fit, reference period 1981 to 2010), scales 1, 3, 6 and 12 months. Script data/SPI/SPIanalysis.R.',
     file: 'data/SPI/SPI_all_stations.csv',
   },
+  'smear-hyytiala': {
+    short: 'SMEAR II Hyytiälä flux data',
+    text: 'University of Helsinki, INAR (2026). SMEAR II Hyytiälä forest station: gap-filled NEE and GPP (table HYY_EDDY233) and the measured CO2 flux at 27 m (HYY_EDDYMAST.F_c_270), 2020 to 2025, 30-minute step. Downloaded 2026-10-27 from the SMEAR API (station id 2). Rights field of the API metadata: public.',
+    file: 'data/smear/hyytiala/README.md',
+  },
+  kulmala2019: {
+    short: 'Kulmala et al. 2019',
+    text: 'Kulmala, L., Pumpanen, J., Kolari, P., Dengel, S., Berninger, F., Köster, K., Matkala, L., Vanhatalo, A., Vesala, T. and Bäck, J. (2019). Inter- and intra-annual dynamics of photosynthesis differ between forest floor vegetation and tree canopy in a subarctic Scots pine stand. Agricultural and Forest Meteorology 271, 1 to 11. The gap-filling and partitioning method of the SMEAR NEE and GPP.',
+    doi: '10.1016/j.agrformet.2019.02.029',
+    file: 'data/smear/hyytiala/README.md',
+  },
 } as const satisfies Record<string, DiveReference>;
 
 export type DiveRefId = (typeof REF_IDS)[number] | keyof typeof EXTRA_REFERENCES;

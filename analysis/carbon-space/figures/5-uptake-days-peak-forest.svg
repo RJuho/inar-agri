@@ -1,0 +1,996 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="311.811024pt" viewBox="0 0 510.23622 311.811024" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="carbon-space-fig5-title carbon-space-fig5-desc">
+ <title id="carbon-space-fig5-title">Share of days with net CO2 uptake (daily NEE &lt; 0) per site-year, over the whole year and over the 90-day window with the largest GPP sum, with the SMEAR II Hyytiälä forest as a reference.</title>
+ <desc id="carbon-space-fig5-desc">Grouped bar chart of 22 site-years: the 16 site-years of Figure 3 and 6 site-years of the SMEAR II Hyytiälä forest (reference, last group). Per site-year, the left bar (full site colour) is the share of days with daily NEE &lt; 0 over the whole year, the right bar (lighter, hatched) the share inside the 90 consecutive local days with the largest GPP sum of the year; y axis days with net uptake (%), 0 to 100, dotted line at 50 %. Mean ± SD (range) of the whole year: forest 44 % ± 4 % (36 % to 50 %, n = 6), grassland 31 % ± 4 % (25 % to 37 %, n = 11), annual crops 36 % ± 29 % (18 % to 87 %, n = 5); of the peak window: forest 91 % ± 6 % (82 % to 98 %, n = 6), grassland 79 % ± 7 % (68 % to 91 %, n = 11), annual crops 76 % ± 7 % (69 % to 83 %, n = 5), Finnish sites of the database 78 % ± 7 % (68 % to 91 %, n = 15). Maktau 2019 maize: 87 % of the year, window 2019-10-03 to 2019-12-31 81 % (mean measured fraction 0.75). Hyytiälä: Hyytiälä 2020: 36 % of the year, window 2020-06-01 to 2020-08-29 82 % (mean measured fraction 0.96); Hyytiälä 2021: 45 % of the year, window 2021-05-27 to 2021-08-24 89 % (mean measured fraction 0.96); Hyytiälä 2022: 43 % of the year, window 2022-06-04 to 2022-09-01 87 % (mean measured fraction 0.97); Hyytiälä 2023: 42 % of the year, window 2023-05-23 to 2023-08-20 96 % (mean measured fraction 0.97); Hyytiälä 2024: 44 % of the year, window 2024-05-23 to 2024-08-20 97 % (mean measured fraction 0.96); Hyytiälä 2025: 50 % of the year, window 2025-06-01 to 2025-08-29 98 % (mean measured fraction 0.87). Other site-years: Anttila 2022: 36 % of the year, window 2022-05-24 to 2022-08-21 79 % (mean measured fraction 0.64); Anttila 2023: 36 % of the year, window 2023-05-10 to 2023-08-07 86 % (mean measured fraction 0.70); Särkisuo 2022: 29 % of the year, window 2022-06-10 to 2022-09-07 74 % (mean measured fraction 0.56); Särkisuo 2023: 31 % of the year, window 2023-07-10 to 2023-10-07 68 % (mean measured fraction 0.54); Haltiala 2022 oats: 24 % of the year, window 2022-05-19 to 2022-08-16 69 % (mean measured fraction 0.69); Haltiala 2023 grass (failed): 25 % of the year, window 2023-05-09 to 2023-08-06 86 % (mean measured fraction 0.68); Haltiala 2024 sunflower: 24 % of the year, window 2024-06-27 to 2024-09-24 83 % (mean measured fraction 0.65); Haltiala 2025 oats: 18 % of the year, window 2025-05-28 to 2025-08-25 69 % (mean measured fraction 0.73); Qvidja 2020: 37 % of the year, window 2020-05-07 to 2020-08-04 83 % (mean measured fraction 0.27); Qvidja 2022: 29 % of the year, window 2022-05-18 to 2022-08-15 77 % (mean measured fraction 0.40); Qvidja 2023: 27 % of the year, window 2023-05-18 to 2023-08-15 71 % (mean measured fraction 0.36); Qvidja 2024: 32 % of the year, window 2024-06-01 to 2024-08-29 73 % (mean measured fraction 0.43); Qvidja 2025: 28 % of the year, window 2025-05-07 to 2025-08-04 83 % (mean measured fraction 0.29); Viikki 2024: 36 % of the year, window 2024-06-15 to 2024-09-12 91 % (mean measured fraction 0.28); Viikki 2025 faba bean: 27 % of the year, window 2025-06-14 to 2025-09-11 80 % (mean measured fraction 0.15).</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Share of days with net CO2 uptake (daily NEE &lt; 0) per site-year, over the whole year and over the 90-day window with the largest GPP sum, with the SMEAR II Hyytiälä forest as a reference.</dc:title>
+    <dc:description>Grouped bar chart of 22 site-years: the 16 site-years of Figure 3 and 6 site-years of the SMEAR II Hyytiälä forest (reference, last group). Per site-year, the left bar (full site colour) is the share of days with daily NEE &lt; 0 over the whole year, the right bar (lighter, hatched) the share inside the 90 consecutive local days with the largest GPP sum of the year; y axis days with net uptake (%), 0 to 100, dotted line at 50 %. Mean ± SD (range) of the whole year: forest 44 % ± 4 % (36 % to 50 %, n = 6), grassland 31 % ± 4 % (25 % to 37 %, n = 11), annual crops 36 % ± 29 % (18 % to 87 %, n = 5); of the peak window: forest 91 % ± 6 % (82 % to 98 %, n = 6), grassland 79 % ± 7 % (68 % to 91 %, n = 11), annual crops 76 % ± 7 % (69 % to 83 %, n = 5), Finnish sites of the database 78 % ± 7 % (68 % to 91 %, n = 15). Maktau 2019 maize: 87 % of the year, window 2019-10-03 to 2019-12-31 81 % (mean measured fraction 0.75). Hyytiälä: Hyytiälä 2020: 36 % of the year, window 2020-06-01 to 2020-08-29 82 % (mean measured fraction 0.96); Hyytiälä 2021: 45 % of the year, window 2021-05-27 to 2021-08-24 89 % (mean measured fraction 0.96); Hyytiälä 2022: 43 % of the year, window 2022-06-04 to 2022-09-01 87 % (mean measured fraction 0.97); Hyytiälä 2023: 42 % of the year, window 2023-05-23 to 2023-08-20 96 % (mean measured fraction 0.97); Hyytiälä 2024: 44 % of the year, window 2024-05-23 to 2024-08-20 97 % (mean measured fraction 0.96); Hyytiälä 2025: 50 % of the year, window 2025-06-01 to 2025-08-29 98 % (mean measured fraction 0.87). Other site-years: Anttila 2022: 36 % of the year, window 2022-05-24 to 2022-08-21 79 % (mean measured fraction 0.64); Anttila 2023: 36 % of the year, window 2023-05-10 to 2023-08-07 86 % (mean measured fraction 0.70); Särkisuo 2022: 29 % of the year, window 2022-06-10 to 2022-09-07 74 % (mean measured fraction 0.56); Särkisuo 2023: 31 % of the year, window 2023-07-10 to 2023-10-07 68 % (mean measured fraction 0.54); Haltiala 2022 oats: 24 % of the year, window 2022-05-19 to 2022-08-16 69 % (mean measured fraction 0.69); Haltiala 2023 grass (failed): 25 % of the year, window 2023-05-09 to 2023-08-06 86 % (mean measured fraction 0.68); Haltiala 2024 sunflower: 24 % of the year, window 2024-06-27 to 2024-09-24 83 % (mean measured fraction 0.65); Haltiala 2025 oats: 18 % of the year, window 2025-05-28 to 2025-08-25 69 % (mean measured fraction 0.73); Qvidja 2020: 37 % of the year, window 2020-05-07 to 2020-08-04 83 % (mean measured fraction 0.27); Qvidja 2022: 29 % of the year, window 2022-05-18 to 2022-08-15 77 % (mean measured fraction 0.40); Qvidja 2023: 27 % of the year, window 2023-05-18 to 2023-08-15 71 % (mean measured fraction 0.36); Qvidja 2024: 32 % of the year, window 2024-06-01 to 2024-08-29 73 % (mean measured fraction 0.43); Qvidja 2025: 28 % of the year, window 2025-05-07 to 2025-08-04 83 % (mean measured fraction 0.29); Viikki 2024: 36 % of the year, window 2024-06-15 to 2024-09-12 91 % (mean measured fraction 0.28); Viikki 2025 faba bean: 27 % of the year, window 2025-06-14 to 2025-09-11 80 % (mean measured fraction 0.15).</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; calculated/annual.csv sha256 27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9; smear/HYY_EDDY233_NEE_GPP_2020.csv sha256 75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20; smear/HYY_EDDYMAST_F_c_270_2020.csv sha256 fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2; smear/HYY_EDDY233_NEE_GPP_2021.csv sha256 468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5; smear/HYY_EDDYMAST_F_c_270_2021.csv sha256 5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d; smear/HYY_EDDY233_NEE_GPP_2022.csv sha256 4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb; smear/HYY_EDDYMAST_F_c_270_2022.csv sha256 c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762; smear/HYY_EDDY233_NEE_GPP_2023.csv sha256 cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914; smear/HYY_EDDYMAST_F_c_270_2023.csv sha256 95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a; smear/HYY_EDDY233_NEE_GPP_2024.csv sha256 2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a; smear/HYY_EDDYMAST_F_c_270_2024.csv sha256 b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3; smear/HYY_EDDY233_NEE_GPP_2025.csv sha256 55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508; smear/HYY_EDDYMAST_F_c_270_2025.csv sha256 39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b</dc:relation>
+    <dc:source>analysis/carbon-space/carbon-space.py (git 5f54e25, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="cs5-figure_1">
+  <g id="cs5-patch_1">
+   <path d="M 0 311.811024 
+L 510.23622 311.811024 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="cs5-axes_1">
+   <g id="cs5-patch_2">
+    <path d="M 51.023622 243.212598 
+L 494.929134 243.212598 
+L 494.929134 37.417323 
+L 51.023622 37.417323 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="cs5-line2d_1">
+    <path d="M 51.023622 140.314961 
+L 494.929134 140.314961 
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: none; stroke-dasharray: 1.4,2.31; stroke-dashoffset: 0; stroke: #222222; stroke-width: 1.4"/>
+   </g>
+   <g id="cs5-matplotlib.axis_1">
+    <g id="cs5-xtick_1">
+     <g id="cs5-line2d_2"/>
+     <g id="cs5-text_1">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(63.830622 266.254473) rotate(-90)">2022</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_2">
+     <g id="cs5-line2d_3"/>
+     <g id="cs5-text_2">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(81.766198 266.254473) rotate(-90)">2023</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_3">
+     <g id="cs5-line2d_4"/>
+     <g id="cs5-text_3">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(106.876005 266.254473) rotate(-90)">2022</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_4">
+     <g id="cs5-line2d_5"/>
+     <g id="cs5-text_4">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(124.811581 266.254473) rotate(-90)">2023</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_5">
+     <g id="cs5-line2d_6"/>
+     <g id="cs5-text_5">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(149.921388 266.254473) rotate(-90)">2022</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_6">
+     <g id="cs5-line2d_7"/>
+     <g id="cs5-text_6">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(167.856964 266.254473) rotate(-90)">2023</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_7">
+     <g id="cs5-line2d_8"/>
+     <g id="cs5-text_7">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(185.79254 266.254473) rotate(-90)">2024</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_8">
+     <g id="cs5-line2d_9"/>
+     <g id="cs5-text_8">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(203.728117 266.254473) rotate(-90)">2025</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_9">
+     <g id="cs5-line2d_10"/>
+     <g id="cs5-text_9">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(228.837923 266.254473) rotate(-90)">2020</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_10">
+     <g id="cs5-line2d_11"/>
+     <g id="cs5-text_10">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(246.7735 266.254473) rotate(-90)">2022</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_11">
+     <g id="cs5-line2d_12"/>
+     <g id="cs5-text_11">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(264.709076 266.254473) rotate(-90)">2023</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_12">
+     <g id="cs5-line2d_13"/>
+     <g id="cs5-text_12">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(282.644652 266.254473) rotate(-90)">2024</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_13">
+     <g id="cs5-line2d_14"/>
+     <g id="cs5-text_13">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(300.580228 266.254473) rotate(-90)">2025</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_14">
+     <g id="cs5-line2d_15"/>
+     <g id="cs5-text_14">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(325.690035 266.254473) rotate(-90)">2024</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_15">
+     <g id="cs5-line2d_16"/>
+     <g id="cs5-text_15">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(343.625611 266.254473) rotate(-90)">2025</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_16">
+     <g id="cs5-line2d_17"/>
+     <g id="cs5-text_16">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(368.735418 266.254473) rotate(-90)">2019</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_17">
+     <g id="cs5-line2d_18"/>
+     <g id="cs5-text_17">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(393.845225 266.254473) rotate(-90)">2020</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_18">
+     <g id="cs5-line2d_19"/>
+     <g id="cs5-text_18">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(411.780801 266.254473) rotate(-90)">2021</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_19">
+     <g id="cs5-line2d_20"/>
+     <g id="cs5-text_19">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(429.716377 266.254473) rotate(-90)">2022</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_20">
+     <g id="cs5-line2d_21"/>
+     <g id="cs5-text_20">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(447.651954 266.254473) rotate(-90)">2023</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_21">
+     <g id="cs5-line2d_22"/>
+     <g id="cs5-text_21">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(465.58753 266.254473) rotate(-90)">2024</text>
+     </g>
+    </g>
+    <g id="cs5-xtick_22">
+     <g id="cs5-line2d_23"/>
+     <g id="cs5-text_22">
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(483.523106 266.254473) rotate(-90)">2025</text>
+     </g>
+    </g>
+   </g>
+   <g id="cs5-matplotlib.axis_2">
+    <g id="cs5-ytick_1">
+     <g id="cs5-line2d_24">
+      <defs>
+       <path id="cs5-md5dd3dbd79" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.9"/>
+      </defs>
+      <g>
+       <use xlink:href="#cs5-md5dd3dbd79" x="51.023622" y="243.212598" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="cs5-text_23">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="44.023622" y="247.201368" transform="rotate(-0 44.023622 247.201368)">0</text>
+     </g>
+    </g>
+    <g id="cs5-ytick_2">
+     <g id="cs5-line2d_25">
+      <g>
+       <use xlink:href="#cs5-md5dd3dbd79" x="51.023622" y="191.76378" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="cs5-text_24">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="44.023622" y="195.752549" transform="rotate(-0 44.023622 195.752549)">25</text>
+     </g>
+    </g>
+    <g id="cs5-ytick_3">
+     <g id="cs5-line2d_26">
+      <g>
+       <use xlink:href="#cs5-md5dd3dbd79" x="51.023622" y="140.314961" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="cs5-text_25">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="44.023622" y="144.30373" transform="rotate(-0 44.023622 144.30373)">50</text>
+     </g>
+    </g>
+    <g id="cs5-ytick_4">
+     <g id="cs5-line2d_27">
+      <g>
+       <use xlink:href="#cs5-md5dd3dbd79" x="51.023622" y="88.866142" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="cs5-text_26">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="44.023622" y="92.854911" transform="rotate(-0 44.023622 92.854911)">75</text>
+     </g>
+    </g>
+    <g id="cs5-ytick_5">
+     <g id="cs5-line2d_28">
+      <g>
+       <use xlink:href="#cs5-md5dd3dbd79" x="51.023622" y="37.417323" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="cs5-text_27">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="44.023622" y="41.406092" transform="rotate(-0 44.023622 41.406092)">100</text>
+     </g>
+    </g>
+    <g id="cs5-text_28">
+     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="17.27911" y="140.314961" transform="rotate(-90 17.27911 140.314961)">Days with net uptake (%)</text>
+    </g>
+   </g>
+   <g id="cs5-patch_3">
+    <path d="M 54.610737 243.212598 
+L 61.784968 243.212598 
+L 61.784968 169.915651 
+L 54.610737 169.915651 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #0072b2; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_4">
+    <path d="M 61.784968 243.212598 
+L 68.959198 243.212598 
+L 68.959198 80.862992 
+L 61.784968 80.862992 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hd72580c047); stroke: #0072b2; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_5">
+    <path d="M 72.546314 243.212598 
+L 79.720544 243.212598 
+L 79.720544 169.351828 
+L 72.546314 169.351828 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #0072b2; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_6">
+    <path d="M 79.720544 243.212598 
+L 86.894775 243.212598 
+L 86.894775 67.143307 
+L 79.720544 67.143307 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hd72580c047); stroke: #0072b2; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_7">
+    <path d="M 97.65612 243.212598 
+L 104.830351 243.212598 
+L 104.830351 184.011218 
+L 97.65612 184.011218 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #e69f00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_8">
+    <path d="M 104.830351 243.212598 
+L 112.004581 243.212598 
+L 112.004581 90.009449 
+L 104.830351 90.009449 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h34fa1b8f3e); stroke: #e69f00; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_9">
+    <path d="M 115.591696 243.212598 
+L 122.765927 243.212598 
+L 122.765927 178.936814 
+L 115.591696 178.936814 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #e69f00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_10">
+    <path d="M 122.765927 243.212598 
+L 129.940157 243.212598 
+L 129.940157 103.729134 
+L 122.765927 103.729134 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h34fa1b8f3e); stroke: #e69f00; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_11">
+    <path d="M 140.701503 243.212598 
+L 147.875734 243.212598 
+L 147.875734 193.596203 
+L 140.701503 193.596203 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_12">
+    <path d="M 147.875734 243.212598 
+L 155.049964 243.212598 
+L 155.049964 101.44252 
+L 147.875734 101.44252 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hdd646b08ba); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_13">
+    <path d="M 158.637079 243.212598 
+L 165.81131 243.212598 
+L 165.81131 191.904735 
+L 158.637079 191.904735 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_14">
+    <path d="M 165.81131 243.212598 
+L 172.98554 243.212598 
+L 172.98554 67.143307 
+L 165.81131 67.143307 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hdd646b08ba); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_15">
+    <path d="M 176.572656 243.212598 
+L 183.746886 243.212598 
+L 183.746886 193.731767 
+L 176.572656 193.731767 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_16">
+    <path d="M 183.746886 243.212598 
+L 190.921117 243.212598 
+L 190.921117 71.716535 
+L 183.746886 71.716535 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hdd646b08ba); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_17">
+    <path d="M 194.508232 243.212598 
+L 201.682462 243.212598 
+L 201.682462 206.000302 
+L 194.508232 206.000302 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_18">
+    <path d="M 201.682462 243.212598 
+L 208.856693 243.212598 
+L 208.856693 101.44252 
+L 201.682462 101.44252 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hdd646b08ba); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_19">
+    <path d="M 219.618039 243.212598 
+L 226.792269 243.212598 
+L 226.792269 166.179941 
+L 219.618039 166.179941 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_20">
+    <path d="M 226.792269 243.212598 
+L 233.9665 243.212598 
+L 233.9665 71.716535 
+L 226.792269 71.716535 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h8723b1f0ab); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_21">
+    <path d="M 237.553615 243.212598 
+L 244.727845 243.212598 
+L 244.727845 183.447395 
+L 237.553615 183.447395 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_22">
+    <path d="M 244.727845 243.212598 
+L 251.902076 243.212598 
+L 251.902076 85.43622 
+L 244.727845 85.43622 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h8723b1f0ab); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_23">
+    <path d="M 255.489191 243.212598 
+L 262.663422 243.212598 
+L 262.663422 187.957976 
+L 255.489191 187.957976 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_24">
+    <path d="M 262.663422 243.212598 
+L 269.837652 243.212598 
+L 269.837652 96.869291 
+L 262.663422 96.869291 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h8723b1f0ab); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_25">
+    <path d="M 273.424767 243.212598 
+L 280.598998 243.212598 
+L 280.598998 177.425584 
+L 273.424767 177.425584 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_26">
+    <path d="M 280.598998 243.212598 
+L 287.773228 243.212598 
+L 287.773228 92.296063 
+L 280.598998 92.296063 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h8723b1f0ab); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_27">
+    <path d="M 291.360344 243.212598 
+L 298.534574 243.212598 
+L 298.534574 185.138863 
+L 291.360344 185.138863 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_28">
+    <path d="M 298.534574 243.212598 
+L 305.708805 243.212598 
+L 305.708805 71.716535 
+L 298.534574 71.716535 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h8723b1f0ab); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_29">
+    <path d="M 316.47015 243.212598 
+L 323.644381 243.212598 
+L 323.644381 169.553634 
+L 316.47015 169.553634 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_30">
+    <path d="M 323.644381 243.212598 
+L 330.818611 243.212598 
+L 330.818611 55.710236 
+L 323.644381 55.710236 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hd4146c0200); stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_31">
+    <path d="M 334.405727 243.212598 
+L 341.579957 243.212598 
+L 341.579957 186.830331 
+L 334.405727 186.830331 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_32">
+    <path d="M 341.579957 243.212598 
+L 348.754188 243.212598 
+L 348.754188 78.576378 
+L 341.579957 78.576378 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-hd4146c0200); stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_33">
+    <path d="M 359.515533 243.212598 
+L 366.689764 243.212598 
+L 366.689764 63.916988 
+L 359.515533 63.916988 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #d55e00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_34">
+    <path d="M 366.689764 243.212598 
+L 373.863994 243.212598 
+L 373.863994 76.289764 
+L 366.689764 76.289764 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h1392000dbe); stroke: #d55e00; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_35">
+    <path d="M 384.62534 243.212598 
+L 391.799571 243.212598 
+L 391.799571 168.429069 
+L 384.62534 168.429069 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #009e73; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_36">
+    <path d="M 391.799571 243.212598 
+L 398.973801 243.212598 
+L 398.973801 74.00315 
+L 391.799571 74.00315 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h2ab1a5886e); stroke: #009e73; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_37">
+    <path d="M 402.560916 243.212598 
+L 409.735147 243.212598 
+L 409.735147 149.618035 
+L 402.560916 149.618035 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #009e73; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_38">
+    <path d="M 409.735147 243.212598 
+L 416.909377 243.212598 
+L 416.909377 60.283465 
+L 409.735147 60.283465 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h2ab1a5886e); stroke: #009e73; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_39">
+    <path d="M 420.496492 243.212598 
+L 427.670723 243.212598 
+L 427.670723 154.128616 
+L 420.496492 154.128616 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #009e73; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_40">
+    <path d="M 427.670723 243.212598 
+L 434.844953 243.212598 
+L 434.844953 64.856693 
+L 427.670723 64.856693 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h2ab1a5886e); stroke: #009e73; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_41">
+    <path d="M 438.432069 243.212598 
+L 445.606299 243.212598 
+L 445.606299 155.820084 
+L 438.432069 155.820084 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #009e73; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_42">
+    <path d="M 445.606299 243.212598 
+L 452.78053 243.212598 
+L 452.78053 46.56378 
+L 445.606299 46.56378 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h2ab1a5886e); stroke: #009e73; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_43">
+    <path d="M 456.367645 243.212598 
+L 463.541875 243.212598 
+L 463.541875 152.122886 
+L 456.367645 152.122886 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #009e73; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_44">
+    <path d="M 463.541875 243.212598 
+L 470.716106 243.212598 
+L 470.716106 44.277165 
+L 463.541875 44.277165 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h2ab1a5886e); stroke: #009e73; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_45">
+    <path d="M 474.303221 243.212598 
+L 481.477452 243.212598 
+L 481.477452 140.033049 
+L 474.303221 140.033049 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: #009e73; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_46">
+    <path d="M 481.477452 243.212598 
+L 488.651682 243.212598 
+L 488.651682 41.990551 
+L 481.477452 41.990551 
+z
+" clip-path="url(#cs5-pc8437bbbcf)" style="fill: url(#cs5-h2ab1a5886e); stroke: #009e73; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-patch_47">
+    <path d="M 51.023622 243.212598 
+L 51.023622 37.417323 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="cs5-patch_48">
+    <path d="M 51.023622 243.212598 
+L 494.929134 243.212598 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="cs5-text_29">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="70.752756" y="287.190958" transform="rotate(-0 70.752756 287.190958)">Anttila</text>
+   </g>
+   <g id="cs5-text_30">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="113.798139" y="302.338614" transform="rotate(-0 113.798139 302.338614)">Särkisuo</text>
+   </g>
+   <g id="cs5-text_31">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="174.779098" y="287.190958" transform="rotate(-0 174.779098 287.190958)">Haltiala</text>
+   </g>
+   <g id="cs5-text_32">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="262.663422" y="302.190958" transform="rotate(-0 262.663422 302.190958)">Qvidja</text>
+   </g>
+   <g id="cs5-text_33">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="332.612169" y="287.190958" transform="rotate(-0 332.612169 287.190958)">Viikki</text>
+   </g>
+   <g id="cs5-text_34">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="366.689764" y="302.190958" transform="rotate(-0 366.689764 302.190958)">Maktau</text>
+   </g>
+   <g id="cs5-text_35">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="436.638511" y="287.338614" transform="rotate(-0 436.638511 287.338614)">Hyytiälä</text>
+   </g>
+  </g>
+  <g id="cs5-legend_1">
+   <g id="cs5-patch_49">
+    <path d="M 146.160139 19.53 
+L 169.260139 19.53 
+L 169.260139 9.45 
+L 146.160139 9.45 
+z
+" style="fill: #888888; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-text_36">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="177.660139" y="18.06" transform="rotate(-0 177.660139 18.06)">Whole year</text>
+   </g>
+   <g id="cs5-patch_50">
+    <path d="M 258.262405 19.53 
+L 281.362405 19.53 
+L 281.362405 9.45 
+L 258.262405 9.45 
+z
+" style="fill: url(#cs5-h79ad6f03b2); stroke: #888888; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="cs5-text_37">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="289.762405" y="18.06" transform="rotate(-0 289.762405 18.06)">Peak-GPP 90 days</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="cs5-pc8437bbbcf">
+   <rect x="51.023622" y="37.417323" width="443.905512" height="205.795276"/>
+  </clipPath>
+ </defs>
+ <defs>
+  <pattern id="cs5-hd72580c047" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#8cc0dc"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #0072b2; stroke: #0072b2; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+  <pattern id="cs5-h34fa1b8f3e" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#f4d48c"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #e69f00; stroke: #e69f00; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+  <pattern id="cs5-hdd646b08ba" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#b3ddf5"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #56b4e9; stroke: #56b4e9; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+  <pattern id="cs5-h8723b1f0ab" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#e8c3d7"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+  <pattern id="cs5-hd4146c0200" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#8c8c8c"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #222222; stroke: #222222; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+  <pattern id="cs5-h1392000dbe" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#ecb78c"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #d55e00; stroke: #d55e00; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+  <pattern id="cs5-h2ab1a5886e" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#8cd3c0"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #009e73; stroke: #009e73; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+  <pattern id="cs5-h79ad6f03b2" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#c9c9c9"/>
+   <path d="M -36 36 
+L 36 -36 
+M -32 40 
+L 40 -32 
+M -28 44 
+L 44 -28 
+M -24 48 
+L 48 -24 
+M -20 52 
+L 52 -20 
+M -16 56 
+L 56 -16 
+M -12 60 
+L 60 -12 
+M -8 64 
+L 64 -8 
+M -4 68 
+L 68 -4 
+M 0 72 
+L 72 0 
+M 4 76 
+L 76 4 
+M 8 80 
+L 80 8 
+M 12 84 
+L 84 12 
+M 16 88 
+L 88 16 
+M 20 92 
+L 92 20 
+M 24 96 
+L 96 24 
+M 28 100 
+L 100 28 
+M 32 104 
+L 104 32 
+M 36 108 
+L 108 36 
+" style="fill: #888888; stroke: #888888; stroke-width: 1.2; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+ </defs>
+</svg>

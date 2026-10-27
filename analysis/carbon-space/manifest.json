@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-27T17:30:57Z",
+  "generatedAt": "2026-10-27T17:49:52Z",
   "git": {
-    "commit": "fcbd8fd",
+    "commit": "5f54e25",
     "dirty": true
   },
   "script": {
     "path": "analysis/carbon-space/carbon-space.py",
-    "sha256": "b0313d9c0b2156e90dc74c2d89b49b6689e2e7e3e3fad0f121ff6f17d784ea78"
+    "sha256": "540a7ecfe4b2c0b82d23dc781979ed285f43ee79f836ee955c0f721cdb2c6a68"
   },
   "lock": {
     "path": "analysis/carbon-space/carbon-space.py.lock",
@@ -44,6 +44,7 @@
   "args": {
     "db": "db",
     "calculated": "data/calculated",
+    "smear": "data/smear/hyytiala",
     "out": null,
     "check": false
   },
@@ -76,6 +77,66 @@
         "path": "calculated/daily.parquet",
         "sha256": "fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9",
         "rows": 11209
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2020.csv",
+        "sha256": "75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20",
+        "rows": 17568
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2020.csv",
+        "sha256": "fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2",
+        "rows": 17568
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2021.csv",
+        "sha256": "468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2021.csv",
+        "sha256": "5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2022.csv",
+        "sha256": "4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2022.csv",
+        "sha256": "c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2023.csv",
+        "sha256": "cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2023.csv",
+        "sha256": "95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2024.csv",
+        "sha256": "2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a",
+        "rows": 17568
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2024.csv",
+        "sha256": "b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3",
+        "rows": 17568
+      },
+      {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2025.csv",
+        "sha256": "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2025.csv",
+        "sha256": "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
+        "rows": 17520
       }
     ]
   },
@@ -134,6 +195,192 @@
         "reco_gc",
         "frac_measured"
       ]
+    },
+    {
+      "path": "smear/HYY_EDDY233_NEE_GPP_2020.csv",
+      "sha256": "75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20",
+      "rows": 17568,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDY233.GPP",
+        "HYY_EDDY233.NEE"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDYMAST_F_c_270_2020.csv",
+      "sha256": "fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2",
+      "rows": 17568,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDYMAST.F_c_270"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDY233_NEE_GPP_2021.csv",
+      "sha256": "468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDY233.GPP",
+        "HYY_EDDY233.NEE"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDYMAST_F_c_270_2021.csv",
+      "sha256": "5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDYMAST.F_c_270"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDY233_NEE_GPP_2022.csv",
+      "sha256": "4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDY233.GPP",
+        "HYY_EDDY233.NEE"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDYMAST_F_c_270_2022.csv",
+      "sha256": "c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDYMAST.F_c_270"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDY233_NEE_GPP_2023.csv",
+      "sha256": "cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDY233.GPP",
+        "HYY_EDDY233.NEE"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDYMAST_F_c_270_2023.csv",
+      "sha256": "95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDYMAST.F_c_270"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDY233_NEE_GPP_2024.csv",
+      "sha256": "2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a",
+      "rows": 17568,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDY233.GPP",
+        "HYY_EDDY233.NEE"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDYMAST_F_c_270_2024.csv",
+      "sha256": "b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3",
+      "rows": 17568,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDYMAST.F_c_270"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDY233_NEE_GPP_2025.csv",
+      "sha256": "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDY233.GPP",
+        "HYY_EDDY233.NEE"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDYMAST_F_c_270_2025.csv",
+      "sha256": "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDYMAST.F_c_270"
+      ]
     }
   ],
   "steps": {
@@ -150,8 +397,50 @@
       "rowsWithoutNee": 1892,
       "rule": "one row per site and local day; a day without daily NEE is not counted in the uptake share"
     },
+    "hyytiala": {
+      "source": "SMEAR II, HYY_EDDY233",
+      "years": {
+        "2020": {
+          "halfHours": 17568,
+          "neeMissing": 0,
+          "gppMissing": 0,
+          "measuredHalfHours": 16863
+        },
+        "2021": {
+          "halfHours": 17520,
+          "neeMissing": 0,
+          "gppMissing": 0,
+          "measuredHalfHours": 12435
+        },
+        "2022": {
+          "halfHours": 17520,
+          "neeMissing": 0,
+          "gppMissing": 0,
+          "measuredHalfHours": 14961
+        },
+        "2023": {
+          "halfHours": 17520,
+          "neeMissing": 0,
+          "gppMissing": 0,
+          "measuredHalfHours": 14316
+        },
+        "2024": {
+          "halfHours": 17568,
+          "neeMissing": 0,
+          "gppMissing": 0,
+          "measuredHalfHours": 14773
+        },
+        "2025": {
+          "halfHours": 17520,
+          "neeMissing": 0,
+          "gppMissing": 0,
+          "measuredHalfHours": 15169
+        }
+      },
+      "rule": "no row is removed; a half hour without NEE or GPP makes the daily and annual sum NULL; NaN or empty F_c_270 = not measured"
+    },
     "sumCheck": {
-      "comparisons": 74,
+      "comparisons": 92,
       "maxRelDiff": 1.2681170347140436e-13,
       "rtol": 1e-06,
       "rule": "annual sum = sum of the daily values of the local year; a NULL annual sum has a daily gap"
@@ -170,23 +459,36 @@
         "measured fraction < 0.2": 6,
         "longest gap > 30 d": 8
       },
-      "rule": "full_year and reliable; Figure 1 also needs annual GPP and Reco"
+      "rule": "full_year and reliable; Figure 1 also needs annual GPP and Reco",
+      "hyytiala": {
+        "siteYears": 6,
+        "fig5": 6,
+        "fig4": 6
+      }
     }
   },
   "outputs": {
-    "results.json": "7fb22def4ae733b0ba119e7d1c316e9811e432ecf1eca7232ca03221766fc145",
+    "results.json": "78ead9bd24f498b59928110695cd80161832531caea461026bec9d18c0a96dd2",
     "figures": {
       "figures/1-carbon-space.svg": {
-        "sha256": "a0fd2a623de3b6f19fe79be2a862d6e2f621614a8d3ae076861a4f9539d6609d",
+        "sha256": "86362a1da8258dd52ecec4888698625907c1f6600d5c1cba70f02d90a0386769",
         "sha256WithoutMetadata": "02414d8c381d4b04d790aee6d4fca0b6c52b65c84408ac1eb990338b8a6f50a9"
       },
       "figures/2-uptake-days.svg": {
-        "sha256": "362a98c25623a78f002f3db6861c63b6e74ffff63b4cfb1a16eb1cac5f2aeb69",
+        "sha256": "fbdec7ac051a70c7be06b7d43db71b9286bf175d76060d96b2be221520899c05",
         "sha256WithoutMetadata": "a17a38295dc6c89fc61ad3eb0a088dcc2780c5e4c43308d9ac2976db89ce5e78"
       },
       "figures/3-uptake-days-peak.svg": {
-        "sha256": "2b898998bb15cefd560e0122dafad323fec266af4da857bb5ef39255946648e2",
+        "sha256": "203377e5e24e59063fc591ac812e0eaf327bb1d08a0ac53150062dff41d27eaf",
         "sha256WithoutMetadata": "bb4aa4c1e82c3ee874bc46f2816ccbdb2f58eac0e59869a2f67632177074b0b1"
+      },
+      "figures/4-carbon-space-forest.svg": {
+        "sha256": "4ece4410df2009ba9e3df2bc6fa4e56ae5579282f8ac052861b617c87d10a1a9",
+        "sha256WithoutMetadata": "5731e3926505e976fd648ca7c0108aae0849b1ec4bdc3f6cc6e0f860e616bb76"
+      },
+      "figures/5-uptake-days-peak-forest.svg": {
+        "sha256": "c4c95881c2e3bd066f0c363437da99c20101ba395e9aab7edf4570706fffe2fc",
+        "sha256WithoutMetadata": "dcadb03b6f014c49e530fa995f7cff51dfc8df031007b067fefa42db2d796d44"
       }
     }
   }

@@ -21,7 +21,7 @@ models:
   - model: Claude Haiku 5.5
     role: language (STE) and reference review
 script: analysis/carbon-space/carbon-space.py
-references: [calculated-doc, anomaly-report, heimsch2024, shurpali2025, rasanen2026, haltiala-management, qvidja-management, viikki-management]
+references: [calculated-doc, anomaly-report, heimsch2024, shurpali2025, rasanen2026, haltiala-management, qvidja-management, viikki-management, smear-hyytiala, kulmala2019]
 checks:
   - kind: recompute
     by: Claude Sonnet 5.5
@@ -42,7 +42,7 @@ import Figure from '../../components/deep-dive/Figure.astro';
 import References from '../../components/deep-dive/References.astro';
 import { baseUrl } from '../../lib/deepDive';
 import { REPO_URL } from '../../lib/dataReport';
-import { carbonSpaceData, excludedRows, fig1Count, inputRows, listText, peakStartRange, peakWindowText, siteYearRows, sourceList, syKey, syLabel } from '../../lib/deepDives/carbonSpace';
+import { carbonSpaceData, excludedRows, fig1Count, inputRows, listText, peakStartRange, peakWindowText, refKey, refPeakStartRange, refRows, refSourceList, siteYearRows, sourceList, syKey, syLabel } from '../../lib/deepDives/carbonSpace';
 
 export const d = carbonSpaceData(raw);
 export const base = baseUrl();
@@ -60,6 +60,10 @@ export const G = d.groups;
 export const annualCropList = listText(d, d.groups['annual crop'].fig2SiteYears);
 export const nQvidjaFig1 = fig1Count(d, 'qvidja');
 export const PS = peakStartRange(d);
+export const R = (key) => refKey(d, key);
+export const RPS = refPeakStartRange(d);
+export const refTable = refRows(d);
+export const refSources = refSourceList(d);
 export const NAME = (key) => syLabel(d, key);
 export const VIEW3 = { name: 'Uptake days and GPP', sites: SITES, variables: ['nee_f', 'gpp'], yearFrom: 2019, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] };
 
@@ -88,6 +92,7 @@ each excluded site-year from these flags (table "Site-years not shown"). The rea
 (measured fraction 0) comes first. Then come "partial year", "measured fraction" and "longest gap"; a site-year can have
 more than one of these. "No annual GPP or Reco sum" applies only to a site-year that is otherwise full and reliable.
 Figure 1 has <Num k="summary.nFig1" digits={0} /> site-years. Figures 2 and 3 have <Num k="summary.nFig2" digits={0} />.
+Figures 4 and 5 add the <Num k="groups.forest.nee.n" digits={0} /> forest years (paragraph "Reference site").
 
 **Uptake days.** A day is a row of `daily.parquet` with a local date. An uptake day is a day with a daily NEE below zero.
 The rule is strict: a daily NEE of exactly zero is not an uptake day. The share is the uptake days divided by the days
@@ -107,6 +112,17 @@ includes Haltiala 2023 (sown grass that failed) and Viikki 2024. The event count
 `db/events.parquet` in the calendar year of the event start date. "Harvest or cut" is the sum of the harvest and cut
 events. "Other" is the sum of the spraying and other events. The events come from the management files
 <Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} /> and the other sources of the database.
+
+**Reference site (Figures 4 and 5).** The SMEAR II Hyytiälä forest is a reference site with rare management. It is not
+in the database. The script reads the years 2020 to 2025 from the SMEAR API: the gap-filled NEE and GPP of table
+HYY_EDDY233 and the measured CO₂ flux at 27 m, F_c_270 <Cite ids={['smear-hyytiala']} />. The SMEAR variable metadata
+names Kulmala et al. 2019 as the method of the gap filling and the partitioning <Cite ids={['kulmala2019']} />. NEE is
+positive for an emission, and GPP is positive. Reco is NEE + GPP. The time base is UTC+2 all year, and a local day is a
+calendar day. The daily and annual sums use the same unit conversion as the calculated products. The measured fraction
+is the share of the half hours with a measured F_c_270 value. The longest gap is the longest run without it. The
+inclusion rule and the uptake windows are the same as for the other sites. The forest is not in the grassland or
+annual-crop group. It has its own group, forest. Figure 4 has <Num k="summary.fig4.n" digits={0} /> site-years and
+Figure 5 has <Num k="summary.nFig5" digits={0} />.
 
 **Line and groups.** The script fits an OLS line, Reco = slope × GPP + intercept, to the Figure 1 site-years. It fits
 with and without Maktau. It also gives the Pearson r. The groups give n, mean, sample SD (n − 1), minimum and maximum.
@@ -220,6 +236,36 @@ The group means do not differ clearly. The SDs are large and the ranges overlap.
 mean: NEE is <Num k="groups.annual crop.nee.mean" digits={0} /> with it and <Num k="groups.annual crop without Maktau.nee.mean" digits={0} />
 without it ({UA}).
 
+### The forest as a reference
+
+<Figure id="figure-4" svgFile="analysis/carbon-space/figures/4-carbon-space-forest.svg" view={VIEW1} />
+
+In Figure 4, <Num k="summary.fig4.nSink" digits={0} /> of the <Num k="summary.fig4.n" digits={0} /> site-years are below
+the 1:1 line and <Num k="summary.fig4.nSource" digits={0} /> are above it. The forest years lie below the line, except
+{refSources} (NEE <Num k={`${R('hyytiala-2020')}.nee`} digits={0} sign unit={UA} />). This source year is in the SMEAR
+data as delivered. This dive does not explain it. The forest Reco/GPP was <Num k="groups.forest.recoGppRatio.mean" /> ±
+<Num k="groups.forest.recoGppRatio.sd" /> (n = <Num k="groups.forest.recoGppRatio.n" digits={0} />, range
+<Num k="groups.forest.recoGppRatio.min" /> to <Num k="groups.forest.recoGppRatio.max" />). The grassland Reco/GPP was
+<Num k="groups.grassland.recoGppRatio.mean" /> ± <Num k="groups.grassland.recoGppRatio.sd" /> (n = <Num k="groups.grassland.recoGppRatio.n" digits={0} />,
+range <Num k="groups.grassland.recoGppRatio.min" /> to <Num k="groups.grassland.recoGppRatio.max" />). With the forest,
+the OLS line is Reco = <Num k="regression.withHyytiala.slope" /> × GPP + <Num k="regression.withHyytiala.intercept" digits={0} />
+(r = <Num k="regression.withHyytiala.r" />, n = <Num k="regression.withHyytiala.n" digits={0} />).
+
+<Figure id="figure-5" svgFile="analysis/carbon-space/figures/5-uptake-days-peak-forest.svg" view={VIEW3} />
+
+The forest had uptake days on <Num k="groups.forest.uptakeYear.mean" percent digits={0} /> ±
+<Num k="groups.forest.uptakeYear.sd" percent digits={0} /> of the year (n = <Num k="groups.forest.uptakeYear.n" digits={0} />,
+range <Num k="groups.forest.uptakeYear.min" percent digits={0} /> to <Num k="groups.forest.uptakeYear.max" percent digits={0} />).
+The grassland share was <Num k="groups.grassland.uptakeYear.mean" percent digits={0} /> and the annual-crop share
+<Num k="groups.annual crop.uptakeYear.mean" percent digits={0} /> (section "Groups"). In the peak window, the forest share
+was <Num k="groups.forest.uptakePeak.mean" percent digits={0} /> ± <Num k="groups.forest.uptakePeak.sd" percent digits={0} />
+(n = <Num k="groups.forest.uptakePeak.n" digits={0} />, range <Num k="groups.forest.uptakePeak.min" percent digits={0} /> to
+<Num k="groups.forest.uptakePeak.max" percent digits={0} />). The grassland share was
+<Num k="groups.grassland.uptakePeak.mean" percent digits={0} /> and the annual-crop share
+<Num k="groups.annual crop.uptakePeak.mean" percent digits={0} />. The forest peak windows start between {RPS.first} and
+{RPS.last}. The forest has no silage cut or grain harvest, as the fields have. This can be one reason for its higher
+shares. The dive does not test it.
+
 ### Tables
 
 <div class="table-wrap">
@@ -242,6 +288,18 @@ without it ({UA}).
 </thead>
 <tbody>
 {excl.map((r) => (<tr id={r.id}><td>{r.site}</td><td class="num">{r.year}</td><td class="wrap">{r.reason}</td><td>{r.figure2}</td><td class="num">{r.frac}</td><td class="num">{r.gap}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Hyytiälä site-years (reference, SMEAR II forest, Figures 4 and 5). GPP, Reco and NEE in {UA} (annual sums). Uptake days = share of the days with daily NEE &lt; 0 (%), whole year, June to August and peak window (month-day, start to end). Measured = measured fraction of the half hours (F_c_270), whole year and peak window.</caption>
+<thead>
+<tr><th scope="col" class="num">Year</th><th scope="col" class="num">GPP</th><th scope="col" class="num">Reco</th><th scope="col" class="num">NEE</th><th scope="col" class="num">Reco/GPP</th><th scope="col" class="num">Uptake days, year</th><th scope="col" class="num">Uptake days, Jun–Aug</th><th scope="col">Peak window</th><th scope="col" class="num">Uptake days, peak</th><th scope="col" class="num">Measured</th><th scope="col" class="num">Measured, peak</th></tr>
+</thead>
+<tbody>
+{refTable.map((r) => (<tr id={r.id}><td class="num">{r.year}</td><td class="num">{r.gpp}</td><td class="num">{r.reco}</td><td class="num">{r.nee}</td><td class="num">{r.ratio}</td><td class="num">{r.uptakeYear}</td><td class="num">{r.uptakeJja}</td><td class="wrap">{r.peakWindow}</td><td class="num">{r.uptakePeak}</td><td class="num">{r.frac}</td><td class="num">{r.fracPeak}</td></tr>))}
 </tbody>
 </table>
 </div>
@@ -279,8 +337,13 @@ without it ({UA}).
 - **Few events.** A site-year has few management events, and each site has a different set of years. The dive
   therefore makes no statistical test of the events. The links between the events and the position of a site-year are
   descriptive. The event table can be incomplete for a site-year.
-- **Figure 3 after the checks.** Figure 3 was added after the independent checks. Its numbers are not independently
-  recomputed.
+- **Forest data from a different pipeline.** The forest NEE and GPP come from the SMEAR gap filling and partitioning
+  <Cite ids={['kulmala2019']} />. The fields use the night-time partitioning of this project <Cite ids={['calculated-doc']} />.
+  The GPP and Reco of the forest and of the fields are therefore not fully comparable.
+- **Forest source year.** Hyytiälä 2020 is a net source in the SMEAR data as delivered <Cite ids={['smear-hyytiala']} />.
+  This dive does not check or explain it.
+- **Figures 3, 4 and 5 after the checks.** Figures 3, 4 and 5 were added after the independent checks. Their numbers
+  are not independently recomputed.
 - **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
   identify it.
 

@@ -53,11 +53,27 @@ const SiteYear = v.object({
   }),
   eventsTotal: v.number(),
 });
+/** A reference site-year (SMEAR II Hyytiälä): the shape of a site-year without events and with the data source. */
+const RefSiteYear = v.object({
+  ...v.omit(SiteYear, ['site', 'group', 'events', 'eventsTotal']).entries,
+  site: v.literal('hyytiala'),
+  group: v.literal('forest'),
+  source: v.string(),
+});
 const Excluded = v.object({ key: v.string(), site: SITE, siteName: v.string(), year: v.number(), reason: v.string(), inFig2: v.boolean() });
 const Stat = v.object({ n: v.number(), mean: v.number(), sd: v.number(), min: v.number(), max: v.number() });
 const Group = v.object({
   fig1SiteYears: v.array(v.string()),
   fig2SiteYears: v.array(v.string()),
+  nee: Stat,
+  recoGppRatio: Stat,
+  uptakeYear: Stat,
+  uptakeJja: Stat,
+  uptakePeak: Stat,
+});
+const ForestGroup = v.object({
+  fig4SiteYears: v.array(v.string()),
+  fig5SiteYears: v.array(v.string()),
   nee: Stat,
   recoGppRatio: Stat,
   uptakeYear: Stat,
@@ -72,8 +88,18 @@ const DataSchema = v.object({
   fig1Keys: v.array(v.string()),
   fig2Keys: v.array(v.string()),
   excluded: v.array(Excluded),
-  regression: v.object({ all: Fit, withoutMaktau: Fit }),
-  groups: v.object({ grassland: Group, 'annual crop': Group, 'annual crop without Maktau': Group }),
+  regression: v.object({ all: Fit, withoutMaktau: Fit, withHyytiala: Fit }),
+  groups: v.object({ grassland: Group, 'annual crop': Group, 'annual crop without Maktau': Group, forest: ForestGroup }),
+  reference: v.object({
+    hyytiala: v.object({
+      siteName: v.string(),
+      source: v.string(),
+      siteYears: v.array(RefSiteYear),
+      fig4Keys: v.array(v.string()),
+      fig5Keys: v.array(v.string()),
+      excluded: v.array(v.unknown()),
+    }),
+  }),
   summary: v.object({
     nFig1: v.number(),
     nFig2: v.number(),
@@ -82,6 +108,8 @@ const DataSchema = v.object({
     minNee: v.string(),
     maxNee: v.string(),
     finnishUptakePeak: Stat,
+    fig4: v.object({ n: v.number(), nSink: v.number(), nSource: v.number() }),
+    nFig5: v.number(),
   }),
   figures: v.array(v.object({ n: v.number(), file: v.string(), title: v.string(), desc: v.string() })),
   dataVersion: v.object({
@@ -111,6 +139,16 @@ export function carbonSpaceData(raw: unknown): CarbonSpaceData {
       throw new Error(`carbon-space: ${k} is in Figure 2 without uptake shares or a peak window`);
     }
   }
+  const ref = d.reference.hyytiala;
+  if (d.summary.fig4.n !== d.fig1Keys.length + ref.fig4Keys.length || d.summary.nFig5 !== d.fig2Keys.length + ref.fig5Keys.length) {
+    throw new Error('carbon-space: the Figure 4 and 5 counts do not agree with the key lists');
+  }
+  for (const k of ref.fig5Keys) {
+    const s = ref.siteYears.find((x) => x.key === k);
+    if (!s || s.gpp === null || s.reco === null || s.nee === null || !s.uptake?.peak || s.uptake.year.share === null || s.uptake.jja.share === null) {
+      throw new Error(`carbon-space: reference site-year ${k} is missing or has no sums or shares`);
+    }
+  }
   for (const e of d.excluded) {
     const s = byKey.get(e.key);
     if (!s || s.inFig1) throw new Error(`carbon-space: excluded site-year ${e.key} is unknown or in Figure 1`);
@@ -132,6 +170,27 @@ export function syKey(d: CarbonSpaceData, key: string): string {
   const i = d.siteYears.findIndex((s) => s.key === key);
   if (i < 0) throw new Error(`carbon-space: no site-year ${key}`);
   return `siteYears.${i}`;
+}
+
+/** Dotted path of one reference site-year, for example `reference.hyytiala.siteYears.0`. */
+export function refKey(d: CarbonSpaceData, key: string): string {
+  const i = d.reference.hyytiala.siteYears.findIndex((s) => s.key === key);
+  if (i < 0) throw new Error(`carbon-space: no reference site-year ${key}`);
+  return `reference.hyytiala.siteYears.${i}`;
+}
+
+/** The reference site-years with NEE > 0, as "Hyytiälä 2020". */
+export function refSourceList(d: CarbonSpaceData): string {
+  const r = d.reference.hyytiala;
+  const names = r.siteYears.filter((s) => r.fig4Keys.includes(s.key) && (s.nee ?? 0) > 0).map((s) => `${s.siteName} ${s.year}`);
+  return names.length <= 1 ? (names[0] ?? 'none') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+/** Earliest and latest start (day and month) of the peak window of the reference site-years. */
+export function refPeakStartRange(d: CarbonSpaceData): { first: string; last: string } {
+  const st = d.reference.hyytiala.siteYears.filter((s) => s.uptake?.peak).map((s) => s.uptake!.peak!.start);
+  st.sort((a, b) => a.slice(5).localeCompare(b.slice(5)));
+  return { first: dayMonth(st[0]!), last: dayMonth(st[st.length - 1]!) };
 }
 
 /** "Haltiala 2023 grass (failed)" or "Qvidja 2022": the site name, the year and the crop label. */
@@ -275,6 +334,42 @@ export function excludedRows(d: CarbonSpaceData): ExcludedRow[] {
       gap: fmtNum(s.longestGapDays, 0),
     };
   });
+}
+
+export interface RefRow {
+  id: string;
+  year: number;
+  gpp: string;
+  reco: string;
+  nee: string;
+  ratio: string;
+  uptakeYear: string;
+  uptakeJja: string;
+  peakWindow: string;
+  uptakePeak: string;
+  fracPeak: string;
+  frac: string;
+}
+
+/** The Hyytiälä site-years of Figures 4 and 5. */
+export function refRows(d: CarbonSpaceData): RefRow[] {
+  const r = d.reference.hyytiala;
+  return r.siteYears
+    .filter((s) => r.fig5Keys.includes(s.key))
+    .map((s) => ({
+      id: `ref-${s.key}`,
+      year: s.year,
+      gpp: f0(s.gpp),
+      reco: f0(s.reco),
+      nee: f0(s.nee),
+      ratio: f2(s.recoGppRatio),
+      uptakeYear: pct(s.uptake?.year.share),
+      uptakeJja: pct(s.uptake?.jja.share),
+      peakWindow: s.uptake?.peak ? `${s.uptake.peak.start.slice(5)} to ${s.uptake.peak.end.slice(5)}` : dash,
+      uptakePeak: pct(s.uptake?.peak?.share),
+      fracPeak: f2(s.uptake?.peak?.fracMeasured ?? null),
+      frac: f2(s.fracMeasured),
+    }));
 }
 
 export interface InputRow {
