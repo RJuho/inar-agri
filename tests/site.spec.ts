@@ -1923,16 +1923,16 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
-  test('the regrowth and drought dive (Python) has three figures, the episode rows, the four tables and SVG downloads', async ({ page, request }) => {
+  test('the regrowth and drought dive (Python) has five figures, the episode rows, the five tables and SVG downloads', async ({ page, request }) => {
     const slug = 'regrowth-drought';
     await page.goto(`/deep-dive/${slug}/`);
     await expect(page.locator('h1')).toContainText('Regrowth');
     await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #8');
     const h2 = await page.locator('main h2').allInnerTexts();
     expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
-    // Three matplotlib figures: first cuts, later cuts, late LUE against SPI-1.
+    // Five matplotlib figures: first cuts, later cuts, late LUE against SPI-1, and the two SPI-3 figures (first cuts, late LUE against SPI-3).
     const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
-    expect(await figures.count()).toBe(3);
+    expect(await figures.count()).toBe(5);
     for (const svg of await figures.all()) {
       const info = await svg.evaluate((el) => {
         const [first, second] = [el.children[0], el.children[1]];
@@ -1955,18 +1955,19 @@ test.describe('deep dive pages', () => {
       expect(info.ariaLabel).toBeNull();
     }
     const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
-    expect(downloads.length).toBe(3);
+    expect(downloads.length).toBe(5);
     for (const href of downloads) {
       expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
       const res = await request.get(href);
       expect(res.status(), href).toBe(200);
       expect(res.headers()['content-type'] ?? '', href).toContain('svg');
     }
-    // All 25 silage episodes, the folded method rules, the group, sensitivity, k and site tables, and the numbers from the JSON.
+    // All 25 silage episodes, the folded method rules, the group (main rule and SPI-3), sensitivity, k and site tables, and the numbers from the JSON.
     expect(await page.locator('tr[id^="episode-"]').count()).toBeGreaterThanOrEqual(25);
     await expect(page.locator('details.dd-table')).toHaveCount(1);
     expect(await page.locator('#method-rules ol li').count()).toBe(9);
-    expect(await page.locator('tr[id^="group-"]').count()).toBe(12);
+    expect(await page.locator('tr[id^="group-"]').count()).toBe(18);
+    expect(await page.locator('tr[id^="group-spi3-"]').count()).toBe(6);
     expect(await page.locator('tr[id^="sens-"]').count()).toBe(16);
     expect(await page.locator('tr[id^="k-"]').count()).toBe(4);
     expect(await page.locator('tr[id^="site-"]').count()).toBe(4);

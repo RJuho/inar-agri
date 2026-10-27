@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="269.291339pt" viewBox="0 0 510.23622 269.291339" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="regrowth-drought-fig5-title regrowth-drought-fig5-desc">
+ <title id="regrowth-drought-fig5-title">Mean light use efficiency of the days 15 to 28 after the last day of a silage harvest, as a fraction of the LUE of the 14 days before the harvest, against the SPI-3 of the harvest month; one marker per episode, first cuts (n = 11) and later cuts (n = 5); a dashed line marks the dry limit SPI-3 = −1.5.</title>
+ <desc id="regrowth-drought-fig5-desc">Two panels side by side with the same axes: first cuts (left) and later cuts (right). X axis: SPI-3 of the harvest month, from −3.25 to 1.25; a dashed vermillion vertical line at −1.5 marks the dry limit (dry = at or left of it). Y axis: mean LUE of the days +15 to +28 as a fraction of the LUE of the days −14 to −1, from 0.00 to 1.75; thin lines mark 1 and 0. Marker per site: Anttila blue circle, Särkisuo orange square, Qvidja reddish purple diamond, Viikki black pentagon; an open marker is a flagged Viikki episode (establishment year or partial harvest), not in the group statistics. 2 first cuts at or left of the dry line; no later cut has SPI-3 ≤ −1.5: the later cuts panel has no point at or left of the dry line. First cuts: qvidja-2023-06-19 SPI-3 −2.98, LUE 1.30; qvidja-2019-06-11 SPI-3 −1.86, LUE 0.52; qvidja-2018-06-12 SPI-3 −1.14, LUE 1.42; qvidja-2022-06-21 SPI-3 −0.99, LUE 1.10; anttila-2022-06-21 SPI-3 −0.33, LUE 1.03; sarkisuo-2022-06-30 SPI-3 −0.33, LUE 1.57; viikki-2024-06-14 SPI-3 −0.30, LUE 1.63 (flagged, open marker); viikki-2022-07-01 SPI-3 −0.09, LUE 1.12; qvidja-2024-06-15 SPI-3 0.59, LUE 1.25; qvidja-2021-06-14 SPI-3 0.59, LUE 0.41; viikki-2023-08-17 SPI-3 0.86, LUE 0.86 (flagged, open marker). Later cuts: qvidja-2019-08-20 SPI-3 −0.93, LUE 0.94; qvidja-2020-08-28 SPI-3 −0.39, LUE 1.28; anttila-2022-08-08 SPI-3 0.28, LUE 0.74; sarkisuo-2022-08-15 SPI-3 0.28, LUE 1.06; anttila-2023-07-19 SPI-3 0.36, LUE 0.75. Episodes without a late window (blocked or fewer than 12 LUE days): anttila-2023-06-21, qvidja-2018-09-23, qvidja-2023-08-21.</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Mean light use efficiency of the days 15 to 28 after the last day of a silage harvest, as a fraction of the LUE of the 14 days before the harvest, against the SPI-3 of the harvest month; one marker per episode, first cuts (n = 11) and later cuts (n = 5); a dashed line marks the dry limit SPI-3 = −1.5.</dc:title>
+    <dc:description>Two panels side by side with the same axes: first cuts (left) and later cuts (right). X axis: SPI-3 of the harvest month, from −3.25 to 1.25; a dashed vermillion vertical line at −1.5 marks the dry limit (dry = at or left of it). Y axis: mean LUE of the days +15 to +28 as a fraction of the LUE of the days −14 to −1, from 0.00 to 1.75; thin lines mark 1 and 0. Marker per site: Anttila blue circle, Särkisuo orange square, Qvidja reddish purple diamond, Viikki black pentagon; an open marker is a flagged Viikki episode (establishment year or partial harvest), not in the group statistics. 2 first cuts at or left of the dry line; no later cut has SPI-3 ≤ −1.5: the later cuts panel has no point at or left of the dry line. First cuts: qvidja-2023-06-19 SPI-3 −2.98, LUE 1.30; qvidja-2019-06-11 SPI-3 −1.86, LUE 0.52; qvidja-2018-06-12 SPI-3 −1.14, LUE 1.42; qvidja-2022-06-21 SPI-3 −0.99, LUE 1.10; anttila-2022-06-21 SPI-3 −0.33, LUE 1.03; sarkisuo-2022-06-30 SPI-3 −0.33, LUE 1.57; viikki-2024-06-14 SPI-3 −0.30, LUE 1.63 (flagged, open marker); viikki-2022-07-01 SPI-3 −0.09, LUE 1.12; qvidja-2024-06-15 SPI-3 0.59, LUE 1.25; qvidja-2021-06-14 SPI-3 0.59, LUE 0.41; viikki-2023-08-17 SPI-3 0.86, LUE 0.86 (flagged, open marker). Later cuts: qvidja-2019-08-20 SPI-3 −0.93, LUE 0.94; qvidja-2020-08-28 SPI-3 −0.39, LUE 1.28; anttila-2022-08-08 SPI-3 0.28, LUE 0.74; sarkisuo-2022-08-15 SPI-3 0.28, LUE 1.06; anttila-2023-07-19 SPI-3 0.36, LUE 0.75. Episodes without a late window (blocked or fewer than 12 LUE days): anttila-2023-06-21, qvidja-2018-09-23, qvidja-2023-08-21.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; db/observations.parquet sha256 922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9; spi/SPI_all_stations.csv sha256 fd61c06114fc3a59a331de89f2cd39464587db2f7df0f33df52df883c72d53b1</dc:relation>
+    <dc:source>analysis/regrowth-drought/regrowth-drought.py (git 192301e, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="rd5-figure_1">
+  <g id="rd5-patch_1">
+   <path d="M 0 269.291339 
+L 510.23622 269.291339 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="rd5-axes_1">
+   <g id="rd5-patch_2">
+    <path d="M 76.535433 226.204724 
+L 278.704502 226.204724 
+L 278.704502 53.858268 
+L 76.535433 53.858268 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rd5-line2d_1">
+    <path d="M 76.535433 127.721035 
+L 278.704502 127.721035 
+" clip-path="url(#rd5-pd1a52f83b4)" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-line2d_2">
+    <path d="M 76.535433 226.204724 
+L 278.704502 226.204724 
+" clip-path="url(#rd5-pd1a52f83b4)" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-line2d_3">
+    <path d="M 155.156737 226.204724 
+L 155.156737 53.858268 
+" clip-path="url(#rd5-pd1a52f83b4)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #d55e00"/>
+   </g>
+   <g id="rd5-matplotlib.axis_1">
+    <g id="rd5-xtick_1">
+     <g id="rd5-line2d_4">
+      <defs>
+       <path id="rd5-mac3ac3047c" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="87.767048" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_1">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="87.767048" y="241.182263" transform="rotate(-0 87.767048 241.182263)">−3</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_2">
+     <g id="rd5-line2d_5">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="132.693508" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_2">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="132.693508" y="241.182263" transform="rotate(-0 132.693508 241.182263)">−2</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_3">
+     <g id="rd5-line2d_6">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="177.619967" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_3">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="177.619967" y="241.182263" transform="rotate(-0 177.619967 241.182263)">−1</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_4">
+     <g id="rd5-line2d_7">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="222.546427" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_4">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="222.546427" y="241.182263" transform="rotate(-0 222.546427 241.182263)">0</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_5">
+     <g id="rd5-line2d_8">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="267.472887" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_5">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="267.472887" y="241.182263" transform="rotate(-0 267.472887 241.182263)">1</text>
+     </g>
+    </g>
+    <g id="rd5-text_6">
+     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="177.619967" y="256.252967" transform="rotate(-0 177.619967 256.252967)">SPI-3 of the harvest month</text>
+    </g>
+   </g>
+   <g id="rd5-matplotlib.axis_2">
+    <g id="rd5-ytick_1">
+     <g id="rd5-line2d_9">
+      <defs>
+       <path id="rd5-m6c5da29a8c" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_7">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="230.193494" transform="rotate(-0 69.535433 230.193494)">0.00</text>
+     </g>
+    </g>
+    <g id="rd5-ytick_2">
+     <g id="rd5-line2d_10">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="201.583802" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_8">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="205.572572" transform="rotate(-0 69.535433 205.572572)">0.25</text>
+     </g>
+    </g>
+    <g id="rd5-ytick_3">
+     <g id="rd5-line2d_11">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="176.96288" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_9">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="180.951649" transform="rotate(-0 69.535433 180.951649)">0.50</text>
+     </g>
+    </g>
+    <g id="rd5-ytick_4">
+     <g id="rd5-line2d_12">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="152.341957" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_10">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="156.330727" transform="rotate(-0 69.535433 156.330727)">0.75</text>
+     </g>
+    </g>
+    <g id="rd5-ytick_5">
+     <g id="rd5-line2d_13">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="127.721035" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_11">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="131.709804" transform="rotate(-0 69.535433 131.709804)">1.00</text>
+     </g>
+    </g>
+    <g id="rd5-ytick_6">
+     <g id="rd5-line2d_14">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="103.100112" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_12">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="107.088882" transform="rotate(-0 69.535433 107.088882)">1.25</text>
+     </g>
+    </g>
+    <g id="rd5-ytick_7">
+     <g id="rd5-line2d_15">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="78.47919" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_13">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="82.46796" transform="rotate(-0 69.535433 82.46796)">1.50</text>
+     </g>
+    </g>
+    <g id="rd5-ytick_8">
+     <g id="rd5-line2d_16">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="76.535433" y="53.858268" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_14">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="69.535433" y="57.847037" transform="rotate(-0 69.535433 57.847037)">1.75</text>
+     </g>
+    </g>
+    <g id="rd5-text_15">
+     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(24.824715 198.157082) rotate(-90)">LUE of days 15 to 28</text>
+     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(38.327791 255.44507) rotate(-90)">(fraction of the mean of days −14 to −1)</text>
+    </g>
+   </g>
+   <g id="rd5-patch_3">
+    <path d="M 76.535433 226.204724 
+L 76.535433 53.858268 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-patch_4">
+    <path d="M 76.535433 226.204724 
+L 278.704502 226.204724 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-text_16">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #d55e00; font-variant-numeric: tabular-nums" x="151.562621" y="68.730485" transform="rotate(-0 151.562621 68.730485)">dry</text>
+   </g>
+   <g id="rd5-line2d_17">
+    <defs>
+     <path id="rd5-m9ba419098b" d="M 0 4 
+C 1.060812 4 2.078319 3.578535 2.828427 2.828427 
+C 3.578535 2.078319 4 1.060812 4 0 
+C 4 -1.060812 3.578535 -2.078319 2.828427 -2.828427 
+C 2.078319 -3.578535 1.060812 -4 0 -4 
+C -1.060812 -4 -2.078319 -3.578535 -2.828427 -2.828427 
+C -3.578535 -2.078319 -4 -1.060812 -4 0 
+C -4 1.060812 -3.578535 2.078319 -2.828427 2.828427 
+C -2.078319 3.578535 -1.060812 4 0 4 
+z
+" style="stroke: #0072b2; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m9ba419098b" x="207.84867" y="124.601163" style="fill: #0072b2; stroke: #0072b2; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_18">
+    <defs>
+     <path id="rd5-m34b34eca98" d="M -0 5.656854 
+L 5.656854 0 
+L 0 -5.656854 
+L -5.656854 -0 
+z
+" style="stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m34b34eca98" x="171.495372" y="86.84448" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_19">
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m34b34eca98" x="139.037625" y="175.009039" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_20">
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m34b34eca98" x="249.268307" y="185.893397" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_21">
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m34b34eca98" x="178.202174" y="117.383952" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_22">
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m34b34eca98" x="88.800012" y="98.27612" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_23">
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m34b34eca98" x="248.994114" y="103.152118" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_24">
+    <defs>
+     <path id="rd5-me42213b2f3" d="M -4 4 
+L 4 4 
+L 4 -4 
+L -4 -4 
+z
+" style="stroke: #e69f00; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-me42213b2f3" x="207.84867" y="71.130816" style="fill: #e69f00; stroke: #e69f00; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_25">
+    <defs>
+     <path id="rd5-mc4b1996128" d="M 0 -4 
+L -3.804226 -1.236068 
+L -2.351141 3.236068 
+L 2.351141 3.236068 
+L 3.804226 -1.236068 
+z
+" style="stroke: #000000; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-mc4b1996128" x="218.726433" y="115.793445" style="stroke: #000000; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_26">
+    <defs>
+     <path id="rd5-m87ffe31074" d="M 0 -4 
+L -3.804226 -1.236068 
+L -2.351141 3.236068 
+L 2.351141 3.236068 
+L 3.804226 -1.236068 
+z
+" style="stroke: #000000; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m87ffe31074" x="261.217592" y="141.978838" style="fill: #ffffff; stroke: #000000; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_27">
+    <g clip-path="url(#rd5-pd1a52f83b4)">
+     <use xlink:href="#rd5-m87ffe31074" x="208.879545" y="65.592707" style="fill: #ffffff; stroke: #000000; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-text_17">
+    <text style="font-weight: 700; font-size: 12px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="76.535433" y="47.858268" transform="rotate(-0 76.535433 47.858268)">First cuts</text>
+   </g>
+  </g>
+  <g id="rd5-axes_2">
+   <g id="rd5-patch_5">
+    <path d="M 302.96479 226.204724 
+L 505.133858 226.204724 
+L 505.133858 53.858268 
+L 302.96479 53.858268 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rd5-line2d_28">
+    <path d="M 302.96479 127.721035 
+L 505.133858 127.721035 
+" clip-path="url(#rd5-p940d8dffd1)" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-line2d_29">
+    <path d="M 302.96479 226.204724 
+L 505.133858 226.204724 
+" clip-path="url(#rd5-p940d8dffd1)" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-line2d_30">
+    <path d="M 381.586094 226.204724 
+L 381.586094 53.858268 
+" clip-path="url(#rd5-p940d8dffd1)" style="fill: none; stroke-dasharray: 3.7,1.6; stroke-dashoffset: 0; stroke: #d55e00"/>
+   </g>
+   <g id="rd5-matplotlib.axis_3">
+    <g id="rd5-xtick_6">
+     <g id="rd5-line2d_31">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="314.196405" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_18">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="314.196405" y="241.182263" transform="rotate(-0 314.196405 241.182263)">−3</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_7">
+     <g id="rd5-line2d_32">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="359.122864" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_19">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="359.122864" y="241.182263" transform="rotate(-0 359.122864 241.182263)">−2</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_8">
+     <g id="rd5-line2d_33">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="404.049324" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_20">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="404.049324" y="241.182263" transform="rotate(-0 404.049324 241.182263)">−1</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_9">
+     <g id="rd5-line2d_34">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="448.975784" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_21">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="448.975784" y="241.182263" transform="rotate(-0 448.975784 241.182263)">0</text>
+     </g>
+    </g>
+    <g id="rd5-xtick_10">
+     <g id="rd5-line2d_35">
+      <g>
+       <use xlink:href="#rd5-mac3ac3047c" x="493.902243" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="rd5-text_22">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="493.902243" y="241.182263" transform="rotate(-0 493.902243 241.182263)">1</text>
+     </g>
+    </g>
+    <g id="rd5-text_23">
+     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="404.049324" y="256.252967" transform="rotate(-0 404.049324 256.252967)">SPI-3 of the harvest month</text>
+    </g>
+   </g>
+   <g id="rd5-matplotlib.axis_4">
+    <g id="rd5-ytick_9">
+     <g id="rd5-line2d_36">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="226.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="rd5-ytick_10">
+     <g id="rd5-line2d_37">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="201.583802" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="rd5-ytick_11">
+     <g id="rd5-line2d_38">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="176.96288" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="rd5-ytick_12">
+     <g id="rd5-line2d_39">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="152.341957" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="rd5-ytick_13">
+     <g id="rd5-line2d_40">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="127.721035" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="rd5-ytick_14">
+     <g id="rd5-line2d_41">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="103.100112" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="rd5-ytick_15">
+     <g id="rd5-line2d_42">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="78.47919" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="rd5-ytick_16">
+     <g id="rd5-line2d_43">
+      <g>
+       <use xlink:href="#rd5-m6c5da29a8c" x="302.96479" y="53.858268" style="fill: #222222; stroke: #222222; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rd5-patch_6">
+    <path d="M 302.96479 226.204724 
+L 302.96479 53.858268 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-patch_7">
+    <path d="M 302.96479 226.204724 
+L 505.133858 226.204724 
+" style="fill: none; stroke: #222222; stroke-width: 0.6; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rd5-text_24">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #d55e00; font-variant-numeric: tabular-nums" x="377.991977" y="68.730485" transform="rotate(-0 377.991977 68.730485)">dry</text>
+   </g>
+   <g id="rd5-line2d_44">
+    <g clip-path="url(#rd5-p940d8dffd1)">
+     <use xlink:href="#rd5-m9ba419098b" x="461.360443" y="153.11999" style="fill: #0072b2; stroke: #0072b2; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_45">
+    <g clip-path="url(#rd5-p940d8dffd1)">
+     <use xlink:href="#rd5-m9ba419098b" x="464.998949" y="152.399657" style="fill: #0072b2; stroke: #0072b2; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_46">
+    <g clip-path="url(#rd5-p940d8dffd1)">
+     <use xlink:href="#rd5-m34b34eca98" x="406.995324" y="133.751868" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_47">
+    <g clip-path="url(#rd5-p940d8dffd1)">
+     <use xlink:href="#rd5-m34b34eca98" x="431.675822" y="100.545503" style="fill: #cc79a7; stroke: #cc79a7; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-line2d_48">
+    <g clip-path="url(#rd5-p940d8dffd1)">
+     <use xlink:href="#rd5-me42213b2f3" x="461.360443" y="122.224199" style="fill: #e69f00; stroke: #e69f00; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-text_25">
+    <text style="font-weight: 700; font-size: 12px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="302.96479" y="47.858268" transform="rotate(-0 302.96479 47.858268)">Later cuts</text>
+   </g>
+  </g>
+  <g id="rd5-legend_1">
+   <g id="rd5-line2d_49">
+    <defs>
+     <path id="rd5-m6a9bd47fb3" d="M 0 4 
+C 1.060812 4 2.078319 3.578535 2.828427 2.828427 
+C 3.578535 2.078319 4 1.060812 4 0 
+C 4 -1.060812 3.578535 -2.078319 2.828427 -2.828427 
+C 2.078319 -3.578535 1.060812 -4 0 -4 
+C -1.060812 -4 -2.078319 -3.578535 -2.828427 -2.828427 
+C -3.578535 -2.078319 -4 -1.060812 -4 0 
+C -4 1.060812 -3.578535 2.078319 -2.828427 2.828427 
+C -2.078319 3.578535 -1.060812 4 0 4 
+z
+" style="stroke: #0072b2"/>
+    </defs>
+    <g>
+     <use xlink:href="#rd5-m6a9bd47fb3" x="62.134765" y="13.753359" style="fill: #0072b2; stroke: #0072b2"/>
+    </g>
+   </g>
+   <g id="rd5-text_26">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="76.834765" y="17.428359" transform="rotate(-0 76.834765 17.428359)">Anttila</text>
+   </g>
+   <g id="rd5-line2d_50">
+    <defs>
+     <path id="rd5-md070c5a5e9" d="M -4 4 
+L 4 4 
+L 4 -4 
+L -4 -4 
+z
+" style="stroke: #e69f00; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#rd5-md070c5a5e9" x="134.273046" y="13.753359" style="fill: #e69f00; stroke: #e69f00; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-text_27">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="148.973046" y="17.428359" transform="rotate(-0 148.973046 17.428359)">Särkisuo</text>
+   </g>
+   <g id="rd5-line2d_51">
+    <defs>
+     <path id="rd5-m6c3c93a31b" d="M -0 5.656854 
+L 5.656854 0 
+L 0 -5.656854 
+L -5.656854 -0 
+z
+" style="stroke: #cc79a7; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#rd5-m6c3c93a31b" x="217.036015" y="13.753359" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-text_28">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="231.736015" y="17.428359" transform="rotate(-0 231.736015 17.428359)">Qvidja</text>
+   </g>
+   <g id="rd5-line2d_52">
+    <defs>
+     <path id="rd5-m915f2bf7ad" d="M 0 -4 
+L -3.804226 -1.236068 
+L -2.351141 3.236068 
+L 2.351141 3.236068 
+L 3.804226 -1.236068 
+z
+" style="stroke: #000000; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#rd5-m915f2bf7ad" x="288.250624" y="13.753359" style="stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-text_29">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="302.950624" y="17.428359" transform="rotate(-0 302.950624 17.428359)">Viikki</text>
+   </g>
+   <g id="rd5-line2d_53">
+    <g>
+     <use xlink:href="#rd5-m87ffe31074" x="353.913359" y="13.753359" style="fill: #ffffff; stroke: #000000; stroke-width: 1.5; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rd5-text_30">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="368.613359" y="17.428359" transform="rotate(-0 368.613359 17.428359)">flagged (not in the groups)</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="rd5-pd1a52f83b4">
+   <rect x="76.535433" y="53.858268" width="202.169068" height="172.346457"/>
+  </clipPath>
+  <clipPath id="rd5-p940d8dffd1">
+   <rect x="302.96479" y="53.858268" width="202.169068" height="172.346457"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-27T08:50:13Z",
+  "generatedAt": "2026-10-27T10:25:25Z",
   "git": {
-    "commit": "546df32",
+    "commit": "192301e",
     "dirty": true
   },
   "script": {
     "path": "analysis/regrowth-drought/regrowth-drought.py",
-    "sha256": "a024fbe812544b7aa65185d7086517d7b6ded83c0ec31495bf93de93d28846d7"
+    "sha256": "60274357cf9e043d1aa5d3d4c82756beccace996e257d39ab78434470472051f"
   },
   "lock": {
     "path": "analysis/regrowth-drought/regrowth-drought.py.lock",
@@ -52,6 +52,12 @@
     "composite.later.normal.relGpp": 24100,
     "composite.later.normal.relLue": 24000,
     "composite.later.normal.relPar": 24200,
+    "composite.spi3.first.dry.relGpp": 41100,
+    "composite.spi3.first.dry.relLue": 41000,
+    "composite.spi3.first.dry.relPar": 41200,
+    "composite.spi3.first.normal.relGpp": 42100,
+    "composite.spi3.first.normal.relLue": 42000,
+    "composite.spi3.first.normal.relPar": 42200,
     "first.dry.after.relGpp.diff": 11102,
     "first.dry.after.relGpp.dry": 11100,
     "first.dry.after.relGpp.normal": 11101,
@@ -70,6 +76,24 @@
     "first.dry.late.relPar.diff": 11212,
     "first.dry.late.relPar.dry": 11210,
     "first.dry.late.relPar.normal": 11211,
+    "first.drySpi3.after.relGpp.diff": 31102,
+    "first.drySpi3.after.relGpp.dry": 31100,
+    "first.drySpi3.after.relGpp.normal": 31101,
+    "first.drySpi3.after.relLue.diff": 31002,
+    "first.drySpi3.after.relLue.dry": 31000,
+    "first.drySpi3.after.relLue.normal": 31001,
+    "first.drySpi3.after.relPar.diff": 31202,
+    "first.drySpi3.after.relPar.dry": 31200,
+    "first.drySpi3.after.relPar.normal": 31201,
+    "first.drySpi3.late.relGpp.diff": 31112,
+    "first.drySpi3.late.relGpp.dry": 31110,
+    "first.drySpi3.late.relGpp.normal": 31111,
+    "first.drySpi3.late.relLue.diff": 31012,
+    "first.drySpi3.late.relLue.dry": 31010,
+    "first.drySpi3.late.relLue.normal": 31011,
+    "first.drySpi3.late.relPar.diff": 31212,
+    "first.drySpi3.late.relPar.dry": 31210,
+    "first.drySpi3.late.relPar.normal": 31211,
     "later.dry.after.relGpp.diff": 12102,
     "later.dry.after.relGpp.dry": 12100,
     "later.dry.after.relGpp.normal": 12101,
@@ -87,13 +111,34 @@
     "later.dry.late.relLue.normal": 12011,
     "later.dry.late.relPar.diff": 12212,
     "later.dry.late.relPar.dry": 12210,
-    "later.dry.late.relPar.normal": 12211
+    "later.dry.late.relPar.normal": 12211,
+    "later.drySpi3.after.relGpp.diff": 32102,
+    "later.drySpi3.after.relGpp.dry": 32100,
+    "later.drySpi3.after.relGpp.normal": 32101,
+    "later.drySpi3.after.relLue.diff": 32002,
+    "later.drySpi3.after.relLue.dry": 32000,
+    "later.drySpi3.after.relLue.normal": 32001,
+    "later.drySpi3.after.relPar.diff": 32202,
+    "later.drySpi3.after.relPar.dry": 32200,
+    "later.drySpi3.after.relPar.normal": 32201,
+    "later.drySpi3.late.relGpp.diff": 32112,
+    "later.drySpi3.late.relGpp.dry": 32110,
+    "later.drySpi3.late.relGpp.normal": 32111,
+    "later.drySpi3.late.relLue.diff": 32012,
+    "later.drySpi3.late.relLue.dry": 32010,
+    "later.drySpi3.late.relLue.normal": 32011,
+    "later.drySpi3.late.relPar.diff": 32212,
+    "later.drySpi3.late.relPar.dry": 32210,
+    "later.drySpi3.late.relPar.normal": 32211
   },
   "seedRule": {
     "seedBase": 11000,
     "groups": "SEED_BASE + 1000 x cut group + 100 x quantity + 10 x window + dryness (0 dry, 1 normal, 2 difference)",
     "compositeSeedBase": 21000,
-    "composite": "COMPOSITE_SEED_BASE + 2000 x cut group + 1000 x dryness + 100 x quantity + day index (0 = day -14); the seeds list gives the first seed of each curve"
+    "composite": "COMPOSITE_SEED_BASE + 2000 x cut group + 1000 x dryness + 100 x quantity + day index (0 = day -14); the seeds list gives the first seed of each curve",
+    "spi3SeedBase": 31000,
+    "spi3CompositeSeedBase": 41000,
+    "spi3": "the SPI-3 grouping uses the same rules with SPI3_SEED_BASE and SPI3_COMPOSITE_SEED_BASE"
   },
   "bootstrap": {
     "resamples": 10000,
@@ -379,19 +424,27 @@
     }
   },
   "outputs": {
-    "results.json": "dcdf891911fbb765245ceeed28bd4f07c0bf29a240e2fdeb7eb8e7f7e2d150fe",
+    "results.json": "2ea2108d7010b9ad2f3c636ebfebe21eff33fcbdafbe21fee2a6c11cf85da138",
     "figures": {
       "figures/1-first-cut.svg": {
-        "sha256": "4513bb471515e4b01197f82e58a93aa5ea342067176cd6aa0b67bb5f921a1345",
+        "sha256": "a17dd151db5560664aafbd502ed9bf6819f0e054c90ef65f1b031c6aea7b17cb",
         "sha256WithoutMetadata": "f99a0770503d8523dad086a8ea52dfade380c0eac9d53acd6f2ad17e0b4ea95f"
       },
       "figures/2-later-cuts.svg": {
-        "sha256": "5eacd39dea3a28a3a68822d12968e9038afc79c684340d363090e5e5ba596fd6",
+        "sha256": "a5ce21badeed7eb8eb814de15213c04e89a7446c9dee4abbf693620112511cee",
         "sha256WithoutMetadata": "3717c9603c2535b0e9fea19361f8c2b6a0193a71b2153a69581b5ff2f9aae785"
       },
       "figures/3-late-lue-vs-spi.svg": {
-        "sha256": "912aaed8bb69f4692b1942a92766dd2c80e69f85554598b164c988f92d0f94b6",
+        "sha256": "55106118952f197b1b39a45388be14327f264a45e54b74947201ddcc294e5041",
         "sha256WithoutMetadata": "0efa2664b24ea7f85a66b2c4b2ef31ed66483d1e4a925b00160aa1499ce4e65d"
+      },
+      "figures/4-first-cut-spi3.svg": {
+        "sha256": "fe9745c8ae27ca377f8cb3b5533b33db03c8cc4a10e8a84da7932c476065576d",
+        "sha256WithoutMetadata": "2aba91efebed33214cdd1b255f943943b7e0d9110191a3c44e5a4073f555bb84"
+      },
+      "figures/5-late-lue-vs-spi3.svg": {
+        "sha256": "0fc912c17f166cca7e8e7fa99053722401f2d092870b8e125339179102936cac",
+        "sha256WithoutMetadata": "e6da60d2e9a4b1a0985352a75de144373493199f617e3596a807ed30f57f0eb4"
       }
     }
   }

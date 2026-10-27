@@ -41,6 +41,10 @@ const Diff = v.object({
 });
 const Comparison = v.object({ dry: Stat, normal: Stat, diff: Diff });
 const WindowStats = v.object({ relLue: Comparison, relGpp: Comparison, relPar: Comparison });
+/**
+ * One cut group. The dry statistics are null (n = 0) when no episode is dry, for example the later
+ * cuts by SPI-3; `Stat` and `Diff` allow null for this.
+ */
 const Group = v.object({
   label: v.string(),
   n: v.object({ dry: v.number(), normal: v.number() }),
@@ -48,6 +52,8 @@ const Group = v.object({
   after: WindowStats,
   late: WindowStats,
 });
+/** The second full grouping, dry = SPI-3 ≤ the threshold of `method.spi3Rule` (Figures 4 and 5). */
+const GroupsSpi3 = v.object({ first: Group, later: Group, rule: v.string(), note: v.string() });
 
 /** Sensitivity statistics: group means only, no interval and no test. */
 const SStat = v.object({ n: v.number(), mean: N, sd: N, min: N, max: N });
@@ -135,6 +141,8 @@ const DataSchema = v.object({
     bootstrapMinN: v.number(),
     ciLevelPct: v.number(),
     utcShiftHours: v.number(),
+    spi3Rule: v.object({ threshold: v.number(), note: v.string() }),
+    yRangeRule: v.string(),
   }),
   counts: v.object({
     silageEpisodes: v.number(),
@@ -163,8 +171,14 @@ const DataSchema = v.object({
     }),
   ),
   episodes: v.array(Episode),
-  groups: v.object({ first: Group, later: Group }),
-  composite: v.object({ yRange: v.tuple([v.number(), v.number()]) }),
+  groups: v.object({ first: Group, later: Group, spi3: GroupsSpi3 }),
+  composite: v.object({
+    yRange: v.tuple([v.number(), v.number()]),
+    /** The y range of Figure 4: one range over the curves of Figures 1, 2 and 4. */
+    yRangeSpi3: v.tuple([v.number(), v.number()]),
+    /** True when `yRangeSpi3` equals `yRange`. */
+    yRangeShared: v.boolean(),
+  }),
   par: v.object({
     k: v.number(),
     kMin: v.number(),
@@ -205,6 +219,17 @@ export function regrowthData(raw: unknown): RegrowthData {
     if (n.dry !== d.counts.perCutGroup[g].dry || n.normal !== d.counts.perCutGroup[g].normal) {
       throw new Error(`regrowth-drought: the group counts of ${g} differ between groups and counts.perCutGroup`);
     }
+    // The SPI-3 grouping uses the same episodes as the main rule.
+    const s = d.groups.spi3[g];
+    if (s.n.dry + s.n.normal !== n.dry + n.normal) {
+      throw new Error(`regrowth-drought: the SPI-3 groups of ${g} do not hold the episodes of the main rule`);
+    }
+    if (s.n.dry !== s.ids.dry.length || s.n.normal !== s.ids.normal.length) {
+      throw new Error(`regrowth-drought: the SPI-3 counts of ${g} differ from the id lists`);
+    }
+  }
+  if (d.composite.yRangeShared !== (d.composite.yRangeSpi3[0] === d.composite.yRange[0] && d.composite.yRangeSpi3[1] === d.composite.yRange[1])) {
+    throw new Error('regrowth-drought: composite.yRangeShared does not agree with yRange and yRangeSpi3');
   }
   return d;
 }
@@ -378,41 +403,57 @@ export interface GroupRow {
   p: string;
 }
 
-/** One row per cut group, window and quantity: dry, normal, the difference with its interval, and the permutation p. */
-export function groupRows(d: RegrowthData): GroupRow[] {
+type GroupOut = v.InferOutput<typeof Group>;
+
+/** The rows of one cut group: one row per window and quantity. `idPrefix` makes the row ids, for example `group-first`. */
+function groupRowsOf(d: RegrowthData, g: CutGroup, group: GroupOut, idPrefix: string): GroupRow[] {
   const rows: GroupRow[] = [];
   const wl = WINDOW_LABEL(d);
-  for (const g of CUT_GROUPS) {
-    for (const w of WINDOWS) {
-      for (const q of QUANTITIES) {
-        const c = d.groups[g][w][q];
-        const diff = c.diff;
-        let diffText: string;
-        let pText: string;
-        if (diff.single) {
-          const s = diff.single;
-          diffText = `${f2s(diff.diff)} (${f2(s.sdUnits)} SD units of the normal group)`;
-          pText = 'no test (one dry episode)';
-        } else {
-          diffText = diff.ci ? `${f2s(diff.diff)} [${f2s(diff.ci[0])}, ${f2s(diff.ci[1])}]` : f2s(diff.diff);
-          pText = diff.permutationP === null ? dash : `${f2(diff.permutationP)} (${fmtNum(diff.nSplits, 0)} splits)`;
-        }
-        rows.push({
-          id: `group-${g}-${w}-${q}`,
-          group: GROUP_LABEL[g],
-          window: wl[w],
-          quantity: QUANTITY_LABEL[q],
-          dry: statText(c.dry),
-          nDry: fmtNum(c.dry.n, 0),
-          normal: statText(c.normal),
-          nNormal: fmtNum(c.normal.n, 0),
-          diff: diffText,
-          p: pText,
-        });
+  for (const w of WINDOWS) {
+    for (const q of QUANTITIES) {
+      const c = group[w][q];
+      const diff = c.diff;
+      let diffText: string;
+      let pText: string;
+      if (diff.single) {
+        const s = diff.single;
+        diffText = `${f2s(diff.diff)} (${f2(s.sdUnits)} SD units of the normal group)`;
+        pText = 'no test (one dry episode)';
+      } else if (c.dry.n === 0) {
+        diffText = dash;
+        pText = 'no test (no dry episode)';
+      } else {
+        diffText = diff.ci ? `${f2s(diff.diff)} [${f2s(diff.ci[0])}, ${f2s(diff.ci[1])}]` : f2s(diff.diff);
+        pText = diff.permutationP === null ? dash : `${f2(diff.permutationP)} (${fmtNum(diff.nSplits, 0)} splits)`;
       }
+      rows.push({
+        id: `${idPrefix}-${w}-${q}`,
+        group: GROUP_LABEL[g],
+        window: wl[w],
+        quantity: QUANTITY_LABEL[q],
+        dry: statText(c.dry),
+        nDry: fmtNum(c.dry.n, 0),
+        normal: statText(c.normal),
+        nNormal: fmtNum(c.normal.n, 0),
+        diff: diffText,
+        p: pText,
+      });
     }
   }
   return rows;
+}
+
+/** One row per cut group, window and quantity: dry, normal, the difference with its interval, and the permutation p (main rule, Table B). */
+export function groupRows(d: RegrowthData): GroupRow[] {
+  return CUT_GROUPS.flatMap((g) => groupRowsOf(d, g, d.groups[g], `group-${g}`));
+}
+
+/**
+ * The same rows for the SPI-3 grouping (Table B2), first cuts only: no later cut is dry by SPI-3,
+ * so the later-cut rows would hold only the normal group. Ids `group-spi3-first-<window>-<quantity>`.
+ */
+export function groupRowsSpi3(d: RegrowthData): GroupRow[] {
+  return groupRowsOf(d, 'first', d.groups.spi3.first, 'group-spi3-first');
 }
 
 export interface SensitivityRow {

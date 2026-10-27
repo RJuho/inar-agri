@@ -349,6 +349,48 @@ def test_counts() -> None:
     assert r["summary"]["extra"]["june2018"]["dryMinus1"] is True
 
 
+def test_spi3_groups() -> None:
+    """The SPI-3 grouping: two dry first cuts, no dry later cut, the same key shape as the
+    main groups, and the sensitivity block unchanged."""
+    r = results()
+    g = r["groups"]["spi3"]
+    assert g["first"]["n"] == {"dry": 2, "normal": 8}
+    assert g["first"]["ids"]["dry"] == ["qvidja-2019-06-11", "qvidja-2023-06-19"]
+    assert g["later"]["n"]["dry"] == 0 and g["later"]["ids"]["dry"] == []
+    assert g["later"]["n"]["normal"] == 7
+    s = r["sensitivity"]["dryness"]["drySpi3"]
+    assert s["first"]["ids"] == g["first"]["ids"] and s["later"]["n"] == g["later"]["n"]
+    assert "spi3" in r["composite"] and list(r["composite"]["spi3"]) == ["first"]
+    assert r["composite"]["yRangeShared"] == (
+        r["composite"]["yRangeSpi3"] == r["composite"]["yRange"]
+    )
+
+    def shape(x: Any) -> Any:
+        if isinstance(x, dict):
+            return {k: shape(v) for k, v in x.items()}
+        return None
+
+    main = r["groups"]["first"]
+    for cut in rd.CUT_GROUPS:
+        assert shape(g[cut]) == shape(main)
+        for w in rd.WINDOWS:
+            for q in rd.QUANTITIES:
+                b = g[cut][w][q]
+                assert b["dry"]["ci"] is None and b["diff"]["ci"] is None
+                if cut == "first":
+                    assert b["dry"]["n"] == 2 and b["normal"]["ci"] is not None
+                    assert b["diff"]["nSplits"] == math.comb(
+                        b["dry"]["n"] + b["normal"]["n"], 2
+                    )
+                    assert close(
+                        b["diff"]["diff"], b["dry"]["mean"] - b["normal"]["mean"]
+                    )
+                    assert close(s["first"][w][q]["dry"]["mean"], b["dry"]["mean"])
+                else:
+                    assert b["dry"]["n"] == 0 and b["diff"]["permutationP"] is None
+    assert r["summary"]["spi3"]["first"]["after"]["dryN"] == 2
+
+
 @pytest.mark.skipif(not DIVE7_JSON.is_file(), reason="Deep Dive #7 JSON is absent")
 def test_used_episodes_equal_deep_dive_7() -> None:
     r = results()
@@ -462,7 +504,7 @@ def test_svg_text(path: Path) -> None:
         assert "font-variant-numeric: tabular-nums" in style
         assert "DejaVu" not in style
     for c in (rd.GROUP_STYLE["dry"]["color"], rd.GROUP_STYLE["normal"]["color"]):
-        if n < 3:
+        if n in (1, 2, 4):
             assert c.lower() in text.lower()
     fig = next(f for f in results()["figures"] if f["n"] == n)
     assert fig["title"] == children[0].text

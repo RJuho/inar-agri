@@ -60,7 +60,12 @@ METHOD
        swc of the same site on the same calendar dates in all its data years (daily swc with the
        40 of 48 rule; the number of years is logged). Sensitivity groups: SPI-3 <= -1.5 and SWC
        anomaly < 0 (group means only; the main result uses SPI-1), and SPI-1 <= -1 (the rule of
-       the TypeScript dive nee-without-harvest-drought).
+       the TypeScript dive nee-without-harvest-drought). The SPI-3 rule (dry = SPI-3 <= -1.5 of
+       the harvest month) is also a second full grouping (groups.spi3, composite.spi3, Figures 4
+       and 5) with the same statistics as the main rule where n allows: the bootstrap CI only
+       with 3 or more episodes, the exact permutation test with 2 or more per group. With the
+       SPI-3 rule, no later cut is dry (groups.spi3.later.n.dry = 0): there is no SPI-3 figure
+       of the later cuts.
     5. Groups: first cut (cutNo = 1, the ordinal of the episode among the harvest and cut
        episodes of the site in that year) and later cuts (cutNo >= 2). A fertilisation in the
        days start-14 to end+14 only sets the flag fertInWindow.
@@ -77,7 +82,9 @@ METHOD
        CI (n >= 3); mean and SD are null when n < 2, except in a group of one episode (the dry
        later cut), whose curve is the episode itself. The y range of Figures 1 and 2 is one range
        over all drawn means, CI bands and the single curve, rounded outwards to a multiple of
-       0.25 and extended to hold 0 and 1.
+       0.25 and extended to hold 0 and 1. The y range of Figure 4 is the same rule over the
+       curves of Figures 1, 2 and 4 together (composite.yRangeSpi3); the result tells whether it
+       equals the range of Figures 1 and 2 (composite.yRangeShared).
     7. Each step that removes rows or changes values logs a count (results.json dataVersion.steps).
     8. Open findings of docs/anomaly-data-report.md that touch this dive are printed
        (OPEN_FINDINGS).
@@ -102,6 +109,8 @@ OUTPUTS
     figures/1-first-cut.svg      first cuts: relative LUE, dry and normal group
     figures/2-later-cuts.svg     later cuts: relative LUE, normal group and the one dry episode
     figures/3-late-lue-vs-spi.svg  relative LUE of days 15 to 28 against SPI-1, per episode
+    figures/4-first-cut-spi3.svg   first cuts: relative LUE, dry and normal group by SPI-3
+    figures/5-late-lue-vs-spi3.svg  relative LUE of days 15 to 28 against SPI-3, per episode
     output/run.log               run log (not in git)
     output/episodes.csv          all silage harvest episodes with the numbers (not in git)
     With --check, all outputs go to output/ and the script compares them with the committed files.
@@ -318,6 +327,8 @@ DETAIL_SHORT = 90
 #   day index (0 = day -14).
 SEED_BASE = 11_000
 COMPOSITE_SEED_BASE = 21_000
+SPI3_SEED_BASE = 31_000  # the SPI-3 grouping (groups.spi3)
+SPI3_COMPOSITE_SEED_BASE = 41_000  # the SPI-3 composite curves (composite.spi3)
 
 # Station of each site in data/SPI/SPI_all_stations.csv (STATION_OF_SITE in
 # scripts/lib/deep-dive/spi.ts).
@@ -552,15 +563,30 @@ MM = 1 / 25.4
 FIG_WIDTH_IN = 180 * MM
 FIG_HEIGHT_IN = 100 * MM
 FIG3_HEIGHT_IN = 95 * MM
-FIGURES = ((1, "first-cut"), (2, "later-cuts"), (3, "late-lue-vs-spi"))
+FIGURES = (
+    (1, "first-cut"),
+    (2, "later-cuts"),
+    (3, "late-lue-vs-spi"),
+    (4, "first-cut-spi3"),
+    (5, "late-lue-vs-spi3"),
+)
 FIG1_TITLE = "First cut: light use efficiency after the harvest, dry and normal June"
 FIG2_TITLE = "Later cuts: light use efficiency after the harvest, dry and normal month"
+FIG4_TITLE = (
+    "First cut: light use efficiency after the harvest, dry and normal June by SPI-3"
+)
 # The panel titles in two lines: the 180 mm panel is too narrow for one line at FONT_SCALE.
 FIG_TITLE_BREAK = ", dry and normal"
 FIG3_TITLES = {"first": "First cuts", "later": "Later cuts"}
 X_LABEL = "Days from the last day of the harvest (local days)"
 Y_LABEL = "LUE (fraction of the mean of days −14 to −1)"
 X_LABEL_SPI = "SPI-1 of the harvest month"
+X_LABEL_SPI3 = "SPI-3 of the harvest month"
+# The SPI key of an episode, the axis name and the text name per rule.
+SPI_RULES = {
+    "spi1": {"key": "spi1", "name": "SPI-1", "xLabel": X_LABEL_SPI},
+    "spi3": {"key": "spi3", "name": "SPI-3", "xLabel": X_LABEL_SPI3},
+}
 Y_LABEL_LATE = "LUE of days 15 to 28\n(fraction of the mean of days −14 to −1)"
 DRY_LABEL = "dry"
 # Thin reference lines of the panels, also the values that the y range must hold.
@@ -1916,13 +1942,18 @@ def episode_result(data: Data, ctx: Context, ep: HarvestEpisode) -> dict[str, An
 
 # ----- groups -----
 def group_stats(
-    eps: Sequence[dict[str, Any]], cut: str, dryness_key: str = "dry"
+    eps: Sequence[dict[str, Any]],
+    cut: str,
+    dryness_key: str = "dry",
+    full: bool | None = None,
+    seed_base: int = SEED_BASE,
 ) -> dict[str, Any]:
     """Statistics per window and quantity of the dry and the normal episodes of one cut group.
-    `dryness_key` selects the dryness definition (dry, drySpi3, drySwc); only the main
-    definition (dry) gets the bootstrap and the permutation test."""
+    `dryness_key` selects the dryness definition (dry, drySpi3, drySwc). With `full` (default:
+    only the main definition dry), the result has the bootstrap CI and the permutation test;
+    else only the plain group means. `seed_base` is the first seed of the bootstrap."""
     ci_idx = CUT_GROUPS.index(cut)
-    main = dryness_key == "dry"
+    main = (dryness_key == "dry") if full is None else full
     dry_eps = [e for e in eps if e[dryness_key]]
     normal_eps = [e for e in eps if not e[dryness_key]]
     out: dict[str, Any] = {
@@ -1944,7 +1975,7 @@ def group_stats(
 
             dv = [val(e) for e in dry_eps]
             nv = [val(e) for e in normal_eps]
-            base = SEED_BASE + 1000 * ci_idx + 100 * qi + 10 * wi
+            base = seed_base + 1000 * ci_idx + 100 * qi + 10 * wi
             tag = f"{cut}.{dryness_key}.{w}.{q}"
             if main:
                 block[q] = {
@@ -1978,9 +2009,16 @@ def plain_stats(values: Iterable[float | None]) -> dict[str, Any]:
     }
 
 
-def composite(eps: Sequence[dict[str, Any]], cut: str, dryness: str) -> dict[str, Any]:
+def composite(
+    eps: Sequence[dict[str, Any]],
+    cut: str,
+    dryness: str,
+    seed_base: int = COMPOSITE_SEED_BASE,
+    rule: str = "spi1",
+) -> dict[str, Any]:
     """Mean, SD, n and bootstrap CI per offset from end of relLUE, relGPP and relPAR over the
-    episodes; mean and SD null when n < min n (2, or 1 in a group of one episode)."""
+    episodes; mean and SD null when n < min n (2, or 1 in a group of one episode). `seed_base`
+    and `rule` (the name in the seed list) separate the main and the SPI-3 grouping."""
     offsets = list(range(COMPOSITE[0], COMPOSITE[1] + 1))
     min_n = min(COMPOSITE_MIN_N, len(eps)) if eps else COMPOSITE_MIN_N
     out: dict[str, Any] = {
@@ -1988,11 +2026,8 @@ def composite(eps: Sequence[dict[str, Any]], cut: str, dryness: str) -> dict[str
         "ids": [e["id"] for e in eps],
         "minNRule": min_n,
     }
-    base = (
-        COMPOSITE_SEED_BASE
-        + 2000 * CUT_GROUPS.index(cut)
-        + 1000 * DRYNESS.index(dryness)
-    )
+    base = seed_base + 2000 * CUT_GROUPS.index(cut) + 1000 * DRYNESS.index(dryness)
+    seed_tag = "composite" if rule == "spi1" else f"composite.{rule}"
     for qi, q in enumerate(QUANTITIES):
         means: list[float | None] = []
         sds: list[float | None] = []
@@ -2011,7 +2046,7 @@ def composite(eps: Sequence[dict[str, Any]], cut: str, dryness: str) -> dict[str
             ci = bootstrap_mean_ci(xs, seed)
             los.append(None if ci is None else ci[0])
             his.append(None if ci is None else ci[1])
-        SEEDS_USED[f"composite.{cut}.{dryness}.{q}"] = base + 100 * qi
+        SEEDS_USED[f"{seed_tag}.{cut}.{dryness}.{q}"] = base + 100 * qi
         out[q] = {
             "mean": means,
             "sd": sds,
@@ -2022,7 +2057,8 @@ def composite(eps: Sequence[dict[str, Any]], cut: str, dryness: str) -> dict[str
             "maxN": max(ns),
         }
     log.info(
-        "composite %s %s: %d episodes, n per day %d to %d",
+        "composite %s %s %s: %d episodes, n per day %d to %d",
+        rule,
         cut,
         dryness,
         len(eps),
@@ -2166,6 +2202,73 @@ def analyse(data: Data) -> dict[str, Any]:
     )
     log.info("y range of Figures 1 and 2: %s", y_range)
 
+    # The SPI-3 grouping: the same statistics as the main rule, where n allows.
+    groups_spi3: dict[str, Any] = {}
+    comps_spi3: dict[str, Any] = {}
+    for cut in CUT_GROUPS:
+        eps = [e for e in in_group if e["cutGroup"] == cut]
+        groups_spi3[cut] = group_stats(
+            eps, cut, "drySpi3", full=True, seed_base=SPI3_SEED_BASE
+        )
+        log.info(
+            "group %s by SPI-3: %d episodes, dry %d (%s), normal %d (%s)",
+            cut,
+            len(eps),
+            groups_spi3[cut]["n"]["dry"],
+            ", ".join(groups_spi3[cut]["ids"]["dry"]),
+            groups_spi3[cut]["n"]["normal"],
+            ", ".join(groups_spi3[cut]["ids"]["normal"]),
+        )
+        for w in WINDOWS:
+            for q in QUANTITIES:
+                g = groups_spi3[cut][w][q]
+                log.info(
+                    "  %s %s: dry %s (SD %s, n %d), normal %s (SD %s, n %d, CI %s to %s), "
+                    "diff %s, p %s (%d splits)",
+                    w,
+                    q,
+                    fmt(g["dry"]["mean"], 3),
+                    fmt(g["dry"]["sd"], 3),
+                    g["dry"]["n"],
+                    fmt(g["normal"]["mean"], 3),
+                    fmt(g["normal"]["sd"], 3),
+                    g["normal"]["n"],
+                    fmt(g["normal"]["ciLo"], 3),
+                    fmt(g["normal"]["ciHi"], 3),
+                    fmt(g["diff"]["diff"], 3),
+                    fmt(g["diff"]["permutationP"], 3),
+                    g["diff"]["nSplits"],
+                )
+        if groups_spi3[cut]["n"]["dry"] > 0:
+            comps_spi3[cut] = {
+                d: composite(
+                    [e for e in eps if e["drySpi3"] == (d == "dry")],
+                    cut,
+                    d,
+                    seed_base=SPI3_COMPOSITE_SEED_BASE,
+                    rule="spi3",
+                )
+                for d in DRYNESS
+            }
+        else:
+            log.info(
+                "composite spi3 %s: no dry episode by SPI-3, no curves and no figure",
+                cut,
+            )
+    y_range_spi3 = nice_range(
+        *_min_max(
+            [comps[c][d] for c in CUT_GROUPS for d in DRYNESS]
+            + [comps_spi3[c][d] for c in comps_spi3 for d in DRYNESS],
+        )
+    )
+    y_range_shared = y_range_spi3 == y_range
+    log.info(
+        "y range of Figure 4 (over the curves of Figures 1, 2 and 4): %s (%s the range of "
+        "Figures 1 and 2)",
+        y_range_spi3,
+        "equals" if y_range_shared else "differs from",
+    )
+
     # Sensitivity: the other dryness definitions, and k for the Qvidja episodes.
     sens_dryness = {
         key: {
@@ -2227,16 +2330,30 @@ def analyse(data: Data) -> dict[str, Any]:
         },
         "daysParBelowMin": data.steps["dailyPar"]["daysParBelowMin"],
     }
-    summary = summary_json(groups)
+    summary = summary_json(groups) | {"spi3": summary_json(groups_spi3)}
     return {
         "counts": counts,
         "sites": sites_json,
         "episodes": episodes,
-        "groups": groups,
+        "groups": groups
+        | {
+            "spi3": groups_spi3
+            | {
+                "rule": f"dry = SPI-3 <= {SPI_DRY} of the harvest month",
+                "note": (
+                    "the same statistics as the main rule where n allows: bootstrap CI with "
+                    f"{BOOTSTRAP_MIN_N} or more episodes, exact permutation test with 2 or "
+                    "more per group; with 2 dry episodes the mean and both values are given"
+                ),
+            }
+        },
         "composite": {
             "offsets": list(range(COMPOSITE[0], COMPOSITE[1] + 1)),
             "yRange": y_range,
             "perGroup": comps,
+            "yRangeSpi3": y_range_spi3,
+            "yRangeShared": y_range_shared,
+            "spi3": comps_spi3,
         },
         "par": data.par,
         "sensitivity": {
@@ -2595,7 +2712,24 @@ def window_sentence(g: dict[str, Any], w: str) -> str:
             f"{fmt(s['normalMax'])}), {fmt(s['sdUnits'], 1)} SD units; no test with one dry "
             "episode."
         )
-    ci = "n/a" if d["ci"] is None else f"{fmt(d['ci'][0])} to {fmt(d['ci'][1])}"
+    if d["ci"] is None:
+        # Fewer than 3 episodes in a group: no bootstrap CI; the two dry values are given.
+        dry = r["dry"]
+        values = (
+            f"the dry values are {fmt(dry['min'])} and {fmt(dry['max'])}"
+            if dry["n"] == 2
+            else f"dry n {dry['n']}"
+        )
+        test = (
+            f"exact permutation p = {fmt(d['permutationP'], 2)} ({d['nSplits']} splits)"
+            if d["permutationP"] is not None
+            else "no test"
+        )
+        return (
+            f"{head}; difference dry − normal {fmt(d['diff'])} (no bootstrap CI with fewer "
+            f"than {BOOTSTRAP_MIN_N} dry episodes; {values}), {test}."
+        )
+    ci = f"{fmt(d['ci'][0])} to {fmt(d['ci'][1])}"
     return (
         f"{head}; difference dry − normal {fmt(d['diff'])} (95 % CI {ci}), exact permutation "
         f"p = {fmt(d['permutationP'], 2)} ({d['nSplits']} splits)."
@@ -2613,24 +2747,30 @@ def common_desc(yr: Sequence[float]) -> str:
     )
 
 
-def fig_first_cut(res: dict[str, Any]) -> tuple[Any, str, str]:
-    comp = res["composite"]
-    offsets = np.array(comp["offsets"], dtype=float)
-    yr = comp["yRange"]
-    g = res["groups"]["first"]
-    cd, cn = comp["perGroup"]["first"]["dry"], comp["perGroup"]["first"]["normal"]
+def _fig_first(
+    g: dict[str, Any],
+    cd: dict[str, Any],
+    cn: dict[str, Any],
+    offsets: np.ndarray,
+    yr: Sequence[float],
+    spi_name: str,
+    fig_title: str,
+    dry_band: bool,
+) -> Any:
+    """The panel of Figure 1 or 4: the normal and the dry composite curve of the first cuts."""
     fig, ax = plt.subplots(figsize=(FIG_WIDTH_IN, FIG_HEIGHT_IN))
     panel_base(ax, yr)
     draw_curve(ax, cn, offsets, "normal", band=True)
-    draw_curve(ax, cd, offsets, "dry", band=True)
-    ax.set_title(two_lines(FIG1_TITLE), loc="left")
+    draw_curve(ax, cd, offsets, "dry", band=dry_band)
+    ax.set_title(two_lines(fig_title), loc="left")
     ax.legend(
         handles=[
             legend_handle(
-                "normal", f"Normal (SPI-1 > {fmt(SPI_DRY, 1)}, n = {cn['episodes']})"
+                "normal",
+                f"Normal ({spi_name} > {fmt(SPI_DRY, 1)}, n = {cn['episodes']})",
             ),
             legend_handle(
-                "dry", f"Dry (SPI-1 ≤ {fmt(SPI_DRY, 1)}, n = {cd['episodes']})"
+                "dry", f"Dry ({spi_name} ≤ {fmt(SPI_DRY, 1)}, n = {cd['episodes']})"
             ),
         ],
         loc="upper left",
@@ -2638,6 +2778,16 @@ def fig_first_cut(res: dict[str, Any]) -> tuple[Any, str, str]:
         handlelength=3.2,
     )
     fig.subplots_adjust(left=0.11, right=0.99, top=0.86, bottom=0.14)
+    return fig
+
+
+def fig_first_cut(res: dict[str, Any]) -> tuple[Any, str, str]:
+    comp = res["composite"]
+    offsets = np.array(comp["offsets"], dtype=float)
+    yr = comp["yRange"]
+    g = res["groups"]["first"]
+    cd, cn = comp["perGroup"]["first"]["dry"], comp["perGroup"]["first"]["normal"]
+    fig = _fig_first(g, cd, cn, offsets, yr, "SPI-1", FIG1_TITLE, dry_band=True)
     title = (
         f"Light use efficiency (GPP / PAR) from 14 days before to 28 days after the last day of "
         f"a first silage cut, as a fraction of the LUE of the 14 days before the harvest: "
@@ -2649,6 +2799,47 @@ def fig_first_cut(res: dict[str, Any]) -> tuple[Any, str, str]:
         "group vermillion, dashed, with squares. The band around each line is the bootstrap 95 % "
         f"CI of the mean over the episodes, drawn where {BOOTSTRAP_MIN_N} or more episodes have a "
         f"value; the line is drawn where {COMPOSITE_MIN_N} or more have a value. Dry episodes: "
+        f"{', '.join(g['ids']['dry'])}. Normal episodes: {', '.join(g['ids']['normal'])}. "
+        f"{window_sentence(g, 'after')} {window_sentence(g, 'late')}"
+    )
+    return fig, title, desc
+
+
+def fig_first_cut_spi3(res: dict[str, Any]) -> tuple[Any, str, str]:
+    """Figure 4: as Figure 1, with the groups from SPI-3 <= SPI_DRY of the harvest month."""
+    comp = res["composite"]
+    offsets = np.array(comp["offsets"], dtype=float)
+    yr = comp["yRangeSpi3"]
+    g = res["groups"]["spi3"]["first"]
+    cd, cn = comp["spi3"]["first"]["dry"], comp["spi3"]["first"]["normal"]
+    dry_band = cd["episodes"] >= BOOTSTRAP_MIN_N
+    fig = _fig_first(g, cd, cn, offsets, yr, "SPI-3", FIG4_TITLE, dry_band=dry_band)
+    title = (
+        f"Light use efficiency (GPP / PAR) from 14 days before to 28 days after the last day of "
+        f"a first silage cut, as a fraction of the LUE of the 14 days before the harvest, with "
+        f"the groups from SPI-3: {cd['episodes']} cuts in a dry month (SPI-3 ≤ "
+        f"{fmt(SPI_DRY, 1)}) and {cn['episodes']} cuts in a normal month; mean over the "
+        "episodes, with the bootstrap 95 % CI of the normal group."
+    )
+    band_text = (
+        f"The band around each line is the bootstrap 95 % CI of the mean over the episodes, "
+        f"drawn where {BOOTSTRAP_MIN_N} or more episodes have a value"
+        if dry_band
+        else (
+            f"The band around the normal line is the bootstrap 95 % CI of the mean over the "
+            f"episodes, drawn where {BOOTSTRAP_MIN_N} or more episodes have a value; the dry "
+            f"line has no band ({cd['episodes']} episodes, fewer than {BOOTSTRAP_MIN_N})"
+        )
+    )
+    range_text = (
+        "The y range is the range of Figures 1 and 2."
+        if comp["yRangeShared"]
+        else "The y range differs from the range of Figures 1 and 2."
+    )
+    desc = (
+        f"One panel. {common_desc(yr)} {range_text} Lines: normal group steel blue, solid, with "
+        f"circles; dry group vermillion, dashed, with squares. {band_text}; the line is drawn "
+        f"where {COMPOSITE_MIN_N} or more have a value. Dry episodes (SPI-3 ≤ {fmt(SPI_DRY, 1)}): "
         f"{', '.join(g['ids']['dry'])}. Normal episodes: {', '.join(g['ids']['normal'])}. "
         f"{window_sentence(g, 'after')} {window_sentence(g, 'late')}"
     )
@@ -2698,18 +2889,23 @@ def fig_later_cuts(res: dict[str, Any]) -> tuple[Any, str, str]:
     return fig, title, desc
 
 
-def fig_late_vs_spi(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
-    """Two panels: the mean relative LUE of days 15 to 28 against SPI-1, one marker per episode."""
+def fig_late_vs_spi(
+    res: dict[str, Any], data: Data, rule: str = "spi1"
+) -> tuple[Any, str, str]:
+    """Two panels: the mean relative LUE of days 15 to 28 against the SPI of the harvest month
+    (SPI-1 in Figure 3, SPI-3 in Figure 5), one marker per episode."""
+    sr = SPI_RULES[rule]
+    key, spi_name = sr["key"], sr["name"]
     eps = [
         e
         for e in res["episodes"]
         if e["used"]
         and e["windows"]["late"] is not None
         and e["windows"]["late"]["relLue"] is not None
-        and e["spi1"] is not None
+        and e[key] is not None
     ]
     fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH_IN, FIG3_HEIGHT_IN), sharey=True)
-    xs_all = [e["spi1"] for e in eps]
+    xs_all = [e[key] for e in eps]
     ys_all = [e["windows"]["late"]["relLue"] for e in eps]
     x_lo = math.floor(min(xs_all + [SPI_DRY]) * 2) / 2 - 0.25
     x_hi = math.ceil(max(xs_all) * 2) / 2 + 0.25
@@ -2735,7 +2931,7 @@ def fig_late_vs_spi(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
             slot = data.slots[e["site"]]
             color = SITE_COLORS[slot]
             ax.plot(
-                e["spi1"],
+                e[key],
                 e["windows"]["late"]["relLue"],
                 marker=SITE_MARKERS[slot],
                 ms=MARKER_SIZE + 1.5,
@@ -2749,7 +2945,7 @@ def fig_late_vs_spi(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         ax.set_ylim(yr[0], yr[1])
         ax.set_yticks(np.arange(0, yr[1] + Y_STEP / 2, Y_STEP))
         ax.set_title(FIG3_TITLES[cut], loc="left")
-        ax.set_xlabel(X_LABEL_SPI)
+        ax.set_xlabel(sr["xLabel"])
     axes[0].set_ylabel(Y_LABEL_LATE)
     handles = [
         Line2D(
@@ -2790,16 +2986,16 @@ def fig_late_vs_spi(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
     n_later = sum(1 for e in eps if e["cutGroup"] == "later")
     title = (
         f"Mean light use efficiency of the days 15 to 28 after the last day of a silage harvest, "
-        f"as a fraction of the LUE of the 14 days before the harvest, against the SPI-1 of the "
-        f"harvest month; one marker per episode, first cuts (n = {n_first}) and later cuts "
-        f"(n = {n_later}); a dashed line marks the dry limit SPI-1 = {fmt(SPI_DRY, 1)}."
+        f"as a fraction of the LUE of the 14 days before the harvest, against the {spi_name} of "
+        f"the harvest month; one marker per episode, first cuts (n = {n_first}) and later cuts "
+        f"(n = {n_later}); a dashed line marks the dry limit {spi_name} = {fmt(SPI_DRY, 1)}."
     )
 
     def points(cut: str) -> str:
         rows = [e for e in eps if e["cutGroup"] == cut]
-        rows.sort(key=lambda e: e["spi1"])
+        rows.sort(key=lambda e: e[key])
         return "; ".join(
-            f"{e['id']} SPI-1 {fmt(e['spi1'])}, LUE {fmt(e['windows']['late']['relLue'])}"
+            f"{e['id']} {spi_name} {fmt(e[key])}, LUE {fmt(e['windows']['late']['relLue'])}"
             + (" (flagged, open marker)" if e["flagged"] else "")
             for e in rows
         )
@@ -2810,18 +3006,36 @@ def fig_late_vs_spi(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         if e["used"]
         and (e["windows"]["late"] is None or e["windows"]["late"]["relLue"] is None)
     ]
+    dry_text = ""
+    if rule != "spi1":
+        n_dry = {
+            c: sum(1 for e in eps if e["cutGroup"] == c and e[key] <= SPI_DRY)
+            for c in CUT_GROUPS
+        }
+        parts = []
+        for c in CUT_GROUPS:
+            label = FIG3_TITLES[c].lower()
+            if n_dry[c] == 0:
+                parts.append(
+                    f"no {label[:-1]} has {spi_name} ≤ {fmt(SPI_DRY, 1)}: the {label} panel "
+                    "has no point at or left of the dry line"
+                )
+            else:
+                parts.append(f"{n_dry[c]} {label} at or left of the dry line")
+        joined = "; ".join(parts)
+        dry_text = " " + joined[0].upper() + joined[1:] + "."
     desc = (
         f"Two panels side by side with the same axes: first cuts (left) and later cuts (right). "
-        f"X axis: SPI-1 of the harvest month, from {fmt(x_lo, 2)} to {fmt(x_hi, 2)}; a dashed "
-        f"vermillion vertical line at {fmt(SPI_DRY, 1)} marks the dry limit (dry = at or left of "
-        f"it). Y axis: mean LUE of the days +{LATE[0]} to +{LATE[1]} as a fraction of the LUE of "
-        f"the days {fmt(BEFORE[0], 0)} to {fmt(BEFORE[1], 0)}, from {fmt(yr[0], 2)} to "
-        f"{fmt(yr[1], 2)}; thin lines mark 1 and 0. Marker per site: Anttila blue circle, "
+        f"X axis: {spi_name} of the harvest month, from {fmt(x_lo, 2)} to {fmt(x_hi, 2)}; a "
+        f"dashed vermillion vertical line at {fmt(SPI_DRY, 1)} marks the dry limit (dry = at or "
+        f"left of it). Y axis: mean LUE of the days +{LATE[0]} to +{LATE[1]} as a fraction of "
+        f"the LUE of the days {fmt(BEFORE[0], 0)} to {fmt(BEFORE[1], 0)}, from {fmt(yr[0], 2)} "
+        f"to {fmt(yr[1], 2)}; thin lines mark 1 and 0. Marker per site: Anttila blue circle, "
         "Särkisuo orange square, Qvidja reddish purple diamond, Viikki black pentagon; an open "
         "marker is a flagged Viikki episode (establishment year or partial harvest), not in the "
-        f"group statistics. First cuts: {points('first')}. Later cuts: {points('later')}. "
-        f"Episodes without a late window (blocked or fewer than {MIN_DAYS} LUE days): "
-        f"{', '.join(missing) if missing else 'none'}."
+        f"group statistics.{dry_text} First cuts: {points('first')}. Later cuts: "
+        f"{points('later')}. Episodes without a late window (blocked or fewer than {MIN_DAYS} "
+        f"LUE days): {', '.join(missing) if missing else 'none'}."
     )
     return fig, title, desc
 
@@ -2890,6 +3104,9 @@ def data_version(
             "groups": "SEED_BASE + 1000 x cut group + 100 x quantity + 10 x window + dryness (0 dry, 1 normal, 2 difference)",
             "compositeSeedBase": COMPOSITE_SEED_BASE,
             "composite": "COMPOSITE_SEED_BASE + 2000 x cut group + 1000 x dryness + 100 x quantity + day index (0 = day -14); the seeds list gives the first seed of each curve",
+            "spi3SeedBase": SPI3_SEED_BASE,
+            "spi3CompositeSeedBase": SPI3_COMPOSITE_SEED_BASE,
+            "spi3": "the SPI-3 grouping uses the same rules with SPI3_SEED_BASE and SPI3_COMPOSITE_SEED_BASE",
         },
         "bootstrap": {
             "resamples": BOOTSTRAP_RESAMPLES,
@@ -2987,9 +3204,30 @@ def method_json() -> dict[str, Any]:
             "x": X_LABEL,
             "y": Y_LABEL,
             "xSpi": X_LABEL_SPI,
+            "xSpi3": X_LABEL_SPI3,
             "yLate": Y_LABEL_LATE,
         },
-        "figureTitles": {"1": FIG1_TITLE, "2": FIG2_TITLE, "3": FIG3_TITLES},
+        "figureTitles": {
+            "1": FIG1_TITLE,
+            "2": FIG2_TITLE,
+            "3": FIG3_TITLES,
+            "4": FIG4_TITLE,
+            "5": FIG3_TITLES,
+        },
+        "yRangeRule": (
+            "Figures 1 and 2: one range over their drawn means, CI bands and the single curve "
+            f"(rounded outwards to a multiple of {Y_STEP}, extended to hold 0 and 1). Figure 4: "
+            "the same rule over the curves of Figures 1, 2 and 4 together "
+            "(composite.yRangeSpi3); composite.yRangeShared says whether it equals the range of "
+            "Figures 1 and 2"
+        ),
+        "spi3Rule": {
+            "threshold": SPI_DRY,
+            "note": (
+                "dry = SPI-3 <= -1.5 of the harvest month; the second full grouping "
+                "(groups.spi3, composite.spi3, Figures 4 and 5); no later cut is dry"
+            ),
+        },
         "rules": [
             line.strip()
             for line in (__doc__ or "")
@@ -3091,8 +3329,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             fig, title, desc = fig_first_cut(res)
         elif name == "later-cuts":
             fig, title, desc = fig_later_cuts(res)
-        else:
+        elif name == "late-lue-vs-spi":
             fig, title, desc = fig_late_vs_spi(res, data)
+        elif name == "first-cut-spi3":
+            fig, title, desc = fig_first_cut_spi3(res)
+        elif name == "late-lue-vs-spi3":
+            fig, title, desc = fig_late_vs_spi(res, data, rule="spi3")
+        else:
+            raise RuntimeError(f"unknown figure {name}")
         path = target / "figures" / f"{n}-{name}.svg"
         save_svg(fig, path, n, title, desc, meta)
         size = path.stat().st_size

@@ -42,7 +42,7 @@ import Figure from '../../components/deep-dive/Figure.astro';
 import References from '../../components/deep-dive/References.astro';
 import { baseUrl } from '../../lib/deepDive';
 import { REPO_URL } from '../../lib/dataReport';
-import { epKey, episodeRows, fertInWindowCount, groupRows, inputRows, kRows, litNote, overrideTexts, regrowthData, sensitivityRows, sitesOf } from '../../lib/deepDives/regrowthDrought';
+import { epKey, episodeRows, fertInWindowCount, groupRows, groupRowsSpi3, inputRows, kRows, litNote, overrideTexts, regrowthData, sensitivityRows, sitesOf } from '../../lib/deepDives/regrowthDrought';
 
 export const d = regrowthData(raw);
 export const base = baseUrl();
@@ -54,6 +54,7 @@ export const Y = (id) => id.split('-')[1]; // the year of an episode id, a label
 export const L = (key) => litNote(d, key);
 export const episodes = episodeRows(d);
 export const groups = groupRows(d);
+export const groupsSpi3 = groupRowsSpi3(d);
 export const sens = sensitivityRows(d);
 export const kTable = kRows(d);
 export const inputs = inputRows(d);
@@ -62,6 +63,9 @@ export const dryFirstSites = sitesOf(d, d.groups.first.ids.dry);
 export const normalFirstSites = sitesOf(d, d.groups.first.ids.normal);
 export const dryLaterSites = sitesOf(d, d.groups.later.ids.dry);
 export const normalLaterSites = sitesOf(d, d.groups.later.ids.normal);
+export const dryFirstSitesSpi3 = sitesOf(d, d.groups.spi3.first.ids.dry);
+export const normalFirstSitesSpi3 = sitesOf(d, d.groups.spi3.first.ids.normal);
+export const yRangeSharedText = d.composite.yRangeShared ? 'This is the range of Figures 1 and 2.' : 'This range differs from the range of Figures 1 and 2.';
 export const fertCount = fertInWindowCount(d);
 export const ULUE = 'g C mol⁻¹';
 export const UPAR = 'mol m⁻² d⁻¹';
@@ -214,21 +218,26 @@ numbers.
    the relative GPP, because a mean of products is not the product of the means; the tables give the window mean of the
    relative GPP. <Num k="counts.used" digits={0} /> episodes have a reference, and <Num k="counts.inGroups" digits={0} />
    of them are in the groups.
-7. **Dryness.** The SPI-1 of the FMI station of the site <Cite ids={['spi-data']} /> in the calendar month that holds
-   *end*: Vantaa for Viikki, Kaarina Yltöinen for Qvidja, Kuopio Maaninka for Anttila and Särkisuo. *Dry* = SPI-1 ≤
-   <Num k="method.spiDry" digits={1} />. This limit is the lower bound of "severely dry" in the SPEI classes that Heimsch
-   et al. 2024 use <Cite ids={['heimsch2024']} note={L('speiSeverelyDry')} />. Deep Dive #3
+7. **Dryness.** The main drought variable is the SPI-1 of the FMI station of the site <Cite ids={['spi-data']} /> in the
+   calendar month that holds *end*: Vantaa for Viikki, Kaarina Yltöinen for Qvidja, Kuopio Maaninka for Anttila and
+   Särkisuo. *Dry* = SPI-1 ≤ <Num k="method.spiDry" digits={1} />. This limit is the lower bound of "severely dry" in the
+   SPEI classes that Heimsch et al. 2024 use <Cite ids={['heimsch2024']} note={L('speiSeverelyDry')} />. Deep Dive #3
    (<a href={`${base}deep-dive/nee-without-harvest-drought/`}>NEE without harvest or drought</a>) uses SPI-1 ≤
    <Num k="method.spiDryOtherDive" digits={1} />. June 2018 at Kaarina Yltöinen has SPI-1
    <Num k="summary.extra.june2018.spi1" /> and SPI-3 <Num k="summary.extra.june2018.spi3" />; thus the Qvidja cut of
    12 June 2018 is not dry by the rule of this dive, although Heimsch et al. 2024 classify May, June and July 2018 as
-   extremely dry by SPEI <Cite ids={['heimsch2024']} note={L('qvidja2018Drought')} />. Three sensitivity rules apply to the same <Num k="counts.inGroups" digits={0} /> episodes as the main rule. (1) SPI-3 ≤
-   <Num k="method.spiDry" digits={1} /> of the same month. (2) SWC anomaly below zero. The daily `swc` is the mean of the
-   30-minute `swc` of the local day, with the day rule of rule 1. The anomaly = the mean daily `swc` of the local days
-   end <Num k="method.swcWindow.0" sign digits={0} /> to end <Num k="method.swcWindow.1" sign digits={0} /> minus the mean
-   of the same site on the same calendar dates in all its data years. Each data year with at least one daily `swc` in
-   these dates counts, the episode year included. The Särkisuo cuts of 2022 have one year with `swc`, thus an anomaly of
-   0. (3) SPI-1 ≤ <Num k="sensitivity.spiMinus1.threshold" digits={1} />. The sensitivity rules give group means only.
+   extremely dry by SPEI <Cite ids={['heimsch2024']} note={L('qvidja2018Drought')} />. The second drought variable is
+   the SPI-3 of the same station month. The SPI-3 covers the three months up to and including the month that holds
+   *end*. *Dry by SPI-3* = SPI-3 ≤ <Num k="method.spi3Rule.threshold" digits={1} />. This rule makes a second full
+   grouping of the same <Num k="counts.inGroups" digits={0} /> episodes, with the statistics of rule 8, its own figures
+   (Figures 4 and 5) and Table B2 (section "Drought by SPI-3"). Two sensitivity rules apply to the same episodes.
+   (1) SWC anomaly below zero. The daily `swc` is the mean of the 30-minute `swc` of the local day, with the day rule of
+   rule 1. The anomaly = the mean daily `swc` of the local days end <Num k="method.swcWindow.0" sign digits={0} /> to end
+   <Num k="method.swcWindow.1" sign digits={0} /> minus the mean of the same site on the same calendar dates in all its
+   data years. Each data year with at least one daily `swc` in these dates counts, the episode year included. The
+   Särkisuo cuts of 2022 have one year with `swc`, thus an anomaly of 0. (2) SPI-1 ≤
+   <Num k="sensitivity.spiMinus1.threshold" digits={1} />. The sensitivity rules give group means only. Table C lists the
+   SPI-3 groups also as means.
 8. **Groups and statistics.** The statistics are per cut group (first, later), dryness (dry, normal) and window (after,
    late), for the relative LUE, GPP and PAR. Each group gives n, mean, sample SD (n − 1), median and range. A percentile
    bootstrap gives the <Num k="method.ciLevelPct" digits={0} /> % interval of the mean when n is
@@ -245,7 +254,9 @@ numbers.
    <Num k="method.bootstrapMinN" digits={0} /> or more. A group of one episode shows the episode itself. The y range of
    Figures 1 and 2 is one range over all drawn means and bands. It is rounded outwards to a multiple of
    <Num k="method.yStep" digits={2} /> and extended to hold 0 and 1: <Num k="composite.yRange.0" digits={2} /> to
-   <Num k="composite.yRange.1" digits={2} />.
+   <Num k="composite.yRange.1" digits={2} />. The y range of Figure 4 uses the same rule over the curves of Figures 1, 2
+   and 4 together: <Num k="composite.yRangeSpi3.0" digits={2} /> to <Num k="composite.yRangeSpi3.1" digits={2} />.
+   {yRangeSharedText}
 9. **Counts and findings.** Each step that removes rows or changes values logs a count in `dataVersion.steps` of
    `results.json`. The script prints the open findings of the data report that touch this dive.
 
@@ -290,7 +301,8 @@ Thus the dive compares within the same cut number.
 Figures 1 and 2 show the relative LUE per day from <Num k="method.compositeFrom" digits={0} abs /> days before to
 <Num k="method.compositeTo" digits={0} /> days after the last day of the harvest. A line is the mean of the episodes of
 the group; the band is the bootstrap <Num k="method.ciLevelPct" digits={0} /> % interval of the mean. Figure 3 shows the
-LUE of the late window of each episode against the SPI-1 of its harvest month.
+LUE of the late window of each episode against the SPI-1 of its harvest month. Figures 4 and 5 repeat Figure 1 and
+Figure 3 with the SPI-3 as the drought variable (section "Drought by SPI-3").
 
 ### First cuts
 
@@ -413,10 +425,85 @@ The flagged Viikki episodes are at <Num k={`${E('viikki-2024-06-14')}.windows.la
 2023, SPI-1 <Num k={`${E('viikki-2023-08-17')}.spi1`} />). The figure shows no monotonic relation between the SPI-1 and
 the late LUE.
 
+### Drought by SPI-3
+
+<Figure id="figure-4" svgFile="analysis/regrowth-drought/figures/4-first-cut-spi3.svg" view={VIEW} />
+
+<Figure id="figure-5" svgFile="analysis/regrowth-drought/figures/5-late-lue-vs-spi3.svg" view={VIEW} />
+
+The second drought variable is the SPI-3 of the station month that holds the last harvest day
+<Cite ids={['spi-data']} />. The SPI-3 covers the three months up to and including that month. *Dry by SPI-3* = SPI-3 ≤
+<Num k="method.spi3Rule.threshold" digits={1} /> (rule 7). The episodes, the windows and the statistics are those of the
+main rule. Figure 4 repeats Figure 1 with the groups from SPI-3. Figure 5 repeats Figure 3 with the SPI-3 on the x axis.
+
+By SPI-3, <Num k="groups.spi3.first.n.dry" digits={0} /> first cuts are dry, both at {dryFirstSitesSpi3}: June
+{Y('qvidja-2019-06-11')} (SPI-3 <Num k={`${E('qvidja-2019-06-11')}.spi3`} />) and June {Y('qvidja-2023-06-19')}
+(SPI-3 <Num k={`${E('qvidja-2023-06-19')}.spi3`} />). The normal group holds
+<Num k="groups.spi3.first.n.normal" digits={0} /> first cuts at {normalFirstSitesSpi3};
+<Num k="groups.spi3.first.late.relLue.normal.n" digits={0} /> of them have a late window. The dry group has n =
+<Num k="groups.spi3.first.n.dry" digits={0} />, fewer than <Num k="method.bootstrapMinN" digits={0} />. Thus Figure 4
+draws a dry line and no dry band, and the dry group and the difference have no bootstrap interval (rule 8). The exact
+permutation test runs with two dry episodes. The values of the two dry episodes are given in place of an interval.
+
+In the days <Num k="method.afterDays.0" sign digits={0} /> to <Num k="method.afterDays.1" sign digits={0} />, the relative
+LUE of the dry group was <Num k="groups.spi3.first.after.relLue.dry.mean" /> (values
+<Num k="groups.spi3.first.after.relLue.dry.min" /> and <Num k="groups.spi3.first.after.relLue.dry.max" />) and of the
+normal group <Num k="groups.spi3.first.after.relLue.normal.mean" /> (SD <Num k="groups.spi3.first.after.relLue.normal.sd" />,
+interval <Num k="groups.spi3.first.after.relLue.normal.ciLo" /> to <Num k="groups.spi3.first.after.relLue.normal.ciHi" />);
+the difference is <Num k="groups.spi3.first.after.relLue.diff.diff" sign /> (p =
+<Num k="groups.spi3.first.after.relLue.diff.permutationP" />, <Num k="groups.spi3.first.after.relLue.diff.nSplits" digits={0} />
+splits). The relative GPP was <Num k="groups.spi3.first.after.relGpp.dry.mean" /> (dry, values
+<Num k="groups.spi3.first.after.relGpp.dry.min" /> and <Num k="groups.spi3.first.after.relGpp.dry.max" />) against
+<Num k="groups.spi3.first.after.relGpp.normal.mean" /> (normal, SD <Num k="groups.spi3.first.after.relGpp.normal.sd" />,
+interval <Num k="groups.spi3.first.after.relGpp.normal.ciLo" /> to <Num k="groups.spi3.first.after.relGpp.normal.ciHi" />);
+the difference is <Num k="groups.spi3.first.after.relGpp.diff.diff" sign /> (p =
+<Num k="groups.spi3.first.after.relGpp.diff.permutationP" />). The relative PAR was
+<Num k="groups.spi3.first.after.relPar.dry.mean" /> (dry, values <Num k="groups.spi3.first.after.relPar.dry.min" /> and
+<Num k="groups.spi3.first.after.relPar.dry.max" />) against <Num k="groups.spi3.first.after.relPar.normal.mean" /> (normal,
+SD <Num k="groups.spi3.first.after.relPar.normal.sd" />, interval <Num k="groups.spi3.first.after.relPar.normal.ciLo" />
+to <Num k="groups.spi3.first.after.relPar.normal.ciHi" />); the difference is
+<Num k="groups.spi3.first.after.relPar.diff.diff" sign /> (p = <Num k="groups.spi3.first.after.relPar.diff.permutationP" />).
+
+In the days <Num k="method.lateDays.0" sign digits={0} /> to <Num k="method.lateDays.1" sign digits={0} /> the relative
+LUE was <Num k="groups.spi3.first.late.relLue.dry.mean" /> (dry, values <Num k="groups.spi3.first.late.relLue.dry.min" />
+and <Num k="groups.spi3.first.late.relLue.dry.max" />) against <Num k="groups.spi3.first.late.relLue.normal.mean" />
+(normal, SD <Num k="groups.spi3.first.late.relLue.normal.sd" />, interval
+<Num k="groups.spi3.first.late.relLue.normal.ciLo" /> to <Num k="groups.spi3.first.late.relLue.normal.ciHi" />); the
+difference is <Num k="groups.spi3.first.late.relLue.diff.diff" sign /> (p =
+<Num k="groups.spi3.first.late.relLue.diff.permutationP" />, <Num k="groups.spi3.first.late.relLue.diff.nSplits" digits={0} />
+splits). The relative GPP was <Num k="groups.spi3.first.late.relGpp.dry.mean" /> (dry, values
+<Num k="groups.spi3.first.late.relGpp.dry.min" /> and <Num k="groups.spi3.first.late.relGpp.dry.max" />) against
+<Num k="groups.spi3.first.late.relGpp.normal.mean" /> (normal, SD <Num k="groups.spi3.first.late.relGpp.normal.sd" />,
+interval <Num k="groups.spi3.first.late.relGpp.normal.ciLo" /> to <Num k="groups.spi3.first.late.relGpp.normal.ciHi" />);
+the difference is <Num k="groups.spi3.first.late.relGpp.diff.diff" sign /> (p =
+<Num k="groups.spi3.first.late.relGpp.diff.permutationP" />). The relative PAR was
+<Num k="groups.spi3.first.late.relPar.dry.mean" /> (dry, values <Num k="groups.spi3.first.late.relPar.dry.min" /> and
+<Num k="groups.spi3.first.late.relPar.dry.max" />) against <Num k="groups.spi3.first.late.relPar.normal.mean" /> (normal,
+SD <Num k="groups.spi3.first.late.relPar.normal.sd" />, interval <Num k="groups.spi3.first.late.relPar.normal.ciLo" /> to
+<Num k="groups.spi3.first.late.relPar.normal.ciHi" />); the difference is
+<Num k="groups.spi3.first.late.relPar.diff.diff" sign /> (p = <Num k="groups.spi3.first.late.relPar.diff.permutationP" />).
+No p value is small. In both windows, one dry LUE value is below the normal mean and the other is above it. Table B2 gives all rows.
+
+No later cut is dry by SPI-3: <Num k="groups.spi3.later.n.dry" digits={0} /> of the
+<Num k="groups.spi3.later.n.normal" digits={0} /> later cuts in the groups. The Qvidja cut of 28 August
+{Y('qvidja-2020-08-28')}, the dry later cut of the main rule, has SPI-3 <Num k={`${E('qvidja-2020-08-28')}.spi3`} />.
+Thus there is no SPI-3 figure of the later cuts, and the later-cuts panel of Figure 5 has no point at or left of the
+dry line. The y range of Figure 4 is one range over the curves of Figures 1, 2 and 4 (rule 8):
+<Num k="composite.yRangeSpi3.0" digits={2} /> to <Num k="composite.yRangeSpi3.1" digits={2} />. {yRangeSharedText}
+
+The SPI-3 rule leaves the June {Y('qvidja-2022-06-21')} cut in the normal group: its SPI-3 is
+<Num k={`${E('qvidja-2022-06-21')}.spi3`} />, above the limit, and its SPI-1 is <Num k={`${E('qvidja-2022-06-21')}.spi1`} />.
+Under both rules the late LUE difference dry − normal is below zero
+(SPI-1 <Num k="groups.first.late.relLue.diff.diff" sign />, SPI-3 <Num k="groups.spi3.first.late.relLue.diff.diff" sign />),
+and under both rules the test does not separate the groups. With two or three dry episodes, one episode can move the
+group mean by a large amount, so the two rules may agree by chance. All dry episodes are again at Qvidja, so the site
+confounding of the main rule also applies here.
+
 ### Sensitivity to the dryness rule
 
 With SPI-3 ≤ <Num k="method.spiDry" digits={1} />, the dry first-cut group has <Num k="sensitivity.dryness.drySpi3.first.n.dry" digits={0} />
-episodes (June 2019 and June 2023) and the later cuts have <Num k="sensitivity.dryness.drySpi3.later.n.dry" digits={0} />.
+episodes (June 2019 and June 2023) and the later cuts have <Num k="sensitivity.dryness.drySpi3.later.n.dry" digits={0} />;
+the section "Drought by SPI-3" gives the full statistics, Figures 4 and 5 and Table B2.
 With the SWC anomaly below zero, <Num k="sensitivity.dryness.drySwc.first.n.dry" digits={0} /> of the
 <Num k="counts.perCutGroup.first.inGroups" digits={0} /> first cuts and <Num k="sensitivity.dryness.drySwc.later.n.dry" digits={0} />
 of the <Num k="counts.perCutGroup.later.inGroups" digits={0} /> later cuts are dry; this rule adds the Anttila cut of
@@ -459,6 +546,18 @@ Table C gives all values. The two alternative values of k gave the same group re
 
 <div class="table-wrap">
 <table>
+<caption>Table B2. Groups by SPI-3 ≤ {d.method.spi3Rule.threshold} of the station month that holds the last harvest day, first cuts only (no later cut is dry by SPI-3): the two values of the dry group (n = {d.groups.spi3.first.n.dry}, no bootstrap interval); mean ± sample SD [{d.method.ciLevelPct} % bootstrap interval] of the normal group; the difference dry − normal without an interval; p = exact two-sided permutation test (number of splits). The same windows and quantities as Table B.</caption>
+<thead>
+<tr><th scope="col">Cut group</th><th scope="col">Window</th><th scope="col">Quantity</th><th scope="col" class="num">Dry</th><th scope="col" class="num">n</th><th scope="col" class="num">Normal</th><th scope="col" class="num">n</th><th scope="col" class="num">Difference</th><th scope="col" class="num">p</th></tr>
+</thead>
+<tbody>
+{groupsSpi3.map((r) => (<tr id={r.id}><td>{r.group}</td><td class="wrap">{r.window}</td><td>{r.quantity}</td><td class="num">{r.dry}</td><td class="num">{r.nDry}</td><td class="num">{r.normal}</td><td class="num">{r.nNormal}</td><td class="num wrap">{r.diff}</td><td class="num wrap">{r.p}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
 <caption>Table C. Sensitivity to the dryness rule: the main rule and the three alternative rules, per cut group and window. n = dry / normal. LUE, GPP and PAR = mean ± sample SD of the relative values when n is {d.method.bootstrapMinN} or more, else the values. Diff. = dry mean − normal mean of the relative LUE. No interval and no test for the alternative rules.</caption>
 <thead>
 <tr><th scope="col">Rule</th><th scope="col">Cut group</th><th scope="col">Window</th><th scope="col" class="num">n</th><th scope="col" class="num">LUE dry</th><th scope="col" class="num">LUE normal</th><th scope="col" class="num">Diff.</th><th scope="col" class="num">GPP dry</th><th scope="col" class="num">GPP normal</th><th scope="col" class="num">PAR dry</th><th scope="col" class="num">PAR normal</th></tr>
@@ -492,7 +591,9 @@ Table C gives all values. The two alternative values of k gave the same group re
   n = <Num k="groups.later.n.dry" digits={0} />. A bootstrap interval of n = <Num k="method.bootstrapMinN" digits={0} />
   is close to the range of the three values. The permutation test has <Num k="groups.first.after.relLue.diff.nSplits" digits={0} />
   (after) and <Num k="groups.first.late.relLue.diff.nSplits" digits={0} /> (late) possible splits; the smallest possible p
-  is thus not small. The dashed curve of Figure 2 is one episode and shows no group behaviour.
+  is thus not small. The dashed curve of Figure 2 is one episode and shows no group behaviour. By SPI-3 the dry first-cut
+  group has n = <Num k="groups.spi3.first.n.dry" digits={0} />, without an interval, and the dry later-cut group has
+  n = <Num k="groups.spi3.later.n.dry" digits={0} />; the dashed line of Figure 4 is the mean of two episodes.
 - **Qvidja PAR from global radiation.** The Qvidja PAR is SW_in × k with one k for all days (rule 5). The ratio PAR /
   SW_in of the other sites varies from day to day (10 to 90 % range <Num k="par.pooled.p10" digits={2} /> to
   <Num k="par.pooled.p90" digits={2} /> mol MJ⁻¹, Table D). The relative values of a Qvidja episode do not depend on k, but
@@ -554,7 +655,7 @@ Table C gives all values. The two alternative values of k gave the same group re
 
 The numbers on this page come from `analysis/regrowth-drought/results.json`. The Python script
 <a href={`${REPO_URL}/blob/main/analysis/regrowth-drought/regrowth-drought.py`}><code>analysis/regrowth-drought/regrowth-drought.py</code></a>
-writes this file, `manifest.json` and the three SVG figures. It reads only the database snapshot built on
+writes this file, `manifest.json` and the five SVG figures. It reads only the database snapshot built on
 {d.dataVersion.snapshot.builtAt}, `data/calculated/daily.parquet` of the same build and `data/SPI/SPI_all_stations.csv`.
 Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
 The table gives the SHA-256, the row count and the columns read of each file (the paths are relative to the `--db`,
