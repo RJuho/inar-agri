@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-28T20:13:36Z",
+  "generatedAt": "2026-10-28T20:23:33Z",
   "git": {
-    "commit": "efff520",
+    "commit": "f5e82e3",
     "dirty": true
   },
   "script": {
@@ -468,34 +468,34 @@
     }
   },
   "outputs": {
-    "results.json": "ff8e1c105a67aa8e1dd47de2700bb4821515f87bda7a1170b77272178958f033",
+    "results.json": "7759eacd842c813bed45732b8466bcc4b057b4662c9967c521bea01ddb499d2d",
     "figures": {
       "figures/1-carbon-space.svg": {
-        "sha256": "0e2abf0b7ad91e0c991128b908072353ee03305b596612c53509d2ae6cc9722a",
+        "sha256": "86f3d31005fcb8d1765b4b3fae240df47f3ee51f10d6015dcf9619a4773411ac",
         "sha256WithoutMetadata": "1880d9f1cece3e5069c7744e0cd8b4a3d30c664b4e79764a2a2acd592318017d"
       },
       "figures/2-uptake-days.svg": {
-        "sha256": "97d1393e2444917417a120b2d1e88f93074ac6c9ad5e56f0c896b5fc56008c6b",
+        "sha256": "545ab7c5cd68f6d69dae140777fd23151234962d754a2c1f2d7f0074784ab446",
         "sha256WithoutMetadata": "52b95bbef135e7142d96a7da7ddb12ce31b1fa8218698a04a6fbd1b4f965da1c"
       },
       "figures/3-uptake-days-peak.svg": {
-        "sha256": "4f631ee58796e1aa4f1b52d42a0c0f672a03df2a8a626ccdb402e8c76699476c",
+        "sha256": "4b6d145ad28ae51223ce29b960725510e7084d2f7f048181a2ce41ed92b9788c",
         "sha256WithoutMetadata": "ec4c44d5bdd659213ce5fe519c311f6fad194f716f6449d2a868425ebcdabf77"
       },
       "figures/4-carbon-space-forest.svg": {
-        "sha256": "152028aa6e5b45b15a3c2eabd4eb0f641c0f39ca8c36ea52114ab9188d9146c1",
+        "sha256": "6911b104f7734471a5c1e0556cbdf137c8834752ac110648890584d1d4564571",
         "sha256WithoutMetadata": "1632f0a04beac7821157c18dd11dd23519f1c1868b60fd82595e0f6644385f1c"
       },
       "figures/5-uptake-days-peak-forest.svg": {
-        "sha256": "5f4e0cac6c5ede38b387c0270723db875b2d06497c6e90c9583ee0b27937ccad",
+        "sha256": "ffeddcbf800322b4b402f02b5db324ba5dd714d66f0b0fe6e6969b1c5a8851cb",
         "sha256WithoutMetadata": "18dd34476239558b9cfe8964262de94235a9585827257290787df5bd3589eb29"
       },
       "figures/variants/1-carbon-space-no-labels.svg": {
-        "sha256": "80a23cf8c13a393e0572dc5255d5ab88d8d479619b2e8c0138fb889d7547e994",
+        "sha256": "09e456cbac68b294b255a554933a26571186379e52b92cbe88c4951de25e49f1",
         "sha256WithoutMetadata": "72eb49ebcdfb26603c8fcc55131917d8b37177aa4bfda26a7905647181fa5489"
       },
       "figures/variants/4-carbon-space-forest-no-labels.svg": {
-        "sha256": "734e214f79d8a45973db0b77cc346d3a6875d48654425e993d30e4d20543f004",
+        "sha256": "202b4380d55f0c34a4eef523f9405c75150068d22aecd5c665c299bac6e6c374",
         "sha256WithoutMetadata": "764185c219f7d917801ef466912585e47525bf6487c6e579dd771f061ba24980"
       }
     }

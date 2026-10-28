@@ -4551,9 +4551,9 @@
     }
   ],
   "dataVersion": {
-    "generatedAt": "2026-10-28T20:15:46Z",
+    "generatedAt": "2026-10-28T20:23:37Z",
     "git": {
-      "commit": "efff520",
+      "commit": "f5e82e3",
       "dirty": true
     },
     "script": {
@@ -4594,8 +4594,8 @@
     "seeds": {},
     "seedNote": "no random numbers",
     "args": {
-      "db": "snapshots/db-2026-10-23/db",
-      "calculated": "snapshots/db-2026-10-23/calculated",
+      "db": "db",
+      "calculated": "data/calculated",
       "smear": "data/smear/hyytiala",
       "out": null,
       "check": false

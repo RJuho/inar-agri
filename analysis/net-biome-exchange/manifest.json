@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-28T20:15:46Z",
+  "generatedAt": "2026-10-28T20:23:37Z",
   "git": {
-    "commit": "efff520",
+    "commit": "f5e82e3",
     "dirty": true
   },
   "script": {
@@ -42,8 +42,8 @@
   "seeds": {},
   "seedNote": "no random numbers",
   "args": {
-    "db": "snapshots/db-2026-10-23/db",
-    "calculated": "snapshots/db-2026-10-23/calculated",
+    "db": "db",
+    "calculated": "data/calculated",
     "smear": "data/smear/hyytiala",
     "out": null,
     "check": false
@@ -452,32 +452,32 @@
     }
   },
   "outputs": {
-    "results.json": "6aa1ca697d409a8aa4b225c9e0d44d46a5fa33a2071c4f3cef3f1bba3190e998",
+    "results.json": "961d9274551eb25fba7e56ef8d954ea905eff26626965273f4395af462f51287",
     "figures": {
       "figures/1-nbe-carbon-space.svg": {
-        "sha256": "45ecb2cb99dd8032041bf24ff564691fe7f5a3008d38ab5eed52c9511a7ae36f",
+        "sha256": "5b81dea554b9ba1db420e87fc1c6539d4ae5ffc996b19b7d2f37f1a29ba81aad",
         "sha256WithoutMetadata": "85943d69e6eb156eb15c8aba418b0364d0abdb8958b10ad6662708729cbfc052"
       }
     },
     "figureVariants": {
       "figures/variants/1-nbe-carbon-space-no-labels.svg": {
-        "sha256": "93bc8b6a75b3502ca75b3625febfcc67f154b0e727aa320ac4a2952b7b5f5af3",
+        "sha256": "e03fcc62705c8470c3c38e06eb85df14bf90f39a8d2fa6fcd1a71366747ee8ab",
         "sha256WithoutMetadata": "3cdb02e4f340861bd141098c87fcc299725b59f30d754b238605997501feb66e"
       },
       "figures/variants/1-nbe-carbon-space-wide.svg": {
-        "sha256": "eee9468bde5b49e82eb1db4a180a1536aa01f1fdcfec5d6026890b32bed4e89b",
+        "sha256": "48c0c6c3c90c7fbe0b74d2d0c09c4051bbb402ebde91bf7fd557f18a80b119db",
         "sha256WithoutMetadata": "34f45965b8f68a1cda4e4bfa12b8d603204edfed81f49292083253a7a7c355c3"
       },
       "figures/variants/1-nbe-carbon-space-wide-no-labels.svg": {
-        "sha256": "7d7801a68f63a36a4449117dbcd6dd41b3865058d3f493fbda32cc95628db294",
+        "sha256": "bf3e26c33c8a139e439e6e68d6c9fe999a2cd4a40a859850f893b22d69724272",
         "sha256WithoutMetadata": "08bbe3b9e7fc134d9d81f47b2a3c188d026f65fc1864ff57b21cdfb0abf6a9b5"
       },
       "figures/variants/1-nbe-carbon-space-wide-no-nee.svg": {
-        "sha256": "9801b5c72bfbabd0266f8d887ef472dfb4ada42b787764c86caa1bea12ede119",
+        "sha256": "8e61f046b37dc4284af855ebe604bb3a1ca96f9d7d1a6fe3af90a1fcbcf3535d",
         "sha256WithoutMetadata": "f0bd7826fa33e313371a55a5e96402e2fc55507854b1f7484a68ce7f2359d548"
       },
       "figures/variants/1-nbe-carbon-space-wide-no-nee-no-labels.svg": {
-        "sha256": "8e784733267fb73efd96b0d15ea05793d42f8b67362f71c344b923e9e675586e",
+        "sha256": "f5e6ff9e2e392f97c50c2e46a4b8177249ea420ffdfd2d45c2a6eabd0996008f",
         "sha256WithoutMetadata": "7f09ab2f402c1f725d304edbbd03fa7a2b3c14450ff7ace6c36632f4822baaa5"
       }
     }
