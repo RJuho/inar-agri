@@ -63,9 +63,13 @@ METHOD
        full year = all days of the year have 48 half hours; reliable = the rule of step 1. The
        inclusion rule, the uptake shares and the peak window are the same as for the other
        sites. Hyytiala is not in the groups grassland and annual crop; it is the group forest.
-       It has no events.
+       It has no events. The stand was thinned at the start of 2020 (40 % of the basal area
+       removed; de Quesada et al. 2025, LITERATURE); Figure 4 marks 2020 with "(thinning)".
     9. Open findings of docs/anomaly-data-report.md that touch this dive are printed
-       (OPEN_FINDINGS). The script uses no literature value, thus it has no LITERATURE table.
+       (OPEN_FINDINGS).
+    10. LITERATURE: the facts of the Hyytiala thinning from de Quesada et al. 2025 (reference id
+       dequesada2025), with page, table or figure. They go to results.json (literature,
+       literatureByKey) and into the text of Figure 4.
 
 DATABASE
     builtAt: 2026-10-23T19:03:07.928Z (db/report.json and Parquet key/value metadata built_at)
@@ -412,6 +416,63 @@ REF_SOURCE = "SMEAR II, HYY_EDDY233"
 REF_GROUP = "forest"
 REF_CROP = ("boreal forest", REF_GROUP, None)
 REF_YEARS = tuple(range(2020, 2026))
+
+# Reference values from articles. Each row: value, unit, uncertainty, reference id, page, table or
+# figure. de Quesada et al. 2025, Forest Ecology and Management 595, 123024
+# (data/articles/1-s2.0-S0378112725005328-main.pdf); page = page of the article PDF.
+LITERATURE: tuple[dict[str, Any], ...] = (
+    {
+        "key": "thinningYear",
+        "text": "The Hyytiala upland forest (SMEAR II) was thinned at the beginning of the year 2020",
+        "value": 2020,
+        "unit": "year",
+        "uncertainty": None,
+        "ref": "dequesada2025",
+        "page": "p. 2, Sect. 2.1 (Table 1); p. 3 (Fig. 1 caption)",
+        "tableFigure": "Table 1, Fig. 1",
+    },
+    {
+        "key": "basalAreaReductionPct",
+        "text": "Basal area 31 m2/ha before and 18 m2/ha after the thinning (40 % reduction)",
+        "value": 40,
+        "unit": "%",
+        "uncertainty": None,
+        "ref": "dequesada2025",
+        "page": "p. 2, Sect. 2.1",
+        "tableFigure": "Table 1",
+    },
+    {
+        "key": "thinnedAreaHa",
+        "text": "Size of the thinned area at Hyytiala",
+        "value": 10,
+        "unit": "ha",
+        "uncertainty": None,
+        "ref": "dequesada2025",
+        "page": "p. 2, Sect. 2.1",
+        "tableFigure": "Table 1",
+    },
+    {
+        "key": "sinkAgainYears",
+        "text": "Eddy covariance (Aslan et al. 2024): the Hyytiala stand became a carbon source after "
+        "the thinning and was a carbon sink again after one year",
+        "value": 1,
+        "unit": "year",
+        "uncertainty": None,
+        "ref": "dequesada2025",
+        "page": "p. 10, Sect. 4 (Discussion)",
+        "tableFigure": None,
+    },
+)
+
+
+def literature_by_key() -> dict[str, dict[str, Any]]:
+    """LITERATURE as an object keyed by `key`."""
+    return {r["key"]: dict(r) for r in LITERATURE}
+
+
+LIT = literature_by_key()
+THINNING_YEAR = int(LIT["thinningYear"]["value"])
+THINNING_KEY = f"{REF_SITE}-{THINNING_YEAR}"
 REF_FLUX_COLS = ("HYY_EDDY233.GPP", "HYY_EDDY233.NEE")
 REF_MEAS_COL = "HYY_EDDYMAST.F_c_270"
 REF_TIME_COLS = ("Year", "Month", "Day", "Hour", "Minute", "Second")
@@ -580,7 +641,7 @@ FIG4_TITLE = (
     "Annual total ecosystem respiration (TER, = Reco) against annual gross primary production "
     "(GPP), one marker per site-year, with the SMEAR II Hyytiälä "
     "forest (rare management) as a reference; below the 1:1 line the site-year was a net CO2 "
-    "sink."
+    "sink. The Hyytiälä stand was thinned at the start of 2020 (de Quesada et al. 2025)."
 )
 FIG5_TITLE = (
     "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year "
@@ -622,7 +683,10 @@ LABEL_OFFSETS_FOREST: dict[str, tuple[float, float, str]] = {
     "hyytiala-2020": (-10, 12, "right"),
     "hyytiala-2025": (12, -14, "left"),
 }
-LABEL_TEXT_FOREST = {"hyytiala-2025": "2021–2025"}
+LABEL_TEXT_FOREST = {
+    THINNING_KEY: f"{THINNING_YEAR} (thinning)",
+    "hyytiala-2025": "2021–2025",
+}
 # The Hyytiala stars are drawn below the markers of the six sites (they are the reference).
 REF_ZORDER = 2.5
 # Labels in two lines (break before the bracket).
@@ -1211,6 +1275,14 @@ def read_hyytiala(
                 y,
                 fmt(a["nee_f_gc"]),
             )
+            if y == THINNING_YEAR:
+                log.info(
+                    "note: the stand was thinned at the start of %d (%s %% of the basal area "
+                    "removed; de Quesada et al. 2025, %s)",
+                    y,
+                    LIT["basalAreaReductionPct"]["value"],
+                    LIT["thinningYear"]["page"],
+                )
     steps["hyytiala"] = {
         "source": REF_SOURCE,
         "years": per_year,
@@ -1906,7 +1978,10 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
         f"{len(ref_rows)} site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, "
         f"a reference with rare management): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, "
         f"both from {fmt(lo)} to {fmt(hi)} on the same scale, dotted 1:1 line, light dotted "
-        "lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä 2020 and the cluster "
+        "lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä "
+        f"{THINNING_YEAR} (thinning: the stand was thinned at the start of {THINNING_YEAR}, "
+        f"{LIT['basalAreaReductionPct']['value']} % of the basal area removed, de Quesada et al. "
+        "2025) and the cluster "
         f"2021–2025. Hyytiälä (g C m−2 yr−1) {per}. Hyytiälä NEE "
         f"{fmt(g[REF_GROUP]['nee']['mean'])} ± {fmt(g[REF_GROUP]['nee']['sd'])} (mean ± SD, "
         f"range {fmt(g[REF_GROUP]['nee']['min'])} to {fmt(g[REF_GROUP]['nee']['max'])}, n = "
@@ -2504,6 +2579,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
         "method": method_json(),
         **res,
+        "literature": list(LITERATURE),
+        "literatureByKey": LIT,
         "figures": figures_json,
         "dataVersion": dv,
     }

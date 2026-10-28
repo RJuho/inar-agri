@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-28T06:38:15Z",
+  "generatedAt": "2026-10-28T07:04:42Z",
   "git": {
-    "commit": "476ff98",
+    "commit": "b8790b2",
     "dirty": true
   },
   "script": {
     "path": "analysis/carbon-space/carbon-space.py",
-    "sha256": "4766d241f82eafff2ce12cea1e0d10458db06d93c34ef0dc96e98bc118dd9ff5"
+    "sha256": "dc0715b9008df77e8bb9cd47318b689c3e7d7e09261ed94dbcea1816261b7976"
   },
   "lock": {
     "path": "analysis/carbon-space/carbon-space.py.lock",
@@ -468,26 +468,26 @@
     }
   },
   "outputs": {
-    "results.json": "fdc42c15895161134cd1cca9b778ed5b870aec5084041832f0e56c5f4471ea32",
+    "results.json": "68ce2467c39ed34e7436966fc057093a585ec2c78bf8f4dcc8dad3101ce063cd",
     "figures": {
       "figures/1-carbon-space.svg": {
-        "sha256": "e319ed2f5c217baba18f2babbbb006801777b89637f7c9afd2017b73895db7eb",
+        "sha256": "9822fb99799f9024b2ff6910e619852baab1ea186e0c5db654baf045d9a3e9d6",
         "sha256WithoutMetadata": "e21c67a50f969ec797082fa24531b861552d86145153a4fc1bfd43ef167e2c56"
       },
       "figures/2-uptake-days.svg": {
-        "sha256": "1ef85aefac6f05c8bc7ac16735dd092101a3bff1aedfaf2e8c223e113e0bf5f7",
+        "sha256": "b82689d256d0792bba3c8325c1f0a9941023a0a4cd741cefbc0f6a35345c84fd",
         "sha256WithoutMetadata": "c21257cea3296c38d3b3addbc77219a7132df196de01610bab92668158ee968e"
       },
       "figures/3-uptake-days-peak.svg": {
-        "sha256": "b5aa4591f12438d0d0f8027db4fafb2ef0bb0f920429e05c05c0793793d6c9b8",
+        "sha256": "2ee740e02e4cbde83ff747a7745f16ee128a677524055757e28b42256c8127e1",
         "sha256WithoutMetadata": "52cc85a9848c1d1f02f03d4b82d13bd9e03059870de3e85b0d01dec8ab972092"
       },
       "figures/4-carbon-space-forest.svg": {
-        "sha256": "8b0ea628104db749361d802f6862c7354761d437b9d8c0fca41c32072bd2d2b2",
-        "sha256WithoutMetadata": "9732550219745fb0630ba886ef7d57d499eb51701ef23c64e74416768555376f"
+        "sha256": "8cf5d52af15f5e839f3cc57d34d89c9b0af1a7144c1b6037522b5aa0603a8291",
+        "sha256WithoutMetadata": "0e9d230955aa5a7ed268452a870b0aa8ccda366fdb2e40dcbad864d75032ed12"
       },
       "figures/5-uptake-days-peak-forest.svg": {
-        "sha256": "ca71a76595d01f65b2f38987a6e195ffec467721a9dba2704d4f448ae4394e26",
+        "sha256": "050131c105704f6b683586f91e6c0a546eb8e7cffc38747744935e84e62bf628",
         "sha256WithoutMetadata": "f2fcf7fb2392960bb8277a7e78d68a465b426587758683f8b99f5064bc638af2"
       }
     }

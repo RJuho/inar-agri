@@ -89,6 +89,12 @@ export const EXTRA_REFERENCES = {
     doi: '10.1016/j.agrformet.2019.02.029',
     file: 'data/smear/hyytiala/README.md',
   },
+  dequesada2025: {
+    short: 'de Quesada et al. 2025',
+    text: 'de Quesada, G., Rautakoski, H., Xu, J., Li, Q., Larmola, T., Salovaara, P., Anttila, V., Peltoniemi, M., Koskinen, M., Lohila, A., Aalto, J., Lehtonen, A., Bäck, J., Mäkipää, R., Heinonsalo, J., Salmon, Y. and Lintunen, A. (2025). Carbon dynamics after thinning in two boreal forest sites: Upland and drained peatland. Forest Ecology and Management 595, 123024. The thinning of the SMEAR II Hyytiälä forest in early 2020.',
+    doi: '10.1016/j.foreco.2025.123024',
+    file: 'data/articles/1-s2.0-S0378112725005328-main.pdf',
+  },
 } as const satisfies Record<string, DiveReference>;
 
 export type DiveRefId = (typeof REF_IDS)[number] | keyof typeof EXTRA_REFERENCES;

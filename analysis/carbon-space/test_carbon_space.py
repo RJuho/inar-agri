@@ -298,6 +298,18 @@ def test_hyytiala_results() -> None:
         ref["fig4Keys"]
     )
     assert set(cs.LABEL_OFFSETS_FOREST) <= set(ref["fig4Keys"])
+    assert set(cs.LABEL_TEXT_FOREST) <= set(cs.LABEL_OFFSETS_FOREST)
+    assert cs.THINNING_KEY in ref["fig4Keys"]
+
+
+def test_literature_rows() -> None:
+    keys = [r["key"] for r in cs.LITERATURE]
+    assert len(keys) == len(set(keys))
+    for r in cs.LITERATURE:
+        assert r["ref"] == "dequesada2025"
+        assert r["page"] and r["page"].startswith("p. ")
+        assert r["value"] is not None and r["unit"]
+    assert cs.THINNING_YEAR in cs.REF_YEARS
 
 
 # ---------- Results ----------

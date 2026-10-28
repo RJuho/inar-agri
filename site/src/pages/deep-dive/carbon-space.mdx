@@ -21,7 +21,7 @@ models:
   - model: Claude Haiku 5.5
     role: language (STE) and reference review
 script: analysis/carbon-space/carbon-space.py
-references: [calculated-doc, anomaly-report, heimsch2024, shurpali2025, rasanen2026, haltiala-management, qvidja-management, viikki-management, smear-hyytiala, kulmala2019]
+references: [calculated-doc, anomaly-report, heimsch2024, shurpali2025, rasanen2026, haltiala-management, qvidja-management, viikki-management, smear-hyytiala, kulmala2019, dequesada2025]
 checks:
   - kind: recompute
     by: Claude Sonnet 5.5
@@ -129,7 +129,11 @@ positive for an emission, and GPP is positive. Reco is NEE + GPP. The time base 
 calendar day. The daily and annual sums use the same unit conversion as the calculated products. The measured fraction
 is the share of the half hours with a measured F_c_270 value. The longest gap is the longest run without it. The
 inclusion rule and the uptake windows are the same as for the other sites. The forest is not in the grassland or
-annual-crop group. It has its own group, forest. Figure 4 has <Num k="summary.fig4.n" digits={0} /> site-years and
+annual-crop group. It has its own group, forest. The stand was thinned at the start of
+<Num k="literatureByKey.thinningYear.value" digits={0} />: the thinning removed
+<Num k="literatureByKey.basalAreaReductionPct.value" digits={0} /> % of the basal area on
+<Num k="literatureByKey.thinnedAreaHa.value" digits={0} /> ha (p. 2, Table 1; p. 3, Fig. 1) <Cite ids={['dequesada2025']} />.
+Figure 4 labels this year "(thinning)". Figure 4 has <Num k="summary.fig4.n" digits={0} /> site-years and
 Figure 5 has <Num k="summary.nFig5" digits={0} />.
 
 **Line and groups.** The script fits an OLS line, Reco = slope × GPP + intercept, to the Figure 1 site-years. It fits
@@ -250,8 +254,11 @@ without it ({UA}).
 
 In Figure 4, <Num k="summary.fig4.nSink" digits={0} /> of the <Num k="summary.fig4.n" digits={0} /> site-years are below
 the 1:1 line and <Num k="summary.fig4.nSource" digits={0} /> are above it. The forest years lie below the line, except
-<E site="hyytiala" />{refSources} (NEE <Num k={`${R('hyytiala-2020')}.nee`} digits={0} sign unit={UA} />). This source year is in the SMEAR
-data as delivered. This dive does not explain it. The forest Reco/GPP was <Num k="groups.forest.recoGppRatio.mean" /> ±
+<E site="hyytiala" />{refSources} (NEE <Num k={`${R('hyytiala-2020')}.nee`} digits={0} sign unit={UA} />). The stand was thinned at the start of
+this year <Cite ids={['dequesada2025']} />. De Quesada et al. (p. 10) cite eddy covariance results that show the same
+pattern: the stand became a carbon source after the thinning and was a carbon sink again after
+<Num k="literatureByKey.sinkAgainYears.value" digits={0} /> year <Cite ids={['dequesada2025']} />. The years 2021 to 2025
+are below the line, in agreement with this. The forest Reco/GPP was <Num k="groups.forest.recoGppRatio.mean" /> ±
 <Num k="groups.forest.recoGppRatio.sd" /> (n = <Num k="groups.forest.recoGppRatio.n" digits={0} />, range
 <Num k="groups.forest.recoGppRatio.min" /> to <Num k="groups.forest.recoGppRatio.max" />). The grassland Reco/GPP was
 <Num k="groups.grassland.recoGppRatio.mean" /> ± <Num k="groups.grassland.recoGppRatio.sd" /> (n = <Num k="groups.grassland.recoGppRatio.n" digits={0} />,
@@ -349,7 +356,9 @@ shares. The dive does not test it.
   <Cite ids={['kulmala2019']} />. The fields use the night-time partitioning of this project <Cite ids={['calculated-doc']} />.
   The GPP and Reco of the forest and of the fields are therefore not fully comparable.
 - **Forest source year.** Hyytiälä 2020 is a net source in the SMEAR data as delivered <Cite ids={['smear-hyytiala']} />.
-  This dive does not check or explain it.
+  The stand was thinned at the start of 2020 <Cite ids={['dequesada2025']} />, and the source year agrees with this. The
+  dive does not separate the effect of the thinning from the effect of the weather of 2020. The wood removed in the
+  thinning is not in NEE.
 - **Figures 3, 4 and 5 after the checks.** Figures 3, 4 and 5 were added after the independent checks. Their numbers
   are not independently recomputed.
 - **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
