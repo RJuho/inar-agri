@@ -480,3 +480,14 @@ def test_encoder_abort_closes_the_log(tmp_path: Path) -> None:
     )
     enc.abort()
     assert enc.proc.returncode is not None and enc.log_file.closed
+
+
+def test_square_axes_in_steps_1_and_2() -> None:
+    """x and y have the same range in steps 1 and 2, and the axes box is square in pixels."""
+    assert (ma.X_LO, ma.X_HI) == (400.0, 1600.0)
+    assert (ma.Y_LO, ma.Y_TOP_1) == (ma.X_LO, ma.X_HI)
+    c = ma.canvas_for(1080)
+    _, _, w, h = ma.AXES_RECT
+    assert w * c.width == pytest.approx(h * c.height)
+    assert ma.LEGEND_X > ma.AXES_RECT[0] + w
+    assert not hasattr(ma, "GUIDES")

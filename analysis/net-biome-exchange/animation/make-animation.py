@@ -117,7 +117,7 @@ WHISKER_START_2 = 0.5  # step 2: the whisker fades in during the second half
 WHISKER_MARGIN = 40.0
 WHISKER_START_3_MIN = 0.7
 TICK_START, TICK_END = 0.05, 0.15  # the grey tick at y = TER fades in
-FADE_START, FADE_END = 0.2, 0.8  # text crossfades (y label, guide labels, source/sink)
+FADE_START, FADE_END = 0.2, 0.8  # text crossfades (y label, net source and net sink)
 JUMP_FADE = 0.3  # a jumping label fades out in the first 30 % of step 3, in during the last 30 %
 ARC_SHORTEST_MAX_DEG = (
     120.0  # label path: the shortest arc up to this angle, else over the top
@@ -135,7 +135,9 @@ CLASS_LEGEND_START = 0.5  # the Class legend fades in during the second half of 
 MM = 1 / 25.4
 FIG_WIDTH_MM, FIG_HEIGHT_MM = 180.0, 135.0
 DEFAULT_WIDTH = 1080
-AXES_RECT = (0.105, 0.11, 0.60, 0.85)  # left, bottom, width, height (figure fraction)
+# The axes box is square (648 x 648 px at 1080 x 810): x and y have the same range in steps
+# 1 and 2, thus the same scale, and the 1:1 line is at 45 degrees (user request 2026-10-28).
+AXES_RECT = (113 / 1080, 90 / 810, 648 / 1080, 648 / 810)  # left, bottom, width, height
 YLABEL_X = -0.115  # y label anchor (axes fraction); the same for both crossfaded texts
 LEGEND_X = 0.725  # left edge of the legend column (figure fraction)
 LEGEND_TOP = 0.96
@@ -159,7 +161,6 @@ SITE_COLORS = (
 SITE_MARKERS = ("o", "s", "^", "D", "p", "v")
 INK = "#222222"
 GUIDE = "#888888"
-GUIDE_TEXT = "#555555"
 SHIFT = "#a6a6a6"
 GRID = "#e2e2e2"
 GRID_LW = 0.6
@@ -200,16 +201,13 @@ SITE_EMOJI = {
 # The video uses the plain site names.
 EMOJI = False
 EMOJI_FONT = Path("/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf")
-X_LO, X_HI, X_TICK = 600.0, 1600.0, 200.0
-Y_LO = 400.0  # Figure 4 starts at 600; Qvidja 2023 moves to 545 (whisker 451) in step 2
+# x and y 400 to 1600 in steps 1 and 2 (Figures 4 and 1: x from 600). y must reach 400:
+# Qvidja 2023 moves to 545 (whisker 451) in step 2. Step 3 grows only the y axis.
+X_LO, X_HI, X_TICK = 400.0, 1600.0, 200.0
+Y_LO = 400.0
 Y_TOP_1 = 1600.0  # y top in steps 1 and 2
 Y_TOP_3 = 3600.0  # y top at the end of step 3 (Figure 1)
 Y_TICK_1, Y_TICK_3 = 200.0, 400.0
-GUIDES = (-200.0, -400.0)
-# The guide labels sit at the right axis edge, below the line (Figure 4 puts them at the edge
-# above the line; Figure 1 on the line at x = 1530). The video axes are denser than both
-# figures, and these are the only places that are free of markers and labels in all steps.
-GUIDE_LABEL_OFFSET = (-8, -7)  # points from the point (X_HI, X_HI + g)
 X_LABEL = r"Annual GPP (g C m$^{-2}$ yr$^{-1}$)"
 Y_LABEL_NEE = r"Annual TER (g C m$^{-2}$ yr$^{-1}$)"
 Y_LABEL_NBE = r"Annual carbon out, TER + C$_{out}$ − C$_{in}$ (g C m$^{-2}$ yr$^{-1}$)"
@@ -253,17 +251,21 @@ LABEL_OFFSETS_FIG4: dict[str, tuple[float, float, str]] = {
 # - "2020 (thinning)" 4 points higher, so that it does not touch the Särkisuo 2022 label at
 #   the end of step 2 (the Särkisuo label is then at its Figure 1 place, left of the marker).
 # - "net sink" sits at axes fraction 0.02 from the bottom (Figure 4: 0.03, Figure 1: 0.01).
+# - Axes: x and y 400 to 1600 in a square box in steps 1 and 2 (equal scale, 1:1 line at
+#   45 degrees); no guide lines NEE/NBE = -200 and -400 (user request 2026-10-28).
+# - Labels changed for this denser scale: anttila-2023 above its marker in steps 2 and 3,
+#   haltiala-2023 at dy 17 (Figure 1: 20), and LABEL_OFFSETS_FINAL below.
 LABEL_OFFSETS_START: dict[str, tuple[float, float, str]] = {
     **LABEL_OFFSETS_FIG4,
-    "haltiala-2023": (-6, -40, "left"),
+    "haltiala-2023": (-40, -60, "left"),
     THINNING_KEY: (-10, 16, "right"),
 }
 LABEL_OFFSETS_END: dict[str, tuple[float, float, str]] = {
     "anttila-2022": (11, 0, "left"),
-    "anttila-2023": (11, 0, "left"),
+    "anttila-2023": (0, 15, "center"),  # video: above (right of it is Qvidja 2025)
     "sarkisuo-2022": (-11, 0, "right"),
     "haltiala-2022": (11, 0, "left"),
-    "haltiala-2023": (-8, 20, "left"),
+    "haltiala-2023": (-8, 17, "left"),  # video: 17 (Figure 1: 20)
     "haltiala-2024": (0, -17, "center"),
     "haltiala-2025": (11, 0, "left"),
     "qvidja-2020": (11, 0, "left"),
@@ -282,9 +284,14 @@ LABEL_OFFSETS_END: dict[str, tuple[float, float, str]] = {
 LABEL_OFFSETS_FINAL: dict[str, tuple[float, float, str]] = {
     **LABEL_OFFSETS_END,
     "haltiala-2023": (-8, 12, "left"),  # clear of "2025 faba bean"
-    "haltiala-2024": (12, -17, "center"),  # clear of the Viikki 2024 label
+    "haltiala-2024": (24, -17, "center"),  # clear of the Viikki 2024 label
+    "haltiala-2022": (16, -24, "left"),  # below the stars, with a leader line
     "viikki-2024": (11, -5, "left"),  # clear of "2024 sunflower"
-    "qvidja-2024": (-4, -17, "center"),  # below the diamond, clear of "2022 oats"
+    "qvidja-2024": (
+        -14,
+        14,
+        "right",
+    ),  # above left, clear of the Haltiala 2022 triangle
 }
 JUMP_KEYS = frozenset(
     {"qvidja-2024"}
@@ -296,6 +303,7 @@ LABEL_TEXT = {
 }
 LEADER_KEYS = frozenset({PRE_THINNING_KEY})  # leader line in both figures
 LEADER_START_KEYS = frozenset({"haltiala-2023"})  # leader line in the start state only
+LEADER_FINAL_KEYS = frozenset({"haltiala-2022"})  # leader line fades in during step 3
 LEADER_STYLE = {
     "arrowstyle": "-",
     "color": GUIDE,
@@ -650,6 +658,8 @@ def point_state(
             if p.key in LEADER_KEYS
             else 1.0 - f
             if p.key in LEADER_START_KEYS
+            else smoothstep(b_raw)
+            if p.key in LEADER_FINAL_KEYS
             else 0.0
         )
         label = Label(p.label, dx, dy, ha, label_alpha, leader)
@@ -784,13 +794,6 @@ def y_ticks(state: State) -> list[tuple[float, float]]:
     return out
 
 
-def screen_angle(ax: Any, p1: tuple[float, float], p2: tuple[float, float]) -> float:
-    """Angle in degrees of the line p1-p2 on the page (data coordinates in)."""
-    a = ax.transData.transform(p1)
-    b = ax.transData.transform(p2)
-    return math.degrees(math.atan2(b[1] - a[1], b[0] - a[0]))
-
-
 def crossfade_text(draw_text: Any, text_nee: str, text_nbe: str, fade: float) -> None:
     """Two overlapping texts: the NEE text with alpha 1 - fade, the NBE text with alpha fade."""
     if fade < 1.0:
@@ -838,36 +841,16 @@ def draw(state: State, canvas: Canvas) -> np.ndarray:
         y_label(Y_LABEL_NEE, 1.0 - 2.0 * state.text_fade)
     else:
         y_label(Y_LABEL_NBE, 2.0 * state.text_fade - 1.0)
-    # The 1:1 line and the guide lines y = x + g, inside the axes (as Figure 1).
-    for g, color, lw in ((0.0, INK, 1.8), *((g, GUIDE, 1.1) for g in GUIDES)):
-        x1 = max(X_LO, Y_LO - g)
-        x2 = min(X_HI, state.y_top - g)
-        ax.plot([x1, x2], [x1 + g, x2 + g], color=color, lw=lw, ls=":", zorder=1)
-        if g == 0.0:
-            continue
-        ang = screen_angle(ax, (x1, x1 + g), (x2, x2 + g))
-
-        def guide_label(
-            text: str, alpha: float, g: float = g, ang: float = ang
-        ) -> None:
-            ax.annotate(
-                text,
-                (X_HI, X_HI + g),
-                xytext=GUIDE_LABEL_OFFSET,
-                textcoords="offset points",
-                ha="right",
-                va="top",
-                rotation=ang,
-                rotation_mode="anchor",
-                fontsize=fs_small,
-                color=GUIDE_TEXT,
-                alpha=alpha,
-                zorder=1,
-            )
-
-        crossfade_text(
-            guide_label, f"NEE = {fmt(g)}", f"NBE = {fmt(g)}", state.text_fade
-        )
+    # The 1:1 line, inside the axes. No guide lines NEE/NBE = -200 and -400 (Figures 4 and 1
+    # have them; removed on user request 2026-10-28).
+    ax.plot(
+        [X_LO, min(X_HI, state.y_top)],
+        [X_LO, min(X_HI, state.y_top)],
+        color=INK,
+        lw=1.8,
+        ls=":",
+        zorder=1,
+    )
 
     def note(x: float, y: float, ha: str, va: str) -> Any:
         def put(text: str, alpha: float) -> None:
