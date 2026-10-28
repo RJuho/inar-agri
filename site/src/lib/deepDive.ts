@@ -80,7 +80,7 @@ export const EXTRA_REFERENCES = {
   },
   'smear-hyytiala': {
     short: 'SMEAR II Hyytiälä flux data',
-    text: 'University of Helsinki, INAR (2026). SMEAR II Hyytiälä forest station: gap-filled NEE and GPP (table HYY_EDDY233) and the measured CO2 flux at 27 m (HYY_EDDYMAST.F_c_270), 2020 to 2025, 30-minute step. Downloaded 2026-10-27 from the SMEAR API (station id 2). Rights field of the API metadata: public.',
+    text: 'University of Helsinki, INAR (2026). SMEAR II Hyytiälä forest station: gap-filled NEE and GPP (table HYY_EDDY233) and the measured CO2 flux at 27 m (HYY_EDDYMAST.F_c_270), 2019 to 2024, 30-minute step. Downloaded 2026-10-27 (2020 to 2024) and 2026-10-28 (2019) from the SMEAR API (station id 2). Rights field of the API metadata: public.',
     file: 'data/smear/hyytiala/README.md',
   },
   kulmala2019: {

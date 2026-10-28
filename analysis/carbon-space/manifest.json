@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-28T07:04:42Z",
+  "generatedAt": "2026-10-28T09:15:18Z",
   "git": {
-    "commit": "b8790b2",
+    "commit": "47ad0f5",
     "dirty": true
   },
   "script": {
     "path": "analysis/carbon-space/carbon-space.py",
-    "sha256": "dc0715b9008df77e8bb9cd47318b689c3e7d7e09261ed94dbcea1816261b7976"
+    "sha256": "beb8c08fe966140171aa78e213d4450b994acd2ac4355c0b6ee152ebbfe81898"
   },
   "lock": {
     "path": "analysis/carbon-space/carbon-space.py.lock",
@@ -79,6 +79,16 @@
         "rows": 11209
       },
       {
+        "path": "smear/HYY_EDDY233_NEE_GPP_2019.csv",
+        "sha256": "32e13af00db88a7c00f6e0cabbdbcbfe9f08fcda220df8b6e2d0e6e72999ced7",
+        "rows": 17520
+      },
+      {
+        "path": "smear/HYY_EDDYMAST_F_c_270_2019.csv",
+        "sha256": "6535ff06a6c24f85fa7b4dfe23e94b53039085815227366bce1e95da7524f739",
+        "rows": 17520
+      },
+      {
         "path": "smear/HYY_EDDY233_NEE_GPP_2020.csv",
         "sha256": "75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20",
         "rows": 17568
@@ -127,16 +137,6 @@
         "path": "smear/HYY_EDDYMAST_F_c_270_2024.csv",
         "sha256": "b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3",
         "rows": 17568
-      },
-      {
-        "path": "smear/HYY_EDDY233_NEE_GPP_2025.csv",
-        "sha256": "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
-        "rows": 17520
-      },
-      {
-        "path": "smear/HYY_EDDYMAST_F_c_270_2025.csv",
-        "sha256": "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
-        "rows": 17520
       }
     ]
   },
@@ -194,6 +194,37 @@
         "gpp_gc",
         "reco_gc",
         "frac_measured"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDY233_NEE_GPP_2019.csv",
+      "sha256": "32e13af00db88a7c00f6e0cabbdbcbfe9f08fcda220df8b6e2d0e6e72999ced7",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDY233.GPP",
+        "HYY_EDDY233.NEE"
+      ]
+    },
+    {
+      "path": "smear/HYY_EDDYMAST_F_c_270_2019.csv",
+      "sha256": "6535ff06a6c24f85fa7b4dfe23e94b53039085815227366bce1e95da7524f739",
+      "rows": 17520,
+      "builtAt": null,
+      "columns": [
+        "Year",
+        "Month",
+        "Day",
+        "Hour",
+        "Minute",
+        "Second",
+        "HYY_EDDYMAST.F_c_270"
       ]
     },
     {
@@ -350,37 +381,6 @@
         "Second",
         "HYY_EDDYMAST.F_c_270"
       ]
-    },
-    {
-      "path": "smear/HYY_EDDY233_NEE_GPP_2025.csv",
-      "sha256": "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
-      "rows": 17520,
-      "builtAt": null,
-      "columns": [
-        "Year",
-        "Month",
-        "Day",
-        "Hour",
-        "Minute",
-        "Second",
-        "HYY_EDDY233.GPP",
-        "HYY_EDDY233.NEE"
-      ]
-    },
-    {
-      "path": "smear/HYY_EDDYMAST_F_c_270_2025.csv",
-      "sha256": "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
-      "rows": 17520,
-      "builtAt": null,
-      "columns": [
-        "Year",
-        "Month",
-        "Day",
-        "Hour",
-        "Minute",
-        "Second",
-        "HYY_EDDYMAST.F_c_270"
-      ]
     }
   ],
   "steps": {
@@ -400,6 +400,12 @@
     "hyytiala": {
       "source": "SMEAR II, HYY_EDDY233",
       "years": {
+        "2019": {
+          "halfHours": 17520,
+          "neeMissing": 0,
+          "gppMissing": 0,
+          "measuredHalfHours": 14894
+        },
         "2020": {
           "halfHours": 17568,
           "neeMissing": 0,
@@ -429,12 +435,6 @@
           "neeMissing": 0,
           "gppMissing": 0,
           "measuredHalfHours": 14773
-        },
-        "2025": {
-          "halfHours": 17520,
-          "neeMissing": 0,
-          "gppMissing": 0,
-          "measuredHalfHours": 15169
         }
       },
       "rule": "no row is removed; a half hour without NEE or GPP makes the daily and annual sum NULL; NaN or empty F_c_270 = not measured"
@@ -468,27 +468,27 @@
     }
   },
   "outputs": {
-    "results.json": "68ce2467c39ed34e7436966fc057093a585ec2c78bf8f4dcc8dad3101ce063cd",
+    "results.json": "7a67978aba1e860c8e3de740c73f31ac827ba415e84db1b714e902b08523d1b6",
     "figures": {
       "figures/1-carbon-space.svg": {
-        "sha256": "9822fb99799f9024b2ff6910e619852baab1ea186e0c5db654baf045d9a3e9d6",
-        "sha256WithoutMetadata": "e21c67a50f969ec797082fa24531b861552d86145153a4fc1bfd43ef167e2c56"
+        "sha256": "2f28b74eed4b7d619e9b49bfa4634910f119ba7c97a15fb2239e63617cce7b87",
+        "sha256WithoutMetadata": "63bd206ae9b235ccb2185ae15f1bc7b16e4034ff455af1edd33ead1252492532"
       },
       "figures/2-uptake-days.svg": {
-        "sha256": "b82689d256d0792bba3c8325c1f0a9941023a0a4cd741cefbc0f6a35345c84fd",
-        "sha256WithoutMetadata": "c21257cea3296c38d3b3addbc77219a7132df196de01610bab92668158ee968e"
+        "sha256": "6f4dbbfd0503ee094c62eb5398d69aba207e649a5e8951c4a0a180f6a98c3988",
+        "sha256WithoutMetadata": "52b95bbef135e7142d96a7da7ddb12ce31b1fa8218698a04a6fbd1b4f965da1c"
       },
       "figures/3-uptake-days-peak.svg": {
-        "sha256": "2ee740e02e4cbde83ff747a7745f16ee128a677524055757e28b42256c8127e1",
-        "sha256WithoutMetadata": "52cc85a9848c1d1f02f03d4b82d13bd9e03059870de3e85b0d01dec8ab972092"
+        "sha256": "9a71ca8f21bfbc94fcf943e10ef6b1c6be642491fe0754820681aa4975ba2bb7",
+        "sha256WithoutMetadata": "ec4c44d5bdd659213ce5fe519c311f6fad194f716f6449d2a868425ebcdabf77"
       },
       "figures/4-carbon-space-forest.svg": {
-        "sha256": "8cf5d52af15f5e839f3cc57d34d89c9b0af1a7144c1b6037522b5aa0603a8291",
-        "sha256WithoutMetadata": "0e9d230955aa5a7ed268452a870b0aa8ccda366fdb2e40dcbad864d75032ed12"
+        "sha256": "8277b1378dd1e4c13052c8c8ba488fc4a3742e4fdc1a4df73573735c38a4428a",
+        "sha256WithoutMetadata": "53ca0261388e8533e99fee1b3342e59237195c428fc2478b4df78577eea81945"
       },
       "figures/5-uptake-days-peak-forest.svg": {
-        "sha256": "050131c105704f6b683586f91e6c0a546eb8e7cffc38747744935e84e62bf628",
-        "sha256WithoutMetadata": "f2fcf7fb2392960bb8277a7e78d68a465b426587758683f8b99f5064bc638af2"
+        "sha256": "ac89f0d6dd549bd445bf7e4df16397bad6cbd87db953c25def6d33c638ce7bbf",
+        "sha256WithoutMetadata": "18dd34476239558b9cfe8964262de94235a9585827257290787df5bd3589eb29"
       }
     }
   }

@@ -129,10 +129,16 @@ def test_ols() -> None:
     assert math.isclose(o["r"], 1.0) and o["n"] == 3
 
 
-def test_round_sig_and_nice_range() -> None:
+def test_round_sig() -> None:
     assert cs.round_sig(1.23456789012345) == 1.23456789
     assert cs.round_sig(float("nan")) is None
-    assert cs.nice_range(612.2, 1478.7) == [400.0, 1600.0]
+
+
+def test_axis_constants() -> None:
+    assert cs.AXIS_LO_1 < cs.AXIS_HI_1
+    assert cs.AXIS_LO_1 % cs.AXIS_TICK_1 == 0 and cs.AXIS_HI_1 % cs.AXIS_TICK_1 == 0
+    assert cs.Y_LABEL_2.startswith("Percentage")
+    assert cs.Y_AXIS_TEXT_2.startswith("percentage")
 
 
 def test_prefix_svg_ids() -> None:
@@ -297,9 +303,30 @@ def test_hyytiala_results() -> None:
     assert res["regression"]["withHyytiala"]["n"] == len(res["fig1Keys"]) + len(
         ref["fig4Keys"]
     )
-    assert set(cs.LABEL_OFFSETS_FOREST) <= set(ref["fig4Keys"])
-    assert set(cs.LABEL_TEXT_FOREST) <= set(cs.LABEL_OFFSETS_FOREST)
+    # Figure 4 offsets: the Hyytiala labels and the overrides of the site labels
+    assert set(cs.LABEL_OFFSETS_FOREST) <= set(ref["fig4Keys"]) | set(res["fig1Keys"])
+    assert set(cs.LABEL_TEXT_FOREST) <= set(cs.LABEL_OFFSETS_FOREST) & set(
+        ref["fig4Keys"]
+    )
     assert cs.THINNING_KEY in ref["fig4Keys"]
+    assert cs.REF_YEARS[0] < cs.THINNING_YEAR < cs.REF_YEARS[-1]
+    assert "pre-thinning" in cs.LABEL_TEXT_FOREST[cs.PRE_THINNING_KEY]
+    assert (
+        cs.LABEL_TEXT_FOREST[cs.CLUSTER_KEY]
+        == f"{cs.THINNING_YEAR + 1}–{cs.REF_YEARS[-1]}"
+    )
+    # all markers of Figures 1 and 4 are inside the fixed axis range
+    rows = [r for r in res["siteYears"] if r["inFig1"]] + [
+        r for r in ref["siteYears"] if r["inFig1"]
+    ]
+    for r in rows:
+        assert cs.AXIS_LO_1 <= r["gpp"] <= cs.AXIS_HI_1
+        assert cs.AXIS_LO_1 <= r["reco"] <= cs.AXIS_HI_1
+    for f in res["figures"]:
+        if f["n"] in (1, 4):
+            assert f"both from {cs.AXIS_LO_1:.0f} to {cs.AXIS_HI_1:.0f}" in f["desc"]
+        else:
+            assert cs.Y_AXIS_TEXT_2 in f["desc"]
 
 
 def test_literature_rows() -> None:

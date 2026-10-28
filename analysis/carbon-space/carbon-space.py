@@ -51,7 +51,7 @@ METHOD
        site-years (whole year, June to August, peak-GPP window). A third summary gives the annual crops without Maktau (Finnish crops only).
     7. Each step that removes rows logs a count (results.json dataVersion.steps).
     8. Reference site SMEAR II Hyytiala (boreal Scots pine forest, rare management; Figures 4 and
-       5): files of the SMEAR API in --smear (data/smear/hyytiala/README.md), 2020 to 2025.
+       5): files of the SMEAR API in --smear (data/smear/hyytiala/README.md), 2019 to 2024.
        HYY_EDDY233.NEE (gap-filled, positive = emission) and HYY_EDDY233.GPP (positive) in
        umol CO2 m-2 s-1, Reco = NEE + GPP. The time stamps are local time (UTC+2 all year) and
        mark the start of the half hour (the first stamp of a file is 1 January 00:00, the last
@@ -64,7 +64,8 @@ METHOD
        inclusion rule, the uptake shares and the peak window are the same as for the other
        sites. Hyytiala is not in the groups grassland and annual crop; it is the group forest.
        It has no events. The stand was thinned at the start of 2020 (40 % of the basal area
-       removed; de Quesada et al. 2025, LITERATURE); Figure 4 marks 2020 with "(thinning)".
+       removed; de Quesada et al. 2025, LITERATURE); Figure 4 marks 2020 with "(thinning)" and
+       2019, the one year before the thinning, with "(pre-thinning)".
     9. Open findings of docs/anomaly-data-report.md that touch this dive are printed
        (OPEN_FINDINGS).
     10. LITERATURE: the facts of the Hyytiala thinning from de Quesada et al. 2025 (reference id
@@ -82,6 +83,8 @@ INPUTS
     db/events.parquet  sha256=b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b  rows=114  columns=site_code, date, type, crop
     calculated/annual.csv  sha256=27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe  rows=33  columns=site_code, year, full_year, reliable, frac_measured, longest_gap_days, n_gpp, nee_f_gc, gpp_gc, reco_gc
     calculated/daily.parquet  sha256=fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9  rows=11209  columns=site_code, date_local, nee_f_gc, gpp_gc, reco_gc, frac_measured
+    smear/HYY_EDDY233_NEE_GPP_2019.csv  sha256=32e13af00db88a7c00f6e0cabbdbcbfe9f08fcda220df8b6e2d0e6e72999ced7  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
+    smear/HYY_EDDYMAST_F_c_270_2019.csv  sha256=6535ff06a6c24f85fa7b4dfe23e94b53039085815227366bce1e95da7524f739  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
     smear/HYY_EDDY233_NEE_GPP_2020.csv  sha256=75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
     smear/HYY_EDDYMAST_F_c_270_2020.csv  sha256=fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
     smear/HYY_EDDY233_NEE_GPP_2021.csv  sha256=468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
@@ -92,8 +95,6 @@ INPUTS
     smear/HYY_EDDYMAST_F_c_270_2023.csv  sha256=95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
     smear/HYY_EDDY233_NEE_GPP_2024.csv  sha256=2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
     smear/HYY_EDDYMAST_F_c_270_2024.csv  sha256=b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3  rows=17568  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
-    smear/HYY_EDDY233_NEE_GPP_2025.csv  sha256=55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDY233.GPP, HYY_EDDY233.NEE
-    smear/HYY_EDDYMAST_F_c_270_2025.csv  sha256=39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b  rows=17520  columns=Year, Month, Day, Hour, Minute, Second, HYY_EDDYMAST.F_c_270
 
 OUTPUTS
     results.json                 all result numbers, figure captions and alt texts, dataVersion
@@ -232,6 +233,31 @@ INPUTS: tuple[InputFile, ...] = (
     ),
     InputFile(
         "smear",
+        "HYY_EDDY233_NEE_GPP_2019.csv",
+        "32e13af00db88a7c00f6e0cabbdbcbfe9f08fcda220df8b6e2d0e6e72999ced7",
+        17520,
+        (
+            "Year",
+            "Month",
+            "Day",
+            "Hour",
+            "Minute",
+            "Second",
+            "HYY_EDDY233.GPP",
+            "HYY_EDDY233.NEE",
+        ),
+        None,
+    ),
+    InputFile(
+        "smear",
+        "HYY_EDDYMAST_F_c_270_2019.csv",
+        "6535ff06a6c24f85fa7b4dfe23e94b53039085815227366bce1e95da7524f739",
+        17520,
+        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
+        None,
+    ),
+    InputFile(
+        "smear",
         "HYY_EDDY233_NEE_GPP_2020.csv",
         "75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20",
         17568,
@@ -355,31 +381,6 @@ INPUTS: tuple[InputFile, ...] = (
         ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
         None,
     ),
-    InputFile(
-        "smear",
-        "HYY_EDDY233_NEE_GPP_2025.csv",
-        "55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508",
-        17520,
-        (
-            "Year",
-            "Month",
-            "Day",
-            "Hour",
-            "Minute",
-            "Second",
-            "HYY_EDDY233.GPP",
-            "HYY_EDDY233.NEE",
-        ),
-        None,
-    ),
-    InputFile(
-        "smear",
-        "HYY_EDDYMAST_F_c_270_2025.csv",
-        "39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b",
-        17520,
-        ("Year", "Month", "Day", "Hour", "Minute", "Second", "HYY_EDDYMAST.F_c_270"),
-        None,
-    ),
 )
 
 # Units. daily.parquet and annual.csv have no unit field. The key/value metadata "constants" of
@@ -415,7 +416,7 @@ REF_NAME = "Hyytiälä"
 REF_SOURCE = "SMEAR II, HYY_EDDY233"
 REF_GROUP = "forest"
 REF_CROP = ("boreal forest", REF_GROUP, None)
-REF_YEARS = tuple(range(2020, 2026))
+REF_YEARS = tuple(range(2019, 2025))
 
 # Reference values from articles. Each row: value, unit, uncertainty, reference id, page, table or
 # figure. de Quesada et al. 2025, Forest Ecology and Management 595, 123024
@@ -619,13 +620,16 @@ SITE_EMOJI = {
     REF_SITE: "🌲🍄",
 }
 REF_LEGEND = f"{SITE_EMOJI[REF_SITE]} {REF_NAME}\n(forest)"
-AXIS_STEP = 100.0  # g C m-2 yr-1; the axis range of Figure 1 is a multiple of this
-AXIS_PAD = 120.0  # g C m-2 yr-1 of free space around the markers
+# Fixed axis range of Figures 1 and 4 (g C m-2 yr-1), the same on x and y. The script stops
+# when a marker is outside it. The ticks are every AXIS_TICK_1.
+AXIS_LO_1 = 600.0
+AXIS_HI_1 = 1600.0
+AXIS_TICK_1 = 200.0
 NEE_GUIDES = (-200.0, -400.0)
 X_LABEL_1 = r"Annual GPP (g C m$^{-2}$ yr$^{-1}$)"
 Y_LABEL_1 = r"Annual TER (g C m$^{-2}$ yr$^{-1}$)"
-Y_LABEL_2 = "Days with net CO$_2$ uptake,\nNEE < 0 (%)"
-Y_AXIS_TEXT_2 = "days with net CO2 uptake, NEE < 0 (%)"
+Y_LABEL_2 = "Percentage of days with\nnet CO$_2$ uptake (NEE < 0)"
+Y_AXIS_TEXT_2 = "percentage of days with net CO2 uptake (NEE < 0)"
 GRID = "#e2e2e2"  # faint grid lines (behind everything)
 GRID_LW = 0.6
 LEVELS = (25.0, 75.0, 100.0)  # faint guide lines of the bar figures
@@ -641,7 +645,8 @@ FIG4_TITLE = (
     "Annual total ecosystem respiration (TER, = Reco) against annual gross primary production "
     "(GPP), one marker per site-year, with the SMEAR II Hyytiälä "
     "forest (rare management) as a reference; below the 1:1 line the site-year was a net CO2 "
-    "sink. The Hyytiälä stand was thinned at the start of 2020 (de Quesada et al. 2025)."
+    f"sink. The Hyytiälä stand was thinned at the start of {THINNING_YEAR} (de Quesada et al. "
+    "2025)."
 )
 FIG5_TITLE = (
     "Share of days with net CO2 uptake (daily NEE < 0) per site-year, over the whole year "
@@ -677,20 +682,29 @@ LABEL_OFFSETS: dict[str, tuple[float, float, str]] = {
 }
 # Figure 4: the Hyytiala markers form a cluster near Anttila. Offsets of Figure 4 that differ
 # from LABEL_OFFSETS, and the Hyytiala labels.
-# Only 2020 (the source year) and the cluster 2021 to 2025 get a label; the other Hyytiala
-# markers have none (the values are in the alt text and in results.json).
+# Only the year before the thinning, the thinning year (the source year) and the cluster of the
+# years after it get a label; the other Hyytiala markers have none (the values are in the alt
+# text and in results.json). The cluster label sits at the last year.
+PRE_THINNING_KEY = f"{REF_SITE}-{REF_YEARS[0]}"
+CLUSTER_KEY = f"{REF_SITE}-{REF_YEARS[-1]}"
+CLUSTER_TEXT = f"{THINNING_YEAR + 1}–{REF_YEARS[-1]}"
 LABEL_OFFSETS_FOREST: dict[str, tuple[float, float, str]] = {
-    "hyytiala-2020": (-10, 12, "right"),
-    "hyytiala-2025": (12, -14, "left"),
+    "haltiala-2024": (11, -6, "left"),  # below the Hyytiala 2021 star
+    PRE_THINNING_KEY: (14, -30, "left"),
+    THINNING_KEY: (-10, 12, "right"),
+    CLUSTER_KEY: (12, -14, "left"),
 }
 LABEL_TEXT_FOREST = {
+    PRE_THINNING_KEY: f"{REF_YEARS[0]} (pre-thinning)",
     THINNING_KEY: f"{THINNING_YEAR} (thinning)",
-    "hyytiala-2025": "2021–2025",
+    CLUSTER_KEY: CLUSTER_TEXT,
 }
+# Labels with a thin leader line from the marker to the text (the marker is in a cluster).
+LEADER_KEYS = frozenset({PRE_THINNING_KEY})
 # The Hyytiala stars are drawn below the markers of the six sites (they are the reference).
 REF_ZORDER = 2.5
 # Labels in two lines (break before the bracket).
-WRAP_LABELS = frozenset({"haltiala-2023"})
+WRAP_LABELS = frozenset({"haltiala-2023", PRE_THINNING_KEY})
 
 log = logging.getLogger(SLUG)
 
@@ -827,15 +841,6 @@ def compare(new: Any, old: Any, path: str = "$") -> list[str]:
             return [f"{path}: {new} != {old}"]
         return []
     return [] if new == old else [f"{path}: {new!r} != {old!r}"]
-
-
-def nice_range(
-    lo: float, hi: float, step: float = AXIS_STEP, pad: float = AXIS_PAD
-) -> list[float]:
-    """[lo - pad, hi + pad] rounded outwards to a multiple of `step`."""
-    a = math.floor((lo - pad) / step) * step
-    b = math.ceil((hi + pad) / step) * step
-    return [float(a), float(b)]
 
 
 def num_or_none(v: Any) -> float | None:
@@ -1816,7 +1821,12 @@ def carbon_space_plot(
 ) -> tuple[Any, float, float]:
     """Figures 1 and 4: Reco against GPP. A site-year without an entry in `offsets` has no label."""
     vals = [r["gpp"] for r in rows] + [r["reco"] for r in rows]
-    lo, hi = nice_range(min(vals), max(vals))
+    lo, hi = AXIS_LO_1, AXIS_HI_1
+    if min(vals) < lo or max(vals) > hi:
+        raise ValueError(
+            f"a marker is outside the fixed axis range {lo:.0f} to {hi:.0f}: "
+            f"min {min(vals):.1f}, max {max(vals):.1f}"
+        )
     fig = plt.figure(figsize=(FIG_WIDTH_IN, FIG1_HEIGHT_IN))
     ax = fig.add_axes((0.12, 0.1, 0.66, 0.88))
     ax.set_xlim(lo, hi)
@@ -1825,14 +1835,15 @@ def carbon_space_plot(
     ax.plot([lo, hi], [lo, hi], color=INK, lw=1.8, ls=":", zorder=1)
     fs_small = 6 * FONT_SCALE
     for g in NEE_GUIDES:
-        # NEE = Reco - GPP = g, thus Reco = GPP + g. The label is at the bottom axis edge.
+        # NEE = Reco - GPP = g, thus Reco = GPP + g. The label is at the right axis edge, at
+        # the upper end of the line (the bottom edge holds the Maktau 2019 marker).
         ax.plot([lo - g, hi], [lo, hi + g], color=GUIDE, lw=1.1, ls=":", zorder=1)
         ax.annotate(
             f"NEE = {fmt(g)}",
-            (lo - g, lo),
-            xytext=(9, 13),
+            (hi, hi + g),
+            xytext=(-8, 5),
             textcoords="offset points",
-            ha="left",
+            ha="right",
             va="bottom",
             rotation=45,
             rotation_mode="anchor",
@@ -1873,6 +1884,7 @@ def carbon_space_plot(
             mec="white",
             mew=MARKER_EDGE,
             zorder=zorder,
+            clip_on=False,  # a marker at the axis edge is drawn whole
         )
         for r in sr:
             if r["key"] not in offsets:
@@ -1881,6 +1893,17 @@ def carbon_space_plot(
             text = texts.get(r["key"], point_label(r))
             if r["key"] in WRAP_LABELS:
                 text = text.replace(" (", "\n(")
+            leader = (
+                {
+                    "arrowstyle": "-",
+                    "color": GUIDE,
+                    "lw": 0.8,
+                    "shrinkA": 0,
+                    "shrinkB": 6,
+                }
+                if r["key"] in LEADER_KEYS
+                else None
+            )
             ax.annotate(
                 text,
                 (r["gpp"], r["reco"]),
@@ -1892,6 +1915,7 @@ def carbon_space_plot(
                 linespacing=1.0,
                 zorder=4,
                 bbox={"boxstyle": "square,pad=0.1", "fc": "white", "ec": "none"},
+                arrowprops=leader,
             )
         handles.append(
             Line2D(
@@ -1910,7 +1934,7 @@ def carbon_space_plot(
     ax.set_ylabel(Y_LABEL_1)
     ax.set_axisbelow(True)
     ax.grid(True, color=GRID, lw=GRID_LW, zorder=0)
-    ticks = np.arange(lo, hi + 1, 200)
+    ticks = np.arange(lo, hi + 1, AXIS_TICK_1)
     ax.set_xticks(ticks)
     ax.set_yticks(ticks)
     fig.legend(
@@ -1979,10 +2003,10 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
         f"a reference with rare management): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, "
         f"both from {fmt(lo)} to {fmt(hi)} on the same scale, dotted 1:1 line, light dotted "
         "lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä "
-        f"{THINNING_YEAR} (thinning: the stand was thinned at the start of {THINNING_YEAR}, "
-        f"{LIT['basalAreaReductionPct']['value']} % of the basal area removed, de Quesada et al. "
-        "2025) and the cluster "
-        f"2021–2025. Hyytiälä (g C m−2 yr−1) {per}. Hyytiälä NEE "
+        f"{REF_YEARS[0]} (pre-thinning), {THINNING_YEAR} (thinning: the stand was thinned at the "
+        f"start of {THINNING_YEAR}, {LIT['basalAreaReductionPct']['value']} % of the basal area "
+        f"removed, de Quesada et al. 2025) and the cluster {CLUSTER_TEXT}. Hyytiälä "
+        f"(g C m−2 yr−1) {per}. Hyytiälä NEE "
         f"{fmt(g[REF_GROUP]['nee']['mean'])} ± {fmt(g[REF_GROUP]['nee']['sd'])} (mean ± SD, "
         f"range {fmt(g[REF_GROUP]['nee']['min'])} to {fmt(g[REF_GROUP]['nee']['max'])}, n = "
         f"{g[REF_GROUP]['nee']['n']}); grassland "
@@ -2209,8 +2233,9 @@ def fig_uptake_days_peak_forest(
         f"and {len(ref_rows)} site-years of the SMEAR II Hyytiälä forest (reference, last group). "
         "Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 "
         "over the whole year, the right bar (lighter, hatched) the share inside the "
-        f"{PEAK_DAYS} consecutive local days with the largest GPP sum of the year; y axis days "
-        "with net CO2 uptake, NEE < 0 (%), 0 to 100, faint guide lines at 25, 50, 75 and 100 % (the 50 % line dotted and a little stronger). Mean ± SD (range) of the whole "
+        f"{PEAK_DAYS} consecutive local days with the largest GPP sum of the year; y axis "
+        f"{Y_AXIS_TEXT_2}, 0 to 100, faint guide lines at 25, 50, 75 and 100 % (the 50 % line "
+        "dotted and a little stronger). Mean ± SD (range) of the whole "
         f"year: forest {share_stat(g[REF_GROUP]['uptakeYear'])}, grassland "
         f"{share_stat(g['grassland']['uptakeYear'])}, annual crops "
         f"{share_stat(g['annual crop']['uptakeYear'])}; of the peak window: forest "
@@ -2370,7 +2395,8 @@ def method_json() -> dict[str, Any]:
             "name": REF_NAME,
             "group": REF_GROUP,
             "source": (
-                "SMEAR II Hyytiälä (station 2), SMEAR API, downloaded 2026-10-27 "
+                "SMEAR II Hyytiälä (station 2), SMEAR API, downloaded 2026-10-27 (2020 to 2024) "
+                "and 2026-10-28 (2019) "
                 "(data/smear/hyytiala/README.md): HYY_EDDY233.NEE and HYY_EDDY233.GPP, "
                 "HYY_EDDYMAST.F_c_270"
             ),
@@ -2424,6 +2450,7 @@ def method_json() -> dict[str, Any]:
         "axisNames": {
             "fig1x": "Annual GPP (g C m-2 yr-1)",
             "fig1y": "Annual TER (g C m-2 yr-1)",
+            "fig1range": [AXIS_LO_1, AXIS_HI_1],
             "fig2y": Y_LABEL_2,
         },
         "rules": [
@@ -2435,7 +2462,10 @@ def method_json() -> dict[str, Any]:
             if line.strip()
         ],
         "openFindings": list(OPEN_FINDINGS),
-        "literature": "none: the script uses no literature value",
+        "literature": (
+            "only the facts of the Hyytiälä thinning (de Quesada et al. 2025) for the labels "
+            "and the text of Figure 4; no literature value enters a calculation"
+        ),
     }
 
 

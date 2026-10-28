@@ -122,7 +122,7 @@ events. "Other" is the sum of the spraying and other events. The events come fro
 <Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} /> and the other sources of the database.
 
 **Reference site (Figures 4 and 5).** The SMEAR II Hyytiälä forest is a reference site with rare management. It is not
-in the database. The script reads the years 2020 to 2025 from the SMEAR API: the gap-filled NEE and GPP of table
+in the database. The script reads the years 2019 to 2024 from the SMEAR API: the gap-filled NEE and GPP of table
 HYY_EDDY233 and the measured CO₂ flux at 27 m, F_c_270 <Cite ids={['smear-hyytiala']} />. The SMEAR variable metadata
 names Kulmala et al. 2019 as the method of the gap filling and the partitioning <Cite ids={['kulmala2019']} />. NEE is
 positive for an emission, and GPP is positive. Reco is NEE + GPP. The time base is UTC+2 all year, and a local day is a
@@ -133,7 +133,7 @@ annual-crop group. It has its own group, forest. The stand was thinned at the st
 <Num k="literatureByKey.thinningYear.value" digits={0} />: the thinning removed
 <Num k="literatureByKey.basalAreaReductionPct.value" digits={0} /> % of the basal area on
 <Num k="literatureByKey.thinnedAreaHa.value" digits={0} /> ha (p. 2, Table 1; p. 3, Fig. 1) <Cite ids={['dequesada2025']} />.
-Figure 4 labels this year "(thinning)". Figure 4 has <Num k="summary.fig4.n" digits={0} /> site-years and
+Figure 4 labels this year "(thinning)" and the one year before it "(pre-thinning)". Figure 4 has <Num k="summary.fig4.n" digits={0} /> site-years and
 Figure 5 has <Num k="summary.nFig5" digits={0} />.
 
 **Line and groups.** The script fits an OLS line, Reco = slope × GPP + intercept, to the Figure 1 site-years. It fits
@@ -257,8 +257,9 @@ the 1:1 line and <Num k="summary.fig4.nSource" digits={0} /> are above it. The f
 <E site="hyytiala" />{refSources} (NEE <Num k={`${R('hyytiala-2020')}.nee`} digits={0} sign unit={UA} />). The stand was thinned at the start of
 this year <Cite ids={['dequesada2025']} />. De Quesada et al. (p. 10) cite eddy covariance results that show the same
 pattern: the stand became a carbon source after the thinning and was a carbon sink again after
-<Num k="literatureByKey.sinkAgainYears.value" digits={0} /> year <Cite ids={['dequesada2025']} />. The years 2021 to 2025
-are below the line, in agreement with this. The forest Reco/GPP was <Num k="groups.forest.recoGppRatio.mean" /> ±
+<Num k="literatureByKey.sinkAgainYears.value" digits={0} /> year <Cite ids={['dequesada2025']} />. The year before the
+thinning, 2019, is below the line (NEE <Num k={`${R('hyytiala-2019')}.nee`} digits={0} sign unit={UA} />), and the years
+2021 to 2024 are below the line again, in agreement with this. The forest Reco/GPP was <Num k="groups.forest.recoGppRatio.mean" /> ±
 <Num k="groups.forest.recoGppRatio.sd" /> (n = <Num k="groups.forest.recoGppRatio.n" digits={0} />, range
 <Num k="groups.forest.recoGppRatio.min" /> to <Num k="groups.forest.recoGppRatio.max" />). The grassland Reco/GPP was
 <Num k="groups.grassland.recoGppRatio.mean" /> ± <Num k="groups.grassland.recoGppRatio.sd" /> (n = <Num k="groups.grassland.recoGppRatio.n" digits={0} />,
@@ -357,8 +358,8 @@ shares. The dive does not test it.
   The GPP and Reco of the forest and of the fields are therefore not fully comparable.
 - **Forest source year.** Hyytiälä 2020 is a net source in the SMEAR data as delivered <Cite ids={['smear-hyytiala']} />.
   The stand was thinned at the start of 2020 <Cite ids={['dequesada2025']} />, and the source year agrees with this. The
-  dive does not separate the effect of the thinning from the effect of the weather of 2020. The wood removed in the
-  thinning is not in NEE.
+  set has one year before the thinning (2019) and four after it, so the dive does not separate the effect of the
+  thinning from the effect of the weather of 2020. The wood removed in the thinning is not in NEE.
 - **Figures 3, 4 and 5 after the checks.** Figures 3, 4 and 5 were added after the independent checks. Their numbers
   are not independently recomputed.
 - **Snapshot.** The database snapshot of this dive is not yet published as a release asset. The hashes in "Reproduce"
@@ -372,11 +373,11 @@ shares. The dive does not test it.
 
 The numbers on this page come from `analysis/carbon-space/results.json`. The Python script
 <a href={`${REPO_URL}/blob/main/analysis/carbon-space/carbon-space.py`}><code>analysis/carbon-space/carbon-space.py</code></a>
-writes this file, `manifest.json` and the two SVG figures. It reads only the database snapshot built on
+writes this file, `manifest.json` and the five SVG figures. It reads only the database snapshot built on
 {d.dataVersion.snapshot.builtAt} and `data/calculated/annual.csv` and `data/calculated/daily.parquet` of the same build.
 Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
 The table gives the SHA-256, the row count and the columns read of each file (the paths are relative to the `--db` and
-`--calculated` folders); the script stops when a hash does not agree. The folder
+`--calculated` and `--smear` folders); the script stops when a hash does not agree. The folder
 <a href={`${REPO_URL}/tree/main/analysis/carbon-space`}><code>analysis/carbon-space/</code></a> has the lock file, the
 unit tests and a README.
 
@@ -394,7 +395,7 @@ unit tests and a README.
 
 ```sh
 npm run build:db && npm run calc                 # make the inputs (the hashes must agree with the script)
-uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated
-uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated --check
+uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated --smear data/smear/hyytiala
+uv run analysis/carbon-space/carbon-space.py --db db --calculated data/calculated --smear data/smear/hyytiala --check
 npm run deep-dives -- --check                    # all dives, TypeScript and Python
 ```
