@@ -1,0 +1,294 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 10
+title: 'Rain pulse: night respiration, NEE and GPP after a rain day'
+question: Does a rain day after dry days change the night respiration, the NEE and the GPP of the next days, and does the soil water before the rain change the size of the pulse?
+shortAnswer: 'At Maktau, night respiration rose after rain and was below the pre-rain level after twelve dry days. In Finland, few events have measured nights. GPP was lower on the rain day, maybe from less light.'
+sites: [anttila, sarkisuo, haltiala, qvidja, viikki, maktau]
+variables: [nee, gpp, reco, precip, swc, tsoil]
+period: { from: 2018, to: 2025 }
+date: '2026-10-28'
+status: draft
+models:
+  - model: Claude Fable 5.1
+    role: question, plan, final text
+  - model: Claude Opus 5.5
+    role: Python analysis script, figures
+  - model: Claude Opus 5.5
+    role: article draft and site integration
+  - model: Claude Sonnet 5.5
+    role: independent recompute of the numbers (own code, without the script and the JSON)
+  - model: Claude Haiku 5.5
+    role: language (STE) and reference review
+script: analysis/rain-pulse/rain-pulse.py
+references: [calculated-doc, anomaly-report, haltiala-management, qvidja-management, viikki-management]
+checks:
+  - kind: recompute
+    by: Claude Sonnet 5.5
+    date: '2026-10-28'
+    result: pass
+    note: Own code from the built page and the snapshot, without the script and the JSON. All event counts equal; Reco and GPP composites within 3 %; Maktau Reco ρ −0.52 against −0.60; NEE day 0 differed because the page did not state the night weighting. The four rules it had to guess (pulse needs 2 of 3 days, NEE weighting, rows without u*, light variable) are now in the method list.
+  - kind: review
+    by: Claude Haiku 5.5
+    date: '2026-10-28'
+    result: partial
+    note: One pass. All citations check out. Must items fixed by Claude Fable 5.1 - short answer with the day-12 subset, SE and n for every mean, NEE sentence with the SWC relation, SE in the alt texts, one rule for "too few" events, finding status words and effects.
+---
+
+import raw from '../../../../analysis/rain-pulse/results.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl, SITE_NAMES } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+import { siteEmoji } from '../../scripts/sites';
+import { eventRows, finnishRange, fitRows, inputRows, lagKey, rainPulseData, sensitivityRows, summaryRows, swcRows } from '../../lib/deepDives/rainPulse';
+
+export const d = rainPulseData(raw);
+export const base = baseUrl();
+export const SITES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'];
+export const VIEW_RECO = { name: 'Rain and night NEE', sites: SITES, variables: ['nee', 'precip', 'tsoil', 'swc'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] };
+export const VIEW_NEE = { name: 'Rain and NEE', sites: SITES, variables: ['nee', 'precip', 'swc'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] };
+export const VIEW_GPP = { name: 'Rain and GPP', sites: SITES, variables: ['gpp', 'precip', 'ppfd'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] };
+export const L = (x, lag, field) => lagKey(d, x, 'maktau', lag, field);
+export const se = (k) => k.replace(/day0$/, 'day0Se');
+export const nk = (k) => k.replace(/day0$/, 'day0N');
+export const R = (path) => finnishRange(d, path);
+export const recoUsed = R('reco.used');
+export const recoLast = R('reco.lastDrawnLag');
+export const gpp0 = R('gpp.day0');
+export const light0 = R('lightRatioDay0');
+export const nee0n = R('nee.day0N');
+export const neeLast = R('nee.lastDrawnLag');
+export const fracRatio = R('measuredFracRatio');
+export const fracPre = R('measuredFracPre');
+export const fits = fitRows(d);
+export const evs = eventRows(d);
+export const sums = summaryRows(d);
+export const swcs = swcRows(d);
+export const sens = sensitivityRows(d);
+export const inputs = inputRows(d);
+export const U = 'µmol CO₂ m⁻² s⁻¹';
+// Site emoji before a site name in the text. aria-hidden: a screen reader reads only the name.
+export const S = ({ site }) => <><span aria-hidden="true">{siteEmoji(site)} </span>{SITE_NAMES[site]}</>;
+
+## Short answer
+
+At <S site="maktau" /> (maize, Kenya), the night respiration (Reco) rose on the night after a rain day of 5 mm or more.
+On day 0, Reco was <Num k="summary.maktau.reco.day0" /> ± <Num k="summary.maktau.reco.day0Se" /> times the pre-rain level
+(ratio to the temperature model; mean ± SE, n = <Num k="summary.maktau.reco.day0N" digits={0} /> events). In the events with no
+rain day up to day 12, Reco on day 12 was <Num k={L('reco', 12, 'mean')} /> ± <Num k={L('reco', 12, 'se')} /> (n = <Num k={L('reco', 12, 'n')} digits={0} />).
+At the Finnish fields, only <Num k={recoUsed.min} digits={0} /> to <Num k={recoUsed.max} digits={0} />
+events per site had enough measured nights, and the composite stops by day <Num k={recoLast.max} digits={0} />. At the Finnish fields, GPP
+on the rain day minus the pre-pulse mean was <Num k={gpp0.min} /> to <Num k={gpp0.max} /> {U} (n = <Num k={nk(gpp0.min)} digits={0} /> to <Num k={nk(gpp0.max)} digits={0} />).
+This may be an effect of the lower light on that day. At <S site="maktau" />, the NEE change on day 0 was small
+(<Num k="summary.maktau.nee.day0" sign /> ± <Num k="summary.maktau.nee.day0Se" /> {U}, n = <Num k="summary.maktau.nee.day0N" digits={0} />),
+but the NEE pulse was larger when the soil was drier (ρ = <Num k="swc.nee.maktau.rho" />, n = <Num k="swc.nee.maktau.n" digits={0} />).
+
+## Data and method
+
+The script reads the harmonised database snapshot built on {d.dataVersion.snapshot.builtAt} and the half-hour fluxes of
+the calculated products <Cite ids={['calculated-doc']} />. The rules:
+
+1. **Rows.** The measured flag of NEE and the night flag come from the calculated products. The fits and the night values use only season nights.
+2. **Season.** Finnish sites: local days from 1 May to 30 September. Maktau: all year. Fluxes at a soil temperature of 0 °C or
+   less are not used.
+3. **Rain.** Daily rain is the sum of the local day. A day with fewer than
+   <Num k="method.minPrecipHalfHours" digits={0} /> rain half hours has no rain value. Haltiala uses the Viikki rain.
+4. **Temperature model.** A Lloyd–Taylor model of the measured night NEE against the soil temperature, per site-year
+   <Cite ids={['calculated-doc']} note="section 4" />. The night sample has u\* ≥ <Num k="method.ustarMin" /> m s⁻¹ at Qvidja and Maktau; rows without a u\* value stay
+   <Cite ids={['calculated-doc']} note="section 5" />. The own fit of this dive needs <Num k="method.lloydTaylor.minN" digits={0} />
+   or more nights and a range of <Num k="method.lloydTaylor.minRange" digits={0} /> K or more. It is fitted again without
+   the <Num k="method.lloydTaylor.trimPercent" digits={0} /> % largest and smallest residuals. E0 is valid when E0 ± SE is
+   inside 30 to 550 K <Cite ids={['calculated-doc']} note="section 4" />. When the own E0 is not valid, the site E0 is used. When that is not valid, the pooled E0 of all valid site-years is used. Rref is always
+   fitted per site-year. A site-year without a night sample has no model.
+5. **Night of a day.** For Reco, the night of day d runs from the evening of day d to the next morning. NEE and GPP
+   use the calendar day.
+6. **Daily values.** Reco = mean measured night NEE / mean model value, with
+   <Num k="method.minNightHalfHours" digits={0} /> or more night half hours. GPP = mean GPP of the measured day half hours
+   (<Num k="method.minDayHalfHours" digits={0} /> or more). NEE = f × night mean + (1 − f) × day mean, where f is the share of
+   the half hours of the day with a night flag (both minimums; the u\* rule applies to the night mean). Light = mean PPFD
+   (SW_IN at Qvidja and Maktau) on the measured day half hours.
+7. **Events.** Day 0 is a season day with rain at or above the threshold (2, 5 or 10 mm). Days −3 to −1 have a rain value
+   below it (they need rain data, not the season). An event stops at day 15, the next day with rain at or above the
+   threshold, a day without rain data or the season end.
+8. **Management.** An event is dropped when days −3 to +15 touch a harvest, cut, grazing, tillage or sowing of the site
+   <Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} />. Maktau has events only for 2019 and 2020.
+9. **Haltiala check.** A Haltiala event counts only when the soil water content (SWC) on day 0 or 1 is
+   <Num k="method.swcRise" /> m³ m⁻³ or more above day −1.
+10. **Pre-pulse.** The pre-pulse mean is the mean of days −3 to −1. It needs <Num k="method.minPreDays" digits={0} /> of
+    the 3 days. Reco is divided by it (pre-pulse = 1). NEE and GPP are a difference to it (pre-pulse = 0).
+11. **Composite.** Mean, SD, SE and n per site, threshold and day. A day with n < <Num k="method.minCompositeN" digits={0} />
+    is not drawn. The pulse of an event is the mean of days 0 to 2 (<Num k="method.minPulseDays" digits={0} /> or more of the 3 days).
+12. **SWC anomaly.** SWC on day −1 minus the site median SWC of the season days. For the 5 mm events: OLS slope, Pearson
+    r and Spearman ρ with p, per site with <Num k="method.minRelationN" digits={0} /> or more events.
+
+## Results
+
+<Figure id="figure-1" svgFile="analysis/rain-pulse/figures/1-reco-lag.svg" view={VIEW_RECO} />
+
+At <S site="maktau" />, the 5 mm pulse (days 0 to 2) was <Num k="summary.maktau.reco.pulse" /> ±
+<Num k="summary.maktau.reco.pulseSe" /> (n = <Num k="summary.maktau.reco.pulseN" digits={0} />). On day 10 the value
+was <Num k={L('reco', 10, 'mean')} /> ± <Num k={L('reco', 10, 'se')} /> (n = <Num k={L('reco', 10, 'n')} digits={0} />),
+and on day 12 <Num k={L('reco', 12, 'mean')} /> ± <Num k={L('reco', 12, 'se')} /> (n = <Num k={L('reco', 12, 'n')} digits={0} />).
+
+<Figure id="figure-2" svgFile="analysis/rain-pulse/figures/2-reco-swc.svg" view={VIEW_RECO} />
+
+At <S site="maktau" />, a drier soil before the rain went with a larger Reco pulse (ρ = <Num k="swc.reco.maktau.rho" />,
+p = <Num k="swc.reco.maktau.rhoP" digits={3} />, n = <Num k="swc.reco.maktau.n" digits={0} />). This is consistent with
+a rewetting pulse. The dive does not test the cause. The Finnish sites have too few events for a test (see the tables).
+
+<Figure id="figure-3" svgFile="analysis/rain-pulse/figures/3-nee-lag.svg" view={VIEW_NEE} />
+
+At <S site="maktau" />, NEE on day 0 was <Num k="summary.maktau.nee.day0" sign /> ± <Num k="summary.maktau.nee.day0Se" /> {U}
+(n = <Num k="summary.maktau.nee.day0N" digits={0} />) against the pre-pulse mean. At the Finnish sites, day 0 had
+n = <Num k={nee0n.min} digits={0} /> to <Num k={nee0n.max} digits={0} /> events. No day after day
+<Num k={neeLast.max} digits={0} /> is drawn.
+
+<Figure id="figure-4" svgFile="analysis/rain-pulse/figures/4-nee-swc.svg" view={VIEW_NEE} />
+
+At <S site="maktau" />, the NEE pulse was also larger (more emission) when the soil was drier (ρ = <Num k="swc.nee.maktau.rho" />,
+p = <Num k="swc.nee.maktau.rhoP" digits={3} />, n = <Num k="swc.nee.maktau.n" digits={0} />).
+
+<Figure id="figure-5" svgFile="analysis/rain-pulse/figures/5-gpp-lag.svg" view={VIEW_GPP} />
+
+At the Finnish sites, GPP on day 0 was <Num k={gpp0.min} /> ± <Num k={se(gpp0.min)} /> (<S site={gpp0.minSite} />,
+n = <Num k={nk(gpp0.min)} digits={0} />) to <Num k={gpp0.max} /> ± <Num k={se(gpp0.max)} /> {U} (<S site={gpp0.maxSite} />,
+n = <Num k={nk(gpp0.max)} digits={0} />) against the pre-pulse mean. The light on day 0 was
+<Num k={light0.min} /> to <Num k={light0.max} /> of the pre-pulse light (section "Limits and uncertainty"). At <S site="maktau" />, GPP on
+day 0 was <Num k="summary.maktau.gpp.day0" /> ± <Num k="summary.maktau.gpp.day0Se" /> {U}
+(n = <Num k="summary.maktau.gpp.day0N" digits={0} />).
+
+<Figure id="figure-6" svgFile="analysis/rain-pulse/figures/6-gpp-swc.svg" view={VIEW_GPP} />
+
+At <S site="maktau" />, the GPP pulse was larger when the soil before the rain was wetter (ρ = <Num k="swc.gpp.maktau.rho" />,
+p &lt; 0.001, n = <Num k="swc.gpp.maktau.n" digits={0} />).
+
+### Tables
+
+<div class="table-wrap">
+<table>
+<caption>Events of 5 mm or more. Reco: ratio to the pre-pulse mean. NEE and GPP: difference to the pre-pulse mean ({U}). Values: mean ± SE (n events). Pulse = mean of days 0 to 2. Last day = the last drawn day (n ≥ {d.method.minCompositeN}). The table also gives values with n < {d.method.minCompositeN}, which the figures do not draw.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Variable</th><th scope="col" class="num">Used</th><th scope="col" class="num">Day 0</th><th scope="col" class="num">Pulse</th><th scope="col" class="num">Day 7</th><th scope="col" class="num">Last day</th></tr>
+</thead>
+<tbody>
+{sums.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td>{r.variable}</td><td class="num">{r.used}</td><td class="num">{r.day0}</td><td class="num">{r.pulse}</td><td class="num">{r.day7}</td><td class="num">{r.last}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Temperature model per site and calendar year. Source: own fit, site fit (E0 of all years), pooled (E0 of all valid site-years) or no model. E0 in K (± SE), Rref and RMSE in {U}, n = night half hours.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col" class="num">Year</th><th scope="col">Source</th><th scope="col" class="num">E0</th><th scope="col" class="num">Rref</th><th scope="col" class="num">n</th><th scope="col" class="num">RMSE</th></tr>
+</thead>
+<tbody>
+{fits.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td class="num">{r.year}</td><td>{r.source}</td><td class="num">{r.e0}</td><td class="num">{r.rref}</td><td class="num">{r.n}</td><td class="num">{r.rmse}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Events per site and threshold: found, dropped for management, dropped by the Haltiala SWC check, kept, and used per variable (with a pre-pulse mean).</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Rain</th><th scope="col" class="num">Found</th><th scope="col" class="num">Management</th><th scope="col" class="num">SWC check</th><th scope="col" class="num">Kept</th><th scope="col" class="num">Reco</th><th scope="col" class="num">NEE</th><th scope="col" class="num">GPP</th></tr>
+</thead>
+<tbody>
+{evs.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td>{r.threshold}</td><td class="num">{r.found}</td><td class="num">{r.management}</td><td class="num">{r.swcCheck}</td><td class="num">{r.kept}</td><td class="num">{r.reco}</td><td class="num">{r.nee}</td><td class="num">{r.gpp}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Pulse against the SWC anomaly (5 mm events). Slope ± SE per m³ m⁻³ (unit of the pulse), Pearson r, "too few" = fewer than {d.method.minRelationN} events.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Variable</th><th scope="col" class="num">n</th><th scope="col" class="num">Slope</th><th scope="col" class="num">r</th><th scope="col" class="num">ρ</th><th scope="col" class="num">p (ρ)</th></tr>
+</thead>
+<tbody>
+{swcs.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td>{r.variable}</td><td class="num">{r.n}</td><td class="num">{r.slope}</td><td class="num">{r.r}</td><td class="num">{r.rho}</td><td class="num">{r.rhoP}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Sensitivity: day 0 (mean ± SE, n) of the 5 mm events when the pre-pulse mean needs 2 of 3 days (main rule) or 1 of 3 days.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Variable</th><th scope="col" class="num">Used, 2 of 3</th><th scope="col" class="num">Day 0, 2 of 3</th><th scope="col" class="num">Used, 1 of 3</th><th scope="col" class="num">Day 0, 1 of 3</th></tr>
+</thead>
+<tbody>
+{sens.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td>{r.variable}</td><td class="num">{r.usedMain}</td><td class="num">{r.day0Main}</td><td class="num">{r.usedOne}</td><td class="num">{r.day0One}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+## Limits and uncertainty
+
+- **Few usable events in Finland.** An event needs measured nights on 2 of the 3 days before the rain, and a night needs 4 measured half hours after the u* rule. Before the rain, the measured fraction of the half hours was <Num k={fracPre.min} /> (<S site={fracPre.minSite} />) to
+  <Num k={fracPre.max} /> (<S site={fracPre.maxSite} />). The day-0 fraction divided by the pre-pulse fraction was
+  <Num k={fracRatio.min} /> to <Num k={fracRatio.max} />, so the rain day itself did not clearly reduce the data. The short summer nights of the Finnish sites may also give few night half hours.
+- **Light on day 0.** The day-0 light was <Num k={light0.min} /> ± <Num k={light0.min.replace(/lightRatioDay0$/, 'lightRatioSd')} /> (SD,
+  <S site={light0.minSite} />, n = <Num k={light0.min.replace(/lightRatioDay0$/, 'lightRatioN')} digits={0} />) to
+  <Num k={light0.max} /> ± <Num k={light0.max.replace(/lightRatioDay0$/, 'lightRatioSd')} /> (<S site={light0.maxSite} />,
+  n = <Num k={light0.max.replace(/lightRatioDay0$/, 'lightRatioN')} digits={0} />) of the pre-pulse light at the Finnish sites. The lower GPP on day 0 may follow from the lower light. The dive has no cloud data and does not test this.
+- **Temperature model at Maktau.** The Maktau site fit was not valid: its E0 stopped at the lower bound. The soil
+  moisture may confound the temperature fit. The Maktau years without a valid own fit use the pooled E0 of <Num k="pooledE0" digits={0} /> K. Of all site-years,
+  <Num k="fitMethodCounts.own" digits={0} /> use an own fit, <Num k="fitMethodCounts.site" digits={0} /> the site fit
+  and <Num k="fitMethodCounts.pooled" digits={0} /> the pooled E0. <Num k="fitMethodCounts.none" digits={0} /> Maktau site-years have no night sample and no model (2014 to 2017 have no fluxes; 2023 has the fill rows of MKT-01).
+- **Haltiala rain.** The rain is from Viikki. The SWC check dropped <Num k="events.haltiala.t5.droppedSwcCheck" digits={0} />
+  of <Num k="events.haltiala.t5.found" digits={0} /> 5 mm events. It assumes that a SWC rise shows rain at Haltiala.
+- **Long lags.** Only events without rain reach day 10. Late days therefore show dry spells. At
+  <S site="maktau" />, n fell from <Num k="summary.maktau.reco.day0N" digits={0} /> on day 0 to
+  <Num k={L('reco', 10, 'n')} digits={0} /> on day 10.
+- **Management.** The management rule dropped <Num k="events.qvidja.t5.droppedManagement" digits={0} /> of
+  <Num k="events.qvidja.t5.found" digits={0} /> 5 mm events at <S site="qvidja" />. The database has Maktau management
+  only for 2019 and 2020. Field work after 2020 can therefore be inside Maktau events.
+- **Open findings** <Cite ids={['anomaly-report']} />.
+  <a href={`${base}data-report/#finding-ANT-01`}>ANT-01</a>, <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a> and
+  <a href={`${base}data-report/#finding-VII-01`}>VII-01</a> (status: waits for provider): the local days of Anttila,
+  Särkisuo, Viikki and the Haltiala rain hold the true local hours 02:00 to 02:00, because the values sit 2 hours early. The night flag is from radiation and is not affected.
+  <a href={`${base}data-report/#finding-QVI-08`}>QVI-08</a> (status: waits for provider): events stop on days without rain data, so the Qvidja rain gap of 2022 gives no events.
+  <a href={`${base}data-report/#finding-QVI-09`}>QVI-09</a> (status: known loss, documented): the lost
+  meteorology is outside the season. <a href={`${base}data-report/#finding-QVI-16`}>QVI-16</a> (status: open): the frozen-soil
+  SWC is outside the season. <a href={`${base}data-report/#finding-MKT-01`}>MKT-01</a> (status: resolved, handled in the build):
+  events stop at the Maktau fill rows.
+  <a href={`${base}data-report/#finding-MKT-03`}>MKT-03</a> (status: new, verified, ask provider): the Maktau 2024 events may hold repeated NEE values.
+- **Snapshot.** The snapshot is not yet published as a release. The hashes in "Reproduce" identify it.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers come from `analysis/rain-pulse/results.json`. The script
+<a href={`${REPO_URL}/blob/main/analysis/rain-pulse/rain-pulse.py`}><code>analysis/rain-pulse/rain-pulse.py</code></a>
+writes it, `manifest.json` and the six SVG figures. It reads the snapshot built on {d.dataVersion.snapshot.builtAt}.
+Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
+The script stops when a hash does not agree. The folder
+<a href={`${REPO_URL}/tree/main/analysis/rain-pulse`}><code>analysis/rain-pulse/</code></a> has the lock file, the unit
+tests and a README.
+
+<div class="table-wrap">
+<table>
+<caption>Input files of the snapshot (database built {d.dataVersion.snapshot.builtAt}, calculated data built {d.dataVersion.snapshot.calcBuiltAt}).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col">SHA-256</th><th scope="col" class="num">Rows</th><th scope="col">Columns read</th></tr>
+</thead>
+<tbody>
+{inputs.map((r) => (<tr><td>{r.path}</td><td class="wrap"><code>{r.sha256}</code></td><td class="num">{r.rows}</td><td class="wrap"><code>{r.columns}</code></td></tr>))}
+</tbody>
+</table>
+</div>
+
+```sh
+npm run build:db && npm run calc                 # make the inputs (the hashes must agree with the script)
+uv run analysis/rain-pulse/rain-pulse.py --db db --calculated data/calculated
+uv run analysis/rain-pulse/rain-pulse.py --db db --calculated data/calculated --check
+npm run deep-dives -- --check                    # all dives, TypeScript and Python
+```

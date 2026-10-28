@@ -1,0 +1,1370 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="411.023622pt" viewBox="0 0 510.23622 411.023622" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="rain-pulse-fig1-title rain-pulse-fig1-desc">
+ <title id="rain-pulse-fig1-title">Night Reco relative to the soil temperature model, before and after a rain day, mean of the events per site and threshold (2, 5 and 10 mm).</title>
+ <desc id="rain-pulse-fig1-desc">Six panels, one per site. X axis: days since the rain day, -3 to 15 (local days). Y axis: night Reco divided by the temperature model, relative to the mean of days −3 to −1 (the night of day d runs from the evening of day d to the morning of day d + 1). Lines: events with at least 2, 5 and 10 mm of rain on day 0; the 5 mm line has a band of ± 1 standard error (SE); a day with fewer than 5 events is not drawn. Values for the 5 mm events (mean ± SE, n events): Anttila: 7 events; day 0: 0.77 ± 0.07 (n = 6); day 7: 1.24 ± 0.30 (n = 2, not drawn); last drawn day 0. Särkisuo: 6 events; day 0: 0.88 ± 0.04 (n = 6); day 7: 1.35 (single event, not drawn); last drawn day 0. Haltiala (Viikki rain): 9 events; day 0: 1.43 ± 0.39 (n = 8); day 7: 0.61 ± 0.05 (n = 2, not drawn); last drawn day 1. Qvidja: 5 events; day 0: 1.01 ± 0.21 (n = 5); day 7: no event; last drawn day 0. Viikki: 4 events; day 0: 1.15 ± 0.20 (n = 4, not drawn); day 7: 0.77 (single event, not drawn); no drawn day. Maktau: 34 events; day 0: 1.19 ± 0.04 (n = 32); day 7: 1.01 ± 0.13 (n = 11); last drawn day 15. Pre-pulse value: 1 (horizontal line).</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Night Reco relative to the soil temperature model, before and after a rain day, mean of the events per site and threshold (2, 5 and 10 mm).</dc:title>
+    <dc:description>Six panels, one per site. X axis: days since the rain day, -3 to 15 (local days). Y axis: night Reco divided by the temperature model, relative to the mean of days −3 to −1 (the night of day d runs from the evening of day d to the morning of day d + 1). Lines: events with at least 2, 5 and 10 mm of rain on day 0; the 5 mm line has a band of ± 1 standard error (SE); a day with fewer than 5 events is not drawn. Values for the 5 mm events (mean ± SE, n events): Anttila: 7 events; day 0: 0.77 ± 0.07 (n = 6); day 7: 1.24 ± 0.30 (n = 2, not drawn); last drawn day 0. Särkisuo: 6 events; day 0: 0.88 ± 0.04 (n = 6); day 7: 1.35 (single event, not drawn); last drawn day 0. Haltiala (Viikki rain): 9 events; day 0: 1.43 ± 0.39 (n = 8); day 7: 0.61 ± 0.05 (n = 2, not drawn); last drawn day 1. Qvidja: 5 events; day 0: 1.01 ± 0.21 (n = 5); day 7: no event; last drawn day 0. Viikki: 4 events; day 0: 1.15 ± 0.20 (n = 4, not drawn); day 7: 0.77 (single event, not drawn); no drawn day. Maktau: 34 events; day 0: 1.19 ± 0.04 (n = 32); day 7: 1.01 ± 0.13 (n = 11); last drawn day 15. Pre-pulse value: 1 (horizontal line).</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; db/observations.parquet sha256 922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; calculated/fluxes_30min.parquet sha256 6149ff22f5c114333a94e293247d6dd6385809a22ea2a7b1105e7ba3a35635ca</dc:relation>
+    <dc:source>analysis/rain-pulse/rain-pulse.py (git 8514235, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="rp1-figure_1">
+  <g id="rp1-patch_1">
+   <path d="M 0 411.023622 
+L 510.23622 411.023622 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="rp1-axes_1">
+   <g id="rp1-patch_2">
+    <path d="M 71.433071 195.23622 
+L 206.167323 195.23622 
+L 206.167323 92.480315 
+L 71.433071 92.480315 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp1-patch_3">
+    <path d="M 93.187039 195.23622 
+L 100.204448 195.23622 
+L 100.204448 92.480315 
+L 93.187039 92.480315 
+z
+" clip-path="url(#rp1-p3d80a2c359)" style="fill: #ececec"/>
+   </g>
+   <g id="rp1-line2d_1">
+    <path d="M 93.187039 195.23622 
+L 93.187039 92.480315 
+" clip-path="url(#rp1-p3d80a2c359)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp1-line2d_2">
+    <path d="M 71.433071 158.964181 
+L 206.167323 158.964181 
+" clip-path="url(#rp1-p3d80a2c359)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-matplotlib.axis_1">
+    <g id="rp1-xtick_1">
+     <g id="rp1-line2d_3">
+      <defs>
+       <path id="rp1-m0eeed30531" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.9"/>
+      </defs>
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="75.643516" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_2">
+     <g id="rp1-line2d_4">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="96.695743" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_3">
+     <g id="rp1-line2d_5">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="131.782788" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_4">
+     <g id="rp1-line2d_6">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="166.869833" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_5">
+     <g id="rp1-line2d_7">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="201.956877" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-matplotlib.axis_2">
+    <g id="rp1-ytick_1">
+     <g id="rp1-line2d_8">
+      <defs>
+       <path id="rp1-m0fdb175c36" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.9"/>
+      </defs>
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="71.433071" y="195.140534" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_1">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="199.129304" transform="rotate(-0 64.433071 199.129304)">0.5</text>
+     </g>
+    </g>
+    <g id="rp1-ytick_2">
+     <g id="rp1-line2d_9">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="71.433071" y="158.964181" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_2">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="162.952951" transform="rotate(-0 64.433071 162.952951)">1.0</text>
+     </g>
+    </g>
+    <g id="rp1-ytick_3">
+     <g id="rp1-line2d_10">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="71.433071" y="122.787828" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_3">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="126.776598" transform="rotate(-0 64.433071 126.776598)">1.5</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-FillBetweenPolyCollection_1">
+    <defs>
+     <path id="rp1-m4a52b9cec0" d="M 75.643516 -256.738596 
+L 75.643516 -250.292982 
+L 82.660925 -247.507 
+L 89.678334 -248.048002 
+L 96.695743 -230.513224 
+L 96.695743 -240.610894 
+L 96.695743 -240.610894 
+L 89.678334 -255.858606 
+L 82.660925 -253.911457 
+L 75.643516 -256.738596 
+z
+"/>
+    </defs>
+    <g clip-path="url(#rp1-p3d80a2c359)">
+     <use xlink:href="#rp1-m4a52b9cec0" x="0" y="411.023622" style="fill: #0072b2; fill-opacity: 0.2"/>
+    </g>
+   </g>
+   <g id="rp1-patch_4">
+    <path d="M 71.433071 195.23622 
+L 71.433071 92.480315 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-patch_5">
+    <path d="M 71.433071 195.23622 
+L 206.167323 195.23622 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-line2d_11">
+    <path d="M 75.643516 157.294019 
+L 82.660925 159.082358 
+L 89.678334 160.330593 
+L 96.695743 168.791544 
+" clip-path="url(#rp1-p3d80a2c359)" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #80b8d8; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-meb01c5cd75" d="M 0 2 
+C 0.530406 2 1.03916 1.789267 1.414214 1.414214 
+C 1.789267 1.03916 2 0.530406 2 0 
+C 2 -0.530406 1.789267 -1.03916 1.414214 -1.414214 
+C 1.03916 -1.789267 0.530406 -2 0 -2 
+C -0.530406 -2 -1.03916 -1.789267 -1.414214 -1.414214 
+C -1.789267 -1.03916 -2 -0.530406 -2 0 
+C -2 0.530406 -1.789267 1.03916 -1.414214 1.414214 
+C -1.03916 1.789267 -0.530406 2 0 2 
+z
+" style="stroke: #80b8d8"/>
+    </defs>
+    <g clip-path="url(#rp1-p3d80a2c359)">
+     <use xlink:href="#rp1-meb01c5cd75" x="75.643516" y="157.294019" style="fill: #80b8d8; stroke: #80b8d8"/>
+     <use xlink:href="#rp1-meb01c5cd75" x="82.660925" y="159.082358" style="fill: #80b8d8; stroke: #80b8d8"/>
+     <use xlink:href="#rp1-meb01c5cd75" x="89.678334" y="160.330593" style="fill: #80b8d8; stroke: #80b8d8"/>
+     <use xlink:href="#rp1-meb01c5cd75" x="96.695743" y="168.791544" style="fill: #80b8d8; stroke: #80b8d8"/>
+    </g>
+   </g>
+   <g id="rp1-text_4">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="71.433071" y="87.235528" transform="rotate(-0 71.433071 87.235528)">n = 8 · 6 · 4</text>
+   </g>
+   <g id="rp1-text_5">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="71.433071" y="72.480315" transform="rotate(-0 71.433071 72.480315)">👱🏻‍♂️🫛 Anttila</text>
+   </g>
+   <g id="rp1-line2d_12">
+    <path d="M 75.643516 157.507833 
+L 82.660925 160.314393 
+L 89.678334 159.070318 
+L 96.695743 175.461563 
+" clip-path="url(#rp1-p3d80a2c359)" style="fill: none; stroke: #0072b2; stroke-width: 2.2; stroke-linecap: square"/>
+    <defs>
+     <path id="rp1-m910e323bd7" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #0072b2"/>
+    </defs>
+    <g clip-path="url(#rp1-p3d80a2c359)">
+     <use xlink:href="#rp1-m910e323bd7" x="75.643516" y="157.507833" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#rp1-m910e323bd7" x="82.660925" y="160.314393" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#rp1-m910e323bd7" x="89.678334" y="159.070318" style="fill: #0072b2; stroke: #0072b2"/>
+     <use xlink:href="#rp1-m910e323bd7" x="96.695743" y="175.461563" style="fill: #0072b2; stroke: #0072b2"/>
+    </g>
+   </g>
+  </g>
+  <g id="rp1-axes_2">
+   <g id="rp1-patch_6">
+    <path d="M 219.640748 195.23622 
+L 354.375 195.23622 
+L 354.375 92.480315 
+L 219.640748 92.480315 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp1-patch_7">
+    <path d="M 241.394716 195.23622 
+L 248.412125 195.23622 
+L 248.412125 92.480315 
+L 241.394716 92.480315 
+z
+" clip-path="url(#rp1-p7710f3c7c4)" style="fill: #ececec"/>
+   </g>
+   <g id="rp1-line2d_13">
+    <path d="M 241.394716 195.23622 
+L 241.394716 92.480315 
+" clip-path="url(#rp1-p7710f3c7c4)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp1-line2d_14">
+    <path d="M 219.640748 158.964181 
+L 354.375 158.964181 
+" clip-path="url(#rp1-p7710f3c7c4)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-matplotlib.axis_3">
+    <g id="rp1-xtick_6">
+     <g id="rp1-line2d_15">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="223.851193" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_7">
+     <g id="rp1-line2d_16">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="244.90342" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_8">
+     <g id="rp1-line2d_17">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="279.990465" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_9">
+     <g id="rp1-line2d_18">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="315.07751" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_10">
+     <g id="rp1-line2d_19">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="350.164555" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-matplotlib.axis_4">
+    <g id="rp1-ytick_4">
+     <g id="rp1-line2d_20">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="219.640748" y="195.140534" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_5">
+     <g id="rp1-line2d_21">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="219.640748" y="158.964181" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_6">
+     <g id="rp1-line2d_22">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="219.640748" y="122.787828" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-FillBetweenPolyCollection_2">
+    <defs>
+     <path id="rp1-m33bd0bfb03" d="M 223.851193 -250.881463 
+L 223.851193 -244.729386 
+L 230.868602 -248.900858 
+L 237.886011 -253.306078 
+L 244.90342 -240.163369 
+L 244.90342 -246.125229 
+L 244.90342 -246.125229 
+L 237.886011 -257.418125 
+L 230.868602 -257.501277 
+L 223.851193 -250.881463 
+z
+"/>
+    </defs>
+    <g clip-path="url(#rp1-p7710f3c7c4)">
+     <use xlink:href="#rp1-m33bd0bfb03" x="0" y="411.023622" style="fill: #e69f00; fill-opacity: 0.2"/>
+    </g>
+   </g>
+   <g id="rp1-patch_8">
+    <path d="M 219.640748 195.23622 
+L 219.640748 92.480315 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-patch_9">
+    <path d="M 219.640748 195.23622 
+L 354.375 195.23622 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-line2d_23">
+    <path d="M 223.851193 162.368547 
+L 230.868602 156.879446 
+L 237.886011 158.400004 
+L 244.90342 169.818592 
+" clip-path="url(#rp1-p7710f3c7c4)" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #f2cf80; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m79d14d68ce" d="M -2 2 
+L 2 2 
+L 2 -2 
+L -2 -2 
+z
+" style="stroke: #f2cf80; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-p7710f3c7c4)">
+     <use xlink:href="#rp1-m79d14d68ce" x="223.851193" y="162.368547" style="fill: #f2cf80; stroke: #f2cf80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m79d14d68ce" x="230.868602" y="156.879446" style="fill: #f2cf80; stroke: #f2cf80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m79d14d68ce" x="237.886011" y="158.400004" style="fill: #f2cf80; stroke: #f2cf80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m79d14d68ce" x="244.90342" y="169.818592" style="fill: #f2cf80; stroke: #f2cf80; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-line2d_24">
+    <path d="M 223.851193 161.552559 
+M 237.886011 156.470656 
+L 244.90342 170.11317 
+" clip-path="url(#rp1-p7710f3c7c4)" style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #e69f00; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m46e14927b8" d="M -2 2 
+L 2 2 
+L 2 -2 
+L -2 -2 
+z
+" style="stroke: #e69f00; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-p7710f3c7c4)">
+     <use xlink:href="#rp1-m46e14927b8" x="223.851193" y="161.552559" style="fill: #ffffff; stroke: #e69f00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m46e14927b8" x="237.886011" y="156.470656" style="fill: #ffffff; stroke: #e69f00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m46e14927b8" x="244.90342" y="170.11317" style="fill: #ffffff; stroke: #e69f00; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-text_6">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="219.640748" y="87.235528" transform="rotate(-0 219.640748 87.235528)">n = 6 · 6 · 6</text>
+   </g>
+   <g id="rp1-text_7">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="219.640748" y="72.480315" transform="rotate(-0 219.640748 72.480315)">🐟🌱 Särkisuo</text>
+   </g>
+   <g id="rp1-line2d_25">
+    <path d="M 223.851193 163.218198 
+L 230.868602 157.822554 
+L 237.886011 155.661521 
+L 244.90342 167.879323 
+" clip-path="url(#rp1-p7710f3c7c4)" style="fill: none; stroke: #e69f00; stroke-width: 2.2; stroke-linecap: square"/>
+    <defs>
+     <path id="rp1-ma15a781d3f" d="M -2.5 2.5 
+L 2.5 2.5 
+L 2.5 -2.5 
+L -2.5 -2.5 
+z
+" style="stroke: #e69f00; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-p7710f3c7c4)">
+     <use xlink:href="#rp1-ma15a781d3f" x="223.851193" y="163.218198" style="fill: #e69f00; stroke: #e69f00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-ma15a781d3f" x="230.868602" y="157.822554" style="fill: #e69f00; stroke: #e69f00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-ma15a781d3f" x="237.886011" y="155.661521" style="fill: #e69f00; stroke: #e69f00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-ma15a781d3f" x="244.90342" y="167.879323" style="fill: #e69f00; stroke: #e69f00; stroke-linejoin: miter"/>
+    </g>
+   </g>
+  </g>
+  <g id="rp1-axes_3">
+   <g id="rp1-patch_10">
+    <path d="M 367.848425 195.23622 
+L 502.582677 195.23622 
+L 502.582677 92.480315 
+L 367.848425 92.480315 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp1-patch_11">
+    <path d="M 389.602393 195.23622 
+L 396.619802 195.23622 
+L 396.619802 92.480315 
+L 389.602393 92.480315 
+z
+" clip-path="url(#rp1-pba8f1a2b17)" style="fill: #ececec"/>
+   </g>
+   <g id="rp1-line2d_26">
+    <path d="M 389.602393 195.23622 
+L 389.602393 92.480315 
+" clip-path="url(#rp1-pba8f1a2b17)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp1-line2d_27">
+    <path d="M 367.848425 158.964181 
+L 502.582677 158.964181 
+" clip-path="url(#rp1-pba8f1a2b17)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-matplotlib.axis_5">
+    <g id="rp1-xtick_11">
+     <g id="rp1-line2d_28">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="372.058871" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_12">
+     <g id="rp1-line2d_29">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="393.111097" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_13">
+     <g id="rp1-line2d_30">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="428.198142" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_14">
+     <g id="rp1-line2d_31">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="463.285187" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-xtick_15">
+     <g id="rp1-line2d_32">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="498.372232" y="195.23622" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-matplotlib.axis_6">
+    <g id="rp1-ytick_7">
+     <g id="rp1-line2d_33">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="367.848425" y="195.140534" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_8">
+     <g id="rp1-line2d_34">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="367.848425" y="158.964181" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_9">
+     <g id="rp1-line2d_35">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="367.848425" y="122.787828" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-FillBetweenPolyCollection_3">
+    <defs>
+     <path id="rp1-m9a82f1f8c9" d="M 372.058871 -252.756597 
+L 372.058871 -248.66773 
+L 379.07628 -247.590222 
+L 386.093688 -253.520097 
+L 393.111097 -254.33999 
+L 400.128506 -242.649134 
+L 400.128506 -254.315714 
+L 400.128506 -254.315714 
+L 393.111097 -311.456693 
+L 386.093688 -257.921514 
+L 379.07628 -251.301695 
+L 372.058871 -252.756597 
+z
+"/>
+    </defs>
+    <g clip-path="url(#rp1-pba8f1a2b17)">
+     <use xlink:href="#rp1-m9a82f1f8c9" x="0" y="411.023622" style="fill: #56b4e9; fill-opacity: 0.2"/>
+    </g>
+   </g>
+   <g id="rp1-patch_12">
+    <path d="M 367.848425 195.23622 
+L 367.848425 92.480315 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-patch_13">
+    <path d="M 367.848425 195.23622 
+L 502.582677 195.23622 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-line2d_36">
+    <path d="M 372.058871 159.567556 
+L 379.07628 159.802869 
+L 386.093688 157.488502 
+L 393.111097 118.166671 
+" clip-path="url(#rp1-pba8f1a2b17)" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #aadaf4; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m13bf58fbb3" d="M 0 -2 
+L -2 2 
+L 2 2 
+z
+" style="stroke: #aadaf4; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-pba8f1a2b17)">
+     <use xlink:href="#rp1-m13bf58fbb3" x="372.058871" y="159.567556" style="fill: #aadaf4; stroke: #aadaf4; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m13bf58fbb3" x="379.07628" y="159.802869" style="fill: #aadaf4; stroke: #aadaf4; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m13bf58fbb3" x="386.093688" y="157.488502" style="fill: #aadaf4; stroke: #aadaf4; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m13bf58fbb3" x="393.111097" y="118.166671" style="fill: #aadaf4; stroke: #aadaf4; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-line2d_37">
+    <path d="M 372.058871 164.050043 
+L 379.07628 164.534482 
+L 386.093688 149.492037 
+L 393.111097 152.882619 
+L 400.128506 164.98185 
+L 407.145915 150.686905 
+L 414.163324 154.976398 
+" clip-path="url(#rp1-pba8f1a2b17)" style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #56b4e9; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m6c523a4f05" d="M 0 -2 
+L -2 2 
+L 2 2 
+z
+" style="stroke: #56b4e9; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-pba8f1a2b17)">
+     <use xlink:href="#rp1-m6c523a4f05" x="372.058871" y="164.050043" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m6c523a4f05" x="379.07628" y="164.534482" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m6c523a4f05" x="386.093688" y="149.492037" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m6c523a4f05" x="393.111097" y="152.882619" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m6c523a4f05" x="400.128506" y="164.98185" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m6c523a4f05" x="407.145915" y="150.686905" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m6c523a4f05" x="414.163324" y="154.976398" style="fill: #ffffff; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-text_8">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="367.848425" y="87.235528" transform="rotate(-0 367.848425 87.235528)">n = 6 · 8 · 5</text>
+   </g>
+   <g id="rp1-text_9">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="367.848425" y="72.480315" transform="rotate(-0 367.848425 72.480315)">🧚🌾 Haltiala (Viikki rain)</text>
+   </g>
+   <g id="rp1-line2d_38">
+    <path d="M 372.058871 160.311458 
+L 379.07628 161.577664 
+L 386.093688 155.302817 
+L 393.111097 128.125281 
+L 400.128506 162.541198 
+" clip-path="url(#rp1-pba8f1a2b17)" style="fill: none; stroke: #56b4e9; stroke-width: 2.2; stroke-linecap: square"/>
+    <defs>
+     <path id="rp1-mad8f11ab2b" d="M 0 -2.5 
+L -2.5 2.5 
+L 2.5 2.5 
+z
+" style="stroke: #56b4e9; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-pba8f1a2b17)">
+     <use xlink:href="#rp1-mad8f11ab2b" x="372.058871" y="160.311458" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mad8f11ab2b" x="379.07628" y="161.577664" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mad8f11ab2b" x="386.093688" y="155.302817" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mad8f11ab2b" x="393.111097" y="128.125281" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mad8f11ab2b" x="400.128506" y="162.541198" style="fill: #56b4e9; stroke: #56b4e9; stroke-linejoin: miter"/>
+    </g>
+   </g>
+  </g>
+  <g id="rp1-axes_4">
+   <g id="rp1-patch_14">
+    <path d="M 71.433071 361.700787 
+L 206.167323 361.700787 
+L 206.167323 258.944882 
+L 71.433071 258.944882 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp1-patch_15">
+    <path d="M 93.187039 361.700787 
+L 100.204448 361.700787 
+L 100.204448 258.944882 
+L 93.187039 258.944882 
+z
+" clip-path="url(#rp1-p23d8c097ee)" style="fill: #ececec"/>
+   </g>
+   <g id="rp1-line2d_39">
+    <path d="M 93.187039 361.700787 
+L 93.187039 258.944882 
+" clip-path="url(#rp1-p23d8c097ee)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp1-line2d_40">
+    <path d="M 71.433071 325.428748 
+L 206.167323 325.428748 
+" clip-path="url(#rp1-p23d8c097ee)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-matplotlib.axis_7">
+    <g id="rp1-xtick_16">
+     <g id="rp1-line2d_41">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="75.643516" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_10">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="75.643516" y="376.678326" transform="rotate(-0 75.643516 376.678326)">−3</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_17">
+     <g id="rp1-line2d_42">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="96.695743" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_11">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="96.695743" y="376.678326" transform="rotate(-0 96.695743 376.678326)">0</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_18">
+     <g id="rp1-line2d_43">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="131.782788" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_12">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="131.782788" y="376.678326" transform="rotate(-0 131.782788 376.678326)">5</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_19">
+     <g id="rp1-line2d_44">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="166.869833" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_13">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="166.869833" y="376.678326" transform="rotate(-0 166.869833 376.678326)">10</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_20">
+     <g id="rp1-line2d_45">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="201.956877" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_14">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="201.956877" y="376.678326" transform="rotate(-0 201.956877 376.678326)">15</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-matplotlib.axis_8">
+    <g id="rp1-ytick_10">
+     <g id="rp1-line2d_46">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="71.433071" y="361.605101" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_15">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="365.593871" transform="rotate(-0 64.433071 365.593871)">0.5</text>
+     </g>
+    </g>
+    <g id="rp1-ytick_11">
+     <g id="rp1-line2d_47">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="71.433071" y="325.428748" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_16">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="329.417518" transform="rotate(-0 64.433071 329.417518)">1.0</text>
+     </g>
+    </g>
+    <g id="rp1-ytick_12">
+     <g id="rp1-line2d_48">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="71.433071" y="289.252395" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_17">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="293.241165" transform="rotate(-0 64.433071 293.241165)">1.5</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-FillBetweenPolyCollection_4">
+    <defs>
+     <path id="rp1-m16b8a86399" d="M 82.660925 -92.19997 
+L 82.660925 -86.396349 
+L 89.678334 -80.686924 
+L 96.695743 -71.237068 
+L 96.695743 -101.384298 
+L 96.695743 -101.384298 
+L 89.678334 -87.147409 
+L 82.660925 -92.19997 
+z
+"/>
+    </defs>
+    <g clip-path="url(#rp1-p23d8c097ee)">
+     <use xlink:href="#rp1-m16b8a86399" x="0" y="411.023622" style="fill: #cc79a7; fill-opacity: 0.2"/>
+    </g>
+   </g>
+   <g id="rp1-patch_16">
+    <path d="M 71.433071 361.700787 
+L 71.433071 258.944882 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-patch_17">
+    <path d="M 71.433071 361.700787 
+L 206.167323 361.700787 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-line2d_49">
+    <path d="M 82.660925 324.436538 
+L 89.678334 327.110229 
+" clip-path="url(#rp1-p23d8c097ee)" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #e6bcd3; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-mf52f26d0d9" d="M -0 2.828427 
+L 2.828427 0 
+L 0 -2.828427 
+L -2.828427 -0 
+z
+" style="stroke: #e6bcd3; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-p23d8c097ee)">
+     <use xlink:href="#rp1-mf52f26d0d9" x="82.660925" y="324.436538" style="fill: #e6bcd3; stroke: #e6bcd3; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf52f26d0d9" x="89.678334" y="327.110229" style="fill: #e6bcd3; stroke: #e6bcd3; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-text_18">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="71.433071" y="253.700095" transform="rotate(-0 71.433071 253.700095)">n = 3 · 5 · 2</text>
+   </g>
+   <g id="rp1-text_19">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="71.433071" y="238.944882" transform="rotate(-0 71.433071 238.944882)">🐂🐝 Qvidja</text>
+   </g>
+   <g id="rp1-line2d_50">
+    <path d="M 82.660925 321.725462 
+L 89.678334 327.106456 
+L 96.695743 324.712939 
+" clip-path="url(#rp1-p23d8c097ee)" style="fill: none; stroke: #cc79a7; stroke-width: 2.2; stroke-linecap: square"/>
+    <defs>
+     <path id="rp1-mca075ab842" d="M -0 3.535534 
+L 3.535534 0 
+L 0 -3.535534 
+L -3.535534 -0 
+z
+" style="stroke: #cc79a7; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-p23d8c097ee)">
+     <use xlink:href="#rp1-mca075ab842" x="82.660925" y="321.725462" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mca075ab842" x="89.678334" y="327.106456" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mca075ab842" x="96.695743" y="324.712939" style="fill: #cc79a7; stroke: #cc79a7; stroke-linejoin: miter"/>
+    </g>
+   </g>
+  </g>
+  <g id="rp1-axes_5">
+   <g id="rp1-patch_18">
+    <path d="M 219.640748 361.700787 
+L 354.375 361.700787 
+L 354.375 258.944882 
+L 219.640748 258.944882 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp1-patch_19">
+    <path d="M 241.394716 361.700787 
+L 248.412125 361.700787 
+L 248.412125 258.944882 
+L 241.394716 258.944882 
+z
+" clip-path="url(#rp1-p246401207a)" style="fill: #ececec"/>
+   </g>
+   <g id="rp1-line2d_51">
+    <path d="M 241.394716 361.700787 
+L 241.394716 258.944882 
+" clip-path="url(#rp1-p246401207a)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp1-line2d_52">
+    <path d="M 219.640748 325.428748 
+L 354.375 325.428748 
+" clip-path="url(#rp1-p246401207a)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-matplotlib.axis_9">
+    <g id="rp1-xtick_21">
+     <g id="rp1-line2d_53">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="223.851193" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_20">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="223.851193" y="376.678326" transform="rotate(-0 223.851193 376.678326)">−3</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_22">
+     <g id="rp1-line2d_54">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="244.90342" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_21">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="244.90342" y="376.678326" transform="rotate(-0 244.90342 376.678326)">0</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_23">
+     <g id="rp1-line2d_55">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="279.990465" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_22">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="279.990465" y="376.678326" transform="rotate(-0 279.990465 376.678326)">5</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_24">
+     <g id="rp1-line2d_56">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="315.07751" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_23">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="315.07751" y="376.678326" transform="rotate(-0 315.07751 376.678326)">10</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_25">
+     <g id="rp1-line2d_57">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="350.164555" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_24">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="350.164555" y="376.678326" transform="rotate(-0 350.164555 376.678326)">15</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-matplotlib.axis_10">
+    <g id="rp1-ytick_13">
+     <g id="rp1-line2d_58">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="219.640748" y="361.605101" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_14">
+     <g id="rp1-line2d_59">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="219.640748" y="325.428748" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_15">
+     <g id="rp1-line2d_60">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="219.640748" y="289.252395" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-patch_20">
+    <path d="M 219.640748 361.700787 
+L 219.640748 258.944882 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-patch_21">
+    <path d="M 219.640748 361.700787 
+L 354.375 361.700787 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-line2d_61">
+    <path d="M 223.851193 340.308584 
+M 237.886011 312.816701 
+L 244.90342 313.407398 
+" clip-path="url(#rp1-p246401207a)" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #808080; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m433f5956d7" d="M 0 -2 
+L -1.902113 -0.618034 
+L -1.175571 1.618034 
+L 1.175571 1.618034 
+L 1.902113 -0.618034 
+z
+" style="stroke: #808080; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-p246401207a)">
+     <use xlink:href="#rp1-m433f5956d7" x="223.851193" y="340.308584" style="fill: #808080; stroke: #808080; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m433f5956d7" x="237.886011" y="312.816701" style="fill: #808080; stroke: #808080; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m433f5956d7" x="244.90342" y="313.407398" style="fill: #808080; stroke: #808080; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-line2d_62">
+    <path d="M 223.851193 338.4514 
+" clip-path="url(#rp1-p246401207a)" style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m4862aa2f7e" d="M 0 -2 
+L -1.902113 -0.618034 
+L -1.175571 1.618034 
+L 1.175571 1.618034 
+L 1.902113 -0.618034 
+z
+" style="stroke: #000000; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-p246401207a)">
+     <use xlink:href="#rp1-m4862aa2f7e" x="223.851193" y="338.4514" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-text_25">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="219.640748" y="253.700095" transform="rotate(-0 219.640748 253.700095)">n = 5 · 4 · 3</text>
+   </g>
+   <g id="rp1-text_26">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="219.640748" y="238.944882" transform="rotate(-0 219.640748 238.944882)">👩🏻‍🔬🎓 Viikki</text>
+   </g>
+  </g>
+  <g id="rp1-axes_6">
+   <g id="rp1-patch_22">
+    <path d="M 367.848425 361.700787 
+L 502.582677 361.700787 
+L 502.582677 258.944882 
+L 367.848425 258.944882 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp1-patch_23">
+    <path d="M 389.602393 361.700787 
+L 396.619802 361.700787 
+L 396.619802 258.944882 
+L 389.602393 258.944882 
+z
+" clip-path="url(#rp1-pcdc6999877)" style="fill: #ececec"/>
+   </g>
+   <g id="rp1-line2d_63">
+    <path d="M 389.602393 361.700787 
+L 389.602393 258.944882 
+" clip-path="url(#rp1-pcdc6999877)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp1-line2d_64">
+    <path d="M 367.848425 325.428748 
+L 502.582677 325.428748 
+" clip-path="url(#rp1-pcdc6999877)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-matplotlib.axis_11">
+    <g id="rp1-xtick_26">
+     <g id="rp1-line2d_65">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="372.058871" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_27">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="372.058871" y="376.678326" transform="rotate(-0 372.058871 376.678326)">−3</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_27">
+     <g id="rp1-line2d_66">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="393.111097" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_28">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="393.111097" y="376.678326" transform="rotate(-0 393.111097 376.678326)">0</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_28">
+     <g id="rp1-line2d_67">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="428.198142" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_29">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="428.198142" y="376.678326" transform="rotate(-0 428.198142 376.678326)">5</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_29">
+     <g id="rp1-line2d_68">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="463.285187" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_30">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="463.285187" y="376.678326" transform="rotate(-0 463.285187 376.678326)">10</text>
+     </g>
+    </g>
+    <g id="rp1-xtick_30">
+     <g id="rp1-line2d_69">
+      <g>
+       <use xlink:href="#rp1-m0eeed30531" x="498.372232" y="361.700787" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp1-text_31">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="498.372232" y="376.678326" transform="rotate(-0 498.372232 376.678326)">15</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-matplotlib.axis_12">
+    <g id="rp1-ytick_16">
+     <g id="rp1-line2d_70">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="367.848425" y="361.605101" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_17">
+     <g id="rp1-line2d_71">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="367.848425" y="325.428748" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp1-ytick_18">
+     <g id="rp1-line2d_72">
+      <g>
+       <use xlink:href="#rp1-m0fdb175c36" x="367.848425" y="289.252395" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp1-FillBetweenPolyCollection_5">
+    <defs>
+     <path id="rp1-m745b20d9f3" d="M 372.058871 -88.2552 
+L 372.058871 -83.482079 
+L 379.07628 -78.702094 
+L 386.093688 -87.272392 
+L 393.111097 -96.677354 
+L 400.128506 -96.739895 
+L 407.145915 -85.637066 
+L 414.163324 -92.060458 
+L 421.180733 -85.219741 
+L 428.198142 -82.717008 
+L 435.215551 -81.219503 
+L 442.23296 -76.642619 
+L 449.250369 -73.086603 
+L 456.267778 -69.046957 
+L 463.285187 -62.773981 
+L 470.302596 -61.721316 
+L 477.320005 -56.409449 
+L 484.337414 -56.700272 
+L 491.354823 -56.674205 
+L 498.372232 -57.927711 
+L 498.372232 -70.905781 
+L 498.372232 -70.905781 
+L 491.354823 -66.457452 
+L 484.337414 -65.361753 
+L 477.320005 -66.613203 
+L 470.302596 -79.497525 
+L 463.285187 -82.410827 
+L 456.267778 -93.469829 
+L 449.250369 -96.424317 
+L 442.23296 -95.300161 
+L 435.215551 -100.15291 
+L 428.198142 -97.146797 
+L 421.180733 -95.443397 
+L 414.163324 -106.483396 
+L 407.145915 -98.602275 
+L 400.128506 -102.108969 
+L 393.111097 -101.882743 
+L 386.093688 -90.035458 
+L 379.07628 -85.636864 
+L 372.058871 -88.2552 
+z
+"/>
+    </defs>
+    <g clip-path="url(#rp1-pcdc6999877)">
+     <use xlink:href="#rp1-m745b20d9f3" x="0" y="411.023622" style="fill: #d55e00; fill-opacity: 0.2"/>
+    </g>
+   </g>
+   <g id="rp1-patch_24">
+    <path d="M 367.848425 361.700787 
+L 367.848425 258.944882 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-patch_25">
+    <path d="M 367.848425 361.700787 
+L 502.582677 361.700787 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp1-line2d_73">
+    <path d="M 372.058871 324.210372 
+L 379.07628 327.438142 
+L 386.093688 324.654927 
+L 393.111097 315.857941 
+L 400.128506 315.692583 
+L 407.145915 318.760558 
+L 414.163324 317.061545 
+L 421.180733 316.877664 
+L 428.198142 320.862236 
+L 435.215551 318.388325 
+L 442.23296 324.397388 
+L 449.250369 332.294697 
+L 456.267778 338.478514 
+L 463.285187 340.700969 
+L 470.302596 340.685739 
+L 477.320005 340.727724 
+L 484.337414 346.964844 
+L 491.354823 345.272144 
+L 498.372232 343.855947 
+" clip-path="url(#rp1-pcdc6999877)" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #eaae80; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m742a0e4699" d="M -0 2 
+L 2 -2 
+L -2 -2 
+z
+" style="stroke: #eaae80; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-pcdc6999877)">
+     <use xlink:href="#rp1-m742a0e4699" x="372.058871" y="324.210372" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="379.07628" y="327.438142" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="386.093688" y="324.654927" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="393.111097" y="315.857941" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="400.128506" y="315.692583" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="407.145915" y="318.760558" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="414.163324" y="317.061545" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="421.180733" y="316.877664" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="428.198142" y="320.862236" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="435.215551" y="318.388325" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="442.23296" y="324.397388" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="449.250369" y="332.294697" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="456.267778" y="338.478514" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="463.285187" y="340.700969" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="470.302596" y="340.685739" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="477.320005" y="340.727724" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="484.337414" y="346.964844" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="491.354823" y="345.272144" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-m742a0e4699" x="498.372232" y="343.855947" style="fill: #eaae80; stroke: #eaae80; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-line2d_74">
+    <path d="M 372.058871 324.684833 
+L 379.07628 330.557391 
+L 386.093688 321.073778 
+L 393.111097 310.712045 
+L 400.128506 312.892674 
+L 407.145915 313.262615 
+L 414.163324 311.485206 
+L 421.180733 323.119243 
+L 428.198142 324.308667 
+L 435.215551 325.479953 
+L 442.23296 327.022554 
+L 449.250369 327.593414 
+L 456.267778 327.692673 
+L 463.285187 329.550864 
+L 470.302596 331.319996 
+L 477.320005 336.876584 
+L 484.337414 337.363218 
+L 491.354823 339.882328 
+L 498.372232 337.124336 
+" clip-path="url(#rp1-pcdc6999877)" style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #d55e00; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-mf209ef62e8" d="M -0 2 
+L 2 -2 
+L -2 -2 
+z
+" style="stroke: #d55e00; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-pcdc6999877)">
+     <use xlink:href="#rp1-mf209ef62e8" x="372.058871" y="324.684833" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="379.07628" y="330.557391" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="386.093688" y="321.073778" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="393.111097" y="310.712045" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="400.128506" y="312.892674" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="407.145915" y="313.262615" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="414.163324" y="311.485206" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="421.180733" y="323.119243" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="428.198142" y="324.308667" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="435.215551" y="325.479953" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="442.23296" y="327.022554" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="449.250369" y="327.593414" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="456.267778" y="327.692673" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="463.285187" y="329.550864" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="470.302596" y="331.319996" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="477.320005" y="336.876584" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="484.337414" y="337.363218" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="491.354823" y="339.882328" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf209ef62e8" x="498.372232" y="337.124336" style="fill: #ffffff; stroke: #d55e00; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="rp1-text_32">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="367.848425" y="253.700095" transform="rotate(-0 367.848425 253.700095)">n = 41 · 32 · 20</text>
+   </g>
+   <g id="rp1-text_33">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="367.848425" y="238.944882" transform="rotate(-0 367.848425 238.944882)">🇰🇪🌽 Maktau</text>
+   </g>
+   <g id="rp1-line2d_75">
+    <path d="M 372.058871 325.154983 
+L 379.07628 328.854143 
+L 386.093688 322.369697 
+L 393.111097 311.743574 
+L 400.128506 311.59919 
+L 407.145915 318.903952 
+L 414.163324 311.751695 
+L 421.180733 320.692053 
+L 428.198142 321.09172 
+L 435.215551 320.337416 
+L 442.23296 325.052232 
+L 449.250369 326.268162 
+L 456.267778 329.765229 
+L 463.285187 338.431218 
+L 470.302596 340.414201 
+L 477.320005 349.512296 
+L 484.337414 349.992609 
+L 491.354823 349.457793 
+L 498.372232 346.606876 
+" clip-path="url(#rp1-pcdc6999877)" style="fill: none; stroke: #d55e00; stroke-width: 2.2; stroke-linecap: square"/>
+    <defs>
+     <path id="rp1-mf7b5ca4882" d="M -0 2.5 
+L 2.5 -2.5 
+L -2.5 -2.5 
+z
+" style="stroke: #d55e00; stroke-linejoin: miter"/>
+    </defs>
+    <g clip-path="url(#rp1-pcdc6999877)">
+     <use xlink:href="#rp1-mf7b5ca4882" x="372.058871" y="325.154983" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="379.07628" y="328.854143" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="386.093688" y="322.369697" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="393.111097" y="311.743574" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="400.128506" y="311.59919" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="407.145915" y="318.903952" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="414.163324" y="311.751695" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="421.180733" y="320.692053" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="428.198142" y="321.09172" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="435.215551" y="320.337416" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="442.23296" y="325.052232" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="449.250369" y="326.268162" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="456.267778" y="329.765229" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="463.285187" y="338.431218" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="470.302596" y="340.414201" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="477.320005" y="349.512296" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="484.337414" y="349.992609" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="491.354823" y="349.457793" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+     <use xlink:href="#rp1-mf7b5ca4882" x="498.372232" y="346.606876" style="fill: #d55e00; stroke: #d55e00; stroke-linejoin: miter"/>
+    </g>
+   </g>
+  </g>
+  <g id="rp1-text_34">
+   <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="255.11811" y="402.155631" transform="rotate(-0 255.11811 402.155631)">Days since the rain day (local days: Finland UTC+2, Maktau UTC+3)</text>
+  </g>
+  <g id="rp1-text_35">
+   <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(14.776703 297.981538) rotate(-90)">Night Reco / temperature model,</text>
+   <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(28.279779 297.981538) rotate(-90)">relative to days −3 to −1</text>
+  </g>
+  <g id="rp1-text_36">
+   <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #555555; font-variant-numeric: tabular-nums" transform="translate(78.45033 39.610209)">Rain on day 0; days −3 to −1 below the threshold. n = events on day 0 for ≥ 2 · 5 · 10 mm;</text>
+   <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #555555; font-variant-numeric: tabular-nums" transform="translate(184.986424 52.210209)">a day with fewer than 5 events is not drawn.</text>
+  </g>
+  <g id="rp1-legend_1">
+   <g id="rp1-line2d_76">
+    <path d="M 118.966854 15.808477 
+L 132.616854 15.808477 
+L 146.266854 15.808477 
+" style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #909090; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-mad450d758a" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #909090"/>
+    </defs>
+    <g>
+     <use xlink:href="#rp1-mad450d758a" x="132.616854" y="15.808477" style="fill: #909090; stroke: #909090"/>
+    </g>
+   </g>
+   <g id="rp1-text_37">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="154.666854" y="19.483477" transform="rotate(-0 154.666854 19.483477)">≥ 2 mm</text>
+   </g>
+   <g id="rp1-line2d_77">
+    <path d="M 209.875526 15.808477 
+L 223.525526 15.808477 
+L 237.175526 15.808477 
+" style="fill: none; stroke: #222222; stroke-width: 2.2; stroke-linecap: square"/>
+    <defs>
+     <path id="rp1-m55fdb29dc8" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #222222"/>
+    </defs>
+    <g>
+     <use xlink:href="#rp1-m55fdb29dc8" x="223.525526" y="15.808477" style="fill: #222222; stroke: #222222"/>
+    </g>
+   </g>
+   <g id="rp1-text_38">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="245.575526" y="19.483477" transform="rotate(-0 245.575526 19.483477)">≥ 5 mm (band ± SE)</text>
+   </g>
+   <g id="rp1-line2d_78">
+    <path d="M 367.508416 15.808477 
+L 381.158416 15.808477 
+L 394.808416 15.808477 
+" style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #222222; stroke-width: 1.3"/>
+    <defs>
+     <path id="rp1-m3912f4df04" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #222222"/>
+    </defs>
+    <g>
+     <use xlink:href="#rp1-m3912f4df04" x="381.158416" y="15.808477" style="fill: #ffffff; stroke: #222222"/>
+    </g>
+   </g>
+   <g id="rp1-text_39">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="403.208416" y="19.483477" transform="rotate(-0 403.208416 19.483477)">≥ 10 mm</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="rp1-p3d80a2c359">
+   <rect x="71.433071" y="92.480315" width="134.734252" height="102.755906"/>
+  </clipPath>
+  <clipPath id="rp1-p7710f3c7c4">
+   <rect x="219.640748" y="92.480315" width="134.734252" height="102.755906"/>
+  </clipPath>
+  <clipPath id="rp1-pba8f1a2b17">
+   <rect x="367.848425" y="92.480315" width="134.734252" height="102.755906"/>
+  </clipPath>
+  <clipPath id="rp1-p23d8c097ee">
+   <rect x="71.433071" y="258.944882" width="134.734252" height="102.755906"/>
+  </clipPath>
+  <clipPath id="rp1-p246401207a">
+   <rect x="219.640748" y="258.944882" width="134.734252" height="102.755906"/>
+  </clipPath>
+  <clipPath id="rp1-pcdc6999877">
+   <rect x="367.848425" y="258.944882" width="134.734252" height="102.755906"/>
+  </clipPath>
+ </defs>
+</svg>

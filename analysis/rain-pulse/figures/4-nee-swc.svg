@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="382.677165pt" viewBox="0 0 510.23622 382.677165" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="rain-pulse-fig4-title rain-pulse-fig4-desc">
+ <title id="rain-pulse-fig4-title">Daily NEE pulse (mean of days 0 to 2 minus the pre-pulse mean) against the soil water content anomaly before the rain, one marker per 5 mm event.</title>
+ <desc id="rain-pulse-fig4-desc">Six panels, one per site. X axis: soil water content (SWC) of the day before the rain minus the site median of the season, in m3 m-3. Y axis: pulse = mean of days 0 to 2 of daily NEE, minus the pre-pulse mean, in µmol CO2 m-2 s-1. One marker per event with at least 5 mm of rain; line = ordinary least squares (OLS) fit. Per site: Anttila: n = 2, too few events for a fit. Särkisuo: n = 2, too few events for a fit. Haltiala (Viikki rain): Pearson r = 0.49 (p = 0.406), Spearman ρ = 0.20 (p = 0.747), slope 15.3 µmol CO2 m-2 s-1 per m3 m-3, n = 5. Qvidja: n = 2, too few events for a fit. Viikki: n = 2, too few events for a fit. Maktau: Pearson r = −0.45 (p = 0.023), Spearman ρ = −0.59 (p = 0.001), slope −5.0 µmol CO2 m-2 s-1 per m3 m-3, n = 26.</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Daily NEE pulse (mean of days 0 to 2 minus the pre-pulse mean) against the soil water content anomaly before the rain, one marker per 5 mm event.</dc:title>
+    <dc:description>Six panels, one per site. X axis: soil water content (SWC) of the day before the rain minus the site median of the season, in m3 m-3. Y axis: pulse = mean of days 0 to 2 of daily NEE, minus the pre-pulse mean, in µmol CO2 m-2 s-1. One marker per event with at least 5 mm of rain; line = ordinary least squares (OLS) fit. Per site: Anttila: n = 2, too few events for a fit. Särkisuo: n = 2, too few events for a fit. Haltiala (Viikki rain): Pearson r = 0.49 (p = 0.406), Spearman ρ = 0.20 (p = 0.747), slope 15.3 µmol CO2 m-2 s-1 per m3 m-3, n = 5. Qvidja: n = 2, too few events for a fit. Viikki: n = 2, too few events for a fit. Maktau: Pearson r = −0.45 (p = 0.023), Spearman ρ = −0.59 (p = 0.001), slope −5.0 µmol CO2 m-2 s-1 per m3 m-3, n = 26.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/variables.parquet sha256 06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e; db/observations.parquet sha256 922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; calculated/fluxes_30min.parquet sha256 6149ff22f5c114333a94e293247d6dd6385809a22ea2a7b1105e7ba3a35635ca</dc:relation>
+    <dc:source>analysis/rain-pulse/rain-pulse.py (git 8514235, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="rp4-figure_1">
+  <g id="rp4-patch_1">
+   <path d="M 0 382.677165 
+L 510.23622 382.677165 
+L 510.23622 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="rp4-axes_1">
+   <g id="rp4-patch_2">
+    <path d="M 71.433071 162.564765 
+L 206.167323 162.564765 
+L 206.167323 57.401575 
+L 71.433071 57.401575 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp4-line2d_1">
+    <path d="M 71.433071 104.833042 
+L 206.167323 104.833042 
+" clip-path="url(#rp4-p5747908946)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-line2d_2">
+    <path d="M 99.052282 162.564765 
+L 99.052282 57.401575 
+" clip-path="url(#rp4-p5747908946)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp4-matplotlib.axis_1">
+    <g id="rp4-xtick_1">
+     <g id="rp4-line2d_3">
+      <defs>
+       <path id="rp4-m59b194c1eb" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.9"/>
+      </defs>
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="99.052282" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_2">
+     <g id="rp4-line2d_4">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="133.823241" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_3">
+     <g id="rp4-line2d_5">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="168.594201" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_4">
+     <g id="rp4-line2d_6">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="203.36516" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-matplotlib.axis_2">
+    <g id="rp4-ytick_1">
+     <g id="rp4-line2d_7">
+      <defs>
+       <path id="rp4-m2cf41f6c1b" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.9"/>
+      </defs>
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="151.66087" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_1">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="155.64964" transform="rotate(-0 64.433071 155.64964)">−4</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_2">
+     <g id="rp4-line2d_8">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="128.246956" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_2">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="132.235726" transform="rotate(-0 64.433071 132.235726)">−2</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_3">
+     <g id="rp4-line2d_9">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="104.833042" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_3">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="108.821811" transform="rotate(-0 64.433071 108.821811)">0</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_4">
+     <g id="rp4-line2d_10">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="81.419128" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_4">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="85.407897" transform="rotate(-0 64.433071 85.407897)">2</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_5">
+     <g id="rp4-line2d_11">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="58.005214" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_5">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="61.993983" transform="rotate(-0 64.433071 61.993983)">4</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-patch_3">
+    <path d="M 71.433071 162.564765 
+L 71.433071 57.401575 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-patch_4">
+    <path d="M 71.433071 162.564765 
+L 206.167323 162.564765 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-PathCollection_1">
+    <defs>
+     <path id="rp4-m85bca1b08d" d="M 0 3.24037 
+C 0.859356 3.24037 1.683631 2.898944 2.291288 2.291288 
+C 2.898944 1.683631 3.24037 0.859356 3.24037 0 
+C 3.24037 -0.859356 2.898944 -1.683631 2.291288 -2.291288 
+C 1.683631 -2.898944 0.859356 -3.24037 0 -3.24037 
+C -0.859356 -3.24037 -1.683631 -2.898944 -2.291288 -2.291288 
+C -2.898944 -1.683631 -3.24037 -0.859356 -3.24037 0 
+C -3.24037 0.859356 -2.898944 1.683631 -2.291288 2.291288 
+C -1.683631 2.898944 -0.859356 3.24037 0 3.24037 
+z
+" style="stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </defs>
+    <g clip-path="url(#rp4-p5747908946)">
+     <use xlink:href="#rp4-m85bca1b08d" x="123.325309" y="64.654209" style="fill: #0072b2; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m85bca1b08d" x="121.660649" y="101.939479" style="fill: #0072b2; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </g>
+   </g>
+   <g id="rp4-text_6">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="71.433071" y="52.08457" transform="rotate(-0 71.433071 52.08457)">n = 2 (too few events)</text>
+   </g>
+   <g id="rp4-text_7">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="71.433071" y="37.401575" transform="rotate(-0 71.433071 37.401575)">👱🏻‍♂️🫛 Anttila</text>
+   </g>
+  </g>
+  <g id="rp4-axes_2">
+   <g id="rp4-patch_5">
+    <path d="M 219.640748 162.564765 
+L 354.375 162.564765 
+L 354.375 57.401575 
+L 219.640748 57.401575 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp4-line2d_12">
+    <path d="M 219.640748 104.833042 
+L 354.375 104.833042 
+" clip-path="url(#rp4-p44db0b94dd)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-line2d_13">
+    <path d="M 247.259959 162.564765 
+L 247.259959 57.401575 
+" clip-path="url(#rp4-p44db0b94dd)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp4-matplotlib.axis_3">
+    <g id="rp4-xtick_5">
+     <g id="rp4-line2d_14">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="247.259959" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_6">
+     <g id="rp4-line2d_15">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="282.030918" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_7">
+     <g id="rp4-line2d_16">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="316.801878" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_8">
+     <g id="rp4-line2d_17">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="351.572837" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-matplotlib.axis_4">
+    <g id="rp4-ytick_6">
+     <g id="rp4-line2d_18">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="151.66087" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_7">
+     <g id="rp4-line2d_19">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="128.246956" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_8">
+     <g id="rp4-line2d_20">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="104.833042" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_9">
+     <g id="rp4-line2d_21">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="81.419128" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_10">
+     <g id="rp4-line2d_22">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="58.005214" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-patch_6">
+    <path d="M 219.640748 162.564765 
+L 219.640748 57.401575 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-patch_7">
+    <path d="M 219.640748 162.564765 
+L 354.375 162.564765 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-PathCollection_2">
+    <defs>
+     <path id="rp4-mffddecee40" d="M -3.24037 3.24037 
+L 3.24037 3.24037 
+L 3.24037 -3.24037 
+L -3.24037 -3.24037 
+z
+" style="stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </defs>
+    <g clip-path="url(#rp4-p44db0b94dd)">
+     <use xlink:href="#rp4-mffddecee40" x="239.279299" y="107.751145" style="fill: #e69f00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-mffddecee40" x="345.082983" y="89.557441" style="fill: #e69f00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </g>
+   </g>
+   <g id="rp4-text_8">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="219.640748" y="52.08457" transform="rotate(-0 219.640748 52.08457)">n = 2 (too few events)</text>
+   </g>
+   <g id="rp4-text_9">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="219.640748" y="37.401575" transform="rotate(-0 219.640748 37.401575)">🐟🌱 Särkisuo</text>
+   </g>
+  </g>
+  <g id="rp4-axes_3">
+   <g id="rp4-patch_8">
+    <path d="M 367.848425 162.564765 
+L 502.582677 162.564765 
+L 502.582677 57.401575 
+L 367.848425 57.401575 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp4-line2d_23">
+    <path d="M 367.848425 104.833042 
+L 502.582677 104.833042 
+" clip-path="url(#rp4-pd29daa1999)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-line2d_24">
+    <path d="M 395.467636 162.564765 
+L 395.467636 57.401575 
+" clip-path="url(#rp4-pd29daa1999)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp4-matplotlib.axis_5">
+    <g id="rp4-xtick_9">
+     <g id="rp4-line2d_25">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="395.467636" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_10">
+     <g id="rp4-line2d_26">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="430.238595" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_11">
+     <g id="rp4-line2d_27">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="465.009555" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-xtick_12">
+     <g id="rp4-line2d_28">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="499.780515" y="162.564765" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-matplotlib.axis_6">
+    <g id="rp4-ytick_11">
+     <g id="rp4-line2d_29">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="151.66087" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_12">
+     <g id="rp4-line2d_30">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="128.246956" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_13">
+     <g id="rp4-line2d_31">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="104.833042" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_14">
+     <g id="rp4-line2d_32">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="81.419128" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_15">
+     <g id="rp4-line2d_33">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="58.005214" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-patch_9">
+    <path d="M 367.848425 162.564765 
+L 367.848425 57.401575 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-patch_10">
+    <path d="M 367.848425 162.564765 
+L 502.582677 162.564765 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-PathCollection_3">
+    <defs>
+     <path id="rp4-m5bcf92270a" d="M 0 -3.24037 
+L -3.24037 3.24037 
+L 3.24037 3.24037 
+z
+" style="stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </defs>
+    <g clip-path="url(#rp4-pd29daa1999)">
+     <use xlink:href="#rp4-m5bcf92270a" x="436.685711" y="103.056843" style="fill: #56b4e9; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m5bcf92270a" x="377.140443" y="155.312131" style="fill: #56b4e9; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m5bcf92270a" x="425.819786" y="114.601013" style="fill: #56b4e9; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m5bcf92270a" x="393.43933" y="98.76831" style="fill: #56b4e9; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m5bcf92270a" x="401.480114" y="89.745007" style="fill: #56b4e9; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </g>
+   </g>
+   <g id="rp4-text_10">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="367.848425" y="52.08457" transform="rotate(-0 367.848425 52.08457)">r = 0.49, ρ = 0.20, n = 5</text>
+   </g>
+   <g id="rp4-text_11">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="367.848425" y="37.401575" transform="rotate(-0 367.848425 37.401575)">🧚🌾 Haltiala (Viikki rain)</text>
+   </g>
+   <g id="rp4-line2d_34">
+    <path d="M 377.140443 127.650153 
+L 436.685711 96.943169 
+" clip-path="url(#rp4-pd29daa1999)" style="fill: none; stroke: #56b4e9; stroke-width: 2.2; stroke-linecap: square"/>
+   </g>
+  </g>
+  <g id="rp4-axes_4">
+   <g id="rp4-patch_11">
+    <path d="M 71.433071 332.929134 
+L 206.167323 332.929134 
+L 206.167323 227.765943 
+L 71.433071 227.765943 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp4-line2d_35">
+    <path d="M 71.433071 275.197411 
+L 206.167323 275.197411 
+" clip-path="url(#rp4-p2787c9a580)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-line2d_36">
+    <path d="M 99.052282 332.929134 
+L 99.052282 227.765943 
+" clip-path="url(#rp4-p2787c9a580)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp4-matplotlib.axis_7">
+    <g id="rp4-xtick_13">
+     <g id="rp4-line2d_37">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="99.052282" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_12">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="99.052282" y="347.906673" transform="rotate(-0 99.052282 347.906673)">0.0</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_14">
+     <g id="rp4-line2d_38">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="133.823241" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_13">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="133.823241" y="347.906673" transform="rotate(-0 133.823241 347.906673)">0.1</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_15">
+     <g id="rp4-line2d_39">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="168.594201" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_14">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="168.594201" y="347.906673" transform="rotate(-0 168.594201 347.906673)">0.2</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_16">
+     <g id="rp4-line2d_40">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="203.36516" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_15">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="203.36516" y="347.906673" transform="rotate(-0 203.36516 347.906673)">0.3</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-matplotlib.axis_8">
+    <g id="rp4-ytick_16">
+     <g id="rp4-line2d_41">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="322.025239" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_16">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="326.014008" transform="rotate(-0 64.433071 326.014008)">−4</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_17">
+     <g id="rp4-line2d_42">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="298.611325" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_17">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="302.600094" transform="rotate(-0 64.433071 302.600094)">−2</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_18">
+     <g id="rp4-line2d_43">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="275.197411" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_18">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="279.18618" transform="rotate(-0 64.433071 279.18618)">0</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_19">
+     <g id="rp4-line2d_44">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="251.783496" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_19">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="255.772266" transform="rotate(-0 64.433071 255.772266)">2</text>
+     </g>
+    </g>
+    <g id="rp4-ytick_20">
+     <g id="rp4-line2d_45">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="71.433071" y="228.369582" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_20">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="64.433071" y="232.358352" transform="rotate(-0 64.433071 232.358352)">4</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-patch_12">
+    <path d="M 71.433071 332.929134 
+L 71.433071 227.765943 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-patch_13">
+    <path d="M 71.433071 332.929134 
+L 206.167323 332.929134 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-PathCollection_4">
+    <defs>
+     <path id="rp4-ma2466ddfdf" d="M -0 4.582576 
+L 4.582576 0 
+L 0 -4.582576 
+L -4.582576 -0 
+z
+" style="stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </defs>
+    <g clip-path="url(#rp4-p2787c9a580)">
+     <use xlink:href="#rp4-ma2466ddfdf" x="99.691007" y="279.426014" style="fill: #cc79a7; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-ma2466ddfdf" x="82.000455" y="308.641873" style="fill: #cc79a7; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </g>
+   </g>
+   <g id="rp4-text_21">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="71.433071" y="222.448938" transform="rotate(-0 71.433071 222.448938)">n = 2 (too few events)</text>
+   </g>
+   <g id="rp4-text_22">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="71.433071" y="207.765943" transform="rotate(-0 71.433071 207.765943)">🐂🐝 Qvidja</text>
+   </g>
+  </g>
+  <g id="rp4-axes_5">
+   <g id="rp4-patch_14">
+    <path d="M 219.640748 332.929134 
+L 354.375 332.929134 
+L 354.375 227.765943 
+L 219.640748 227.765943 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp4-line2d_46">
+    <path d="M 219.640748 275.197411 
+L 354.375 275.197411 
+" clip-path="url(#rp4-p84539044bf)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-line2d_47">
+    <path d="M 247.259959 332.929134 
+L 247.259959 227.765943 
+" clip-path="url(#rp4-p84539044bf)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp4-matplotlib.axis_9">
+    <g id="rp4-xtick_17">
+     <g id="rp4-line2d_48">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="247.259959" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_23">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="247.259959" y="347.906673" transform="rotate(-0 247.259959 347.906673)">0.0</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_18">
+     <g id="rp4-line2d_49">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="282.030918" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_24">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="282.030918" y="347.906673" transform="rotate(-0 282.030918 347.906673)">0.1</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_19">
+     <g id="rp4-line2d_50">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="316.801878" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_25">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="316.801878" y="347.906673" transform="rotate(-0 316.801878 347.906673)">0.2</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_20">
+     <g id="rp4-line2d_51">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="351.572837" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_26">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="351.572837" y="347.906673" transform="rotate(-0 351.572837 347.906673)">0.3</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-matplotlib.axis_10">
+    <g id="rp4-ytick_21">
+     <g id="rp4-line2d_52">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="322.025239" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_22">
+     <g id="rp4-line2d_53">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="298.611325" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_23">
+     <g id="rp4-line2d_54">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="275.197411" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_24">
+     <g id="rp4-line2d_55">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="251.783496" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_25">
+     <g id="rp4-line2d_56">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="219.640748" y="228.369582" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-patch_15">
+    <path d="M 219.640748 332.929134 
+L 219.640748 227.765943 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-patch_16">
+    <path d="M 219.640748 332.929134 
+L 354.375 332.929134 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-PathCollection_5">
+    <defs>
+     <path id="rp4-m0c0e184282" d="M 0 -3.24037 
+L -3.081775 -1.00133 
+L -1.904642 2.621515 
+L 1.904642 2.621515 
+L 3.081775 -1.00133 
+z
+" style="stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </defs>
+    <g clip-path="url(#rp4-p84539044bf)">
+     <use xlink:href="#rp4-m0c0e184282" x="272.892826" y="291.107782" style="fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m0c0e184282" x="282.822644" y="268.806052" style="fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </g>
+   </g>
+   <g id="rp4-text_27">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="219.640748" y="222.448938" transform="rotate(-0 219.640748 222.448938)">n = 2 (too few events)</text>
+   </g>
+   <g id="rp4-text_28">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="219.640748" y="207.765943" transform="rotate(-0 219.640748 207.765943)">👩🏻‍🔬🎓 Viikki</text>
+   </g>
+  </g>
+  <g id="rp4-axes_6">
+   <g id="rp4-patch_17">
+    <path d="M 367.848425 332.929134 
+L 502.582677 332.929134 
+L 502.582677 227.765943 
+L 367.848425 227.765943 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="rp4-line2d_57">
+    <path d="M 367.848425 275.197411 
+L 502.582677 275.197411 
+" clip-path="url(#rp4-p72df4de6ed)" style="fill: none; stroke: #888888; stroke-width: 0.9; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-line2d_58">
+    <path d="M 395.467636 332.929134 
+L 395.467636 227.765943 
+" clip-path="url(#rp4-p72df4de6ed)" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #888888; stroke-width: 0.9"/>
+   </g>
+   <g id="rp4-matplotlib.axis_11">
+    <g id="rp4-xtick_21">
+     <g id="rp4-line2d_59">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="395.467636" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_29">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="395.467636" y="347.906673" transform="rotate(-0 395.467636 347.906673)">0.0</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_22">
+     <g id="rp4-line2d_60">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="430.238595" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_30">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="430.238595" y="347.906673" transform="rotate(-0 430.238595 347.906673)">0.1</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_23">
+     <g id="rp4-line2d_61">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="465.009555" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_31">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="465.009555" y="347.906673" transform="rotate(-0 465.009555 347.906673)">0.2</text>
+     </g>
+    </g>
+    <g id="rp4-xtick_24">
+     <g id="rp4-line2d_62">
+      <g>
+       <use xlink:href="#rp4-m59b194c1eb" x="499.780515" y="332.929134" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="rp4-text_32">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="499.780515" y="347.906673" transform="rotate(-0 499.780515 347.906673)">0.3</text>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-matplotlib.axis_12">
+    <g id="rp4-ytick_26">
+     <g id="rp4-line2d_63">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="322.025239" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_27">
+     <g id="rp4-line2d_64">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="298.611325" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_28">
+     <g id="rp4-line2d_65">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="275.197411" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_29">
+     <g id="rp4-line2d_66">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="251.783496" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+    <g id="rp4-ytick_30">
+     <g id="rp4-line2d_67">
+      <g>
+       <use xlink:href="#rp4-m2cf41f6c1b" x="367.848425" y="228.369582" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="rp4-patch_18">
+    <path d="M 367.848425 332.929134 
+L 367.848425 227.765943 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-patch_19">
+    <path d="M 367.848425 332.929134 
+L 502.582677 332.929134 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="rp4-PathCollection_6">
+    <defs>
+     <path id="rp4-m578d0ed65c" d="M -0 3.24037 
+L 3.24037 -3.24037 
+L -3.24037 -3.24037 
+z
+" style="stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </defs>
+    <g clip-path="url(#rp4-p72df4de6ed)">
+     <use xlink:href="#rp4-m578d0ed65c" x="394.790461" y="275.048755" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="392.81476" y="269.354143" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="402.962678" y="275.379312" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="411.494114" y="279.369695" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="403.921403" y="277.889405" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="391.995596" y="269.766851" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="392.460396" y="259.738204" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="423.327689" y="271.531015" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="427.026667" y="276.661984" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="430.459873" y="279.924503" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="411.398242" y="281.643253" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="433.061778" y="272.4287" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="407.107039" y="280.630079" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="403.085249" y="284.125594" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="413.697967" y="275.881415" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="410.13855" y="284.761838" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="393.706738" y="270.302806" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="391.171578" y="271.880294" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="395.665449" y="272.972725" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="394.613279" y="273.720493" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="393.903337" y="269.127825" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="393.892415" y="273.704779" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="391.061143" y="272.868674" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="425.433243" y="276.914717" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="426.218426" y="278.408076" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+     <use xlink:href="#rp4-m578d0ed65c" x="392.56719" y="273.511541" style="fill: #d55e00; fill-opacity: 0.85; stroke: #ffffff; stroke-opacity: 0.85; stroke-width: 0.7"/>
+    </g>
+   </g>
+   <g id="rp4-text_33">
+    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #555555; font-variant-numeric: tabular-nums" x="367.848425" y="222.448938" transform="rotate(-0 367.848425 222.448938)">r = −0.45, ρ = −0.59, n = 26</text>
+   </g>
+   <g id="rp4-text_34">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="367.848425" y="207.765943" transform="rotate(-0 367.848425 207.765943)">🇰🇪🌽 Maktau</text>
+   </g>
+   <g id="rp4-line2d_68">
+    <path d="M 391.061143 272.439932 
+L 433.061778 279.518528 
+" clip-path="url(#rp4-p72df4de6ed)" style="fill: none; stroke: #d55e00; stroke-width: 2.2; stroke-linecap: square"/>
+   </g>
+  </g>
+  <g id="rp4-text_35">
+   <!-- SWC on day −1 minus the site median (m$^3$ m$^{-3}$) -->
+   <g style="fill: #222222" transform="translate(118.65561 374.234371)">
+    <text style="font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-variant-numeric: tabular-nums">
+     <tspan x="0" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">S</tspan>
+     <tspan x="7.141113" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">W</tspan>
+     <tspan x="18.264771" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+     <tspan x="26.119995" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="29.696045" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+     <tspan x="36.578979" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+     <tspan x="43.709106" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="47.285156" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+     <tspan x="54.42627" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+     <tspan x="61.32019" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">y</tspan>
+     <tspan x="67.977905" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="71.553955" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+     <tspan x="80.980225" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+     <tspan x="88.137817" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="91.713867" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+     <tspan x="102.672729" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">i</tspan>
+     <tspan x="105.79834" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+     <tspan x="112.928467" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">u</tspan>
+     <tspan x="120.058594" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">s</tspan>
+     <tspan x="125.9198" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="129.49585" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+     <tspan x="133.90686" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">h</tspan>
+     <tspan x="141.036987" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+     <tspan x="147.958374" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="151.534424" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">s</tspan>
+     <tspan x="157.39563" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">i</tspan>
+     <tspan x="160.52124" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+     <tspan x="164.932251" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+     <tspan x="171.853638" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="175.429688" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+     <tspan x="186.38855" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">e</tspan>
+     <tspan x="193.309937" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">d</tspan>
+     <tspan x="200.45105" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">i</tspan>
+     <tspan x="203.57666" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+     <tspan x="210.470581" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+     <tspan x="217.600708" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="221.176758" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">(</tspan>
+     <tspan x="225.565796" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+     <tspan x="241.950256" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="245.526306" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+     <tspan x="268.509155" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">)</tspan>
+     <tspan x="236.632324" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">3</tspan>
+     <tspan x="256.592834" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+     <tspan x="263.191223" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">3</tspan>
+    </text>
+   </g>
+  </g>
+  <g id="rp4-text_36">
+   <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(14.776703 246.688583) rotate(-90)">NEE pulse</text>
+   <!-- ($\mu$mol CO$_2$ m$^{-2}$ s$^{-1}$) -->
+   <g style="fill: #222222" transform="translate(30.306537 246.688583) rotate(-90)">
+    <text style="font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-variant-numeric: tabular-nums">
+     <tspan x="0" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">(</tspan>
+     <tspan x="4.389038" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">μ</tspan>
+     <tspan x="11.546631" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+     <tspan x="22.505493" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+     <tspan x="29.388428" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">l</tspan>
+     <tspan x="32.514038" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="36.090088" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+     <tspan x="43.945312" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">O</tspan>
+     <tspan x="58.225891" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="61.801941" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+     <tspan x="84.78479" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+     <tspan x="88.36084" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">s</tspan>
+     <tspan x="106.246033" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">)</tspan>
+     <tspan x="52.907959" y="1.17437" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">2</tspan>
+     <tspan x="72.868469" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+     <tspan x="79.466858" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">2</tspan>
+     <tspan x="94.329712" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+     <tspan x="100.928101" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+    </text>
+   </g>
+  </g>
+  <g id="rp4-text_37">
+   <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #555555; font-variant-numeric: tabular-nums" x="285.732283" y="12.578751" transform="rotate(-0 285.732283 12.578751)">One marker per ≥ 5 mm event; line = OLS fit; r = Pearson, ρ = Spearman; NEE &lt; 0 = uptake</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="rp4-p5747908946">
+   <rect x="71.433071" y="57.401575" width="134.734252" height="105.16319"/>
+  </clipPath>
+  <clipPath id="rp4-p44db0b94dd">
+   <rect x="219.640748" y="57.401575" width="134.734252" height="105.16319"/>
+  </clipPath>
+  <clipPath id="rp4-pd29daa1999">
+   <rect x="367.848425" y="57.401575" width="134.734252" height="105.16319"/>
+  </clipPath>
+  <clipPath id="rp4-p2787c9a580">
+   <rect x="71.433071" y="227.765943" width="134.734252" height="105.16319"/>
+  </clipPath>
+  <clipPath id="rp4-p84539044bf">
+   <rect x="219.640748" y="227.765943" width="134.734252" height="105.16319"/>
+  </clipPath>
+  <clipPath id="rp4-p72df4de6ed">
+   <rect x="367.848425" y="227.765943" width="134.734252" height="105.16319"/>
+  </clipPath>
+ </defs>
+</svg>

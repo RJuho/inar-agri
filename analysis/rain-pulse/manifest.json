@@ -1,0 +1,979 @@
+{
+  "generatedAt": "2026-10-28T07:31:04Z",
+  "git": {
+    "commit": "8514235",
+    "dirty": true
+  },
+  "script": {
+    "path": "analysis/rain-pulse/rain-pulse.py",
+    "sha256": "54398ab98a567c64fb1fa6b24d0c4006aff920950420909e64c078d2ea3930e5"
+  },
+  "lock": {
+    "path": "analysis/rain-pulse/rain-pulse.py.lock",
+    "sha256": "4bc04c227da2acc8dec4c88c30b6a28dfb06a400d985d56c06a88fca52e02419"
+  },
+  "python": "3.13.5",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+  "packages": {
+    "annotated-types": "0.8.0",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "fonttools": "4.68.0",
+    "formulaic": "1.2.2",
+    "interface_meta": "2.0.1",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.11.2",
+    "mypy_extensions": "1.1.0",
+    "narwhals": "2.28.0",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pandas": "3.1.0",
+    "pandera": "0.34.1",
+    "patsy": "1.0.3",
+    "pillow": "13.0.0",
+    "pyarrow": "26.0.0",
+    "pydantic": "2.14.1",
+    "pydantic_core": "2.50.1",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "3.0.0",
+    "scipy": "1.18.1",
+    "six": "1.17.0",
+    "statsmodels": "0.15.0",
+    "typeguard": "4.6.0",
+    "typing-inspect": "0.9.0",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.5",
+    "wrapt": "2.5.1"
+  },
+  "seeds": {},
+  "seedNote": "no random numbers",
+  "args": {
+    "db": "db",
+    "calculated": "data/calculated",
+    "out": null,
+    "check": false
+  },
+  "dbBuiltAt": "2026-10-23T19:03:07.928Z",
+  "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+  "snapshot": {
+    "builtAt": "2026-10-23T19:03:07.928Z",
+    "calcBuiltAt": "2026-10-23T19:03:09.003Z",
+    "commit": "44ec98f",
+    "commitNote": "HEAD at build time; db/report.json does not record a commit",
+    "url": null,
+    "urlNote": "TODO: release asset db-2026-10-23.zip not yet published",
+    "inputs": [
+      {
+        "path": "db/sites.parquet",
+        "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+        "rows": 6
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+        "rows": 26
+      },
+      {
+        "path": "db/observations.parquet",
+        "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+        "rows": 537980
+      },
+      {
+        "path": "db/events.parquet",
+        "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+        "rows": 114
+      },
+      {
+        "path": "calculated/fluxes_30min.parquet",
+        "sha256": "6149ff22f5c114333a94e293247d6dd6385809a22ea2a7b1105e7ba3a35635ca",
+        "rows": 537980
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "path": "db/sites.parquet",
+      "sha256": "9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59",
+      "rows": 6,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "code",
+        "name",
+        "utc_offset_min"
+      ]
+    },
+    {
+      "path": "db/variables.parquet",
+      "sha256": "06e6a41c727958beb973f2b76adb8182d88b0a5d501be6f11c948c0129fb7c6e",
+      "rows": 26,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "column_name",
+        "unit"
+      ]
+    },
+    {
+      "path": "db/observations.parquet",
+      "sha256": "922346b5afe2ec56de128311aa3d8dc8cd0ccc1a57700bd333bbdf95a51d8964",
+      "rows": 537980,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "ts_start",
+        "nee",
+        "nee_qc",
+        "tsoil",
+        "swc",
+        "precip",
+        "ustar",
+        "sw_in",
+        "ppfd"
+      ]
+    },
+    {
+      "path": "db/events.parquet",
+      "sha256": "b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b",
+      "rows": 114,
+      "builtAt": "2026-10-23T19:03:07.928Z",
+      "columns": [
+        "site_id",
+        "site_code",
+        "date",
+        "date_end",
+        "type"
+      ]
+    },
+    {
+      "path": "calculated/fluxes_30min.parquet",
+      "sha256": "6149ff22f5c114333a94e293247d6dd6385809a22ea2a7b1105e7ba3a35635ca",
+      "rows": 537980,
+      "builtAt": "2026-10-23T19:03:09.003Z",
+      "columns": [
+        "site_id",
+        "ts_start",
+        "night",
+        "nee_fill",
+        "gpp"
+      ]
+    }
+  ],
+  "steps": {
+    "units": {
+      "observations": {
+        "ts_start": "UTC",
+        "nee": "µmol CO2 m-2 s-1",
+        "tsoil": "°C",
+        "swc": "m3 m-3",
+        "precip": "mm",
+        "ustar": "m s-1",
+        "sw_in": "W m-2",
+        "ppfd": "µmol m-2 s-1"
+      },
+      "calculated": {
+        "unit_gpp": "µmol CO2 m-2 s-1",
+        "unit_ts_start": "UTC"
+      },
+      "lloydTaylor": {
+        "tref": 15,
+        "t0": -46.02
+      }
+    },
+    "sites": {
+      "rowsRead": 6,
+      "utcOffsetMin": {
+        "anttila": 120,
+        "sarkisuo": 120,
+        "haltiala": 120,
+        "qvidja": 120,
+        "viikki": 120,
+        "maktau": 180
+      }
+    },
+    "management": {
+      "rowsRead": 114,
+      "rowsUsed": 73,
+      "types": [
+        "harvest",
+        "cut",
+        "grazing",
+        "tillage",
+        "sowing"
+      ],
+      "perSite": {
+        "anttila": {
+          "events": 6,
+          "first": "2021-06-03",
+          "last": "2023-07-19"
+        },
+        "sarkisuo": {
+          "events": 5,
+          "first": "2021-06-09",
+          "last": "2023-08-15"
+        },
+        "haltiala": {
+          "events": 21,
+          "first": "2021-05-13",
+          "last": "2025-10-03"
+        },
+        "qvidja": {
+          "events": 25,
+          "first": "2018-06-12",
+          "last": "2025-08-10"
+        },
+        "viikki": {
+          "events": 13,
+          "first": "2022-07-01",
+          "last": "2025-09-10"
+        },
+        "maktau": {
+          "events": 3,
+          "first": "2019-04-12",
+          "last": "2020-07-30"
+        }
+      },
+      "rule": "an event is dropped when its days -3 to +15 touch one of these days"
+    },
+    "halfHours": {
+      "observationRowsRead": 537980,
+      "fluxRowsRead": 537980,
+      "rowsAfterJoin": 537980,
+      "maktauNeeNotMeasured": 14413,
+      "perSite": {
+        "anttila": {
+          "rows": 35040,
+          "seasonRows": 14688,
+          "measured": 22360,
+          "seasonMeasured": 9670,
+          "seasonTsoilLe0": 0,
+          "seasonTsoilLe0Measured": 0,
+          "seasonUstarBelow": 0,
+          "seasonMeasuredNightUstarBelow": 0
+        },
+        "sarkisuo": {
+          "rows": 35040,
+          "seasonRows": 14688,
+          "measured": 19648,
+          "seasonMeasured": 8290,
+          "seasonTsoilLe0": 0,
+          "seasonTsoilLe0Measured": 0,
+          "seasonUstarBelow": 0,
+          "seasonMeasuredNightUstarBelow": 0
+        },
+        "haltiala": {
+          "rows": 81600,
+          "seasonRows": 36432,
+          "measured": 50077,
+          "seasonMeasured": 24244,
+          "seasonTsoilLe0": 0,
+          "seasonTsoilLe0Measured": 0,
+          "seasonUstarBelow": 0,
+          "seasonMeasuredNightUstarBelow": 0
+        },
+        "qvidja": {
+          "rows": 134108,
+          "seasonRows": 58364,
+          "measured": 35085,
+          "seasonMeasured": 18290,
+          "seasonTsoilLe0": 0,
+          "seasonTsoilLe0Measured": 0,
+          "seasonUstarBelow": 10510,
+          "seasonMeasuredNightUstarBelow": 773
+        },
+        "viikki": {
+          "rows": 70128,
+          "seasonRows": 29376,
+          "measured": 14949,
+          "seasonMeasured": 6971,
+          "seasonTsoilLe0": 19,
+          "seasonTsoilLe0Measured": 0,
+          "seasonUstarBelow": 0,
+          "seasonMeasuredNightUstarBelow": 0
+        },
+        "maktau": {
+          "rows": 182064,
+          "seasonRows": 182064,
+          "measured": 38235,
+          "seasonMeasured": 38235,
+          "seasonTsoilLe0": 0,
+          "seasonTsoilLe0Measured": 0,
+          "seasonUstarBelow": 1691,
+          "seasonMeasuredNightUstarBelow": 0
+        }
+      },
+      "rule": "inner join on site_id and ts_start (one to one); measured = nee_fill 'measured' (Finnish sites: equal to nee_qc = 0, checked); Maktau half hours with nee but not measured are removed by the quality filter of the calculated products; half hours with tsoil <= 0 C are not used for the flux responses; night half hours with u* < 0.1 m s-1 at Qvidja and Maktau are not used"
+    },
+    "fits": {
+      "perSite": {
+        "anttila": {
+          "nightSample": 2289
+        },
+        "sarkisuo": {
+          "nightSample": 1278
+        },
+        "haltiala": {
+          "nightSample": 5865
+        },
+        "qvidja": {
+          "nightSample": 3404
+        },
+        "viikki": {
+          "nightSample": 1697
+        },
+        "maktau": {
+          "nightSample": 16418
+        }
+      },
+      "rule": "own fit with >= 100 night values and a tsoil range >= 5 K; valid when E0 - SE > 30 K and E0 + SE < 550 K; else E0 of the site fit (all season nights) when valid; else the pooled E0 (median of the valid own E0); for site and pooled, Rref is fitted for the site-year with E0 fixed",
+      "methodCounts": {
+        "own": 17,
+        "site": 5,
+        "pooled": 5,
+        "none": 6
+      },
+      "pooledE0": 281.06656214463897,
+      "validOwnE0": 17,
+      "siteYears": {
+        "own": [
+          "anttila 2022",
+          "anttila 2023",
+          "sarkisuo 2022",
+          "sarkisuo 2023",
+          "haltiala 2021",
+          "haltiala 2022",
+          "haltiala 2024",
+          "qvidja 2020",
+          "qvidja 2021",
+          "qvidja 2022",
+          "qvidja 2023",
+          "qvidja 2024",
+          "qvidja 2025",
+          "viikki 2022",
+          "viikki 2023",
+          "viikki 2025",
+          "maktau 2018"
+        ],
+        "site": [
+          "haltiala 2023",
+          "haltiala 2025",
+          "qvidja 2018",
+          "qvidja 2019",
+          "viikki 2024"
+        ],
+        "pooled": [
+          "maktau 2019",
+          "maktau 2020",
+          "maktau 2021",
+          "maktau 2022",
+          "maktau 2024"
+        ],
+        "none": [
+          "maktau 2014",
+          "maktau 2015",
+          "maktau 2016",
+          "maktau 2017",
+          "maktau 2023",
+          "maktau 2025"
+        ]
+      },
+      "siteYearsOwnE0AtBound": [
+        "qvidja 2018",
+        "maktau 2019",
+        "maktau 2021",
+        "maktau 2022"
+      ]
+    },
+    "days": {
+      "perSite": {
+        "anttila": {
+          "days": 731,
+          "seasonDays": 306,
+          "seasonDaysRain": 306,
+          "seasonDaysSwc": 305,
+          "daysReco": 159,
+          "daysNee": 170,
+          "daysGpp": 291,
+          "daysLight": 290,
+          "daysRecoModelNotPositive": 0
+        },
+        "sarkisuo": {
+          "days": 731,
+          "seasonDays": 306,
+          "seasonDaysRain": 225,
+          "seasonDaysSwc": 219,
+          "daysReco": 89,
+          "daysNee": 96,
+          "daysGpp": 218,
+          "daysLight": 218,
+          "daysRecoModelNotPositive": 0
+        },
+        "haltiala": {
+          "days": 1700,
+          "seasonDays": 759,
+          "seasonDaysRain": 611,
+          "seasonDaysSwc": 759,
+          "daysReco": 454,
+          "daysNee": 505,
+          "daysGpp": 746,
+          "daysLight": 746,
+          "daysRecoModelNotPositive": 0,
+          "rainSource": "viikki"
+        },
+        "qvidja": {
+          "days": 2794,
+          "seasonDays": 1216,
+          "seasonDaysRain": 1165,
+          "seasonDaysSwc": 1172,
+          "daysReco": 261,
+          "daysNee": 289,
+          "daysGpp": 697,
+          "daysLight": 697,
+          "daysRecoModelNotPositive": 0
+        },
+        "viikki": {
+          "days": 1461,
+          "seasonDays": 612,
+          "seasonDaysRain": 611,
+          "seasonDaysSwc": 580,
+          "daysReco": 134,
+          "daysNee": 118,
+          "daysGpp": 279,
+          "daysLight": 279,
+          "daysRecoModelNotPositive": 0
+        },
+        "maktau": {
+          "days": 3794,
+          "seasonDays": 3794,
+          "seasonDaysRain": 3430,
+          "seasonDaysSwc": 3648,
+          "daysReco": 833,
+          "daysNee": 837,
+          "daysGpp": 930,
+          "daysLight": 1006,
+          "daysRecoModelNotPositive": 0
+        }
+      },
+      "rule": "rain needs >= 40 precip half hours, swc >= 24, reco >= 4 night half hours of the night sample, gpp and light >= 8 measured day half hours, nee >= 4 measured night and >= 8 measured day half hours; responses on season days only"
+    },
+    "events": {
+      "rule": "day 0 in season with rain >= T; days -3 to -1 with rain < T; censored at rain >= T, a day without rain value or the season end; dropped on a management event in days -3 to +15; Haltiala: SWC rise >= 0.01 m3 m-3 on day 0 or 1",
+      "perSite": {
+        "anttila": {
+          "t2": {
+            "found": 33,
+            "droppedManagement": 9,
+            "droppedSwcCheck": null,
+            "kept": 24,
+            "used": {
+              "reco": 8,
+              "nee": 11,
+              "gpp": 23
+            }
+          },
+          "t5": {
+            "found": 23,
+            "droppedManagement": 6,
+            "droppedSwcCheck": null,
+            "kept": 17,
+            "used": {
+              "reco": 7,
+              "nee": 9,
+              "gpp": 15
+            }
+          },
+          "t10": {
+            "found": 13,
+            "droppedManagement": 5,
+            "droppedSwcCheck": null,
+            "kept": 8,
+            "used": {
+              "reco": 4,
+              "nee": 4,
+              "gpp": 7
+            }
+          }
+        },
+        "sarkisuo": {
+          "t2": {
+            "found": 22,
+            "droppedManagement": 6,
+            "droppedSwcCheck": null,
+            "kept": 16,
+            "used": {
+              "reco": 6,
+              "nee": 7,
+              "gpp": 16
+            }
+          },
+          "t5": {
+            "found": 17,
+            "droppedManagement": 4,
+            "droppedSwcCheck": null,
+            "kept": 13,
+            "used": {
+              "reco": 6,
+              "nee": 6,
+              "gpp": 13
+            }
+          },
+          "t10": {
+            "found": 13,
+            "droppedManagement": 2,
+            "droppedSwcCheck": null,
+            "kept": 11,
+            "used": {
+              "reco": 6,
+              "nee": 6,
+              "gpp": 10
+            }
+          }
+        },
+        "haltiala": {
+          "t2": {
+            "found": 51,
+            "droppedManagement": 14,
+            "droppedSwcCheck": 24,
+            "kept": 13,
+            "used": {
+              "reco": 6,
+              "nee": 6,
+              "gpp": 13
+            }
+          },
+          "t5": {
+            "found": 38,
+            "droppedManagement": 9,
+            "droppedSwcCheck": 15,
+            "kept": 14,
+            "used": {
+              "reco": 9,
+              "nee": 8,
+              "gpp": 14
+            }
+          },
+          "t10": {
+            "found": 26,
+            "droppedManagement": 4,
+            "droppedSwcCheck": 8,
+            "kept": 14,
+            "used": {
+              "reco": 8,
+              "nee": 8,
+              "gpp": 14
+            }
+          }
+        },
+        "qvidja": {
+          "t2": {
+            "found": 91,
+            "droppedManagement": 34,
+            "droppedSwcCheck": null,
+            "kept": 57,
+            "used": {
+              "reco": 4,
+              "nee": 5,
+              "gpp": 25
+            }
+          },
+          "t5": {
+            "found": 82,
+            "droppedManagement": 32,
+            "droppedSwcCheck": null,
+            "kept": 50,
+            "used": {
+              "reco": 5,
+              "nee": 6,
+              "gpp": 24
+            }
+          },
+          "t10": {
+            "found": 54,
+            "droppedManagement": 23,
+            "droppedSwcCheck": null,
+            "kept": 31,
+            "used": {
+              "reco": 2,
+              "nee": 5,
+              "gpp": 15
+            }
+          }
+        },
+        "viikki": {
+          "t2": {
+            "found": 51,
+            "droppedManagement": 17,
+            "droppedSwcCheck": null,
+            "kept": 34,
+            "used": {
+              "reco": 5,
+              "nee": 5,
+              "gpp": 16
+            }
+          },
+          "t5": {
+            "found": 38,
+            "droppedManagement": 9,
+            "droppedSwcCheck": null,
+            "kept": 29,
+            "used": {
+              "reco": 4,
+              "nee": 4,
+              "gpp": 16
+            }
+          },
+          "t10": {
+            "found": 26,
+            "droppedManagement": 4,
+            "droppedSwcCheck": null,
+            "kept": 22,
+            "used": {
+              "reco": 3,
+              "nee": 4,
+              "gpp": 14
+            }
+          }
+        },
+        "maktau": {
+          "t2": {
+            "found": 166,
+            "droppedManagement": 2,
+            "droppedSwcCheck": null,
+            "kept": 164,
+            "used": {
+              "reco": 41,
+              "nee": 41,
+              "gpp": 45
+            }
+          },
+          "t5": {
+            "found": 130,
+            "droppedManagement": 2,
+            "droppedSwcCheck": null,
+            "kept": 128,
+            "used": {
+              "reco": 34,
+              "nee": 34,
+              "gpp": 36
+            }
+          },
+          "t10": {
+            "found": 92,
+            "droppedManagement": 1,
+            "droppedSwcCheck": null,
+            "kept": 91,
+            "used": {
+              "reco": 25,
+              "nee": 25,
+              "gpp": 25
+            }
+          }
+        }
+      },
+      "normalisation": {
+        "reco t2 anttila": {
+          "noPrePulse": 14,
+          "prePulseNotPositive": 0
+        },
+        "nee t2 anttila": {
+          "noPrePulse": 13,
+          "prePulseNotPositive": 0
+        },
+        "gpp t2 anttila": {
+          "noPrePulse": 0,
+          "prePulseNotPositive": 0
+        },
+        "reco t5 anttila": {
+          "noPrePulse": 9,
+          "prePulseNotPositive": 0
+        },
+        "nee t5 anttila": {
+          "noPrePulse": 8,
+          "prePulseNotPositive": 0
+        },
+        "gpp t5 anttila": {
+          "noPrePulse": 2,
+          "prePulseNotPositive": 0
+        },
+        "reco t10 anttila": {
+          "noPrePulse": 4,
+          "prePulseNotPositive": 0
+        },
+        "nee t10 anttila": {
+          "noPrePulse": 4,
+          "prePulseNotPositive": 0
+        },
+        "gpp t10 anttila": {
+          "noPrePulse": 1,
+          "prePulseNotPositive": 0
+        },
+        "reco t2 sarkisuo": {
+          "noPrePulse": 8,
+          "prePulseNotPositive": 0
+        },
+        "nee t2 sarkisuo": {
+          "noPrePulse": 8,
+          "prePulseNotPositive": 0
+        },
+        "gpp t2 sarkisuo": {
+          "noPrePulse": 0,
+          "prePulseNotPositive": 0
+        },
+        "reco t5 sarkisuo": {
+          "noPrePulse": 6,
+          "prePulseNotPositive": 0
+        },
+        "nee t5 sarkisuo": {
+          "noPrePulse": 6,
+          "prePulseNotPositive": 0
+        },
+        "gpp t5 sarkisuo": {
+          "noPrePulse": 0,
+          "prePulseNotPositive": 0
+        },
+        "reco t10 sarkisuo": {
+          "noPrePulse": 5,
+          "prePulseNotPositive": 0
+        },
+        "nee t10 sarkisuo": {
+          "noPrePulse": 5,
+          "prePulseNotPositive": 0
+        },
+        "gpp t10 sarkisuo": {
+          "noPrePulse": 1,
+          "prePulseNotPositive": 0
+        },
+        "reco t2 haltiala": {
+          "noPrePulse": 5,
+          "prePulseNotPositive": 0
+        },
+        "nee t2 haltiala": {
+          "noPrePulse": 7,
+          "prePulseNotPositive": 0
+        },
+        "gpp t2 haltiala": {
+          "noPrePulse": 0,
+          "prePulseNotPositive": 0
+        },
+        "reco t5 haltiala": {
+          "noPrePulse": 4,
+          "prePulseNotPositive": 0
+        },
+        "nee t5 haltiala": {
+          "noPrePulse": 6,
+          "prePulseNotPositive": 0
+        },
+        "gpp t5 haltiala": {
+          "noPrePulse": 0,
+          "prePulseNotPositive": 0
+        },
+        "reco t10 haltiala": {
+          "noPrePulse": 5,
+          "prePulseNotPositive": 0
+        },
+        "nee t10 haltiala": {
+          "noPrePulse": 6,
+          "prePulseNotPositive": 0
+        },
+        "gpp t10 haltiala": {
+          "noPrePulse": 0,
+          "prePulseNotPositive": 0
+        },
+        "reco t2 qvidja": {
+          "noPrePulse": 50,
+          "prePulseNotPositive": 0
+        },
+        "nee t2 qvidja": {
+          "noPrePulse": 51,
+          "prePulseNotPositive": 0
+        },
+        "gpp t2 qvidja": {
+          "noPrePulse": 26,
+          "prePulseNotPositive": 0
+        },
+        "reco t5 qvidja": {
+          "noPrePulse": 42,
+          "prePulseNotPositive": 0
+        },
+        "nee t5 qvidja": {
+          "noPrePulse": 41,
+          "prePulseNotPositive": 0
+        },
+        "gpp t5 qvidja": {
+          "noPrePulse": 22,
+          "prePulseNotPositive": 0
+        },
+        "reco t10 qvidja": {
+          "noPrePulse": 28,
+          "prePulseNotPositive": 0
+        },
+        "nee t10 qvidja": {
+          "noPrePulse": 22,
+          "prePulseNotPositive": 0
+        },
+        "gpp t10 qvidja": {
+          "noPrePulse": 13,
+          "prePulseNotPositive": 0
+        },
+        "reco t2 viikki": {
+          "noPrePulse": 27,
+          "prePulseNotPositive": 0
+        },
+        "nee t2 viikki": {
+          "noPrePulse": 27,
+          "prePulseNotPositive": 0
+        },
+        "gpp t2 viikki": {
+          "noPrePulse": 14,
+          "prePulseNotPositive": 0
+        },
+        "reco t5 viikki": {
+          "noPrePulse": 24,
+          "prePulseNotPositive": 0
+        },
+        "nee t5 viikki": {
+          "noPrePulse": 24,
+          "prePulseNotPositive": 0
+        },
+        "gpp t5 viikki": {
+          "noPrePulse": 12,
+          "prePulseNotPositive": 0
+        },
+        "reco t10 viikki": {
+          "noPrePulse": 16,
+          "prePulseNotPositive": 0
+        },
+        "nee t10 viikki": {
+          "noPrePulse": 16,
+          "prePulseNotPositive": 0
+        },
+        "gpp t10 viikki": {
+          "noPrePulse": 7,
+          "prePulseNotPositive": 0
+        },
+        "reco t2 maktau": {
+          "noPrePulse": 118,
+          "prePulseNotPositive": 0
+        },
+        "nee t2 maktau": {
+          "noPrePulse": 118,
+          "prePulseNotPositive": 0
+        },
+        "gpp t2 maktau": {
+          "noPrePulse": 115,
+          "prePulseNotPositive": 0
+        },
+        "reco t5 maktau": {
+          "noPrePulse": 91,
+          "prePulseNotPositive": 0
+        },
+        "nee t5 maktau": {
+          "noPrePulse": 91,
+          "prePulseNotPositive": 0
+        },
+        "gpp t5 maktau": {
+          "noPrePulse": 89,
+          "prePulseNotPositive": 0
+        },
+        "reco t10 maktau": {
+          "noPrePulse": 65,
+          "prePulseNotPositive": 0
+        },
+        "nee t10 maktau": {
+          "noPrePulse": 65,
+          "prePulseNotPositive": 0
+        },
+        "gpp t10 maktau": {
+          "noPrePulse": 65,
+          "prePulseNotPositive": 0
+        }
+      },
+      "lagsHiddenNBelow5": {
+        "reco t2 anttila": 9,
+        "nee t2 anttila": 9,
+        "gpp t2 anttila": 9,
+        "reco t5 anttila": 10,
+        "nee t5 anttila": 10,
+        "gpp t5 anttila": 11,
+        "reco t10 anttila": 18,
+        "nee t10 anttila": 19,
+        "gpp t10 anttila": 13,
+        "reco t2 sarkisuo": 7,
+        "nee t2 sarkisuo": 8,
+        "gpp t2 sarkisuo": 10,
+        "reco t5 sarkisuo": 8,
+        "nee t5 sarkisuo": 10,
+        "gpp t5 sarkisuo": 7,
+        "reco t10 sarkisuo": 16,
+        "nee t10 sarkisuo": 15,
+        "gpp t10 sarkisuo": 2,
+        "reco t2 haltiala": 5,
+        "nee t2 haltiala": 5,
+        "gpp t2 haltiala": 9,
+        "reco t5 haltiala": 13,
+        "nee t5 haltiala": 12,
+        "gpp t5 haltiala": 13,
+        "reco t10 haltiala": 12,
+        "nee t10 haltiala": 11,
+        "gpp t10 haltiala": 0,
+        "reco t2 qvidja": 6,
+        "nee t2 qvidja": 2,
+        "gpp t2 qvidja": 8,
+        "reco t5 qvidja": 11,
+        "nee t5 qvidja": 7,
+        "gpp t5 qvidja": 4,
+        "reco t10 qvidja": 8,
+        "nee t10 qvidja": 12,
+        "gpp t10 qvidja": 5,
+        "reco t2 viikki": 4,
+        "nee t2 viikki": 6,
+        "gpp t2 viikki": 7,
+        "reco t5 viikki": 11,
+        "nee t5 viikki": 9,
+        "gpp t5 viikki": 9,
+        "reco t10 viikki": 13,
+        "nee t10 viikki": 9,
+        "gpp t10 viikki": 8,
+        "reco t2 maktau": 0,
+        "nee t2 maktau": 0,
+        "gpp t2 maktau": 0,
+        "reco t5 maktau": 0,
+        "nee t5 maktau": 0,
+        "gpp t5 maktau": 0,
+        "reco t10 maktau": 0,
+        "nee t10 maktau": 0,
+        "gpp t10 maktau": 0
+      },
+      "lagsHiddenTotal": 410
+    }
+  },
+  "outputs": {
+    "results.json": "606fb9fdd0645f8c12f40ec2cdaa4beab12867f6ca7d81c475e3bd43a51c4481",
+    "figures": {
+      "figures/1-reco-lag.svg": {
+        "sha256": "762e34b3c630582cbdac29a32d0ad70bf0e30255df8db928f7dde9820359a9c1",
+        "sha256WithoutMetadata": "00ffc6d606930b0d39655523475f8cb5610d147c9903e40f5ed36feadd311236"
+      },
+      "figures/2-reco-swc.svg": {
+        "sha256": "815bd0ad51515f2896b9e70ba9f73581a0831caa2f73c8b124a500c6f51ae44d",
+        "sha256WithoutMetadata": "7f51e71b01708a94ee06608fa1a8713955e35d2f71770729f0c4871c7add572e"
+      },
+      "figures/3-nee-lag.svg": {
+        "sha256": "f08b9f7058a54b76cdb23467bf840572adaa7a857e15582ad989e19cbe15c065",
+        "sha256WithoutMetadata": "fe046f4f70a5b4d8aa26849441e1e139abc9d1c8e15c0efc1acdb9077f499c75"
+      },
+      "figures/4-nee-swc.svg": {
+        "sha256": "08e979985b55cd60edbbd29362048e4dad6f14f887cd6ead84c08dde75c06536",
+        "sha256WithoutMetadata": "7732e324fc163140879e7454cdba0b8a0d4915f58872c78136e0eddb2330feee"
+      },
+      "figures/5-gpp-lag.svg": {
+        "sha256": "821d90a239f9e1c075d4b9e1b592bd068013b48c590944ac0888dd8610c789f4",
+        "sha256WithoutMetadata": "f905555a768761369edc5c512b843ebf51e37535c6d07f33721fe164669f14db"
+      },
+      "figures/6-gpp-swc.svg": {
+        "sha256": "2c3f324cac039dced5061c2c27a6ce790daa884480897b7b76b712a539499a48",
+        "sha256WithoutMetadata": "128f37a02323dbc1a5829afa41ec77e91798bac6041f77469ac5bb5f239b425b"
+      }
+    }
+  }
+}
