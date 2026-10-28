@@ -1,0 +1,290 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 10
+title: 'Net biome exchange: NEE plus the carbon of harvest, inputs and thinning'
+question: How does the annual carbon balance of a site-year change when the carbon of the harvest, the grazing, the thinning and the organic inputs is added to NEE?
+shortAnswer: 'With the carbon of harvest and grazing, several field years with net CO₂ uptake become carbon losses. Organic inputs move some years the other way. The forest thinning year becomes a large loss.'
+sites: [anttila, sarkisuo, haltiala, qvidja, viikki, maktau]
+variables: [nee_f, gpp, reco]
+period: { from: 2018, to: 2025 }
+date: '2026-10-28'
+status: draft
+models:
+  - model: Claude Fable 5.1
+    role: question and plan
+  - model: Claude Opus 5.5
+    role: Python analysis script, figure, article draft and site integration
+script: analysis/net-biome-exchange/net-biome-exchange.py
+references: [calculated-doc, anomaly-report, aalto-thinning2023, dequesada2025, gao2026, vettikkat2026, heimsch2024, shurpali2025, rasanen2026, haltiala-management, qvidja-management, viikki-management, smear-hyytiala, kulmala2019]
+checks: []
+---
+
+import raw from '../../../../analysis/net-biome-exchange/results.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+import { assumptionSiteYears, emojiOf, inputRows, litRows, nbeData, nbeRows, noNbeRows, SY } from '../../lib/deepDives/netBiomeExchange';
+
+export const d = nbeData(raw);
+export const base = baseUrl();
+export const SITES = ['anttila', 'sarkisuo', 'haltiala', 'qvidja', 'viikki', 'maktau'];
+export const VIEW1 = { name: 'Net biome exchange', sites: SITES, variables: ['nee_f', 'gpp', 'reco'], yearFrom: 2018, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['budget'] };
+export const rows = nbeRows(d);
+export const noRows = noNbeRows(d);
+export const lit = litRows(d);
+export const inputs = inputRows(d);
+export const UA = 'g C m⁻² yr⁻¹';
+export const E = ({ site }) => <span aria-hidden="true">{emojiOf(site)} </span>;
+export const L = ({ k, n = 0 }) => <Num k={`literatureByKey.${k}.value`} digits={n} />;
+export const V = ({ k, f, n = 0, sign = false }) => <Num k={`${SY(k)}.${f}`} digits={n} sign={sign} />;
+export const FS = 'summary.figureSites';
+
+## Short answer
+
+Net biome exchange (NBE) is NEE plus the carbon that management takes out of the field (C_out), minus the carbon that it
+brings in (C_in). At the six sites, <Num k={`${FS}.nSourceNee`} digits={0} /> of the <Num k={`${FS}.nbe.n`} digits={0} />
+site-years in Figure 1 had NEE above zero, and <Num k={`${FS}.nSourceNbe`} digits={0} /> had NBE above zero. The carbon
+of harvest and grazing changed <Num k={`${FS}.nSinkNeeSourceNbe`} digits={0} /> net CO₂ sinks into carbon losses. For
+<Num k={`${FS}.nSinkToSourceRangeInclZero`} digits={0} /> of them, <E site="qvidja" />Qvidja 2025, NBE is less than 1 g C m⁻² yr⁻¹
+(<V k="qvidja-2025" f="nbe" n={1} sign />), and its range includes zero. Organic inputs changed
+<Num k={`${FS}.nSourceNeeSinkNbe`} digits={0} /> net CO₂ sources into carbon gains; for
+<Num k={`${FS}.nSourceToSinkRangeInclZero`} digits={0} /> of them, <E site="viikki" />Viikki 2024, the range includes zero.
+At Qvidja in 2023, a compost input made NBE strongly negative. At the <E site="hyytiala" />Hyytiälä forest, the wood of
+the 2020 thinning made NBE <Num k="summary.hyytiala.thinning.nbe" digits={0} sign unit={UA} />. NBE includes no CH₄, and some terms are assumptions.
+
+## Data and method
+
+**Formula and sign.** NBE = NEE + C_out − C_in, in {UA}. A positive NBE is a carbon loss from the field (the ecosystem),
+the same sign as NEE. NBE contains CO₂-C only; CH₄ is not in it. One site-year is one site and one local calendar year.
+
+**Data.** The script `analysis/net-biome-exchange/net-biome-exchange.py` reads the database snapshot built on
+{d.dataVersion.snapshot.builtAt} and two calculated tables of the same build <Cite ids={['calculated-doc']} />. The
+annual table gives the gap-filled annual NEE and the annual GPP and TER (= Reco) of the night-time partitioning. A
+site-year without an annual NEE sum has no NBE. The management table gives the carbon of each management event in g C m⁻²,
+from the management files <Cite ids={['haltiala-management', 'qvidja-management', 'viikki-management']} /> and the
+articles. An event belongs to the calendar year of its date. A harvest row is C_out; this includes the grass that grazing
+animals eat. A fertilisation row with carbon is C_in; this includes the excreta of the grazing animals. A row with a
+carbon fraction from the site is site data. Each other row gets an assumption (next paragraph). The script stops when
+such a row has no assumption.
+
+**Assumptions.** Each assumption has a central value and a value for the lowest and the highest NBE. The values come from
+articles with a page (table "Values from the literature"), or from the management files (e, h, i). A value in kg ha⁻¹ divided
+by 10 is in g m⁻²; a value in Mg ha⁻¹ times 100 is in g m⁻².
+
+- a. Viikki crop carbon ({assumptionSiteYears(d, 'a-viikki-crop-c')}): dry mass times <L k="cropCGao" n={2} />, the value
+  that Gao et al. use for this field <Cite ids={['gao2026']} note="p. 7" />. Low NBE: <L k="cropCHeimsch" n={2} />
+  <Cite ids={['heimsch2024']} note="p. 4" />. High NBE: <L k="cropCShurpaliMax" n={2} />, the highest grass carbon
+  content of Shurpali et al. <Cite ids={['shurpali2025']} note="p. 8, Table 4" />.
+- b. Manure carbon fraction of dry mass (DM): the organic fraction (<L k="gaoOrganicFraction" n={3} />) times the carbon in
+  the organic matter (<L k="gaoCOfOrganic" n={3} />) of the dry manure of the Viikki field, that is
+  <Num k="derived.manureCFraction" digits={4} /> g C per g DM <Cite ids={['gao2026']} note="p. 7" />.
+- c. Viikki 2023 dry manure: <L k="gaoManureDm" /> kg DM/ha times the fraction above <Cite ids={['gao2026']} note="p. 7" />.
+  This gives the <L k="gaoCManure2023" /> kg C/ha of Gao et al. <Cite ids={['gao2026']} note="p. 6, Table 2" />. Low NBE
+  (more input): <L k="vettVolumeSf" /> m³/ha of solid fraction with <L k="vettDensitySf" /> kg m⁻³ and <L k="vettDmSf" n={3} />
+  DM <Cite ids={['vettikkat2026']} note="p. 2, Table 1; p. 3, Table 2" />. High NBE: the central value.
+- d. Viikki 2024 manure: dry manure <Num k="derived.viikkiN2024.dry manure" digits={1} /> kg N/ha (9 October) and liquid
+  manure <Num k="derived.viikkiN2024.liquid manure" digits={1} /> kg N/ha. The management file gives kg N/ha only. Its 2023 value, <Num k="derived.viikkiN2023" digits={1} /> kg N/ha,
+  agrees with the ammoniacal N (TAN) of Vettikkat et al., <L k="vettTanApplied" n={1} /> kg/ha <Cite ids={['vettikkat2026']} note="p. 2, Table 1" />.
+  The script therefore reads the N of the file as TAN. Dry manure: central and high NBE with the DM per kg N of 2023,
+  <L k="gaoManureDm" /> kg DM / <Num k="derived.viikkiN2023" digits={1} /> kg N (Gao et al. and the management file); low NBE with the DM per kg TAN of the solid fraction. Liquid manure: central with the DM per kg TAN of the
+  liquid fraction; low NBE with the raw manure per kg TAN; high NBE with the liquid fraction per kg total N
+  <Cite ids={['vettikkat2026']} note="p. 3, Table 2" />. Carbon = DM times the manure fraction.
+- e. Haltiala 2023 manure, <Num k="derived.haltialaVolume" digits={0} /> m³/ha of an unknown type. DM per m³: central the raw manure of Vettikkat et al., low NBE
+  the solid fraction, high NBE the liquid fraction <Cite ids={['vettikkat2026']} note="p. 3, Table 2" />. Low NBE also
+  uses <Num k="derived.haltialaVolumeMax" digits={0} /> m³/ha: the event note says the volume "could be 45-60 m3/ha"
+  <Cite ids={['haltiala-management']} />. The applications on the two sectors (June and August) count as one
+  application on the field, as in the management table.
+- f. Qvidja 2020 own NPK mix (DM known, carbon not known). Heimsch et al. give an organic input of
+  <L k="heimschInput2020" /> ± <Num k="literatureByKey.heimschInput2020.uncertainty" digits={0} /> {UA} for 4 May 2020 to
+  3 May 2021 <Cite ids={['heimsch2024']} note="p. 6, Table 1" />. Their input includes the liquid fertilisers
+  <Cite ids={['heimsch2024']} note="p. 4" />. The NPK mix is this total minus the compost row of the same window
+  (<Num k="derived.qvidjaKnownInput2020" digits={0} /> {UA}). Low NBE (more input): total plus the uncertainty, minus the
+  compost row. High NBE: total minus the uncertainty, minus the compost row, but not below zero.
+- g. Qvidja 2021 broiler litter: DM times the manure fraction (a value for dry cattle manure; broiler litter can differ).
+  Low NBE: DM times <L k="gaoCOfOrganic" n={3} /> (all DM organic). High NBE: no carbon, because the input of Heimsch et al.
+  for 4 May 2021 to 3 May 2022 is only <L k="heimschInput2021" /> {UA} <Cite ids={['heimsch2024']} note="p. 6, Table 1" />.
+- h. Qvidja 2023 compost fibre: the carbon fraction of the management file (<Num k="derived.compostFibreCFraction" digits={2} /> of DM). The range is the carbon fraction
+  of the other Qvidja composts with site data, <Num k="derived.compostCFractions.0" digits={4} /> to
+  <Num k="derived.compostCFractions.1" digits={4} /> (the carbon in g C m⁻² times 10, divided by the dry mass in kg ha⁻¹, of the management table; the script uses the unrounded fractions).
+- i. Qvidja 2025 grazing (no carbon values): animal-days = animals times days, from the event text. Each quantified
+  Qvidja grazing row gives a removal rate and an excreta rate per animal-day (carbon divided by the animal-days of the
+  row). Central: the mean rate of the horse rows (2021) for the horses, and the mean rate of the cattle rows (2022 and
+  2024) for the cattle. Low NBE: the removal and excreta rates of the row with the smallest net rate (removal minus
+  excreta), on all animal-days of the year. High NBE: the rates of the row with the largest net rate, on all
+  animal-days. The rows are per field area, as in the file.
+
+**Classes and range.** Class A: a full year, and all terms are site data. Class B: one or more assumed terms, or a partial
+year. A partial year has no range. Low NBE uses the low-NBE value of each assumed term, and high NBE the high-NBE value. All assumptions go to their
+extremes together, so the range is wide; it is not a confidence interval. The range does not include the uncertainty of NEE.
+
+**Maktau.** The management table has no Maktau row. Räsänen et al. cite a maize yield of <L k="maktauYield2021" n={2} /> t/ha
+for the dry year 2021 and a complete crop failure in 2022 <Cite ids={['rasanen2026']} note="p. 11" />. They give no
+residue fate and no yield of the other years. Maktau therefore has no NBE.
+
+**Hyytiälä forest.** The script reads the SMEAR II Hyytiälä years 2019 to 2024 as in Deep Dive #9: gap-filled NEE and GPP
+of table HYY_EDDY233, TER = NEE + GPP, local time UTC+2, and the measured CO₂ flux at 27 m (F_c_270)
+<Cite ids={['smear-hyytiala', 'kulmala2019']} />. An annual sum is empty when one half hour has no value. The measured
+fraction is the share of the half hours with an F_c_270 value; the longest gap is the longest run of half hours without
+one (a missing value in the file). The full-year and reliable rules are the same as for the fields. The stand
+was thinned in February and March 2020; about <L k="thinEarlyAreaHa" /> ha was thinned in December 2019
+and January 2020, and the script puts all of it in 2020 <Cite ids={['aalto-thinning2023']} note="p. 2" />. C_out of 2020
+is the commercial removal (logs and pulpwood), mean of the plots in the 200 m radius of the tower:
+<L k="thinRemoval200m" n={1} /> Mg C ha⁻¹, that is <Num k="summary.hyytiala.thinning.cOut" digits={0} /> {UA} <Cite ids={['aalto-thinning2023']} note="p. 7, Table 3" />. About
+<L k="thinShare200mPct" /> % of the forest in this radius was thinned <Cite ids={['aalto-thinning2023']} note="p. 1" />.
+Low NBE uses the mean of all 43 plots (<L k="thinRemovalAllPlots" n={1} />), high NBE the 26 thinned plots
+(<L k="thinRemovalThinnedPlots" n={1} />). The report converts dry mass to carbon with <L k="thinCarbonFraction" n={1} />
+<Cite ids={['aalto-thinning2023']} note="p. 6" />. The cutting residue (<L k="thinResidue200m" n={1} /> Mg C ha⁻¹
+<Cite ids={['aalto-thinning2023']} note="p. 7, Table 3" />) was left at the site <Cite ids={['aalto-thinning2023']} note="p. 3" />
+and is not an output. The understorey clearing of
+spring 2019 left all trees on the ground <Cite ids={['aalto-thinning2023']} note="p. 2" />. The script uses no other
+output or input for 2019 to 2024, so NBE = NEE in these years. De Quesada et al. give a similar removal,
+<Num k="literatureByKey.dequesadaRemoval.value" digits={1} /> ± <Num k="literatureByKey.dequesadaRemoval.uncertainty" digits={1} /> kg C m⁻²,
+and their NEP does not include it <Cite ids={['dequesada2025']} note="p. 3; p. 7" />.
+
+**Figure.** The x axis is the annual GPP. The y axis is the annual carbon out, TER + C_out − C_in. Thus y − x = NBE, and the
+dotted 1:1 line is NBE = 0. A site-year is in the figure when it is a full year, it is reliable (measured fraction
+<Num k="method.minFrac" digits={1} /> or more, longest gap <Num k="method.maxGapDays" digits={0} /> days or less), it has
+annual GPP and TER sums (both not empty), and it has an NBE. This is the rule of Figure 4 of Deep Dive #9. The summary values use the
+site-years of the six sites in the figure, without Hyytiälä: n, mean, sample SD, minimum and maximum. There is no test;
+n is small and the site-years of one site are not independent.
+
+## Results
+
+<Figure id="figure-1" svgFile="analysis/net-biome-exchange/figures/1-nbe-carbon-space.svg" view={VIEW1} />
+
+For the six sites in the figure, NEE was <Num k={`${FS}.nee.mean`} digits={0} /> ± <Num k={`${FS}.nee.sd`} digits={0} /> {UA}
+(mean ± SD, n = <Num k={`${FS}.nee.n`} digits={0} />, range <Num k={`${FS}.nee.min`} digits={0} /> to <Num k={`${FS}.nee.max`} digits={0} sign />).
+NBE was <Num k={`${FS}.nbe.mean`} digits={0} sign /> ± <Num k={`${FS}.nbe.sd`} digits={0} /> {UA} (range
+<Num k={`${FS}.nbe.min`} digits={0} /> to <Num k={`${FS}.nbe.max`} digits={0} sign />). C_out − C_in was
+<Num k={`${FS}.cNet.mean`} digits={0} sign /> ± <Num k={`${FS}.cNet.sd`} digits={0} /> {UA} (range
+<Num k={`${FS}.cNet.min`} digits={0} /> to <Num k={`${FS}.cNet.max`} digits={0} sign />). With the central values,
+<Num k={`${FS}.nSourceNbe`} digits={0} /> site-years had NBE above zero. With the low and the high ends of the ranges, the
+count was <Num k={`${FS}.nSourceNbeLow`} digits={0} /> and <Num k={`${FS}.nSourceNbeHigh`} digits={0} />.
+
+At <E site="anttila" />Anttila, <E site="sarkisuo" />Särkisuo and in the <E site="haltiala" />Haltiala grain years, the harvest
+carbon was larger than the net CO₂ uptake. For example, Anttila 2023 had NEE <V k="anttila-2023" f="nee" /> and NBE
+<V k="anttila-2023" f="nbe" sign /> {UA}; Haltiala 2022 (oats) had NEE <V k="haltiala-2022" f="nee" /> and NBE
+<V k="haltiala-2022" f="nbe" sign />. In Haltiala 2024, the sunflower crop stayed on the field, so NBE = NEE
+(<V k="haltiala-2024" f="nbe" />). The failed grass year Haltiala 2023 had NBE <V k="haltiala-2023" f="nbe" sign /> with the central manure value. Its
+range, <V k="haltiala-2023" f="nbeLow" /> to <V k="haltiala-2023" f="nbeHigh" sign />, includes zero because the manure
+volume and type are not certain.
+
+At <E site="qvidja" />Qvidja, the organic inputs were larger than the harvest carbon in 2022 and 2023. In 2023, the compost fibre brought
+<V k="qvidja-2023" f="cIn" /> {UA}. NEE was <V k="qvidja-2023" f="nee" sign />, but NBE was <V k="qvidja-2023" f="nbe" />
+{UA} (range <V k="qvidja-2023" f="nbeLow" /> to <V k="qvidja-2023" f="nbeHigh" />). In 2022, the compost made NBE
+<V k="qvidja-2022" f="nbe" /> from an NEE of <V k="qvidja-2022" f="nee" sign />. A negative NBE after a large input shows
+carbon that came into the field; it does not show that the soil kept it. At <E site="viikki" />Viikki 2024, the manure
+assumptions give a wide range (<V k="viikki-2024" f="nbeLow" /> to <V k="viikki-2024" f="nbeHigh" sign />).
+
+The <E site="hyytiala" />Hyytiälä forest had NBE = NEE in the years without management, from
+<Num k="summary.hyytiala.nee.min" digits={0} /> to <Num k="summary.hyytiala.neeMaxWithoutThinning" digits={0} /> {UA}. In the thinning year, NEE was
+<Num k="summary.hyytiala.thinning.nee" digits={0} sign /> and the removal was <Num k="summary.hyytiala.thinning.cOut" digits={0} /> {UA}.
+NBE was therefore <Num k="summary.hyytiala.thinning.nbe" digits={0} sign /> {UA} (range
+<Num k="summary.hyytiala.thinning.nbeLow" digits={0} /> to <Num k="summary.hyytiala.thinning.nbeHigh" digits={0} />). NBE
+counts the removed carbon in the year of the removal, although wood products can keep it for years.
+
+### Tables
+
+<div class="table-wrap">
+<table>
+<caption>Site-years with NBE. NEE, C_out, C_in and NBE in {UA}. Haltiala 2021 (from 7 May) and Qvidja 2018 (from 9 May) are partial years: their values are sums over the measured part of the year, not annual values. Range = low to high NBE of the assumptions (class B). Assumptions: the letters of the method; "thinning" = Hyytiälä 2020. Figure: "yes" or the reason why the site-year is not in Figure 1.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col" class="num">Year</th><th scope="col">Crop</th><th scope="col" class="num">NEE</th><th scope="col" class="num">C_out</th><th scope="col" class="num">C_in</th><th scope="col" class="num">NBE</th><th scope="col" class="num">Range</th><th scope="col">Class</th><th scope="col">Assumptions</th><th scope="col">Figure</th></tr>
+</thead>
+<tbody>
+{rows.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td class="num">{r.year}</td><td class="wrap">{r.crop}</td><td class="num">{r.nee}</td><td class="num">{r.cOut}</td><td class="num">{r.cIn}</td><td class="num">{r.nbe}</td><td class="num">{r.range}</td><td>{r.cls}</td><td class="wrap">{r.assumptions}</td><td class="wrap">{r.figure}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Site-years without NBE, with the reason.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col" class="num">Year</th><th scope="col">Reason</th></tr>
+</thead>
+<tbody>
+{noRows.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td class="num">{r.year}</td><td class="wrap">{r.reason}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Values from the literature (script table LITERATURE). Page = page of the PDF.</caption>
+<thead>
+<tr><th scope="col">Value</th><th scope="col">Text</th><th scope="col">Source</th><th scope="col">Page</th></tr>
+</thead>
+<tbody>
+{lit.map((r) => (<tr id={r.id}><td class="num">{r.value}</td><td class="wrap">{r.text}</td><td>{r.source}</td><td class="wrap">{r.page}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+## Limits and uncertainty
+
+- **Assumed terms.** Viikki has no class-A year: the crop carbon fraction is not measured there. The manure terms of
+  Viikki and Haltiala come from DM and N values of one manure analysis on the Viikki farm, not of the applied lots. The
+  ranges show the effect of these choices only roughly.
+- **Partial years.** Haltiala 2021 starts on 7 May and Qvidja 2018 on 9 May. Their NEE, C_out, C_in and NBE are sums over
+  the measured part of the year, not annual values. They are not in the figure.
+- **NEE uncertainty.** The range does not include the uncertainty of the annual NEE. Many half hours are gap-filled,
+  and the annual sums depend on the gap-filling model <Cite ids={['calculated-doc']} />.
+- **Fate of the carbon.** NBE counts the carbon of an input when it comes in and the carbon of a harvest when it goes out.
+  It does not say how much of an input stays in the soil, or when the harvested carbon goes back to the atmosphere.
+- **Yield data.** Haltiala 2025 yield may be a fresh weight (note of the management table). The Qvidja 2021 broiler litter
+  is not in the input of Heimsch et al. <Cite ids={['heimsch2024']} note="p. 6, Table 1" />; it is possible that it was
+  not applied in the flux footprint.
+- **Time stamps.** The raw stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as UTC+2 (findings
+  <a href={`${base}data-report/#finding-ANT-01`}>ANT-01</a>, <a href={`${base}data-report/#finding-SAR-01`}>SAR-01</a> and
+  <a href={`${base}data-report/#finding-VII-01`}>VII-01</a>; status: waits for provider) <Cite ids={['anomaly-report']} />.
+  The annual NEE changes only by the 2 hours at the ends of the year; we expect a small effect, but the script does not
+  give its size. The management terms do not change.
+- **Qvidja and Viikki NEE.** The Qvidja annual NEE of the database is more negative than in Heimsch et al. 2024
+  (<a href={`${base}data-report/#finding-QVI-11`}>QVI-11</a>; status: open question; the annual sums differ by 25 to
+  109 g C m⁻² yr⁻¹), so the Qvidja NBE can be too low. The Viikki 2024 gap-filled NEE differs from the measured NEE in some half hours
+  (<a href={`${base}data-report/#finding-VII-05`}>VII-05</a>; status: known, verified; the annual NEE is 20.4 instead of
+  22.5 g C m⁻² yr⁻¹, a difference of 2) <Cite ids={['anomaly-report']} />.
+  The Viikki NEE unit comes from the file headers; a wrong unit would scale NEE but not the management terms.
+- **Forest footprint.** The removal is a plot mean for the 200 m radius; the flux footprint of the tower is not the same
+  area. The forest NEE comes from another gap-filling and partitioning method than the fields <Cite ids={['kulmala2019']} />.
+- **No CH₄.** NBE contains CO₂-C only. The calculated NECB of this project also subtracts CH₄-C
+  <Cite ids={['calculated-doc']} />.
+- **Not checked.** No independent recompute or review was made yet. The snapshot is not yet published as a release asset.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `analysis/net-biome-exchange/results.json`. The Python script
+<a href={`${REPO_URL}/blob/main/analysis/net-biome-exchange/net-biome-exchange.py`}><code>analysis/net-biome-exchange/net-biome-exchange.py</code></a>
+writes this file, `manifest.json` and the SVG figure. It reads the database snapshot built on {d.dataVersion.snapshot.builtAt},
+`data/calculated/annual.csv` and `data/calculated/management_carbon.csv` of the same build, and the Hyytiälä files of the
+SMEAR API. Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
+The table gives the SHA-256, the row count and the columns read of each file (paths relative to the `--db`,
+`--calculated` and `--smear` folders); the script stops when a hash does not agree. The folder
+<a href={`${REPO_URL}/tree/main/analysis/net-biome-exchange`}><code>analysis/net-biome-exchange/</code></a> has the lock
+file, the unit tests and a README.
+
+<div class="table-wrap">
+<table>
+<caption>Input files (database built {d.dataVersion.snapshot.builtAt}, calculated data built {d.dataVersion.snapshot.calcBuiltAt}).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col">SHA-256</th><th scope="col" class="num">Rows</th><th scope="col">Columns read</th></tr>
+</thead>
+<tbody>
+{inputs.map((r) => (<tr><td>{r.path}</td><td class="wrap"><code>{r.sha256}</code></td><td class="num">{r.rows}</td><td class="wrap"><code>{r.columns}</code></td></tr>))}
+</tbody>
+</table>
+</div>
+
+```sh
+uv run analysis/net-biome-exchange/net-biome-exchange.py --db db --calculated data/calculated --smear data/smear/hyytiala
+uv run analysis/net-biome-exchange/net-biome-exchange.py --db db --calculated data/calculated --smear data/smear/hyytiala --check
+npm run deep-dives -- --check                    # all dives, TypeScript and Python
+```

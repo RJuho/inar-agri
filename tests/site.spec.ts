@@ -2036,6 +2036,44 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
+  test('the net biome exchange dive (Python) has one figure, the NBE tables and an SVG download', async ({ page, request }) => {
+    const slug = 'net-biome-exchange';
+    await page.goto(`/deep-dive/${slug}/`);
+    await expect(page.locator('h1')).toContainText('Net biome exchange');
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #10');
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
+    expect(await figures.count()).toBe(1);
+    const info = await figures.first().evaluate((el) => ({
+      first: el.children[0]?.tagName.toLowerCase(),
+      second: el.children[1]?.tagName.toLowerCase(),
+      desc: el.children[1]?.textContent?.trim() ?? '',
+    }));
+    expect([info.first, info.second]).toEqual(['title', 'desc']);
+    expect(info.desc).toContain('NBE');
+    const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(downloads.length).toBe(1);
+    for (const href of downloads) {
+      expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
+      const res = await request.get(href);
+      expect(res.status(), href).toBe(200);
+    }
+    // 27 site-years with NBE (21 of the six sites, 6 Hyytiälä), 12 without NBE (Maktau).
+    await expect(page.locator('tr[id^="nbe-"]')).toHaveCount(27);
+    await expect(page.locator('tr[id^="nonbe-"]')).toHaveCount(12);
+    await expect(page.locator('tr[id^="nonbe-maktau-"]')).toHaveCount(12);
+    await expect(page.locator('tr#nbe-hyytiala-2020 td').nth(8)).toHaveText('B');
+    await expect(page.locator('tr#nbe-anttila-2022 td').nth(8)).toHaveText('A');
+    await expect(page.locator('tr[id^="lit-"]').first()).toBeVisible();
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(50);
+    const text = await page.locator('main').innerText();
+    expect(text).not.toMatch(/\bundefined\b|\bNaN\b/);
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    await expectOnlyUpdateScript(page);
+  });
+
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -2053,7 +2091,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/', '/deep-dive/carbon-space/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/', '/deep-dive/carbon-space/', '/deep-dive/net-biome-exchange/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);

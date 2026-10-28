@@ -89,6 +89,11 @@ export const EXTRA_REFERENCES = {
     doi: '10.1016/j.agrformet.2019.02.029',
     file: 'data/smear/hyytiala/README.md',
   },
+  'aalto-thinning2023': {
+    short: 'Aalto et al. 2023',
+    text: 'Aalto, J., Kolari, P., Korpela, I., Schiestl-Aalto, P. and Bäck, J. (2023). SMEAR II forest thinning: Description of the methods and background information for carbon storage estimation. University of Helsinki, updated 22 June 2023. Report with the carbon storage of the 2020 thinning of the SMEAR II Hyytiälä forest (Table 3: commercial removal and cutting residue).',
+    file: 'data/Hyytiälä/Hyytiala thinning description_updated230622.pdf',
+  },
   dequesada2025: {
     short: 'de Quesada et al. 2025',
     text: 'de Quesada, G., Rautakoski, H., Xu, J., Li, Q., Larmola, T., Salovaara, P., Anttila, V., Peltoniemi, M., Koskinen, M., Lohila, A., Aalto, J., Lehtonen, A., Bäck, J., Mäkipää, R., Heinonsalo, J., Salmon, Y. and Lintunen, A. (2025). Carbon dynamics after thinning in two boreal forest sites: Upland and drained peatland. Forest Ecology and Management 595, 123024. The thinning of the SMEAR II Hyytiälä forest in early 2020.',

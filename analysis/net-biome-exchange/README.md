@@ -1,0 +1,13 @@
+# Net biome exchange (NBE)
+
+Question: how does the annual carbon balance of a site-year change when the carbon of the harvest, the grazing, the thinning and the organic inputs is added to NEE? NBE = NEE + C_out − C_in (g C m⁻² yr⁻¹, positive = carbon loss, CO₂-C only). Article: https://inar.rjuho.dev/deep-dive/net-biome-exchange/
+
+Data: the harmonised database snapshot of 2026-10-23 (`builtAt` 2026-10-23T19:03:07.928Z): `db/sites.parquet`, `db/events.parquet` (only the volume note of the Haltiala 2023 manure), `data/calculated/annual.csv` and `data/calculated/management_carbon.csv` (calculated products of the same build, `built_at` 2026-10-23T19:03:09.003Z). The release asset `db-2026-10-23.zip` is not yet published (TODO); a local copy is in `snapshots/db-2026-10-23/` (not in git). The script docstring gives the SHA-256 and the row count of each input file. Reference site: SMEAR II Hyytiälä 2019 to 2024 from the SMEAR API in `data/smear/hyytiala/` (not in git; `data/smear/hyytiala/README.md` gives the download commands), the same files as Deep Dive #9 (carbon-space). The thinning removal of 2020 comes from the thinning description of Aalto et al. (2023), `data/Hyytiälä/Hyytiala thinning description_updated230622.pdf`, Table 3, p. 7.
+
+Method: management carbon per site-year from `management_carbon.csv` (harvest = C_out, fertilisation with carbon = C_in). Rows without site carbon data get an assumption with a page (`LITERATURE`, `assumption_terms()`); each assumption gives a low and a high NBE. Class A = full year and all terms from site data; class B = an assumed term or a partial year. Maktau has no NBE (no yield, residue or input data). The figure shows the full and reliable site-years (as Deep Dive #9 Figure 4).
+
+Figure (`figures/`): 1 `1-nbe-carbon-space.svg` annual carbon out (TER + C_out − C_in) against annual GPP; the vertical distance from the 1:1 line is NBE.
+
+Run (from the repository root): `uv run analysis/net-biome-exchange/net-biome-exchange.py --db db --calculated data/calculated --smear data/smear/hyytiala` (or `--db snapshots/db-2026-10-23/db --calculated snapshots/db-2026-10-23/calculated` when `db/` holds a newer build); check against the committed results: add `--check`.
+
+Develop: `uvx ruff@0.17.2 format analysis/net-biome-exchange && uvx ruff@0.17.2 check analysis/net-biome-exchange`, `uv run --with pyright==1.1.414 --with pytest==9.1.1 --with-requirements analysis/net-biome-exchange/net-biome-exchange.py pyright analysis/net-biome-exchange`, `uv run --with pytest==9.1.1 --with-requirements analysis/net-biome-exchange/net-biome-exchange.py pytest analysis/net-biome-exchange/`. The test `test_against_necb` checks NBE = −NECB − CH₄-C of `necb.csv` for the class-A site-years.
