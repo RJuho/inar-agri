@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-28T06:17:28Z",
+  "generatedAt": "2026-10-28T06:38:15Z",
   "git": {
-    "commit": "ec301ef",
+    "commit": "476ff98",
     "dirty": true
   },
   "script": {
     "path": "analysis/carbon-space/carbon-space.py",
-    "sha256": "444ffdf9c7988995b10a64022ccd4f5e6ca7afc7d4872883a431325728ea8bcf"
+    "sha256": "4766d241f82eafff2ce12cea1e0d10458db06d93c34ef0dc96e98bc118dd9ff5"
   },
   "lock": {
     "path": "analysis/carbon-space/carbon-space.py.lock",
@@ -468,27 +468,27 @@
     }
   },
   "outputs": {
-    "results.json": "dc9894bb17cd3045bee162ae4f2b77ca2dbd2463b7c32c51a6ac8776ef277600",
+    "results.json": "fdc42c15895161134cd1cca9b778ed5b870aec5084041832f0e56c5f4471ea32",
     "figures": {
       "figures/1-carbon-space.svg": {
-        "sha256": "6c7d619ecd99042069de0e9dd71115a68fd7bc491274ab1e95c7ce00e7ed2a2a",
-        "sha256WithoutMetadata": "ba0050c4ce82d0aa1f83695e2bda92c9410c4e58e4742da3d0767fad13308b3c"
+        "sha256": "e319ed2f5c217baba18f2babbbb006801777b89637f7c9afd2017b73895db7eb",
+        "sha256WithoutMetadata": "e21c67a50f969ec797082fa24531b861552d86145153a4fc1bfd43ef167e2c56"
       },
       "figures/2-uptake-days.svg": {
-        "sha256": "8a6a236cde1c98fdf815eba4cbaf71447a8e64a0ff2332551b1d4d644ac881a6",
-        "sha256WithoutMetadata": "b2718067e0fae78de69795880997d54281b7daef67581a7aed7eb9d9ba386f39"
+        "sha256": "1ef85aefac6f05c8bc7ac16735dd092101a3bff1aedfaf2e8c223e113e0bf5f7",
+        "sha256WithoutMetadata": "c21257cea3296c38d3b3addbc77219a7132df196de01610bab92668158ee968e"
       },
       "figures/3-uptake-days-peak.svg": {
-        "sha256": "46f8a99e4531c8a15cb2853643ea15f91fce5f2747a6339ed8d911452ad66330",
-        "sha256WithoutMetadata": "427db3d321e6d4c9fe1ff33a1dcff002306230bb825de1898aa463bf9756bb59"
+        "sha256": "b5aa4591f12438d0d0f8027db4fafb2ef0bb0f920429e05c05c0793793d6c9b8",
+        "sha256WithoutMetadata": "52cc85a9848c1d1f02f03d4b82d13bd9e03059870de3e85b0d01dec8ab972092"
       },
       "figures/4-carbon-space-forest.svg": {
-        "sha256": "2ed1377433d11ba23830dc306c9e82fe039f1341b801bde12bbf10cf733da37f",
-        "sha256WithoutMetadata": "9c89f3bc43bd618126a5963f6fc2cc4d628917b53dabe73a3186ce7ec9f7d0ac"
+        "sha256": "8b0ea628104db749361d802f6862c7354761d437b9d8c0fca41c32072bd2d2b2",
+        "sha256WithoutMetadata": "9732550219745fb0630ba886ef7d57d499eb51701ef23c64e74416768555376f"
       },
       "figures/5-uptake-days-peak-forest.svg": {
-        "sha256": "fa5ff445a2bbb44a41ace704923b3eebbeef99e775b54a37fc495b373e915689",
-        "sha256WithoutMetadata": "41a336bba3805f2221f16d34b7ae25c9ec657c32333ece86e3d61c15c5fc5756"
+        "sha256": "ca71a76595d01f65b2f38987a6e195ffec467721a9dba2704d4f448ae4394e26",
+        "sha256WithoutMetadata": "f2fcf7fb2392960bb8277a7e78d68a465b426587758683f8b99f5064bc638af2"
       }
     }
   }

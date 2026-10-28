@@ -12,7 +12,7 @@
     <dc:description>Grouped bar chart of 16 site-years (full and reliable years), grouped by site, the same layout as Figure 2. Per site-year, the left bar (full site colour) is the share of days with daily NEE &lt; 0 over the whole year, the right bar (lighter, hatched) the share inside the 90 consecutive local days with the largest GPP sum of the year (80 or more days with GPP); y axis days with net CO2 uptake, NEE &lt; 0 (%), 0 to 100, faint guide lines at 25, 50, 75 and 100 % (the 50 % line dotted and a little stronger). Mean ± SD (range) of the peak window: Finnish sites 78 % ± 7 % (68 % to 91 %, n = 15), grassland 79 % ± 7 % (68 % to 91 %, n = 11), annual crops 76 % ± 7 % (69 % to 83 %, n = 5), annual crops without Maktau 75 % ± 8 % (69 % to 83 %, n = 4). Per site-year: Anttila 2022: 36 % of the year, window 2022-05-24 to 2022-08-21 79 % (mean measured fraction 0.64); Anttila 2023: 36 % of the year, window 2023-05-10 to 2023-08-07 86 % (mean measured fraction 0.70); Särkisuo 2022: 29 % of the year, window 2022-06-10 to 2022-09-07 74 % (mean measured fraction 0.56); Särkisuo 2023: 31 % of the year, window 2023-07-10 to 2023-10-07 68 % (mean measured fraction 0.54); Haltiala 2022 oats: 24 % of the year, window 2022-05-19 to 2022-08-16 69 % (mean measured fraction 0.69); Haltiala 2023 grass (failed): 25 % of the year, window 2023-05-09 to 2023-08-06 86 % (mean measured fraction 0.68); Haltiala 2024 sunflower: 24 % of the year, window 2024-06-27 to 2024-09-24 83 % (mean measured fraction 0.65); Haltiala 2025 oats: 18 % of the year, window 2025-05-28 to 2025-08-25 69 % (mean measured fraction 0.73); Qvidja 2020: 37 % of the year, window 2020-05-07 to 2020-08-04 83 % (mean measured fraction 0.27); Qvidja 2022: 29 % of the year, window 2022-05-18 to 2022-08-15 77 % (mean measured fraction 0.40); Qvidja 2023: 27 % of the year, window 2023-05-18 to 2023-08-15 71 % (mean measured fraction 0.36); Qvidja 2024: 32 % of the year, window 2024-06-01 to 2024-08-29 73 % (mean measured fraction 0.43); Qvidja 2025: 28 % of the year, window 2025-05-07 to 2025-08-04 83 % (mean measured fraction 0.29); Viikki 2024: 36 % of the year, window 2024-06-15 to 2024-09-12 91 % (mean measured fraction 0.28); Viikki 2025 faba bean: 27 % of the year, window 2025-06-14 to 2025-09-11 80 % (mean measured fraction 0.15); Maktau 2019 maize: 87 % of the year, window 2019-10-03 to 2019-12-31 81 % (mean measured fraction 0.75).</dc:description>
     <dc:format>image/svg+xml</dc:format>
     <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; calculated/annual.csv sha256 27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9; smear/HYY_EDDY233_NEE_GPP_2020.csv sha256 75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20; smear/HYY_EDDYMAST_F_c_270_2020.csv sha256 fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2; smear/HYY_EDDY233_NEE_GPP_2021.csv sha256 468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5; smear/HYY_EDDYMAST_F_c_270_2021.csv sha256 5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d; smear/HYY_EDDY233_NEE_GPP_2022.csv sha256 4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb; smear/HYY_EDDYMAST_F_c_270_2022.csv sha256 c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762; smear/HYY_EDDY233_NEE_GPP_2023.csv sha256 cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914; smear/HYY_EDDYMAST_F_c_270_2023.csv sha256 95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a; smear/HYY_EDDY233_NEE_GPP_2024.csv sha256 2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a; smear/HYY_EDDYMAST_F_c_270_2024.csv sha256 b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3; smear/HYY_EDDY233_NEE_GPP_2025.csv sha256 55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508; smear/HYY_EDDYMAST_F_c_270_2025.csv sha256 39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b</dc:relation>
-    <dc:source>analysis/carbon-space/carbon-space.py (git ec301ef, dirty)</dc:source>
+    <dc:source>analysis/carbon-space/carbon-space.py (git 476ff98, dirty)</dc:source>
     <dc:creator>
      <cc:Agent>
       <dc:title>matplotlib 3.11.2</dc:title>
@@ -35,128 +35,128 @@ z
   </g>
   <g id="cs3-axes_1">
    <g id="cs3-patch_2">
-    <path d="M 58.677165 226.771654 
-L 500.031496 226.771654 
+    <path d="M 58.677165 212.598425 
+L 500.031496 212.598425 
 L 500.031496 34.015748 
 L 58.677165 34.015748 
 z
 " style="fill: #ffffff"/>
    </g>
    <g id="cs3-line2d_1">
-    <path d="M 58.677165 178.582677 
-L 500.031496 178.582677 
-" clip-path="url(#cs3-p0891680b88)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.8; stroke-linecap: square"/>
+    <path d="M 58.677165 167.952756 
+L 500.031496 167.952756 
+" clip-path="url(#cs3-p3300e0605f)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.8; stroke-linecap: square"/>
    </g>
    <g id="cs3-line2d_2">
-    <path d="M 58.677165 82.204724 
-L 500.031496 82.204724 
-" clip-path="url(#cs3-p0891680b88)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.8; stroke-linecap: square"/>
+    <path d="M 58.677165 78.661417 
+L 500.031496 78.661417 
+" clip-path="url(#cs3-p3300e0605f)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.8; stroke-linecap: square"/>
    </g>
    <g id="cs3-line2d_3">
     <path d="M 58.677165 34.015748 
 L 500.031496 34.015748 
-" clip-path="url(#cs3-p0891680b88)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.8; stroke-linecap: square"/>
    </g>
    <g id="cs3-line2d_4">
-    <path d="M 58.677165 130.393701 
-L 500.031496 130.393701 
-" clip-path="url(#cs3-p0891680b88)" style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #a8a8a8; stroke-width: 1.2"/>
+    <path d="M 58.677165 123.307087 
+L 500.031496 123.307087 
+" clip-path="url(#cs3-p3300e0605f)" style="fill: none; stroke-dasharray: 1.2,1.98; stroke-dashoffset: 0; stroke: #a8a8a8; stroke-width: 1.2"/>
    </g>
    <g id="cs3-matplotlib.axis_1">
     <g id="cs3-xtick_1">
      <g id="cs3-line2d_5"/>
      <g id="cs3-text_1">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="72.085398" y="235.754808" transform="rotate(-0 72.085398 235.754808)">2022</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="72.085398" y="221.581579" transform="rotate(-0 72.085398 221.581579)">2022</text>
      </g>
     </g>
     <g id="cs3-xtick_2">
      <g id="cs3-line2d_6"/>
      <g id="cs3-text_2">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="94.432453" y="235.754808" transform="rotate(-0 94.432453 235.754808)">2023</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="94.432453" y="221.581579" transform="rotate(-0 94.432453 221.581579)">2023</text>
      </g>
     </g>
     <g id="cs3-xtick_3">
      <g id="cs3-line2d_7"/>
      <g id="cs3-text_3">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="125.71833" y="235.754808" transform="rotate(-0 125.71833 235.754808)">2022</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="125.71833" y="221.581579" transform="rotate(-0 125.71833 221.581579)">2022</text>
      </g>
     </g>
     <g id="cs3-xtick_4">
      <g id="cs3-line2d_8"/>
      <g id="cs3-text_4">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="148.065384" y="235.754808" transform="rotate(-0 148.065384 235.754808)">2023</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="148.065384" y="221.581579" transform="rotate(-0 148.065384 221.581579)">2023</text>
      </g>
     </g>
     <g id="cs3-xtick_5">
      <g id="cs3-line2d_9"/>
      <g id="cs3-text_5">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="179.351261" y="235.754808" transform="rotate(-0 179.351261 235.754808)">2022</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="179.351261" y="221.581579" transform="rotate(-0 179.351261 221.581579)">2022</text>
      </g>
     </g>
     <g id="cs3-xtick_6">
      <g id="cs3-line2d_10"/>
      <g id="cs3-text_6">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="208.402432" y="235.754808" transform="rotate(-0 208.402432 235.754808)">2023</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="208.402432" y="221.581579" transform="rotate(-0 208.402432 221.581579)">2023</text>
      </g>
     </g>
     <g id="cs3-xtick_7">
      <g id="cs3-line2d_11"/>
      <g id="cs3-text_7">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="246.392425" y="235.754808" transform="rotate(-0 246.392425 235.754808)">2024</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="246.392425" y="221.581579" transform="rotate(-0 246.392425 221.581579)">2024</text>
      </g>
     </g>
     <g id="cs3-xtick_8">
      <g id="cs3-line2d_12"/>
      <g id="cs3-text_8">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="277.678302" y="235.754808" transform="rotate(-0 277.678302 235.754808)">2025</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="277.678302" y="221.581579" transform="rotate(-0 277.678302 221.581579)">2025</text>
      </g>
     </g>
     <g id="cs3-xtick_9">
      <g id="cs3-line2d_13"/>
      <g id="cs3-text_9">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="308.964178" y="235.754808" transform="rotate(-0 308.964178 235.754808)">2020</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="308.964178" y="221.581579" transform="rotate(-0 308.964178 221.581579)">2020</text>
      </g>
     </g>
     <g id="cs3-xtick_10">
      <g id="cs3-line2d_14"/>
      <g id="cs3-text_10">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="331.311233" y="235.754808" transform="rotate(-0 331.311233 235.754808)">2022</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="331.311233" y="221.581579" transform="rotate(-0 331.311233 221.581579)">2022</text>
      </g>
     </g>
     <g id="cs3-xtick_11">
      <g id="cs3-line2d_15"/>
      <g id="cs3-text_11">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="353.658288" y="235.754808" transform="rotate(-0 353.658288 235.754808)">2023</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="353.658288" y="221.581579" transform="rotate(-0 353.658288 221.581579)">2023</text>
      </g>
     </g>
     <g id="cs3-xtick_12">
      <g id="cs3-line2d_16"/>
      <g id="cs3-text_12">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="376.005342" y="235.754808" transform="rotate(-0 376.005342 235.754808)">2024</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="376.005342" y="221.581579" transform="rotate(-0 376.005342 221.581579)">2024</text>
      </g>
     </g>
     <g id="cs3-xtick_13">
      <g id="cs3-line2d_17"/>
      <g id="cs3-text_13">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="398.352397" y="235.754808" transform="rotate(-0 398.352397 235.754808)">2025</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="398.352397" y="221.581579" transform="rotate(-0 398.352397 221.581579)">2025</text>
      </g>
     </g>
     <g id="cs3-xtick_14">
      <g id="cs3-line2d_18"/>
      <g id="cs3-text_14">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="429.638274" y="235.754808" transform="rotate(-0 429.638274 235.754808)">2024</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="429.638274" y="221.581579" transform="rotate(-0 429.638274 221.581579)">2024</text>
      </g>
     </g>
     <g id="cs3-xtick_15">
      <g id="cs3-line2d_19"/>
      <g id="cs3-text_15">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="451.985328" y="235.754808" transform="rotate(-0 451.985328 235.754808)">2025</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="451.985328" y="221.581579" transform="rotate(-0 451.985328 221.581579)">2025</text>
      </g>
     </g>
     <g id="cs3-xtick_16">
      <g id="cs3-line2d_20"/>
      <g id="cs3-text_16">
-      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="483.271205" y="235.754808" transform="rotate(-0 483.271205 235.754808)">2019</text>
+      <text style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="483.271205" y="221.581579" transform="rotate(-0 483.271205 221.581579)">2019</text>
      </g>
     </g>
    </g>
@@ -169,41 +169,41 @@ L -3.5 0
 " style="stroke: #222222; stroke-width: 0.9"/>
       </defs>
       <g>
-       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="226.771654" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="212.598425" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
       </g>
      </g>
      <g id="cs3-text_17">
-      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="230.760423" transform="rotate(-0 51.677165 230.760423)">0</text>
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="216.587195" transform="rotate(-0 51.677165 216.587195)">0</text>
      </g>
     </g>
     <g id="cs3-ytick_2">
      <g id="cs3-line2d_22">
       <g>
-       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="178.582677" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="167.952756" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
       </g>
      </g>
      <g id="cs3-text_18">
-      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="182.571447" transform="rotate(-0 51.677165 182.571447)">25</text>
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="171.941525" transform="rotate(-0 51.677165 171.941525)">25</text>
      </g>
     </g>
     <g id="cs3-ytick_3">
      <g id="cs3-line2d_23">
       <g>
-       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="130.393701" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="123.307087" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
       </g>
      </g>
      <g id="cs3-text_19">
-      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="134.38247" transform="rotate(-0 51.677165 134.38247)">50</text>
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="127.295856" transform="rotate(-0 51.677165 127.295856)">50</text>
      </g>
     </g>
     <g id="cs3-ytick_4">
      <g id="cs3-line2d_24">
       <g>
-       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="82.204724" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+       <use xlink:href="#cs3-m3937a23c5d" x="58.677165" y="78.661417" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
       </g>
      </g>
      <g id="cs3-text_20">
-      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="86.193494" transform="rotate(-0 51.677165 86.193494)">75</text>
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="51.677165" y="82.650187" transform="rotate(-0 51.677165 82.650187)">75</text>
      </g>
     </g>
     <g id="cs3-ytick_5">
@@ -218,7 +218,7 @@ L -3.5 0
     </g>
     <g id="cs3-text_22">
      <!-- Days with net CO$_2$ uptake, -->
-     <g style="fill: #222222" transform="translate(10.304358 204.924951) rotate(-90)">
+     <g style="fill: #222222" transform="translate(10.304358 197.838337) rotate(-90)">
       <text style="font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-variant-numeric: tabular-nums">
        <tspan x="0" y="-0.453125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">D</tspan>
        <tspan x="8.66272" y="-0.453125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
@@ -247,312 +247,312 @@ L -3.5 0
        <tspan x="97.951904" y="1.23437" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">2</tspan>
       </text>
      </g>
-     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(23.806555 165.099951) rotate(-90)">NEE &lt; 0 (%)</text>
+     <text style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(23.806555 158.013337) rotate(-90)">NEE &lt; 0 (%)</text>
     </g>
    </g>
    <g id="cs3-patch_3">
-    <path d="M 63.146576 226.771654 
-L 72.085398 226.771654 
-L 72.085398 158.118865 
-L 63.146576 158.118865 
+    <path d="M 63.146576 212.598425 
+L 72.085398 212.598425 
+L 72.085398 148.993636 
+L 63.146576 148.993636 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #0072b2; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #0072b2; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_4">
-    <path d="M 72.085398 226.771654 
-L 81.02422 226.771654 
-L 81.02422 74.708661 
-L 72.085398 74.708661 
+    <path d="M 72.085398 212.598425 
+L 81.02422 212.598425 
+L 81.02422 71.716535 
+L 72.085398 71.716535 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h987209d198); stroke: #0072b2; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h987209d198); stroke: #0072b2; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_5">
-    <path d="M 85.493631 226.771654 
-L 94.432453 226.771654 
-L 94.432453 157.590767 
-L 85.493631 157.590767 
+    <path d="M 85.493631 212.598425 
+L 94.432453 212.598425 
+L 94.432453 148.504368 
+L 85.493631 148.504368 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #0072b2; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #0072b2; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_6">
-    <path d="M 94.432453 226.771654 
-L 103.371275 226.771654 
-L 103.371275 61.858268 
-L 94.432453 61.858268 
+    <path d="M 94.432453 212.598425 
+L 103.371275 212.598425 
+L 103.371275 59.811024 
+L 94.432453 59.811024 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h987209d198); stroke: #0072b2; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h987209d198); stroke: #0072b2; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_7">
-    <path d="M 116.779508 226.771654 
-L 125.71833 226.771654 
-L 125.71833 171.321325 
-L 116.779508 171.321325 
+    <path d="M 116.779508 212.598425 
+L 125.71833 212.598425 
+L 125.71833 161.225326 
+L 116.779508 161.225326 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #e69f00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #e69f00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_8">
-    <path d="M 125.71833 226.771654 
-L 134.657151 226.771654 
-L 134.657151 83.275591 
-L 125.71833 83.275591 
+    <path d="M 125.71833 212.598425 
+L 134.657151 212.598425 
+L 134.657151 79.653543 
+L 125.71833 79.653543 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h9c2882545d); stroke: #e69f00; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h9c2882545d); stroke: #e69f00; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_9">
-    <path d="M 139.126562 226.771654 
-L 148.065384 226.771654 
-L 148.065384 166.568439 
-L 139.126562 166.568439 
+    <path d="M 139.126562 212.598425 
+L 148.065384 212.598425 
+L 148.065384 156.821918 
+L 139.126562 156.821918 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #e69f00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #e69f00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_10">
-    <path d="M 148.065384 226.771654 
-L 157.004206 226.771654 
-L 157.004206 96.125984 
-L 148.065384 96.125984 
+    <path d="M 148.065384 212.598425 
+L 157.004206 212.598425 
+L 157.004206 91.559055 
+L 148.065384 91.559055 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h9c2882545d); stroke: #e69f00; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h9c2882545d); stroke: #e69f00; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_11">
-    <path d="M 170.412439 226.771654 
-L 179.351261 226.771654 
-L 179.351261 180.298997 
-L 170.412439 180.298997 
+    <path d="M 170.412439 212.598425 
+L 179.351261 212.598425 
+L 179.351261 169.542876 
+L 170.412439 169.542876 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_12">
-    <path d="M 179.351261 226.771654 
-L 188.290083 226.771654 
-L 188.290083 93.984252 
-L 179.351261 93.984252 
+    <path d="M 179.351261 212.598425 
+L 188.290083 212.598425 
+L 188.290083 89.574803 
+L 179.351261 89.574803 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_13">
-    <path d="M 199.46361 226.771654 
-L 208.402432 226.771654 
-L 208.402432 178.714702 
-L 199.46361 178.714702 
+    <path d="M 199.46361 212.598425 
+L 208.402432 212.598425 
+L 208.402432 168.075073 
+L 199.46361 168.075073 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_14">
-    <path d="M 208.402432 226.771654 
-L 217.341254 226.771654 
-L 217.341254 61.858268 
-L 208.402432 61.858268 
+    <path d="M 208.402432 212.598425 
+L 217.341254 212.598425 
+L 217.341254 59.811024 
+L 208.402432 59.811024 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_15">
-    <path d="M 237.453603 226.771654 
-L 246.392425 226.771654 
-L 246.392425 180.425971 
-L 237.453603 180.425971 
+    <path d="M 237.453603 212.598425 
+L 246.392425 212.598425 
+L 246.392425 169.660514 
+L 237.453603 169.660514 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_16">
-    <path d="M 246.392425 226.771654 
-L 255.331247 226.771654 
-L 255.331247 66.141732 
-L 246.392425 66.141732 
+    <path d="M 246.392425 212.598425 
+L 255.331247 212.598425 
+L 255.331247 63.779528 
+L 246.392425 63.779528 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_17">
-    <path d="M 268.73948 226.771654 
-L 277.678302 226.771654 
-L 277.678302 191.917161 
-L 268.73948 191.917161 
+    <path d="M 268.73948 212.598425 
+L 277.678302 212.598425 
+L 277.678302 180.306763 
+L 268.73948 180.306763 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #56b4e9; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_18">
-    <path d="M 277.678302 226.771654 
-L 286.617123 226.771654 
-L 286.617123 93.984252 
-L 277.678302 93.984252 
+    <path d="M 277.678302 212.598425 
+L 286.617123 212.598425 
+L 286.617123 89.574803 
+L 277.678302 89.574803 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-hf75f6cba90); stroke: #56b4e9; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_19">
-    <path d="M 300.025356 226.771654 
-L 308.964178 226.771654 
-L 308.964178 154.619853 
-L 300.025356 154.619853 
+    <path d="M 300.025356 212.598425 
+L 308.964178 212.598425 
+L 308.964178 145.751904 
+L 300.025356 145.751904 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_20">
-    <path d="M 308.964178 226.771654 
-L 317.903 226.771654 
-L 317.903 66.141732 
-L 308.964178 66.141732 
+    <path d="M 308.964178 212.598425 
+L 317.903 212.598425 
+L 317.903 63.779528 
+L 308.964178 63.779528 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_21">
-    <path d="M 322.372411 226.771654 
-L 331.311233 226.771654 
-L 331.311233 170.793226 
-L 322.372411 170.793226 
+    <path d="M 322.372411 212.598425 
+L 331.311233 212.598425 
+L 331.311233 160.736059 
+L 322.372411 160.736059 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_22">
-    <path d="M 331.311233 226.771654 
-L 340.250055 226.771654 
-L 340.250055 78.992126 
-L 331.311233 78.992126 
+    <path d="M 331.311233 212.598425 
+L 340.250055 212.598425 
+L 340.250055 75.685039 
+L 331.311233 75.685039 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_23">
-    <path d="M 344.719466 226.771654 
-L 353.658288 226.771654 
-L 353.658288 175.018013 
-L 344.719466 175.018013 
+    <path d="M 344.719466 212.598425 
+L 353.658288 212.598425 
+L 353.658288 164.6502 
+L 344.719466 164.6502 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_24">
-    <path d="M 353.658288 226.771654 
-L 362.59711 226.771654 
-L 362.59711 89.700787 
-L 353.658288 89.700787 
+    <path d="M 353.658288 212.598425 
+L 362.59711 212.598425 
+L 362.59711 85.606299 
+L 353.658288 85.606299 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_25">
-    <path d="M 367.06652 226.771654 
-L 376.005342 226.771654 
-L 376.005342 165.152962 
-L 367.06652 165.152962 
+    <path d="M 367.06652 212.598425 
+L 376.005342 212.598425 
+L 376.005342 155.51052 
+L 367.06652 155.51052 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_26">
-    <path d="M 376.005342 226.771654 
-L 384.944164 226.771654 
-L 384.944164 85.417323 
-L 376.005342 85.417323 
+    <path d="M 376.005342 212.598425 
+L 384.944164 212.598425 
+L 384.944164 81.637795 
+L 376.005342 81.637795 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_27">
-    <path d="M 389.413575 226.771654 
-L 398.352397 226.771654 
-L 398.352397 172.377521 
-L 389.413575 172.377521 
+    <path d="M 389.413575 212.598425 
+L 398.352397 212.598425 
+L 398.352397 162.203862 
+L 389.413575 162.203862 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #cc79a7; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_28">
-    <path d="M 398.352397 226.771654 
-L 407.291219 226.771654 
-L 407.291219 66.141732 
-L 398.352397 66.141732 
+    <path d="M 398.352397 212.598425 
+L 407.291219 212.598425 
+L 407.291219 63.779528 
+L 398.352397 63.779528 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h64217fe7fb); stroke: #cc79a7; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_29">
-    <path d="M 420.699452 226.771654 
-L 429.638274 226.771654 
-L 429.638274 157.779786 
-L 420.699452 157.779786 
+    <path d="M 420.699452 212.598425 
+L 429.638274 212.598425 
+L 429.638274 148.679489 
+L 420.699452 148.679489 
 z
-" clip-path="url(#cs3-p0891680b88)" style="stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_30">
-    <path d="M 429.638274 226.771654 
-L 438.577096 226.771654 
-L 438.577096 51.149606 
-L 429.638274 51.149606 
+    <path d="M 429.638274 212.598425 
+L 438.577096 212.598425 
+L 438.577096 49.889764 
+L 429.638274 49.889764 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h251655a967); stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h251655a967); stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_31">
-    <path d="M 443.046507 226.771654 
-L 451.985328 226.771654 
-L 451.985328 173.961816 
-L 443.046507 173.961816 
+    <path d="M 443.046507 212.598425 
+L 451.985328 212.598425 
+L 451.985328 163.671664 
+L 443.046507 163.671664 
 z
-" clip-path="url(#cs3-p0891680b88)" style="stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_32">
-    <path d="M 451.985328 226.771654 
-L 460.92415 226.771654 
-L 460.92415 72.566929 
-L 451.985328 72.566929 
+    <path d="M 451.985328 212.598425 
+L 460.92415 212.598425 
+L 460.92415 69.732283 
+L 451.985328 69.732283 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h251655a967); stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h251655a967); stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_33">
-    <path d="M 474.332383 226.771654 
-L 483.271205 226.771654 
-L 483.271205 58.836371 
-L 474.332383 58.836371 
+    <path d="M 474.332383 212.598425 
+L 483.271205 212.598425 
+L 483.271205 57.011326 
+L 474.332383 57.011326 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: #d55e00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: #d55e00; stroke: #222222; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_34">
-    <path d="M 483.271205 226.771654 
-L 492.210027 226.771654 
-L 492.210027 70.425197 
-L 483.271205 70.425197 
+    <path d="M 483.271205 212.598425 
+L 492.210027 212.598425 
+L 492.210027 67.748031 
+L 483.271205 67.748031 
 z
-" clip-path="url(#cs3-p0891680b88)" style="fill: url(#cs3-h1d04985700); stroke: #d55e00; stroke-width: 0.8; stroke-linejoin: miter"/>
+" clip-path="url(#cs3-p3300e0605f)" style="fill: url(#cs3-h1d04985700); stroke: #d55e00; stroke-width: 0.8; stroke-linejoin: miter"/>
    </g>
    <g id="cs3-patch_35">
-    <path d="M 58.677165 226.771654 
+    <path d="M 58.677165 212.598425 
 L 58.677165 34.015748 
 " style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="cs3-patch_36">
-    <path d="M 58.677165 226.771654 
-L 500.031496 226.771654 
+    <path d="M 58.677165 212.598425 
+L 500.031496 212.598425 
 " style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="cs3-text_23">
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="179.351261" y="248.101536" transform="rotate(-0 179.351261 248.101536)">oats</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="179.351261" y="233.928308" transform="rotate(-0 179.351261 233.928308)">oats</text>
    </g>
    <g id="cs3-text_24">
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(198.275088 246.841771)">grass</text>
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(195.086416 255.376536)">(failed)</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(198.275088 232.668542)">grass</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(195.086416 241.203308)">(failed)</text>
    </g>
    <g id="cs3-text_25">
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="246.392425" y="248.317747" transform="rotate(-0 246.392425 248.317747)">sunflower</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="246.392425" y="234.144519" transform="rotate(-0 246.392425 234.144519)">sunflower</text>
    </g>
    <g id="cs3-text_26">
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="277.678302" y="248.101536" transform="rotate(-0 277.678302 248.101536)">oats</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="277.678302" y="233.928308" transform="rotate(-0 277.678302 233.928308)">oats</text>
    </g>
    <g id="cs3-text_27">
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(443.688453 248.317747)">faba</text>
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(442.622633 255.817747)">bean</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(443.688453 234.144519)">faba</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(442.622633 241.644519)">bean</text>
    </g>
    <g id="cs3-text_28">
-    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="483.271205" y="248.317747" transform="rotate(-0 483.271205 248.317747)">maize</text>
+    <text style="font-style: italic; font-size: 7.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="483.271205" y="234.144519" transform="rotate(-0 483.271205 234.144519)">maize</text>
    </g>
    <g id="cs3-text_29">
-    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="83.258926" y="272.750013" transform="rotate(-0 83.258926 272.750013)">Anttila</text>
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="83.258926" y="258.576785" transform="rotate(-0 83.258926 258.576785)">👱🏻‍♂️🫛 Anttila</text>
    </g>
    <g id="cs3-text_30">
-    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="136.891857" y="272.897669" transform="rotate(-0 136.891857 272.897669)">Särkisuo</text>
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="136.891857" y="273.724441" transform="rotate(-0 136.891857 273.724441)">🐟🌱 Särkisuo</text>
    </g>
    <g id="cs3-text_31">
-    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="228.514781" y="272.750013" transform="rotate(-0 228.514781 272.750013)">Haltiala</text>
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="228.514781" y="258.576785" transform="rotate(-0 228.514781 258.576785)">🧚🌾 Haltiala</text>
    </g>
    <g id="cs3-text_32">
-    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="353.658288" y="272.750013" transform="rotate(-0 353.658288 272.750013)">Qvidja</text>
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="353.658288" y="273.576785" transform="rotate(-0 353.658288 273.576785)">🐂🐝 Qvidja</text>
    </g>
    <g id="cs3-text_33">
-    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="440.811801" y="272.750013" transform="rotate(-0 440.811801 272.750013)">Viikki</text>
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="440.811801" y="258.576785" transform="rotate(-0 440.811801 258.576785)">👩🏻‍🔬🎓 Viikki</text>
    </g>
    <g id="cs3-text_34">
-    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="483.271205" y="272.750013" transform="rotate(-0 483.271205 272.750013)">Maktau</text>
+    <text style="font-weight: 700; font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="492.210027" y="273.576785" transform="rotate(-0 492.210027 273.576785)">🇰🇪🌽 Maktau</text>
    </g>
   </g>
   <g id="cs3-legend_1">
@@ -581,8 +581,8 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="cs3-p0891680b88">
-   <rect x="58.677165" y="34.015748" width="441.354331" height="192.755906"/>
+  <clipPath id="cs3-p3300e0605f">
+   <rect x="58.677165" y="34.015748" width="441.354331" height="178.582677"/>
   </clipPath>
  </defs>
  <defs>

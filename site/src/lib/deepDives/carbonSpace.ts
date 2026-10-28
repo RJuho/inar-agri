@@ -5,6 +5,7 @@
 // parts of the JSON pass without a check.
 import * as v from 'valibot';
 import { fmtNum, SITE_NAMES, type SiteCode } from '../deepDive';
+import { siteEmoji } from '../../scripts/sites';
 
 const N = v.nullable(v.number());
 const SITE = v.picklist(Object.keys(SITE_NAMES) as SiteCode[]);
@@ -208,11 +209,41 @@ export function listText(d: CarbonSpaceData, keys: readonly string[]): string {
 
 /** The site-years of Figure 1 with NEE > 0 (net source), as "Qvidja 2022, Qvidja 2023 and …". */
 export function sourceList(d: CarbonSpaceData, site?: SiteCode): string {
-  const keys = d.fig1Keys.filter((k) => {
+  return listText(d, sourceKeys(d, site));
+}
+
+/** Emoji of the reference site Hyytiälä (not a database site, thus not in SITE_EMOJI of scripts/sites.ts). */
+export const REF_EMOJI = '🌲🍄';
+
+/** Emoji of a site code: SITE_EMOJI for the database sites, REF_EMOJI for 'hyytiala'. */
+export function emojiOf(code: string): string {
+  return code === 'hyytiala' ? REF_EMOJI : siteEmoji(code);
+}
+
+/** One part of a site-year list: the emoji (empty after the first site-year of the same site) and the label. */
+export interface ListPart {
+  emoji: string;
+  label: string;
+}
+
+/** Site-year labels for a list in the text. Only the first site-year of each site gets the emoji. */
+export function listParts(d: CarbonSpaceData, keys: readonly string[]): ListPart[] {
+  const seen = new Set<string>();
+  return keys.map((k) => {
+    const s = d.siteYears.find((x) => x.key === k);
+    if (!s) throw new Error(`carbon-space: no site-year ${k}`);
+    const emoji = seen.has(s.site) ? '' : siteEmoji(s.site);
+    seen.add(s.site);
+    return { emoji, label: syLabel(d, k) };
+  });
+}
+
+/** Keys of the Figure 1 site-years with NEE > 0 (net source), optional of one site. */
+export function sourceKeys(d: CarbonSpaceData, site?: SiteCode): string[] {
+  return d.fig1Keys.filter((k) => {
     const s = d.siteYears.find((x) => x.key === k)!;
     return (s.nee ?? 0) > 0 && (!site || s.site === site);
   });
-  return listText(d, keys);
 }
 
 /** Number of Figure 1 site-years of one site. */
@@ -256,6 +287,8 @@ const pct = (x: number | null | undefined) => (x === null || x === undefined ? d
 
 export interface SiteYearRow {
   id: string;
+  /** Site emoji; the table puts it in an aria-hidden span before the name. */
+  emoji: string;
   site: string;
   year: number;
   crop: string;
@@ -282,6 +315,7 @@ function siteYearRow(s: SiteYearOut): SiteYearRow {
   const e = s.events;
   return {
     id: `sy-${s.key}`,
+    emoji: siteEmoji(s.site),
     site: s.siteName,
     year: s.year,
     crop: s.crop,
@@ -312,6 +346,8 @@ export function siteYearRows(d: CarbonSpaceData): SiteYearRow[] {
 
 export interface ExcludedRow {
   id: string;
+  /** Site emoji; the table puts it in an aria-hidden span before the name. */
+  emoji: string;
   site: string;
   year: number;
   reason: string;
@@ -326,6 +362,7 @@ export function excludedRows(d: CarbonSpaceData): ExcludedRow[] {
     const s = d.siteYears.find((x) => x.key === e.key)!;
     return {
       id: `excluded-${e.key}`,
+      emoji: siteEmoji(e.site),
       site: e.siteName,
       year: e.year,
       reason: e.reason,

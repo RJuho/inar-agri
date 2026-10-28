@@ -12,7 +12,7 @@
     <dc:description>The scatter plot of Figure 1 (15 site-years of the six sites) with 6 site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, a reference with rare management): x axis annual GPP (g C m−2 yr−1), y axis annual total ecosystem respiration (TER, = Reco; g C m−2 yr−1), both from 400 to 1600 on the same scale, dotted 1:1 line, light dotted lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä 2020 and the cluster 2021–2025. Hyytiälä (g C m−2 yr−1) 2020: GPP 968, TER 1083, NEE 115; 2021: GPP 1115, TER 971, NEE −144; 2022: GPP 1206, TER 1019, NEE −187; 2023: GPP 1208, TER 985, NEE −223; 2024: GPP 1249, TER 1001, NEE −248; 2025: GPP 1259, TER 978, NEE −282. Hyytiälä NEE −162 ± 143 (mean ± SD, range −282 to 115, n = 6); grassland −41 ± 138 (range −283 to 131, n = 10); annual crops −139 ± 183 (range −392 to 20, n = 5). 14 of 21 site-years are below the line. OLS line over all 21 site-years: TER = 0.58 × GPP + 349, r = 0.70.</dc:description>
     <dc:format>image/svg+xml</dc:format>
     <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; calculated/annual.csv sha256 27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9; smear/HYY_EDDY233_NEE_GPP_2020.csv sha256 75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20; smear/HYY_EDDYMAST_F_c_270_2020.csv sha256 fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2; smear/HYY_EDDY233_NEE_GPP_2021.csv sha256 468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5; smear/HYY_EDDYMAST_F_c_270_2021.csv sha256 5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d; smear/HYY_EDDY233_NEE_GPP_2022.csv sha256 4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb; smear/HYY_EDDYMAST_F_c_270_2022.csv sha256 c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762; smear/HYY_EDDY233_NEE_GPP_2023.csv sha256 cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914; smear/HYY_EDDYMAST_F_c_270_2023.csv sha256 95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a; smear/HYY_EDDY233_NEE_GPP_2024.csv sha256 2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a; smear/HYY_EDDYMAST_F_c_270_2024.csv sha256 b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3; smear/HYY_EDDY233_NEE_GPP_2025.csv sha256 55b088461ab9540cc64e639cad794bc841a485f3867409c25246d6e3c1d22508; smear/HYY_EDDYMAST_F_c_270_2025.csv sha256 39818f87ca29f049156b33fe5936145b415db6b30765edfc1e8e3dc1cc2b4a1b</dc:relation>
-    <dc:source>analysis/carbon-space/carbon-space.py (git ec301ef, dirty)</dc:source>
+    <dc:source>analysis/carbon-space/carbon-space.py (git 476ff98, dirty)</dc:source>
     <dc:creator>
      <cc:Agent>
       <dc:title>matplotlib 3.11.2</dc:title>
@@ -694,7 +694,7 @@ z
     </g>
    </g>
    <g id="cs4-text_39">
-    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="254.144861" transform="rotate(-0 432.486614 254.144861)">Anttila</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="254.144861" transform="rotate(-0 432.486614 254.144861)">👱🏻‍♂️🫛 Anttila</text>
    </g>
    <g id="cs4-line2d_40">
     <defs>
@@ -710,7 +710,7 @@ z
     </g>
    </g>
    <g id="cs4-text_40">
-    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="271.995681" transform="rotate(-0 432.486614 271.995681)">Särkisuo</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="271.995681" transform="rotate(-0 432.486614 271.995681)">🐟🌱 Särkisuo</text>
    </g>
    <g id="cs4-line2d_41">
     <defs>
@@ -725,7 +725,7 @@ z
     </g>
    </g>
    <g id="cs4-text_41">
-    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="289.846501" transform="rotate(-0 432.486614 289.846501)">Haltiala</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="289.846501" transform="rotate(-0 432.486614 289.846501)">🧚🌾 Haltiala</text>
    </g>
    <g id="cs4-line2d_42">
     <defs>
@@ -741,7 +741,7 @@ z
     </g>
    </g>
    <g id="cs4-text_42">
-    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="307.697322" transform="rotate(-0 432.486614 307.697322)">Qvidja</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="307.697322" transform="rotate(-0 432.486614 307.697322)">🐂🐝 Qvidja</text>
    </g>
    <g id="cs4-line2d_43">
     <defs>
@@ -758,7 +758,7 @@ z
     </g>
    </g>
    <g id="cs4-text_43">
-    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="325.548142" transform="rotate(-0 432.486614 325.548142)">Viikki</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="325.548142" transform="rotate(-0 432.486614 325.548142)">👩🏻‍🔬🎓 Viikki</text>
    </g>
    <g id="cs4-line2d_44">
     <defs>
@@ -773,7 +773,7 @@ z
     </g>
    </g>
    <g id="cs4-text_44">
-    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="343.398962" transform="rotate(-0 432.486614 343.398962)">Maktau</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="343.398962" transform="rotate(-0 432.486614 343.398962)">🇰🇪🌽 Maktau</text>
    </g>
    <g id="cs4-line2d_45">
     <defs>
@@ -795,7 +795,7 @@ z
     </g>
    </g>
    <g id="cs4-text_45">
-    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(432.486614 362.300808)">Hyytiälä</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(432.486614 362.300808)">🌲🍄 Hyytiälä</text>
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(432.486614 374.903679)">(forest)</text>
    </g>
   </g>

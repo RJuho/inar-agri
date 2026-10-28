@@ -127,6 +127,7 @@ import platform
 import re
 import subprocess
 import sys
+import warnings
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -543,7 +544,20 @@ FIGURES = (
 REF_COLOR = "#009e73"
 REF_MARKER = "*"
 REF_MARKER_SIZE = 19
-REF_LEGEND = "Hyytiälä\n(forest)"
+# Site emojis in the figure labels (legend, bar group names): the same as SITE_EMOJI in
+# site/src/scripts/sites.ts, plus Hyytiala (reference forest, not a database site).
+# Format: emoji, one space, name. The titles and alt texts keep the plain names, because a
+# screen reader reads emojis aloud. The browser draws the emojis with FONT_STACK.
+SITE_EMOJI = {
+    "anttila": "👱🏻‍♂️🫛",
+    "sarkisuo": "🐟🌱",
+    "haltiala": "🧚🌾",
+    "qvidja": "🐂🐝",
+    "viikki": "👩🏻‍🔬🎓",
+    "maktau": "🇰🇪🌽",
+    REF_SITE: "🌲🍄",
+}
+REF_LEGEND = f"{SITE_EMOJI[REF_SITE]} {REF_NAME}\n(forest)"
 AXIS_STEP = 100.0  # g C m-2 yr-1; the axis range of Figure 1 is a multiple of this
 AXIS_PAD = 120.0  # g C m-2 yr-1 of free space around the markers
 NEE_GUIDES = (-200.0, -400.0)
@@ -1687,6 +1701,20 @@ def point_label(r: dict[str, Any]) -> str:
     return f"{r['year']} {r['cropLabel']}" if r["cropLabel"] else str(r["year"])
 
 
+def site_label(site: str, data: Data) -> str:
+    """Figure label of a site: emoji, one space, name (for example "🐂🐝 Qvidja")."""
+    return f"{SITE_EMOJI[site]} {data.names[site]}"
+
+
+def emoji_glyph_filter() -> None:
+    """Ignore only the matplotlib warnings "Glyph N (...) missing from font(s) DejaVu Sans" of the
+    code points of SITE_EMOJI. DejaVu Sans (the layout font) has no emoji glyphs; the SVG keeps
+    the text, and the browser draws the emojis with FONT_STACK."""
+    cps = sorted({ord(c) for e in SITE_EMOJI.values() for c in e})
+    pattern = r"Glyph (" + "|".join(str(c) for c in cps) + r") \("
+    warnings.filterwarnings("ignore", message=pattern, category=UserWarning)
+
+
 def site_style(site: str, data: Data) -> tuple[str, str, float, float, str]:
     """Colour, marker, marker size, zorder and legend text of a site."""
     if site == REF_SITE:
@@ -1697,7 +1725,7 @@ def site_style(site: str, data: Data) -> tuple[str, str, float, float, str]:
         SITE_MARKERS[slot],
         MARKER_SIZE,
         MARKER_ZORDER.get(site, 3),
-        data.names[site],
+        site_label(site, data),
     )
 
 
@@ -1941,12 +1969,13 @@ def uptake_bars(
     """Figures 2, 3 and 5: bar pairs per site-year; the second bar is uptake[key] (hatched).
 
     compact (Figure 5, 22 site-years): vertical year labels, no crop lines (the crops are in
-    the alt text and in Figure 3), site names in two staggered rows."""
+    the alt text and in Figure 3). The site names (with the emoji) are in two staggered rows in
+    all three figures, because in one row the neighbour names overlap."""
     xs = bar_positions([dict(r, cropLabel=None) for r in rows] if compact else rows)
     height = FIG5_HEIGHT_IN if compact else FIG2_HEIGHT_IN
     fig = plt.figure(figsize=(FIG_WIDTH_IN, height))
     ax = fig.add_axes(
-        (0.115, 0.22, 0.865, 0.66) if compact else (0.115, 0.2, 0.865, 0.68)
+        (0.115, 0.22, 0.865, 0.66) if compact else (0.115, 0.25, 0.865, 0.63)
     )
     width = 0.4
     for xi, r in zip(xs, rows, strict=True):
@@ -2002,15 +2031,19 @@ def uptake_bars(
                 fontstyle="italic",
                 linespacing=1.0,
             )
-    for i, site in enumerate(dict.fromkeys(r["site"] for r in rows)):
+    sites = list(dict.fromkeys(r["site"] for r in rows))
+    for i, site in enumerate(sites):
         sx = [xi for xi, r in zip(xs, rows, strict=True) if r["site"] == site]
+        # The name of a last group with one site-year is wider than the group: it ends at the
+        # right edge of the bars, so that it is not cut at the figure edge.
+        at_end = site == sites[-1] and len(sx) == 1
         ax.annotate(
-            data.names[site],
-            ((min(sx) + max(sx)) / 2, 0),
+            site_label(site, data),
+            (max(sx) + width if at_end else (min(sx) + max(sx)) / 2, 0),
             xycoords=("data", "axes fraction"),
-            xytext=(0, (-36 - 15 * (i % 2)) if compact else -38),
+            xytext=(0, (-36 - 15 * (i % 2)) if compact else (-38 - 15 * (i % 2))),
             textcoords="offset points",
-            ha="center",
+            ha="right" if at_end else "center",
             va="top",
             fontsize=7 * FONT_SCALE,
             fontweight="bold",
@@ -2405,6 +2438,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 3
 
     setup_matplotlib()
+    emoji_glyph_filter()
     git = git_info(script_dir)
     meta = {
         "source": f"{SCRIPT_PATH} (git {git['commit']}{', dirty' if git['dirty'] else ''})",

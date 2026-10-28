@@ -2024,6 +2024,9 @@ test.describe('deep dive pages', () => {
     // The six Hyytiälä reference years.
     await expect(page.locator('tr[id^="ref-hyytiala-"]')).toHaveCount(6);
     await expect(page.locator('tr#excluded-sarkisuo-2023 td').nth(3)).toHaveText('yes');
+    // The site column starts with the site emoji in an aria-hidden span; a screen reader reads only the name.
+    await expect(page.locator('tr#sy-qvidja-2020 td').first().locator('span[aria-hidden="true"]')).toHaveText('🐂🐝');
+    await expect(page.locator('tr#sy-qvidja-2020 td').first()).toHaveText('🐂🐝 Qvidja');
     expect(await page.locator('.dd-num').count()).toBeGreaterThan(50);
     const text = await page.locator('main').innerText();
     expect(text).not.toMatch(/\bundefined\b|\bNaN\b/);

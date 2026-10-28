@@ -2890,14 +2890,14 @@
     }
   ],
   "dataVersion": {
-    "generatedAt": "2026-10-28T06:17:28Z",
+    "generatedAt": "2026-10-28T06:38:15Z",
     "git": {
-      "commit": "ec301ef",
+      "commit": "476ff98",
       "dirty": true
     },
     "script": {
       "path": "analysis/carbon-space/carbon-space.py",
-      "sha256": "444ffdf9c7988995b10a64022ccd4f5e6ca7afc7d4872883a431325728ea8bcf"
+      "sha256": "4766d241f82eafff2ce12cea1e0d10458db06d93c34ef0dc96e98bc118dd9ff5"
     },
     "lock": {
       "path": "analysis/carbon-space/carbon-space.py.lock",
