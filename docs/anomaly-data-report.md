@@ -1,6 +1,6 @@
 # Anomaly report: site variables (scan of 2026-10-21)
 
-Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Update 2026-10-23: HAL-03 resolved (provider confirmed the 2021 `swc` values). Update 2026-10-22: QVI-01 resolved; the Qvidja `swc` is now converted from volts to m³ m⁻³ (the numbers of QVI-02 and QVI-03 are raw `SM` values in V). New finding QVI-16 (2026-10-22): 17 950 Qvidja `swc` values in frozen soil, open. Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
+Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21 11:18 UTC. Scope: the 22 harmonised columns of the 24 website variables (`gpp` and `reco` are calculated by `scripts/calc.ts` and have no raw column). No data was changed. No correction was made. Update 2026-10-28: the new file `data/Maktau/Maktau_AWS_1h.dat` adds Maktau meteo from 2013-09-28 and the rain with 0.2 mm resolution; new findings MKT-10 (wind before 2014-09, NULL in build), MKT-11 (30-min rain rounded to whole mm, resolved) and MKT-12 (radiation peak late in 2013-09 to 2014-10, open). Update 2026-10-23: HAL-03 resolved (provider confirmed the 2021 `swc` values). Update 2026-10-22: QVI-01 resolved; the Qvidja `swc` is now converted from volts to m³ m⁻³ (the numbers of QVI-02 and QVI-03 are raw `SM` values in V). New finding QVI-16 (2026-10-22): 17 950 Qvidja `swc` values in frozen soil, open. Related documents: `docs/qvidja-soil-moisture.md` (the Qvidja `SM` unit) and `docs/harmonised-database.md` (build rules and known problems).
 
 ## Summary
 
@@ -10,7 +10,7 @@ Status: report of 2026-10-21. Input: `db/observations.parquet`, built 2026-10-21
 - Qvidja end of 2025 (S2, new): from 2025-11-01 the soil probes follow the air temperature and the net radiation is positive at night, to about 2025-12-22. `sw_out` is missing from 2025-10-26 to 2025-12-28 (QVI-12).
 - Qvidja NEE (S2, open): the annual NEE sums of the file are 25 to 109 g C m-2 more negative than Heimsch 2024 Table 1. The file is probably a different processing version (QVI-11). Qvidja GPP and Reco come from a daytime method and do not close with NEE (QVI-07).
 - Viikki N2O (S1 if wrong, open): the header unit `ug m-2 s-1` can be µg N2O or µg N2O-N. The build assumes µg N2O. The 2022 sum is 16.8 kg N2O ha-1 after 108 kg N ha-1 (VII-06).
-- Maktau (S2): `FC` repeats one value for up to 25 periods in 2024-04 to 2024-07, 11 % of the 2024 NEE values (MKT-03). The logger stored day-time rows only from 2023-07 to 2024-01 (MKT-01). Day-time `ta` in 2024 is 1.5 to 2.8 °C above the earlier years; the sonic temperature of the EC system shows the same rise, so the warm 2024 is probably real (MKT-08).
+- Maktau (S2): `FC` repeats one value for up to 25 periods in 2024-04 to 2024-07, 11 % of the 2024 NEE values (MKT-03). The logger stored day-time rows only from 2023-07 to 2024-01 (MKT-01). Day-time `ta` in 2024 is 1.5 to 2.8 °C above the earlier years; the sonic temperature of the EC system shows the same rise, so the warm 2024 is probably real (MKT-08). The 30-min meteo file rounds the rain to whole mm, so its annual sums are 8 to 15 % too low; the build now takes the rain from the AWS file (MKT-11, resolved 2026-10-28).
 - Haltiala `swc` 2021 (S2, resolved: provider confirmed the values on 2026-10-23): the level is 0.06 to 0.10 above the later years (HAL-03).
 - Radiometers (S3 for winter sums): the CNR4 night offset at Anttila stepped from −1 to −5 W m-2 on 2022-10-14, and at Särkisuo to −6 W m-2 from 2023-08-08. Viikki has −7 W m-2 at night (ANT-02, SAR-02, VII-02).
 
@@ -23,8 +23,8 @@ Findings per site and severity (counts of findings, not of flags):
 | Haltiala | 0 | 1 | 0 | 4 | 5 | 0 |
 | Qvidja | 1 | 7 | 3 | 5 | 16 | 4 |
 | Viikki | 2 | 0 | 2 | 4 | 8 | 2 |
-| Maktau | 0 | 3 | 4 | 2 | 9 | 5 |
-| Total | 5 | 12 | 15 | 21 | 53 | 14 |
+| Maktau | 0 | 4 | 6 | 2 | 12 | 8 |
+| Total | 5 | 13 | 17 | 21 | 56 | 17 |
 
 A finding with two severities counts at the higher one (ANT-02, SAR-02, SAR-04, VII-06, MKT-08). "New" = status new, with the part-new findings QVI-04 and QVI-08, and QVI-16 (open, added 2026-10-22).
 
@@ -77,6 +77,7 @@ Sorted by severity, then site. The details are in the site sections.
 | QVI-16 | Qvidja | swc | winters 2018 to 2025 | none (manual) | 17 950 values with tsoil ≤ 0 °C | not reliable below 0 °C (ML3 manual p. 28) | open (decision pending) | S2 | winter swc too low | decide build rule |
 | MKT-01 | Maktau | all meteo | 2023-07 to 2024-01 | P | night rows missing | full days | handled in build | S2 | day-time means | document |
 | MKT-03 | Maktau | nee | 2024-04 to 2024-07 | B | FC equal in runs up to 25 | no repeated flux | new (verified) | S2 | 11 % of 2024 NEE | ask provider |
+| MKT-11 | Maktau | precip | 2014-08 to 2025-01 | none (manual) | whole mm per 30 min | 0.2 mm tipping bucket | resolved (AWS file, 2026-10-28) | S2 | annual sums 8 to 15 % low | build rule (done) |
 | MKT-08 | Maktau | ta, vpd | 2024-02 to 2024-11 | D | day ta +1.5 to 2.8 °C; T_SONIC rises too | day and night move together | open question | S2 if sensor, S4 if real | 2024 ta and vpd | ask provider |
 | ANT-02 | Anttila | sw_in, sw_out, netrad | from 2022-10-14 | E, A, N, F2, M | night −5 W m-2 | 0 ± 2 W m-2 | new | S4; S3 for sums | winter daily sums too low | ask provider |
 | ANT-03 | Anttila | reco_src | 12 periods 2022 to 2023 | A | Reco to −10.74 | Reco ≥ 0 | verified | S3 | 12 half hours | document |
@@ -92,6 +93,8 @@ Sorted by severity, then site. The details are in the site sections.
 | MKT-02 | Maktau | vpd | 2023-02 to 2024-02 | C | 6 396 values in fill rows | NULL | new (verified) | S3 | MDS driver | build rule |
 | MKT-04 | Maktau | tsoil | 12 periods | A, C | 0.97 to 10.07 °C | ≥ 15 °C | new (verified) | S3 | minimum wrong | build rule |
 | MKT-05 | Maktau | le | 2019 to 2022 | A, C | night 413 and −155 W m-2 | flag 2 removed | new (verified) | S3 | spikes | build rule |
+| MKT-10 | Maktau | ws, wd | 2013-09-28 to 2014-08-31 | none (manual) | monthly mean ws 10 to 12 m s-1 | 1 to 2 m s-1 | new (verified) | S3 | wind of the first year | build rule (done), ask provider |
+| MKT-12 | Maktau | all meteo | 2013-09 to 2014-10 | G | sw_in centroid 12.7 to 13.5 h | 12.3 to 12.8 h (2015 to 2022) | new | S3 | hourly values up to 1 h late | ask provider |
 | MKT-06 | Maktau | sw_in, netrad | 2018-04-06/07; 8 periods | A | 1 570 W m-2 | ≤ 1 100 | known, verified | S3 | one day 25 % too high | document |
 | ANT-05 | Anttila | tsoil | winters | B, E, F9 | runs of 0.2 to 0.6 °C | zero curtain | real event | S4 | flat lines | document |
 | ANT-06 | Anttila | gpp_src | winter, 2022-04 | B | GPP 0 by day | night-time method | source artefact | S4 | none | document |
@@ -913,7 +916,7 @@ Files: `data/Viikki/EC/<year>.csv` (stamp `Datetime`) and `data/Viikki/pit1_clea
 
 ### Maktau
 
-Files: `data/Maktau/Maktau_meteo_30_min_KE-Mkt.csv` (M) and `data/Maktau/Continuous_KE-Mkt.csv` (C). `annual.csv` has no `nee_f` sum for Maktau: the site has measured `FC` only, so no comparison with an article is possible.
+Files: `data/Maktau/Maktau_meteo_30_min_KE-Mkt.csv` (M), `data/Maktau/Continuous_KE-Mkt.csv` (C) and, from 2026-10-28, `data/Maktau/Maktau_AWS_1h.dat` (A; hourly, same logger as M; MKT-10 to MKT-12). `annual.csv` has no `nee_f` sum for Maktau: the site has measured `FC` only, so no comparison with an article is possible.
 
 #### MKT-01 all meteo columns: the logger stored day-time rows only from 2023-07 to 2024-01
 
@@ -925,7 +928,7 @@ Files: `data/Maktau/Maktau_meteo_30_min_KE-Mkt.csv` (M) and `data/Maktau/Continu
 - Control: 2015 to 2022 have 0 to 58 fill rows per month (2017-04 and 2024-02 excepted).
 - Probable cause: logger fill (power loss at night; the day-only pattern points to a solar power supply). Alternative tested: the EC system stored night rows in the same months (`nee` at night in 2023-07 to 2023-12), so the night loss is in the meteo logger, not in the whole station. The build sets TA, RH, TS, SWC, PA, WS, G to NULL by the zero rule and `precip`, `sw_in` to NULL in the fill rows.
 - Status / Severity: handled in build (the NULL rules); the day-only pattern is new information / S2 (7 months with night values missing)
-- Effect: monthly and annual means of Maktau 2023 and 2024-01 are day-time means (ta, rh, tsoil, swc too high, rh too low). `precip` 2023 covers 33 % of the year (69 mm). The `calc.ts` MDS gap filling for Maktau has no night data in these months. The website `monthly` and `coverage` diagrams show it.
+- Effect: monthly and annual means of Maktau 2023 and 2024-01 are day-time means (ta, rh, tsoil, swc too high, rh too low). `precip` 2023 covers 35 % of the year (79.6 mm, AWS file since 2026-10-28). The `calc.ts` MDS gap filling for Maktau has no night data in these months. The website `monthly` and `coverage` diagrams show it.
 - Next action: document only (add the day-only pattern and the months 2023-04 to 2023-06 with no data to `docs/harmonised-database.md`). Do not use Maktau 2023 monthly means.
 - Verify:
   ```sql
@@ -1068,6 +1071,57 @@ Files: `data/Maktau/Maktau_meteo_30_min_KE-Mkt.csv` (M) and `data/Maktau/Continu
   SELECT year(ts_start) AS yr, round(sum(precip), 0) AS p_oct, round(avg(swc), 3) AS swc_oct, round(avg(rh), 0) AS rh_oct FROM 'db/observations.parquet' WHERE site_id = 6 AND month(ts_start + INTERVAL 3 HOUR) = 10 GROUP BY 1 ORDER BY 1;
   ```
 
+#### MKT-10 ws, wd: wind speed before 2014-09 is not plausible
+
+- Source: `ws`, `wd` ← M `WS_1_1_1`, `WD_1_1_1`; A `WS_ms_S_WVT`, `WindDir_D1_WVT` (equal values)
+- Period: 2013-09-28 to 2014-08-31 (A); 2014-08-23 to 2014-08-31 in M
+- Observed: monthly mean WS 12.5 m s-1 in 2013 (A), 9.6 to 11.2 m s-1 in 2014-06 to 2014-08; median of 2014-08 12.0 m s-1. From 2014-09 the monthly mean is 1.1 to 2.2 m s-1. 6 612 hours have WS > 5 m s-1, all before 2015-01-15; the maximum from 2015 is 5.3 m s-1.
+- Expected: 1 to 2 m s-1, as in all later years.
+- Raw rows: A `2013-09-28 22:00:00` WS 14.2, WD 136.7; `2013-09-29 03:00:00` WS 6.495.
+- Control: the other columns of the same rows (TA, RH, SW_IN) are plausible.
+- Probable cause: a different sensor, unit or multiplier of the logger program in the first year (open).
+- Status / Severity: new (verified), build rule / S3 (one year of wind)
+- Effect: none after the rule. Before 2026-10-28 the database had 397 such `ws` values (2014-08-23 to 2014-08-31).
+- Next action: build rule (done 2026-10-28: `ws` and `wd` NULL before 2014-09-01, `MAKTAU_WIND_EARLY` in `scripts/lib/registry.ts`); ask provider.
+- Verify:
+  ```sql
+  SELECT strftime(strptime(column00, '%Y-%m-%d %H:%M:%S'), '%Y-%m') AS month, avg(try_cast(WS_ms_S_WVT AS DOUBLE)) AS ws FROM read_csv('data/Maktau/Maktau_AWS_1h.dat', all_varchar=true) WHERE column00 < '2015-03' GROUP BY 1 ORDER BY 1;
+  ```
+
+#### MKT-11 precip: the 30-min meteo file rounds the rain to whole mm
+
+- Source: `precip` ← M `P_RAIN_1_1_1` (before 2026-10-28); A `Rain_mm_Tot` (from 2026-10-28)
+- Period: 2014-08-23 to 2025-01-10
+- Observed: `P_RAIN_1_1_1` has only whole numbers (0, 1, 2, ...). `Rain_mm_Tot` of the AWS file has 0.2 mm steps (tipping bucket). In 2 425 hours the sums differ. Annual sums M against A: 2015 395 against 429.8 mm, 2019 608 against 679.0 mm, 2022 184 against 207.6 mm.
+- Expected: 0.2 mm resolution.
+- Raw rows: A `2021-09-03 07:00:00` 0.2 mm; M `202109030630` and `202109030700` 0 and 0.
+- Control: all other columns of A are equal to the mean of the two M rows (TA difference 0.0 in 84 043 hours).
+- Probable cause: rounding in the export of the 30-min file.
+- Status / Severity: resolved (2026-10-28) / S2 (annual sums 8 to 15 % too low)
+- Effect: none after the change. Maktau `precip` is now the hourly sum of A, half in each 30-min period. 30-min values are thus smoothed; daily and monthly sums are exact.
+- Next action: none.
+- Verify:
+  ```sql
+  SELECT year(ts_start + INTERVAL 3 HOUR) AS y, round(sum(precip), 1) AS mm FROM 'db/observations.parquet' WHERE site_id = 6 GROUP BY 1 ORDER BY 1;
+  ```
+
+#### MKT-12 all meteo columns: the radiation peak is late in 2013-09 to 2014-10
+
+- Source: `sw_in` ← A `SlrW_Avg` (before 2014-08-23 16:30), M `SW_IN_1_1_1`
+- Period: 2013-09 to 2014-10
+- Observed: the radiation-weighted mean local hour (centroid) of `sw_in` per month is 12.72 to 13.53 h in 2013-09 to 2014-08 and 12.67 to 12.90 h in 2014-08 to 2014-10. Scan check G: peak hour 13.5 in 2014-01 and 2014-04, first hour with radiation 7.5 in 2014-02 to 2014-08.
+- Expected: the centroid of the same month in 2015 to 2022: 12.34 to 12.78 h (2 February 13.24).
+- Raw rows: the values are plausible one by one; the effect is a time shift of about 0.3 to 0.9 h.
+- Control: from 2014-11 the centroid is 12.23 to 12.69 h, as in the later years. The values of the 30-min file in 2014-08 to 2014-10 show the same shift, so the AWS file is not the cause.
+- Probable cause: the logger clock was about 0.5 h late in the first year (open). Cloud patterns can move the centroid by about 0.4 h in one month.
+- Status / Severity: new / S3 (hourly timing of the first year)
+- Effect: diurnal patterns of 2013-09 to 2014-10 are up to 1 h late. Daily and monthly values do not change.
+- Next action: ask provider.
+- Verify:
+  ```sql
+  WITH t AS (SELECT ts_start + INTERVAL 3 HOUR + INTERVAL 15 MINUTE AS tl, sw_in FROM 'db/observations.parquet' WHERE site_id = 6 AND sw_in > 0) SELECT strftime(tl, '%Y-%m') AS month, round(sum(sw_in * (hour(tl) + minute(tl) / 60.0)) / sum(sw_in), 2) AS centroid FROM t WHERE tl < '2015-06-01' GROUP BY 1 ORDER BY 1;
+  ```
+
 ## Cross-site findings
 
 ### Time axis
@@ -1129,7 +1183,7 @@ Night gaps of `nee` at Haltiala, Qvidja and Viikki (night coverage 1 to 41 % aga
 | CH4 and N2O start 2022-05-06 (partial year 2022) | Särkisuo | known | Shurpali 2025 p. 3; SAR-07; `annual.csv` share 0.66 |
 | N2O peaks June to July 2022 and July 2023 are measured | Särkisuo | known | brief; SAR-07 |
 | Logger fill rows TA = RH = 0 (NULL for ta, rh, tsoil, swc, pa, ws, g, precip, sw_in) | Maktau | handled in build | `docs/harmonised-database.md`, rule 4 and optional columns; MKT-01 |
-| `precip` 2023 covers 33 % of the year (69 mm) | Maktau | known | `docs/harmonised-database.md`, logger fill rows |
+| `precip` 2023 covers 35 % of the year (79.6 mm) | Maktau | known | `docs/harmonised-database.md`, logger fill rows |
 | NETRAD day-time only 2023-05 to 2024-01 (kept) | Maktau | known | `docs/harmonised-database.md`, net radiation 2023 |
 | Wind vane stuck from 2019-06 (daily SD rule) | Maktau | handled in build | `docs/harmonised-database.md`, wind direction |
 | `WS_1_1_1` too low 2023-07-01 to 2024-06-30 (NULL) | Maktau | handled in build | `docs/harmonised-database.md`, wind speed |
@@ -1252,6 +1306,8 @@ Maktau (Räsänen group):
 17. What produces the repeated `FC` values in 2024-04 to 2024-07 (runs of up to 25 equal values without `FC_SSITC_TEST`, `USTAR`, `H`, `LE`)? Is the file gap-filled in part? (MKT-03)
 18. Was the T/RH sensor, its shield or its place changed between 2022-08 and 2024? Is a reference station available for the day-time warm bias of 2024? (MKT-08)
 19. Are the logger fill rows (TA = RH = 0, day-time only data from 2023-07 to 2024-01) a power problem? Is `VPD` in these rows a held value? (MKT-01, MKT-02)
+20. Which wind sensor, unit or multiplier did the AWS use before 2014-09? The mean wind speed is 10 to 12 m s-1 there and 1 to 2 m s-1 later. (MKT-10)
+21. Was the logger clock late in 2013-09 to 2014-10? The radiation peak is 0.3 to 0.9 h later than in 2015 to 2022. (MKT-12)
 
 ## Reproduce
 

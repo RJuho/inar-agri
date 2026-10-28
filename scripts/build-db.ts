@@ -37,6 +37,18 @@ type SourceReport = Report['sources'][number];
 
 // ---------- small helpers ----------
 
+/** Text for site_variables.aggregation: how the source rows become 30-min periods. */
+function aggregationText(src: Source, c: CoreColumn): string | null {
+  if (src.aggregate) return `${src.aggregate.method} of ${src.stepMin}-min values, at least ${src.aggregate.minCount}`;
+  if (src.expand) {
+    const n = src.expand.offsetsMin.length;
+    return (src.expand.sumColumns as readonly string[]).includes(c)
+      ? `${src.stepMin}-min sum, 1/${n} to each of the ${n} 30-min periods (offsets ${src.expand.offsetsMin.join(', ')} min)`
+      : `${src.stepMin}-min mean, copied to each of the ${n} 30-min periods (offsets ${src.expand.offsetsMin.join(', ')} min)`;
+  }
+  return null;
+}
+
 /** DuckDB type of an output column, from VARIABLES. */
 const COLUMN_TYPE: Record<string, string> = Object.fromEntries(VARIABLES.map((x) => [x.column, x.type]));
 
@@ -159,6 +171,17 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
       SELECT ts_local, min(source_row) AS source_row,
              ${ALL_COLUMNS.map((c) => `CASE WHEN count(${ident(c)}) >= ${minCount} THEN round(avg(${ident(c)}), 10) END AS ${ident(c)}`).join(', ')}
       FROM d GROUP BY ts_local`;
+  } else if (src.expand) {
+    // One row per offset. A sum column is divided by the number of offsets, a mean is copied.
+    const { offsetsMin, sumColumns } = src.expand;
+    const n = offsetsMin.length;
+    const out = ALL_COLUMNS.map((c) =>
+      (sumColumns as readonly string[]).includes(c) && src.columns[c] ? `${ident(c)} / ${n} AS ${ident(c)}` : ident(c),
+    );
+    stageSql = `
+      WITH r AS (SELECT source_row, ts_local, ${allCols.join(', ')} FROM ${ident(`raw_${src.id}`)} WHERE ts_local IS NOT NULL)
+      SELECT r.ts_local + to_minutes(o.off) AS ts_local, r.source_row, ${out.join(', ')}
+      FROM r CROSS JOIN (VALUES ${offsetsMin.map((x) => `(${x})`).join(', ')}) o(off)`;
   } else {
     stageSql = `SELECT ts_local, source_row, ${allCols.join(', ')} FROM ${ident(`raw_${src.id}`)} WHERE ts_local IS NOT NULL`;
   }
@@ -187,6 +210,7 @@ async function ingestSource(conn: DuckDBConnection, src: Source): Promise<Source
     linesSkippedByParser,
     duplicateStamps: num(s.dup_stamps),
     rowsAfterAggregation: src.aggregate ? num(staged.n) : null,
+    rowsAfterExpansion: src.expand ? num(staged.n) : null,
     columns,
   };
   log(`  ${src.id}: ${report.physicalLines} lines, ${report.rowsRead} rows read, ${report.rowsRejected} rejected, ${report.duplicateStamps} duplicate stamps`);
@@ -334,8 +358,8 @@ function renderMarkdown(report: Report): string {
   parts.push('');
   parts.push(
     table(
-      ['Source', 'File', 'Lines', 'Header', 'Rows read', 'Skipped', 'Rejected', 'Duplicate stamps', 'Rows after aggregation'],
-      report.sources.map((s) => [s.id, s.path, s.physicalLines, s.headerLines, s.rowsRead, s.linesSkippedByParser, s.rowsRejected, s.duplicateStamps, s.rowsAfterAggregation]),
+      ['Source', 'File', 'Lines', 'Header', 'Rows read', 'Skipped', 'Rejected', 'Duplicate stamps', 'Rows after aggregation', 'Rows after expansion'],
+      report.sources.map((s) => [s.id, s.path, s.physicalLines, s.headerLines, s.rowsRead, s.linesSkippedByParser, s.rowsRejected, s.duplicateStamps, s.rowsAfterAggregation, s.rowsAfterExpansion]),
     ),
   );
   parts.push('');
@@ -435,7 +459,7 @@ async function main(): Promise<void> {
       const site = registry.sites.find((s) => s.code === src.site)!;
       return `(${[
         site.siteId, site.code, c, src.id, src.path, m.sourceColumns.join(', '), m.expr, m.factor ?? null, m.zeroIsNull ?? false,
-        m.depthCm ?? null, src.rank, src.aggregate ? `${src.aggregate.method} of ${src.stepMin}-min values, at least ${src.aggregate.minCount}` : null, m.note ?? null,
+        m.depthCm ?? null, src.rank, aggregationText(src, c), m.note ?? null,
       ].map(lit).join(', ')})`;
     }),
   );

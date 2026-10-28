@@ -498,6 +498,7 @@ All three data files use comma delimiter, AmeriFlux/FLUXNET variable names, time
 | `data/Maktau/Continuous_KE-Mkt.csv` | 99501 | 165 | 201812171200 to 202409041100 |
 | `data/Maktau/Maktau_meteo_30_min_KE-Mkt.csv` | 182065 | 44 | 201408231630 to 202501101600 |
 | `data/Maktau/Maktau_meteo_1_hour_KE-Mkt.csv` | 53380 | 25 | 201811011300 to 202412031500 |
+| `data/Maktau/Maktau_AWS_1h.dat` | 98924 | 56 | 2013-09-28 22:00:00 to 2025-01-10 16:00:00 (other format, see below) |
 
 ### `Continuous_KE-Mkt.csv` (EC and biomet, 30 min)
 
@@ -717,6 +718,40 @@ All three data files use comma delimiter, AmeriFlux/FLUXNET variable names, time
 | `SWC_1_2_2` | 0.070236094 |
 | `SWC_1_3_3` | 0.080622925 |
 | `NETRAD_1_1_1` | -9999 |
+
+### `Maktau_AWS_1h.dat` (added 2026-10-28)
+
+Hourly values of the automatic weather station (AWS), the same logger as `Maktau_meteo_30_min_KE-Mkt.csv`. The file is not Campbell TOA5: it is a plain CSV with one header line, comma delimiter and the raw logger names. The first header is empty: it is the timestamp (DuckDB name `column00`), format `yyyy-mm-dd HH:MM:SS`, local time UTC+3. Missing value: empty field. `RECORD` has half values (8101.5), because each row is the mean of two 30-min records.
+
+Time base: the value at stamp t is the mean of the 30-min meteo rows that start at t − 30 min and t (checked on 84 043 hours: TA difference 0.0). `Rain_mm_Tot` is the sum of these two periods. Logger fill hours (TA = RH = 0 in the 30-min file) are empty here, but `Rain_mm_Tot` is 0 and `Presmb` and `SlrW_Avg` can have values in them.
+
+Units are not in the file. The units below come from the equal columns of the 30-min file.
+
+| Column | Unit | Equal to (30-min file) | Example first row |
+|---|---|---|---|
+| (empty) | local time UTC+3 | centre of the hour | 2013-09-28 22:00:00 |
+| `RECORD` | - | | 0.0 |
+| `AirTC_Avg` | °C | `TA_1_1_1` | 19.26 |
+| `RH` | % | `RH_1_1_1` | 88.2 |
+| `Rain_mm_Tot` | mm per hour, 0.2 mm resolution | `P_RAIN_1_1_1` (rounded to whole mm) | 0.0 |
+| `WS_ms_S_WVT` | m s-1 | `WS_1_1_1` | 14.2 |
+| `WindDir_D1_WVT` | degrees | `WD_1_1_1` | 136.7 |
+| `WindDir_SD1_WVT` | degrees | | 18.1 |
+| `SlrW_Avg` | W m-2 | `SW_IN_1_1_1` | 0.0 |
+| `T_10cm_Avg`, `T_30cm_Avg`, `T_50cm_Avg` | °C | `TS_1_1_1`, `TS_1_2_2`, `TS_1_3_3` | 0.568, 0.525, 0.51 |
+| `Rs_kOhms`, `Rs_kOhms_Hst` | kΩ | | 6001.0, 0.0 |
+| `Flux_act_Avg(1..3)` | W m-2 | | -10.77 |
+| `Flux_corr_Avg(1..3)` | W m-2 | `G_1_1_1` to `G_1_3_3` | -12.78 |
+| `Presmb` | hPa | `PA_1_1_1` × 10 | 896.0 |
+| `VWC_10cm_corr`, `VWC_30cm_corr`, `VWC_50cm_corr` | m3 m-3 | `SWC_1_1_1` to `SWC_1_3_3` | 0.034552 |
+| `error1`, `Tcav_Temp_C_Avg` | -, °C | | (empty) |
+| `WP_sta_*_Avg`, `WP_maize_*_Avg` (10, 30, 50 cm) | kPa | `SWP_*` | (empty) |
+| `Ts_sta_*_Avg`, `Ts_maize_*_Avg` (10, 30, 50 cm) | °C | `TS_2_*`, `TS_3_*` | (empty) |
+| `UpN22_Avg(1..3)`, `DwN22a_Avg(1..3)`, `DwN22b_Avg(1..3)` | - | `SPEC_NIR_*` | (empty) |
+| `soil_T_infra_Avg`, `plant_T_infra_Avg` | °C | | (empty) |
+| `red_maize`, `nir_maize`, `ndvi_maize`, `red_bush`, `nir_bush`, `ndvi_bush` | - | `NDVI_*` | (empty; from 2016) |
+
+Use in the harmonised database: all meteo before 2014-08-23 16:30, and `precip` for all years (`docs/harmonised-database.md`).
 
 ### `Maktau_meteo_1_hour_KE-Mkt.csv`
 

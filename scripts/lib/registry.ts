@@ -75,6 +75,13 @@ export type Source = {
   rank: number;
   /** Required for files with a time step below 30 minutes. */
   aggregate?: { method: 'mean'; minCount: number };
+  /**
+   * Required for files with a time step above 30 minutes. Each row gives its values to the
+   * 30-min periods that start at the parsed stamp + each offset (minutes). The value of a
+   * column in `sumColumns` (a sum over the step) is divided by the number of offsets;
+   * the other columns (means) are copied.
+   */
+  expand?: { offsetsMin: number[]; sumColumns: CoreColumn[] };
   columns: Partial<Record<CoreColumn, ColumnMap>>;
 };
 
@@ -286,24 +293,28 @@ const MAKTAU_WD_STUCK = `coalesce(least(${maktauWdSd('')}, ${maktauWdSd(' + 180'
  * USTAR has too many gaps for a row rule, so the rule is a date range (no WS data from 2023-03-08 to 2023-07-18).
  */
 const MAKTAU_WS_BAD = "ts_parsed >= TIMESTAMP '2023-07-01' AND ts_parsed < TIMESTAMP '2024-07-01'";
-/** Meteo file only. The continuous file has no usable WS, and its NETRAD_1_1_1 is a copy of SW_IN. */
+/**
+ * Wind sensor before 2014-09. The monthly mean of WS is 10 to 12 m s-1 from 2013-09 to 2014-08
+ * (1 to 2 m s-1 from 2014-09, maximum 5.3 m s-1 from 2015). The values are not plausible for this
+ * site, thus WS and WD are NULL before 2014-09-01 (MKT-10). The AWS file has the same values.
+ */
+const MAKTAU_WIND_EARLY = "ts_parsed < TIMESTAMP '2014-09-01'";
+/**
+ * Meteo file only. The continuous file has no usable WS, and its NETRAD_1_1_1 is a copy of SW_IN.
+ * No precip: P_RAIN_1_1_1 of this file is rounded to whole mm (MKT-11). Precip comes from the AWS file.
+ */
 const maktauMeteo: Partial<Record<CoreColumn, ColumnMap>> = {
-  precip: {
-    sourceColumns: ['P_RAIN_1_1_1', 'TA_1_1_1', 'RH_1_1_1'],
-    expr: `CASE WHEN ${MAKTAU_FILL_ROW} THEN NULL ELSE num("P_RAIN_1_1_1") END`,
-    note: 'mm per 30 min. NULL in logger fill rows (TA and RH exact 0), mainly 2023. A real 0 elsewhere stays 0.',
-  },
   pa: { sourceColumns: ['PA_1_1_1'], expr: 'num("PA_1_1_1")', zeroIsNull: true, note: 'Meteo file only. Exact 0 is a logger fill value.' },
   ws: {
     sourceColumns: ['WS_1_1_1'],
-    expr: `CASE WHEN ${MAKTAU_WS_BAD} THEN NULL ELSE num("WS_1_1_1") END`,
+    expr: `CASE WHEN ${MAKTAU_WS_BAD} OR ${MAKTAU_WIND_EARLY} THEN NULL ELSE num("WS_1_1_1") END`,
     zeroIsNull: true,
-    note: 'Exact 0 is a logger fill value. NULL from 2023-07 to 2024-06 (anemometer reads low). The WS column of the continuous file is not a speed.',
+    note: 'Exact 0 is a logger fill value. NULL before 2014-09-01 (10 to 12 m s-1, not plausible, MKT-10) and from 2023-07 to 2024-06 (anemometer reads low). The WS column of the continuous file is not a speed.',
   },
   wd: {
     sourceColumns: ['WD_1_1_1', 'WS_1_1_1'],
-    expr: `CASE WHEN num("WS_1_1_1") <> 0 AND NOT (${MAKTAU_WD_STUCK}) THEN num("WD_1_1_1") END`,
-    note: 'NULL where WS_1_1_1 is exact 0 (fill value, WD is then 0 too) and on days with a stuck vane (daily SD of WD below 5°). 0° is a valid direction, so no zero rule on WD.',
+    expr: `CASE WHEN num("WS_1_1_1") <> 0 AND NOT (${MAKTAU_WD_STUCK}) AND NOT (${MAKTAU_WIND_EARLY}) THEN num("WD_1_1_1") END`,
+    note: 'NULL where WS_1_1_1 is exact 0 (fill value, WD is then 0 too), on days with a stuck vane (daily SD of WD below 5°) and before 2014-09-01 (wind sensor not plausible, MKT-10). 0° is a valid direction, so no zero rule on WD.',
   },
   netrad: {
     sourceColumns: ['NETRAD_1_1_1'],
@@ -312,6 +323,45 @@ const maktauMeteo: Partial<Record<CoreColumn, ColumnMap>> = {
     note: 'Meteo file only (the continuous NETRAD_1_1_1 is a copy of SW_IN). Kept in logger fill rows: the values there are normal. Exact 0 (5 rows) is a fill value.',
   },
   g: { sourceColumns: ['G_1_1_1'], expr: 'num("G_1_1_1")', zeroIsNull: true, depthCm: null, note: 'Meteo file only. Exact 0 is a logger fill value.' },
+};
+
+/**
+ * Maktau_AWS_1h.dat: hourly values of the same logger as the 30-min meteo file, 2013-09-28 22:00 to
+ * 2025-01-10 16:00 (local time UTC+3). The value at stamp t is the mean (rain: the sum) of the
+ * 30-min periods that start at t - 30 min and t; thus `expand` gives it to these two periods.
+ * The first header is empty (DuckDB name `column00`). Logger fill hours are empty fields here, but
+ * Rain_mm_Tot is 0 and Presmb and SlrW_Avg can have values in them: these columns are NULL where
+ * AirTC_Avg is empty.
+ * Use: all variables before the 30-min file starts (2014-08-23 16:30), and precip for all years,
+ * because Rain_mm_Tot has 0.2 mm resolution (the 30-min file rounds to whole mm, MKT-11).
+ * No WS and WD (not plausible before 2014-09, MKT-10) and no net radiation column.
+ */
+const MAKTAU_AWS_GAP = "ts_parsed <= TIMESTAMP '2014-08-23 16:00'";
+const MAKTAU_AWS_FILL = 'num("AirTC_Avg") IS NULL';
+const awsGap = (col: string, extra: Partial<ColumnMap> = {}, scale = ''): ColumnMap => ({
+  sourceColumns: [col],
+  expr: `CASE WHEN ${MAKTAU_AWS_GAP} THEN num("${col}")${scale} END`,
+  zeroIsNull: true,
+  note: 'AWS file, only before the 30-min meteo file starts (stamp up to 2014-08-23 16:00). Hourly mean in both 30-min periods. Exact 0 is a logger fill value.',
+  ...extra,
+});
+const maktauAws: Partial<Record<CoreColumn, ColumnMap>> = {
+  ta: awsGap('AirTC_Avg'),
+  rh: awsGap('RH'),
+  tsoil: awsGap('T_10cm_Avg', { depthCm: 10 }),
+  swc: awsGap('VWC_10cm_corr', { depthCm: 10 }),
+  sw_in: {
+    sourceColumns: ['SlrW_Avg', 'AirTC_Avg'],
+    expr: `CASE WHEN ${MAKTAU_AWS_GAP} AND NOT (${MAKTAU_AWS_FILL}) THEN num("SlrW_Avg") END`,
+    note: 'AWS file, only before the 30-min meteo file starts (stamp up to 2014-08-23 16:00). Hourly mean in both 30-min periods. NULL in logger fill hours (AirTC_Avg empty).',
+  },
+  pa: awsGap('Presmb', { factor: 0.1, note: 'AWS file, only before the 30-min meteo file starts (stamp up to 2014-08-23 16:00). Presmb is hPa; factor 0.1 gives kPa. Hourly mean in both 30-min periods. Exact 0 is a logger fill value.' }, ' * 0.1'),
+  g: awsGap('Flux_corr_Avg(1)'),
+  precip: {
+    sourceColumns: ['Rain_mm_Tot', 'AirTC_Avg'],
+    expr: `CASE WHEN ${MAKTAU_AWS_FILL} THEN NULL ELSE num("Rain_mm_Tot") END`,
+    note: 'All years. Hourly sum with 0.2 mm resolution; half of it in each 30-min period (mm per 30 min). NULL in logger fill hours (AirTC_Avg empty; the file gives 0 there). The 30-min meteo file rounds rain to whole mm (MKT-11) and is not used for precip.',
+  },
 };
 
 export const SOURCES: Source[] = [
@@ -386,6 +436,13 @@ export const SOURCES: Source[] = [
     timestampColumn: 'TIMESTAMP_START', timestampFormats: [COMPACT], timestampIsEnd: false, stepMin: 30, rank: 2,
     columns: { ...maktauSoil(2), ...maktauMeteo },
   },
+  {
+    id: 'maktau_aws_1h', site: 'maktau', path: 'data/Maktau/Maktau_AWS_1h.dat',
+    delim: ',', headerLines: 1, decimalComma: false,
+    timestampColumn: 'column00', timestampFormats: [ISO_SECONDS], timestampIsEnd: false, stepMin: 60, rank: 3,
+    expand: { offsetsMin: [-30, 0], sumColumns: ['precip'] },
+    columns: maktauAws,
+  },
 ];
 
 export const REGISTRY: Registry = { sites: SITES, sources: SOURCES };
@@ -409,7 +466,7 @@ export const VARIABLES = [
   { column: 'gpp_src', type: 'DOUBLE', unit: 'µmol CO2 m-2 s-1', description: 'Gross primary production from the data provider, GPP >= 0 (uptake). Anttila, Särkisuo (night-time method), Qvidja (daytime method, sign changed).' },
   { column: 'reco_src', type: 'DOUBLE', unit: 'µmol CO2 m-2 s-1', description: 'Ecosystem respiration from the data provider. Anttila, Särkisuo, Qvidja.' },
   { column: 'ch4', type: 'DOUBLE', unit: 'µmol CH4 m-2 s-1', description: 'Gap-filled methane flux. Anttila and Särkisuo only.' },
-  { column: 'precip', type: 'DOUBLE', unit: 'mm', description: 'Precipitation, sum per 30-minute period. Not at Haltiala.' },
+  { column: 'precip', type: 'DOUBLE', unit: 'mm', description: 'Precipitation, sum per 30-minute period. Not at Haltiala. Maktau: hourly sum, half in each 30-minute period.' },
   { column: 'pa', type: 'DOUBLE', unit: 'kPa', description: 'Air pressure. Anttila, Särkisuo, Viikki (2022-2023), Maktau.' },
   { column: 'ws', type: 'DOUBLE', unit: 'm s-1', description: 'Wind speed. Qvidja, Viikki, Maktau.' },
   { column: 'wd', type: 'DOUBLE', unit: 'degrees', description: 'Wind direction, degrees from north (clockwise). Qvidja, Viikki, Maktau.' },

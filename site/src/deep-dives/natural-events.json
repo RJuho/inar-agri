@@ -3,33 +3,33 @@
   "title": "Natural events and disturbances",
   "script": "scripts/deep-dives/natural-events.ts",
   "dataVersion": {
-    "generatedAt": "2026-10-23T16:00:21.947Z",
+    "generatedAt": "2026-10-28T10:48:29.992Z",
     "git": {
-      "commit": "cdf2a3f",
+      "commit": "eab1555",
       "dirty": true
     },
-    "dbBuiltAt": "2026-10-23T15:58:35.911Z",
-    "calcBuiltAt": "2026-10-23T15:58:37.031Z",
+    "dbBuiltAt": "2026-10-28T10:44:08.475Z",
+    "calcBuiltAt": "2026-10-28T10:44:32.506Z",
     "inputs": [
       {
         "path": "db/sites.parquet",
         "bytes": 4133,
-        "sha256": "61690663932c405fcefa65755b1ce7c51a1aa08da5b8dea1f1575ed7d99d3fe1"
+        "sha256": "4314b30c3aa8f57c0eefdfa5cceabe95b5c49b7c4641aeab9bc4c8ff6a17f4a8"
       },
       {
         "path": "db/observations.parquet",
-        "bytes": 23111672,
-        "sha256": "510ed6ed0e73677c7d8bafacc82deb5e8f4e388ebb9de7b47f0a7e1a3c815de6"
+        "bytes": 23313382,
+        "sha256": "5c934e8cb1a138e92ced776651ec9703d1722321c2406b75e88d8de31aff585a"
       },
       {
         "path": "db/events.parquet",
         "bytes": 8474,
-        "sha256": "2882c34fe751d568dad3de83ae8ed2d10d8f4b8d584ce5a8bab011e8aef76a7a"
+        "sha256": "f27df617c335881361166a3c7074ab95ed712cf8e5665ec929760131d9b2f306"
       },
       {
         "path": "data/calculated/daily.parquet",
-        "bytes": 427350,
-        "sha256": "71cd1647524c32805b2f13cb944395bd59eab775af62131691f6bfac2d41b454"
+        "bytes": 430596,
+        "sha256": "4a7eb84b1db7f41deee55448464922edd058dc5b760fda74f1c1df487c96cf66"
       }
     ]
   },
@@ -583,9 +583,9 @@
         "episodes": 0
       },
       "heavyRain": {
-        "days": 22,
-        "allDays": 22,
-        "episodes": 21
+        "days": 24,
+        "allDays": 24,
+        "episodes": 23
       },
       "drySpell": {
         "days": 0,
@@ -9019,7 +9019,7 @@
         "end": "2019-04-20",
         "days": 1,
         "usedDays": 1,
-        "peak": 36,
+        "peak": 37.2,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9077,7 +9077,7 @@
         "end": "2019-05-05",
         "days": 1,
         "usedDays": 1,
-        "peak": 68,
+        "peak": 69,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9119,7 +9119,7 @@
         "end": "2019-10-01",
         "days": 1,
         "usedDays": 1,
-        "peak": 27,
+        "peak": 31.2,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9147,7 +9147,7 @@
         "end": "2019-10-05",
         "days": 1,
         "usedDays": 1,
-        "peak": 22,
+        "peak": 22.4,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9161,11 +9161,25 @@
         "end": "2019-10-09",
         "days": 1,
         "usedDays": 1,
-        "peak": 33,
+        "peak": 33.6,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
           "mean": 0.9989448553,
+          "sd": null
+        }
+      },
+      {
+        "class": "heavyRain",
+        "start": "2019-10-17",
+        "end": "2019-10-17",
+        "days": 1,
+        "usedDays": 1,
+        "peak": 21.6,
+        "peakUnit": "mm",
+        "nee": {
+          "n": 1,
+          "mean": 0.2598295853,
           "sd": null
         }
       },
@@ -9189,7 +9203,7 @@
         "end": "2019-10-28",
         "days": 1,
         "usedDays": 1,
-        "peak": 26,
+        "peak": 26.8,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9203,7 +9217,7 @@
         "end": "2019-11-14",
         "days": 1,
         "usedDays": 1,
-        "peak": 32,
+        "peak": 31.6,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9231,7 +9245,7 @@
         "end": "2019-11-24",
         "days": 1,
         "usedDays": 1,
-        "peak": 22,
+        "peak": 22.8,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9259,7 +9273,7 @@
         "end": "2019-12-01",
         "days": 1,
         "usedDays": 1,
-        "peak": 29,
+        "peak": 30.2,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9287,7 +9301,7 @@
         "end": "2019-12-06",
         "days": 1,
         "usedDays": 1,
-        "peak": 21,
+        "peak": 21.2,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9301,7 +9315,7 @@
         "end": "2019-12-29",
         "days": 1,
         "usedDays": 1,
-        "peak": 22,
+        "peak": 23.4,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9521,7 +9535,7 @@
         "end": "2020-04-23",
         "days": 1,
         "usedDays": 1,
-        "peak": 34,
+        "peak": 34.8,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9549,7 +9563,7 @@
         "end": "2020-11-30",
         "days": 91,
         "usedDays": 91,
-        "peak": 59,
+        "peak": 70.2,
         "peakUnit": "mm",
         "nee": {
           "n": 91,
@@ -9754,7 +9768,7 @@
         "end": "2021-05-31",
         "days": 92,
         "usedDays": 92,
-        "peak": 141,
+        "peak": 149.8,
         "peakUnit": "mm",
         "nee": {
           "n": 92,
@@ -9843,7 +9857,7 @@
         "end": "2021-03-27",
         "days": 1,
         "usedDays": 1,
-        "peak": 30,
+        "peak": 29.4,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -9914,7 +9928,7 @@
         "end": "2021-11-30",
         "days": 91,
         "usedDays": 91,
-        "peak": 38,
+        "peak": 41,
         "peakUnit": "mm",
         "nee": {
           "n": 91,
@@ -10180,7 +10194,7 @@
         "end": "2022-05-31",
         "days": 92,
         "usedDays": 92,
-        "peak": 43,
+        "peak": 49.2,
         "peakUnit": "mm",
         "nee": {
           "n": 92,
@@ -10471,6 +10485,20 @@
         }
       },
       {
+        "class": "heavyRain",
+        "start": "2022-11-16",
+        "end": "2022-11-16",
+        "days": 1,
+        "usedDays": 1,
+        "peak": 20.6,
+        "peakUnit": "mm",
+        "nee": {
+          "n": 1,
+          "mean": 0.7770721705,
+          "sd": null
+        }
+      },
+      {
         "class": "soilWet",
         "start": "2022-11-17",
         "end": "2022-12-01",
@@ -10490,7 +10518,7 @@
         "end": "2022-11-23",
         "days": 1,
         "usedDays": 1,
-        "peak": 23,
+        "peak": 23.6,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -10720,7 +10748,7 @@
         "end": "2024-02-26",
         "days": 1,
         "usedDays": 1,
-        "peak": 21,
+        "peak": 21.8,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -10868,7 +10896,7 @@
         "end": "2024-03-24",
         "days": 1,
         "usedDays": 1,
-        "peak": 24,
+        "peak": 23.6,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -10896,7 +10924,7 @@
         "end": "2024-04-10",
         "days": 1,
         "usedDays": 1,
-        "peak": 25,
+        "peak": 25.2,
         "peakUnit": "mm",
         "nee": {
           "n": 1,
@@ -10924,7 +10952,7 @@
         "end": "2024-04-13",
         "days": 2,
         "usedDays": 2,
-        "peak": 54,
+        "peak": 56.2,
         "peakUnit": "mm",
         "nee": {
           "n": 2,
@@ -11073,7 +11101,7 @@
         "end": "2024-11-01",
         "days": 1,
         "usedDays": 1,
-        "peak": 21,
+        "peak": 21.2,
         "peakUnit": "mm",
         "nee": {
           "n": 0,
@@ -11162,7 +11190,7 @@
         "end": "2024-11-30",
         "days": 1,
         "usedDays": 1,
-        "peak": 35,
+        "peak": 34.1,
         "peakUnit": "mm",
         "nee": {
           "n": 0,
@@ -11190,7 +11218,7 @@
         "end": "2024-12-19",
         "days": 1,
         "usedDays": 1,
-        "peak": 33,
+        "peak": 33.8,
         "peakUnit": "mm",
         "nee": {
           "n": 0,
@@ -11222,10 +11250,10 @@
         "start": "2019-03-01",
         "end": "2019-05-31",
         "precipDays": 92,
-        "precipMm": 183,
+        "precipMm": 199.4,
         "swcDays": 92,
         "swcMean": 0.07519005193,
-        "medianMm": 170,
+        "medianMm": 190.6,
         "swcRef": 0.07519005193,
         "failed": false
       },
@@ -11235,10 +11263,10 @@
         "start": "2019-09-01",
         "end": "2019-11-30",
         "precipDays": 91,
-        "precipMm": 289,
+        "precipMm": 326.6,
         "swcDays": 91,
         "swcMean": 0.1056624152,
-        "medianMm": 86,
+        "medianMm": 94.2,
         "swcRef": 0.05028489225,
         "failed": false
       },
@@ -11248,10 +11276,10 @@
         "start": "2020-03-01",
         "end": "2020-05-31",
         "precipDays": 92,
-        "precipMm": 170,
+        "precipMm": 190.6,
         "swcDays": 92,
         "swcMean": 0.09257180977,
-        "medianMm": 170,
+        "medianMm": 190.6,
         "swcRef": 0.07519005193,
         "failed": false
       },
@@ -11261,10 +11289,10 @@
         "start": "2020-09-01",
         "end": "2020-11-30",
         "precipDays": 91,
-        "precipMm": 59,
+        "precipMm": 70.2,
         "swcDays": 91,
         "swcMean": 0.04975664493,
-        "medianMm": 86,
+        "medianMm": 94.2,
         "swcRef": 0.05028489225,
         "failed": true
       },
@@ -11274,10 +11302,10 @@
         "start": "2021-03-01",
         "end": "2021-05-31",
         "precipDays": 92,
-        "precipMm": 141,
+        "precipMm": 149.8,
         "swcDays": 92,
         "swcMean": 0.07089490739,
-        "medianMm": 170,
+        "medianMm": 190.6,
         "swcRef": 0.07519005193,
         "failed": true
       },
@@ -11287,10 +11315,10 @@
         "start": "2021-09-01",
         "end": "2021-11-30",
         "precipDays": 91,
-        "precipMm": 38,
+        "precipMm": 41,
         "swcDays": 91,
         "swcMean": 0.03422997893,
-        "medianMm": 86,
+        "medianMm": 94.2,
         "swcRef": 0.05028489225,
         "failed": true
       },
@@ -11300,10 +11328,10 @@
         "start": "2022-03-01",
         "end": "2022-05-31",
         "precipDays": 92,
-        "precipMm": 43,
+        "precipMm": 49.2,
         "swcDays": 92,
         "swcMean": 0.04861621134,
-        "medianMm": 170,
+        "medianMm": 190.6,
         "swcRef": 0.07519005193,
         "failed": true
       },
@@ -11313,10 +11341,10 @@
         "start": "2022-09-01",
         "end": "2022-11-30",
         "precipDays": 91,
-        "precipMm": 86,
+        "precipMm": 94.2,
         "swcDays": 91,
         "swcMean": 0.05081313957,
-        "medianMm": 86,
+        "medianMm": 94.2,
         "swcRef": 0.05028489225,
         "failed": false
       },
@@ -11329,7 +11357,7 @@
         "precipMm": null,
         "swcDays": 7,
         "swcMean": null,
-        "medianMm": 170,
+        "medianMm": 190.6,
         "swcRef": 0.07519005193,
         "failed": null
       },
@@ -11342,7 +11370,7 @@
         "precipMm": null,
         "swcDays": 91,
         "swcMean": 0.08894716892,
-        "medianMm": 86,
+        "medianMm": 94.2,
         "swcRef": 0.05028489225,
         "failed": null
       },
@@ -11352,10 +11380,10 @@
         "start": "2024-03-01",
         "end": "2024-05-31",
         "precipDays": 92,
-        "precipMm": 201,
+        "precipMm": 223.6,
         "swcDays": 92,
         "swcMean": 0.08375841351,
-        "medianMm": 170,
+        "medianMm": 190.6,
         "swcRef": 0.07519005193,
         "failed": false
       },
@@ -11365,10 +11393,10 @@
         "start": "2024-09-01",
         "end": "2024-11-30",
         "precipDays": 91,
-        "precipMm": 102,
+        "precipMm": 105.3,
         "swcDays": 91,
         "swcMean": 0.0487520814,
-        "medianMm": 86,
+        "medianMm": 94.2,
         "swcRef": 0.05028489225,
         "failed": false
       }
@@ -11821,26 +11849,26 @@
       },
       "maktau": {
         "event": {
-          "n": 19,
-          "mean": -0.4342806534,
-          "sd": 1.465859274,
+          "n": 21,
+          "mean": -0.3435443171,
+          "sd": 1.422210451,
           "min": -3.493045073,
           "max": 1.347869266,
-          "ciLo": -1.09093192,
-          "ciHi": 0.1756068744,
-          "nPositive": 10
+          "ciLo": -0.9542180107,
+          "ciHi": 0.2213598081,
+          "nPositive": 12
         },
         "reference": {
-          "n": 1071,
-          "mean": -0.6770098365,
-          "sd": 1.122822874,
+          "n": 1069,
+          "mean": -0.6792464328,
+          "sd": 1.122624425,
           "min": -5.292490286,
           "max": 2.507005725,
-          "ciLo": -0.7432279472,
-          "ciHi": -0.6103518036,
-          "nPositive": 252
+          "ciLo": -0.7459340673,
+          "ciHi": -0.6125073315,
+          "nPositive": 250
         },
-        "diff": 0.2427291831
+        "diff": 0.3357021157
       }
     },
     "drySpell": {
@@ -12635,7 +12663,7 @@
           "frost": 5,
           "heat": 0,
           "coldSpell": 0,
-          "heavyRain": 8,
+          "heavyRain": 9,
           "drySpell": 0,
           "failedRains": 0,
           "soilDrought": 0,
@@ -12654,7 +12682,7 @@
               "frost": 0,
               "heat": 0,
               "coldSpell": 0,
-              "heavyRain": 6,
+              "heavyRain": 7,
               "drySpell": 0,
               "failedRains": 0,
               "soilDrought": 0,
@@ -13600,7 +13628,7 @@
           "frost": 15,
           "heat": 3,
           "coldSpell": 0,
-          "heavyRain": 2,
+          "heavyRain": 3,
           "drySpell": 48,
           "failedRains": 0,
           "soilDrought": 88,
@@ -13657,7 +13685,7 @@
               "frost": 0,
               "heat": 3,
               "coldSpell": 0,
-              "heavyRain": 1,
+              "heavyRain": 2,
               "drySpell": 0,
               "failedRains": 0,
               "soilDrought": 76,
@@ -45212,7 +45240,7 @@
           32,
           32,
           32,
-          0,
+          8,
           64,
           64,
           64,
@@ -47368,7 +47396,7 @@
   "totals": {
     "usedDays": 8507,
     "usedNeeDays": 8203,
-    "eventDaysNee": 3303,
-    "episodes": 740
+    "eventDaysNee": 3304,
+    "episodes": 742
   }
 }

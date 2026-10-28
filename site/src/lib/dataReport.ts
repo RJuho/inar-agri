@@ -91,6 +91,7 @@ export const FINDINGS: Finding[] = [
   { id: 'QVI-16', site: 'Qvidja', variable: 'swc', severity: 'S2', finding: 'ML3 readings in frozen soil are not reliable (manual p. 28): ice gives a much lower permittivity, so θ reads too low. 17 950 values (14.5 %) have tsoil ≤ 0 °C.', impact: 'Winter swc too low; the build keeps the values', status: 'open', note: 'NULL rule not decided' },
   { id: 'MKT-01', site: 'Maktau', variable: 'all meteo', severity: 'S2', finding: 'Logger stored day-time rows only, 2023-07 to 2024-01.', impact: 'Monthly means are day-time means', status: 'resolved' },
   { id: 'MKT-03', site: 'Maktau', variable: 'nee', severity: 'S2', finding: '`FC` repeats one value for up to 25 periods, 2024-04 to 2024-07.', impact: '11 % of the 2024 NEE values', status: 'provider' },
+  { id: 'MKT-11', site: 'Maktau', variable: 'precip', severity: 'S2', finding: 'The 30-min meteo file rounds the rain to whole mm; the AWS file has 0.2 mm steps.', impact: 'Annual sums were 8 to 15 % too low; the build uses the AWS file since 2026-10-28', status: 'resolved', note: '2026-10-28' },
   { id: 'MKT-08', site: 'Maktau', variable: 'ta, vpd', severity: 'S2', finding: 'Day-time ta in 2024 1.5 to 2.8 °C above earlier years; sonic temperature rises too.', impact: '2024 ta and vpd (probably real)', status: 'provider' },
   { id: 'ANT-02', site: 'Anttila', variable: 'sw_in, sw_out, netrad', severity: 'S3', finding: 'CNR4 night offset steps from −1 to −5 W m⁻² on 2022-10-14.', impact: 'Winter daily sums too low', status: 'provider' },
   { id: 'ANT-03', site: 'Anttila', variable: 'reco_src', severity: 'S3', finding: '12 night periods with Reco down to −10.74 (copies of negative NEE).', impact: '12 half hours', status: 'resolved' },
@@ -106,6 +107,8 @@ export const FINDINGS: Finding[] = [
   { id: 'MKT-02', site: 'Maktau', variable: 'vpd', severity: 'S3', finding: '6 396 VPD values kept in the logger fill rows.', impact: 'Wrong driver for MDS gap filling', status: 'open' },
   { id: 'MKT-04', site: 'Maktau', variable: 'tsoil', severity: 'S3', finding: 'Single-period drops of all depths to 0.97 to 10.07 °C.', impact: 'Minimum is wrong', status: 'open' },
   { id: 'MKT-05', site: 'Maktau', variable: 'le', severity: 'S3', finding: 'No quality filter: night spikes of 413 and −155 W m⁻².', impact: 'Spikes', status: 'open' },
+  { id: 'MKT-10', site: 'Maktau', variable: 'ws, wd', severity: 'S3', finding: 'Monthly mean wind speed 10 to 12 m s⁻¹ before 2014-09 (later 1 to 2).', impact: 'NULL before 2014-09-01 in the build', status: 'provider', note: 'build rule done 2026-10-28' },
+  { id: 'MKT-12', site: 'Maktau', variable: 'all meteo', severity: 'S3', finding: 'Radiation peak 0.3 to 0.9 h late in 2013-09 to 2014-10 (logger clock?).', impact: 'Diurnal timing of the first year', status: 'provider' },
   { id: 'MKT-06', site: 'Maktau', variable: 'sw_in, netrad', severity: 'S3', finding: 'Single values up to 1 570 W m⁻².', impact: 'One day 25 % too high', status: 'resolved' },
   { id: 'ANT-05', site: 'Anttila', variable: 'tsoil', severity: 'S4', finding: 'Winter runs of 0.2 to 0.6 °C (zero curtain).', impact: 'Flat lines (real)', status: 'resolved' },
   { id: 'ANT-06', site: 'Anttila', variable: 'gpp_src', severity: 'S4', finding: 'GPP 0 by day in winter (night-time method).', impact: 'None', status: 'resolved' },
@@ -167,6 +170,32 @@ export interface ChangeLogEntry {
 
 /** Newest entry first. */
 export const CHANGE_LOG: ChangeLogEntry[] = [
+  {
+    id: 'change-2026-10-28-maktau-aws',
+    date: '2026-10-28',
+    title: 'Maktau: meteo from 2013 and rain with 0.2 mm resolution',
+    site: 'Maktau',
+    variable: 'precip, ta, rh, tsoil, swc, sw_in, pa, g, ws, wd',
+    findings: ['MKT-10', 'MKT-11', 'MKT-12'],
+    summary: [
+      'The provider gave a new file, `data/Maktau/Maktau_AWS_1h.dat`, with hourly values of the weather station from 2013-09-28 to 2025-01-10. It is the same logger as the 30-minute meteo file: the value of each hour is the mean of two 30-minute rows of that file.',
+      'The file adds two things. (1) Meteo data for 2013-09-28 to 2014-08-23, before the 30-minute file starts. The database now has these months: each hourly value is in both 30-minute periods. (2) Rain with 0.2 mm resolution. The 30-minute file rounds the rain to whole mm, so its annual sums were 8 to 15 % too low. Maktau `precip` now comes from the new file for all years, half of the hourly sum in each 30-minute period.',
+      'The wind speed before 2014-09 is 10 to 12 m/s as a monthly mean, against 1 to 2 m/s later. It is not plausible, thus `ws` and `wd` are now empty before 2014-09-01. All other values after 2014-08-23 did not change.',
+    ],
+    facts: [
+      { term: 'New file', value: '`Maktau_AWS_1h.dat`, 98 923 hourly rows, 56 columns' },
+      { term: 'New periods', value: '15 782 (2013-09-28 21:30 to 2014-08-23 16:00 local time)' },
+      { term: 'Rain 2019', value: '679.0 mm (was 608 mm)' },
+    ],
+    formulas: [],
+    tables: [],
+    openPoints: [],
+    openQuestions: [
+      'Which wind sensor, unit or multiplier did the station use before 2014-09? (MKT-10)',
+      'Was the logger clock late in 2013-09 to 2014-10? The radiation peak is 0.3 to 0.9 h later than in later years. (MKT-12)',
+    ],
+    doc: 'docs/harmonised-database.md',
+  },
   {
     id: 'change-2026-10-23-events-file',
     date: '2026-10-23',

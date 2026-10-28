@@ -53,13 +53,25 @@ export const SourceSchema = v.pipe(
     timestampColumn: nonEmpty,
     timestampFormats: v.pipe(v.array(nonEmpty), v.minLength(1)),
     timestampIsEnd: v.boolean(),
-    stepMin: v.picklist([5, 10, 15, 30]),
+    stepMin: v.picklist([5, 10, 15, 30, 60]),
     rank: v.pipe(v.number(), v.integer(), v.minValue(1)),
     aggregate: v.optional(v.object({ method: v.literal('mean'), minCount: v.pipe(v.number(), v.integer(), v.minValue(1)) })),
+    expand: v.optional(
+      v.object({
+        offsetsMin: v.pipe(v.array(v.pipe(v.number(), v.integer(), v.multipleOf(30))), v.minLength(2)),
+        sumColumns: v.array(v.picklist(ALL_COLUMNS)),
+      }),
+    ),
     columns: v.object(Object.fromEntries(ALL_COLUMNS.map((c) => [c, v.optional(ColumnMapSchema)]))),
   }),
   v.check((s) => Object.keys(s.columns).length > 0, 'a source needs at least one column mapping'),
-  v.check((s) => s.stepMin === 30 || s.aggregate !== undefined, 'a source with a step below 30 min needs an aggregate rule'),
+  v.check((s) => s.stepMin >= 30 || s.aggregate !== undefined, 'a source with a step below 30 min needs an aggregate rule'),
+  v.check((s) => s.stepMin <= 30 || s.expand !== undefined, 'a source with a step above 30 min needs an expand rule'),
+  v.check((s) => s.expand === undefined || s.aggregate === undefined, 'a source cannot have both an aggregate and an expand rule'),
+  v.check(
+    (s) => s.expand === undefined || s.expand.offsetsMin.length * 30 === s.stepMin,
+    'expand: the number of offsets × 30 min must be equal to the step',
+  ),
 );
 
 export const RegistrySchema = v.pipe(
@@ -195,6 +207,7 @@ export const ReportSchema = v.object({
       linesSkippedByParser: count,
       duplicateStamps: count,
       rowsAfterAggregation: v.nullable(count),
+      rowsAfterExpansion: v.nullable(count),
       columns: v.record(v.string(), v.object({ n_valid: count, n_sentinel: count, n_zero_nulled: count, n_range_nulled: count, factor: v.nullable(v.number()) })),
     }),
   ),
