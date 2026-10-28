@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-28T11:19:21Z",
+  "generatedAt": "2026-10-28T11:19:54Z",
   "git": {
-    "commit": "7d1e348",
+    "commit": "445cc40",
     "dirty": true
   },
   "script": {
@@ -452,10 +452,10 @@
     }
   },
   "outputs": {
-    "results.json": "fb1dd916c76e479a71ed2af8a7b846907bbaeccc15762fefa33df222dfb1bf04",
+    "results.json": "270a1161e3c8d967275d1432d737efcddf029427be32bdc87c73361b2955da79",
     "figures": {
       "figures/1-nbe-carbon-space.svg": {
-        "sha256": "d5b1e2f535456fc6f09294265b578d2a697846abcfc82136b76f2185a31959ac",
+        "sha256": "29894c8ad632e7cef4b6209474012dc8a143452d52c7f252139257292d4ea732",
         "sha256WithoutMetadata": "f3a513093cc11540ec3a7550d3aeec5cc78e62e4f9ef1c2d2ac8f26a0f01665a"
       }
     }
