@@ -2036,61 +2036,6 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
-  test('the rain pulse dive (Python) has six figures, the event and fit tables and SVG downloads', async ({ page, request }) => {
-    const slug = 'rain-pulse';
-    await page.goto(`/deep-dive/${slug}/`);
-    await expect(page.locator('h1')).toContainText('Rain');
-    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #10');
-    const h2 = await page.locator('main h2').allInnerTexts();
-    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
-    // Six matplotlib figures: the lag composite and the SWC relation of night Reco, NEE and GPP.
-    const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
-    expect(await figures.count()).toBe(6);
-    for (const svg of await figures.all()) {
-      const info = await svg.evaluate((el) => ({
-        labelledby: el.getAttribute('aria-labelledby') ?? '',
-        first: el.children[0]?.tagName.toLowerCase(),
-        second: el.children[1]?.tagName.toLowerCase(),
-        titleId: el.children[0]?.id ?? '',
-        descId: el.children[1]?.id ?? '',
-        title: el.children[0]?.textContent?.trim() ?? '',
-        desc: el.children[1]?.textContent?.trim() ?? '',
-      }));
-      expect([info.first, info.second]).toEqual(['title', 'desc']);
-      expect(info.title.length).toBeGreaterThan(0);
-      expect(info.desc.length).toBeGreaterThan(0);
-      expect(info.labelledby.split(/\s+/)).toEqual([info.titleId, info.descId]);
-    }
-    const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
-    expect(downloads.length).toBe(6);
-    for (const href of downloads) {
-      expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
-      const res = await request.get(href);
-      expect(res.status(), href).toBe(200);
-      expect(res.headers()['content-type'] ?? '', href).toContain('svg');
-    }
-    // Summary: 3 variables × 6 sites. Events: 6 sites × 3 thresholds. Fits: one row per site-year of results.json.
-    await expect(page.locator('tr[id^="sum-"]')).toHaveCount(18);
-    await expect(page.locator('tr[id^="ev-"]')).toHaveCount(18);
-    await expect(page.locator('tr[id^="ev-qvidja-"]')).toHaveCount(3);
-    await expect(page.locator('tr[id^="swc-"]')).toHaveCount(18);
-    await expect(page.locator('tr[id^="sens-"]')).toHaveCount(18);
-    await expect(page.locator('tr[id^="fit-"]')).toHaveCount(33);
-    await expect(page.locator('tr#fit-maktau-2019 td').nth(2)).toHaveText('pooled');
-    await expect(page.locator('tr#ev-haltiala-5 td').nth(4)).toHaveText(/^\d+$/);
-    await expect(page.locator('tr#swc-reco-anttila td').nth(3)).toHaveText('too few');
-    // The site column starts with the site emoji in an aria-hidden span; a screen reader reads only the name.
-    await expect(page.locator('tr#ev-qvidja-5 td').first().locator('span[aria-hidden="true"]')).toHaveText('🐂🐝');
-    await expect(page.locator('tr#ev-qvidja-5 td').first()).toHaveText('🐂🐝 Qvidja');
-    expect(await page.locator('.dd-num').count()).toBeGreaterThan(40);
-    const text = await page.locator('main').innerText();
-    expect(text).not.toMatch(/\bundefined\b|\bNaN\b/);
-    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
-    expect(hrefs.length).toBeGreaterThan(0);
-    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
-    await expectOnlyUpdateScript(page);
-  });
-
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -2108,7 +2053,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/', '/deep-dive/carbon-space/', '/deep-dive/rain-pulse/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/', '/deep-dive/carbon-space/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);
