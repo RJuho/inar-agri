@@ -79,7 +79,8 @@ the failed grass year 2023 was a source. NEE does not include the harvest carbon
 on {d.dataVersion.snapshot.builtAt}. It reads `db/sites.parquet` and `db/events.parquet`. It also reads the calculated
 products of the same build, `data/calculated/annual.csv` and `data/calculated/daily.parquet` <Cite ids={['calculated-doc']} />.
 It checks the SHA-256 and the row count of each file before it reads data (section "Reproduce"). GPP and Reco come from
-the night-time partitioning of the calculated products. NEE is the gap-filled NEE. At Maktau, GPP, Reco and NEE come from
+the night-time partitioning of the calculated products. The figures label Reco as TER (total ecosystem respiration, the
+same quantity). NEE is the gap-filled NEE. At Maktau, GPP, Reco and NEE come from
 the u* filter and the MDS gap filling of the calculated products <Cite ids={['calculated-doc']} />. All sums use local
 calendar years and local days.
 

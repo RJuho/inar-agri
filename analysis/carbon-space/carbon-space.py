@@ -548,14 +548,23 @@ AXIS_STEP = 100.0  # g C m-2 yr-1; the axis range of Figure 1 is a multiple of t
 AXIS_PAD = 120.0  # g C m-2 yr-1 of free space around the markers
 NEE_GUIDES = (-200.0, -400.0)
 X_LABEL_1 = r"Annual GPP (g C m$^{-2}$ yr$^{-1}$)"
-Y_LABEL_1 = r"Annual Reco (g C m$^{-2}$ yr$^{-1}$)"
-Y_LABEL_2 = "Days with net uptake (%)"
+Y_LABEL_1 = r"Annual TER (g C m$^{-2}$ yr$^{-1}$)"
+Y_LABEL_2 = "Days with net CO$_2$ uptake,\nNEE < 0 (%)"
+Y_AXIS_TEXT_2 = "days with net CO2 uptake, NEE < 0 (%)"
+GRID = "#e2e2e2"  # faint grid lines (behind everything)
+GRID_LW = 0.6
+LEVELS = (25.0, 75.0, 100.0)  # faint guide lines of the bar figures
+LEVEL_50_COLOR = (
+    "#a8a8a8"  # the 50 % line: a little stronger, still lighter than the bars
+)
 FIG1_TITLE = (
-    "Annual ecosystem respiration (Reco) against annual gross primary production (GPP), "
+    "Annual total ecosystem respiration (TER, = Reco) against annual gross primary production "
+    "(GPP), "
     "one marker per site-year; below the 1:1 line the site-year was a net CO2 sink."
 )
 FIG4_TITLE = (
-    "Annual Reco against annual GPP, one marker per site-year, with the SMEAR II Hyytiälä "
+    "Annual total ecosystem respiration (TER, = Reco) against annual gross primary production "
+    "(GPP), one marker per site-year, with the SMEAR II Hyytiälä "
     "forest (rare management) as a reference; below the 1:1 line the site-year was a net CO2 "
     "sink."
 )
@@ -1799,6 +1808,8 @@ def carbon_space_plot(
         )
     ax.set_xlabel(X_LABEL_1)
     ax.set_ylabel(Y_LABEL_1)
+    ax.set_axisbelow(True)
+    ax.grid(True, color=GRID, lw=GRID_LW, zorder=0)
     ticks = np.arange(lo, hi + 1, 200)
     ax.set_xticks(ticks)
     ax.set_yticks(ticks)
@@ -1826,17 +1837,17 @@ def carbon_space_desc(
     mn, mx = by_key[s["minNee"]], by_key[s["maxNee"]]
     desc = (
         f"Scatter plot of {s['nFig1']} site-years (full and reliable years with annual GPP and "
-        f"Reco): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, both from {fmt(lo)} to "
+        f"TER): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, both from {fmt(lo)} to "
         f"{fmt(hi)} on the same scale. A dotted 1:1 line divides net source years (above, NEE > 0) "
         f"from net sink years (below, NEE < 0); light dotted lines mark NEE = −200 and −400 g C "
-        f"m−2 yr−1. Annual GPP is {fmt(s['fig1']['gpp']['min'])} to {fmt(s['fig1']['gpp']['max'])}, "
-        f"Reco {fmt(s['fig1']['reco']['min'])} to {fmt(s['fig1']['reco']['max'])} g C m−2 yr−1. "
+        f"m−2 yr−1; faint grid lines every 200. Annual GPP is {fmt(s['fig1']['gpp']['min'])} to {fmt(s['fig1']['gpp']['max'])}, "
+        f"TER {fmt(s['fig1']['reco']['min'])} to {fmt(s['fig1']['reco']['max'])} g C m−2 yr−1. "
         f"{s['nSink']} site-years are below the line and {s['nSource']} above it. NEE is "
         f"{fmt(s['fig1']['nee']['mean'])} ± {fmt(s['fig1']['nee']['sd'])} (mean ± SD, range "
         f"{fmt(s['fig1']['nee']['min'])} to {fmt(s['fig1']['nee']['max'])}, n = "
         f"{s['fig1']['nee']['n']}) g C m−2 yr−1; the strongest sink is {mn['siteName']} {point_label(mn)} with NEE "
         f"{fmt(mn['nee'])}, the strongest source {mx['siteName']} {point_label(mx)} with NEE "
-        f"{fmt(mx['nee'])}. OLS line: Reco = {fmt(reg['all']['slope'], 2)} × GPP + "
+        f"{fmt(mx['nee'])}. OLS line: TER = {fmt(reg['all']['slope'], 2)} × GPP + "
         f"{fmt(reg['all']['intercept'])}, r = {fmt(reg['all']['r'], 2)} (n = {reg['all']['n']}); "
         f"without Maktau slope {fmt(reg['withoutMaktau']['slope'], 2)}, r = "
         f"{fmt(reg['withoutMaktau']['r'], 2)} (n = {reg['withoutMaktau']['n']}). Each site has its "
@@ -1858,7 +1869,7 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
     g = res["groups"]
     s4 = res["summary"]["fig4"]
     per = "; ".join(
-        f"{r['year']}: GPP {fmt(r['gpp'])}, Reco {fmt(r['reco'])}, NEE {fmt(r['nee'])}"
+        f"{r['year']}: GPP {fmt(r['gpp'])}, TER {fmt(r['reco'])}, NEE {fmt(r['nee'])}"
         for r in ref_rows
     )
     excl = [e for e in ref["excluded"]]
@@ -1867,7 +1878,7 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
         f"{len(ref_rows)} site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, "
         f"a reference with rare management): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, "
         f"both from {fmt(lo)} to {fmt(hi)} on the same scale, dotted 1:1 line, light dotted "
-        "lines at NEE = −200 and −400 g C m−2 yr−1. Labels: Hyytiälä 2020 and the cluster "
+        "lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä 2020 and the cluster "
         f"2021–2025. Hyytiälä (g C m−2 yr−1) {per}. Hyytiälä NEE "
         f"{fmt(g[REF_GROUP]['nee']['mean'])} ± {fmt(g[REF_GROUP]['nee']['sd'])} (mean ± SD, "
         f"range {fmt(g[REF_GROUP]['nee']['min'])} to {fmt(g[REF_GROUP]['nee']['max'])}, n = "
@@ -1878,7 +1889,7 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
         f"{fmt(g['annual crop']['nee']['sd'])} (range {fmt(g['annual crop']['nee']['min'])} to "
         f"{fmt(g['annual crop']['nee']['max'])}, n = {g['annual crop']['nee']['n']}). "
         f"{s4['nSink']} of {s4['n']} site-years are below the line. OLS line over all "
-        f"{reg['withHyytiala']['n']} site-years: Reco = {fmt(reg['withHyytiala']['slope'], 2)} × "
+        f"{reg['withHyytiala']['n']} site-years: TER = {fmt(reg['withHyytiala']['slope'], 2)} × "
         f"GPP + {fmt(reg['withHyytiala']['intercept'])}, r = {fmt(reg['withHyytiala']['r'], 2)}."
         + (
             " Hyytiälä years not shown: "
@@ -1892,7 +1903,7 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
 
 
 X_AXIS_TEXT_1 = "annual GPP (g C m−2 yr−1)"
-Y_AXIS_TEXT_1 = "annual Reco (g C m−2 yr−1)"
+Y_AXIS_TEXT_1 = "annual total ecosystem respiration (TER, = Reco; g C m−2 yr−1)"
 
 
 def crop_lines(r: dict[str, Any]) -> list[str]:
@@ -1934,7 +1945,9 @@ def uptake_bars(
     xs = bar_positions([dict(r, cropLabel=None) for r in rows] if compact else rows)
     height = FIG5_HEIGHT_IN if compact else FIG2_HEIGHT_IN
     fig = plt.figure(figsize=(FIG_WIDTH_IN, height))
-    ax = fig.add_axes((0.1, 0.22, 0.87, 0.66) if compact else (0.1, 0.2, 0.87, 0.68))
+    ax = fig.add_axes(
+        (0.115, 0.22, 0.865, 0.66) if compact else (0.115, 0.2, 0.865, 0.68)
+    )
     width = 0.4
     for xi, r in zip(xs, rows, strict=True):
         color = site_style(r["site"], data)[0]
@@ -1960,7 +1973,9 @@ def uptake_bars(
             lw=0.8,
             zorder=2,
         )
-    ax.axhline(50, color=INK, lw=1.4, ls=":", zorder=1)
+    for level in LEVELS:
+        ax.axhline(level, color=GRID, lw=GRID_LW + 0.2, zorder=0.5)
+    ax.axhline(50, color=LEVEL_50_COLOR, lw=1.2, ls=":", zorder=0.6)
     ax.set_ylim(0, 100)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.set_xlim(xs[0] - 0.6, xs[-1] + 0.75)
@@ -2039,7 +2054,7 @@ def fig_uptake_days(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         f"Grouped bar chart of {s['nFig2']} site-years (full and reliable years), grouped by "
         "site. Per site-year, the left bar (full site colour) is the share of days with daily "
         "NEE < 0 over the whole year, the right bar (lighter, hatched) the share over June to "
-        "August; y axis days with net uptake (%), 0 to 100, dotted line at 50 %. At the Finnish "
+        f"August; y axis {Y_AXIS_TEXT_2}, 0 to 100, faint guide lines at 25, 50, 75 and 100 % (the 50 % line dotted and a little stronger). At the Finnish "
         f"sites the share is {pct(s['finnishUptakeYear']['min'])} to "
         f"{pct(s['finnishUptakeYear']['max'])} of the year (n = {s['finnishUptakeYear']['n']}) "
         f"and {pct(s['finnishUptakeJja']['min'])} to {pct(s['finnishUptakeJja']['max'])} of June "
@@ -2087,7 +2102,7 @@ def fig_uptake_days_peak_forest(
         "Per site-year, the left bar (full site colour) is the share of days with daily NEE < 0 "
         "over the whole year, the right bar (lighter, hatched) the share inside the "
         f"{PEAK_DAYS} consecutive local days with the largest GPP sum of the year; y axis days "
-        "with net uptake (%), 0 to 100, dotted line at 50 %. Mean ± SD (range) of the whole "
+        "with net CO2 uptake, NEE < 0 (%), 0 to 100, faint guide lines at 25, 50, 75 and 100 % (the 50 % line dotted and a little stronger). Mean ± SD (range) of the whole "
         f"year: forest {share_stat(g[REF_GROUP]['uptakeYear'])}, grassland "
         f"{share_stat(g['grassland']['uptakeYear'])}, annual crops "
         f"{share_stat(g['annual crop']['uptakeYear'])}; of the peak window: forest "
@@ -2127,8 +2142,8 @@ def fig_uptake_days_peak(res: dict[str, Any], data: Data) -> tuple[Any, str, str
         "site, the same layout as Figure 2. Per site-year, the left bar (full site colour) is the "
         "share of days with daily NEE < 0 over the whole year, the right bar (lighter, hatched) "
         f"the share inside the {PEAK_DAYS} consecutive local days with the largest GPP sum of the "
-        f"year ({PEAK_MIN_GPP_DAYS} or more days with GPP); y axis days with net uptake (%), 0 to "
-        "100, dotted line at 50 %. "
+        f"year ({PEAK_MIN_GPP_DAYS} or more days with GPP); y axis {Y_AXIS_TEXT_2}, 0 to 100, faint "
+        "guide lines at 25, 50, 75 and 100 % (the 50 % line dotted and a little stronger). "
         + (
             "Site-years without a valid window (whole-year bar only): "
             + ", ".join(f"{r['siteName']} {r['year']}" for r in missing)
@@ -2300,7 +2315,7 @@ def method_json() -> dict[str, Any]:
         },
         "axisNames": {
             "fig1x": "Annual GPP (g C m-2 yr-1)",
-            "fig1y": "Annual Reco (g C m-2 yr-1)",
+            "fig1y": "Annual TER (g C m-2 yr-1)",
             "fig2y": Y_LABEL_2,
         },
         "rules": [
