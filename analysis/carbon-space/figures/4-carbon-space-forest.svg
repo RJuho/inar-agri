@@ -3,16 +3,16 @@
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="510.23622pt" height="425.19685pt" viewBox="0 0 510.23622 425.19685" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="carbon-space-fig4-title carbon-space-fig4-desc">
  <title id="carbon-space-fig4-title">Annual total ecosystem respiration (TER, = Reco) against annual gross primary production (GPP), one marker per site-year, with the SMEAR II Hyytiälä forest (rare management) as a reference; below the 1:1 line the site-year was a net CO2 sink. The Hyytiälä stand was thinned at the start of 2020 (de Quesada et al. 2025).</title>
- <desc id="carbon-space-fig4-desc">The scatter plot of Figure 1 (15 site-years of the six sites) with 6 site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, a reference with rare management): x axis annual GPP (g C m−2 yr−1), y axis annual total ecosystem respiration (TER, = Reco; g C m−2 yr−1), both from 600 to 1600 on the same scale, dotted 1:1 line, light dotted lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä 2019 (pre-thinning), 2020 (thinning: the stand was thinned at the start of 2020, 40 % of the basal area removed, de Quesada et al. 2025) and the cluster 2021–2024. Hyytiälä (g C m−2 yr−1) 2019: GPP 1190, TER 977, NEE −214; 2020: GPP 968, TER 1083, NEE 115; 2021: GPP 1115, TER 971, NEE −144; 2022: GPP 1206, TER 1019, NEE −187; 2023: GPP 1208, TER 985, NEE −223; 2024: GPP 1249, TER 1001, NEE −248. Hyytiälä NEE −150 ± 134 (mean ± SD, range −248 to 115, n = 6); grassland −41 ± 138 (range −283 to 131, n = 10); annual crops −139 ± 183 (range −392 to 20, n = 5). 14 of 21 site-years are below the line. OLS line over all 21 site-years: TER = 0.59 × GPP + 337, r = 0.71.</desc>
+ <desc id="carbon-space-fig4-desc">The scatter plot of Figure 1 (15 site-years of the six sites) with 6 site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, a reference with rare management): x axis annual GPP (g C m−2 yr−1), y axis annual total ecosystem respiration (TER, = Reco; g C m−2 yr−1), both from 600 to 1600 on the same scale, dotted 1:1 line, faint grid lines every 200. Labels: Hyytiälä 2019 (pre-thinning), 2020 (thinning: the stand was thinned at the start of 2020, 40 % of the basal area removed, de Quesada et al. 2025) and the cluster 2021–2024. Hyytiälä (g C m−2 yr−1) 2019: GPP 1190, TER 977, NEE −214; 2020: GPP 968, TER 1083, NEE 115; 2021: GPP 1115, TER 971, NEE −144; 2022: GPP 1206, TER 1019, NEE −187; 2023: GPP 1208, TER 985, NEE −223; 2024: GPP 1249, TER 1001, NEE −248. Hyytiälä NEE −150 ± 134 (mean ± SD, range −248 to 115, n = 6); grassland −41 ± 138 (range −283 to 131, n = 10); annual crops −139 ± 183 (range −392 to 20, n = 5). 14 of 21 site-years are below the line. OLS line over all 21 site-years: TER = 0.59 × GPP + 337, r = 0.71.</desc>
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
     <dc:title>Annual total ecosystem respiration (TER, = Reco) against annual gross primary production (GPP), one marker per site-year, with the SMEAR II Hyytiälä forest (rare management) as a reference; below the 1:1 line the site-year was a net CO2 sink. The Hyytiälä stand was thinned at the start of 2020 (de Quesada et al. 2025).</dc:title>
-    <dc:description>The scatter plot of Figure 1 (15 site-years of the six sites) with 6 site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, a reference with rare management): x axis annual GPP (g C m−2 yr−1), y axis annual total ecosystem respiration (TER, = Reco; g C m−2 yr−1), both from 600 to 1600 on the same scale, dotted 1:1 line, light dotted lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä 2019 (pre-thinning), 2020 (thinning: the stand was thinned at the start of 2020, 40 % of the basal area removed, de Quesada et al. 2025) and the cluster 2021–2024. Hyytiälä (g C m−2 yr−1) 2019: GPP 1190, TER 977, NEE −214; 2020: GPP 968, TER 1083, NEE 115; 2021: GPP 1115, TER 971, NEE −144; 2022: GPP 1206, TER 1019, NEE −187; 2023: GPP 1208, TER 985, NEE −223; 2024: GPP 1249, TER 1001, NEE −248. Hyytiälä NEE −150 ± 134 (mean ± SD, range −248 to 115, n = 6); grassland −41 ± 138 (range −283 to 131, n = 10); annual crops −139 ± 183 (range −392 to 20, n = 5). 14 of 21 site-years are below the line. OLS line over all 21 site-years: TER = 0.59 × GPP + 337, r = 0.71.</dc:description>
+    <dc:description>The scatter plot of Figure 1 (15 site-years of the six sites) with 6 site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, a reference with rare management): x axis annual GPP (g C m−2 yr−1), y axis annual total ecosystem respiration (TER, = Reco; g C m−2 yr−1), both from 600 to 1600 on the same scale, dotted 1:1 line, faint grid lines every 200. Labels: Hyytiälä 2019 (pre-thinning), 2020 (thinning: the stand was thinned at the start of 2020, 40 % of the basal area removed, de Quesada et al. 2025) and the cluster 2021–2024. Hyytiälä (g C m−2 yr−1) 2019: GPP 1190, TER 977, NEE −214; 2020: GPP 968, TER 1083, NEE 115; 2021: GPP 1115, TER 971, NEE −144; 2022: GPP 1206, TER 1019, NEE −187; 2023: GPP 1208, TER 985, NEE −223; 2024: GPP 1249, TER 1001, NEE −248. Hyytiälä NEE −150 ± 134 (mean ± SD, range −248 to 115, n = 6); grassland −41 ± 138 (range −283 to 131, n = 10); annual crops −139 ± 183 (range −392 to 20, n = 5). 14 of 21 site-years are below the line. OLS line over all 21 site-years: TER = 0.59 × GPP + 337, r = 0.71.</dc:description>
     <dc:format>image/svg+xml</dc:format>
     <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; calculated/annual.csv sha256 27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe; calculated/daily.parquet sha256 fcae1d28c3761bd8b9da5f8aa3c821435254018a9959cba2598b13cb038bded9; smear/HYY_EDDY233_NEE_GPP_2019.csv sha256 32e13af00db88a7c00f6e0cabbdbcbfe9f08fcda220df8b6e2d0e6e72999ced7; smear/HYY_EDDYMAST_F_c_270_2019.csv sha256 6535ff06a6c24f85fa7b4dfe23e94b53039085815227366bce1e95da7524f739; smear/HYY_EDDY233_NEE_GPP_2020.csv sha256 75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20; smear/HYY_EDDYMAST_F_c_270_2020.csv sha256 fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2; smear/HYY_EDDY233_NEE_GPP_2021.csv sha256 468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5; smear/HYY_EDDYMAST_F_c_270_2021.csv sha256 5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d; smear/HYY_EDDY233_NEE_GPP_2022.csv sha256 4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb; smear/HYY_EDDYMAST_F_c_270_2022.csv sha256 c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762; smear/HYY_EDDY233_NEE_GPP_2023.csv sha256 cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914; smear/HYY_EDDYMAST_F_c_270_2023.csv sha256 95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a; smear/HYY_EDDY233_NEE_GPP_2024.csv sha256 2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a; smear/HYY_EDDYMAST_F_c_270_2024.csv sha256 b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3</dc:relation>
-    <dc:source>analysis/carbon-space/carbon-space.py (git 47ad0f5, dirty)</dc:source>
+    <dc:source>analysis/carbon-space/carbon-space.py (git efff520, dirty)</dc:source>
     <dc:creator>
      <cc:Agent>
       <dc:title>matplotlib 3.11.2</dc:title>
@@ -306,16 +306,6 @@ L 397.984252 27.212598
 " clip-path="url(#cs4-pb204f2e6fb)" style="fill: none; stroke-dasharray: 1.8,2.97; stroke-dashoffset: 0; stroke: #222222; stroke-width: 1.8"/>
    </g>
    <g id="cs4-line2d_26">
-    <path d="M 128.579528 363.968504 
-L 397.984252 94.56378 
-" clip-path="url(#cs4-pb204f2e6fb)" style="fill: none; stroke-dasharray: 1.1,1.815; stroke-dashoffset: 0; stroke: #888888; stroke-width: 1.1"/>
-   </g>
-   <g id="cs4-line2d_27">
-    <path d="M 195.930709 363.968504 
-L 397.984252 161.914961 
-" clip-path="url(#cs4-pb204f2e6fb)" style="fill: none; stroke-dasharray: 1.1,1.815; stroke-dashoffset: 0; stroke: #888888; stroke-width: 1.1"/>
-   </g>
-   <g id="cs4-line2d_28">
     <defs>
      <path id="cs4-m46db79ab04" d="M 0 -9.5 
 L -2.132883 -2.935661 
@@ -350,18 +340,12 @@ L 397.984252 363.968504
 " style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="cs4-text_15">
-    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #555555; font-variant-numeric: tabular-nums" x="388.45541" y="88.034937" transform="rotate(-45 388.45541 88.034937)">NEE = −200</text>
-   </g>
-   <g id="cs4-text_16">
-    <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #555555; font-variant-numeric: tabular-nums" x="388.45541" y="155.386118" transform="rotate(-45 388.45541 155.386118)">NEE = −400</text>
-   </g>
-   <g id="cs4-text_17">
     <text style="font-weight: 700; font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="71.331024" y="45.862639" transform="rotate(-0 71.331024 45.862639)">net source (NEE &gt; 0)</text>
    </g>
-   <g id="cs4-text_18">
+   <g id="cs4-text_16">
     <text style="font-weight: 700; font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="387.881575" y="351.16319" transform="rotate(-0 387.881575 351.16319)">net sink (NEE &lt; 0)</text>
    </g>
-   <g id="cs4-line2d_29">
+   <g id="cs4-line2d_27">
     <defs>
      <path id="cs4-m16c2f72e34" d="M 0 6.5 
 C 1.72382 6.5 3.377269 5.815119 4.596194 4.596194 
@@ -380,7 +364,7 @@ z
      <use xlink:href="#cs4-m16c2f72e34" x="322.005534" y="198.489085" style="fill: #0072b2; stroke: #ffffff; stroke-width: 0.8"/>
     </g>
    </g>
-   <g id="cs4-line2d_30">
+   <g id="cs4-line2d_28">
     <defs>
      <path id="cs4-mbc9af21927" d="M -6.5 6.5 
 L 6.5 6.5 
@@ -393,7 +377,7 @@ z
      <use xlink:href="#cs4-mbc9af21927" x="172.277074" y="270.788567" style="fill: #e69f00; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-line2d_31">
+   <g id="cs4-line2d_29">
     <defs>
      <path id="cs4-m1382377587" d="M -0 9.192388 
 L 9.192388 0 
@@ -410,7 +394,7 @@ z
      <use xlink:href="#cs4-m1382377587" x="357.128184" y="72.749152" style="fill: #cc79a7; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-line2d_32">
+   <g id="cs4-line2d_30">
     <defs>
      <path id="cs4-m7e4735b27a" d="M 0 -6.5 
 L -6.181867 -2.00861 
@@ -425,7 +409,7 @@ z
      <use xlink:href="#cs4-m7e4735b27a" x="159.192342" y="259.205528" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-line2d_33">
+   <g id="cs4-line2d_31">
     <defs>
      <path id="cs4-m2682c0794c" d="M -0 6.5 
 L 6.5 -6.5 
@@ -437,7 +421,7 @@ z
      <use xlink:href="#cs4-m2682c0794c" x="197.454314" y="359.850184" style="fill: #d55e00; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-line2d_34">
+   <g id="cs4-line2d_32">
     <defs>
      <path id="cs4-ma1ad078870" d="M 0 -6.5 
 L -6.5 6.5 
@@ -452,7 +436,7 @@ z
      <use xlink:href="#cs4-ma1ad078870" x="225.375719" y="201.132519" style="fill: #56b4e9; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-text_19">
+   <g id="cs4-text_17">
     <g id="cs4-patch_5">
      <path d="M 297.110486 227.457944 
 L 321.815486 227.457944 
@@ -463,7 +447,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="298.010486" y="225.333803" transform="rotate(-0 298.010486 225.333803)">2022</text>
    </g>
-   <g id="cs4-text_20">
+   <g id="cs4-text_18">
     <g id="cs4-patch_6">
      <path d="M 332.105534 203.889085 
 L 356.810534 203.889085 
@@ -474,7 +458,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="333.005534" y="201.764945" transform="rotate(-0 333.005534 201.764945)">2023</text>
    </g>
-   <g id="cs4-text_21">
+   <g id="cs4-text_19">
     <g id="cs4-patch_7">
      <path d="M 182.377074 283.188567 
 L 207.082074 283.188567 
@@ -485,7 +469,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="183.277074" y="281.064427" transform="rotate(-0 183.277074 281.064427)">2022</text>
    </g>
-   <g id="cs4-text_22">
+   <g id="cs4-text_20">
     <g id="cs4-patch_8">
      <path d="M 212.166799 319.871765 
 L 258.971018 319.871765 
@@ -496,7 +480,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="213.066799" y="317.747624" transform="rotate(-0 213.066799 317.747624)">2022 oats</text>
    </g>
-   <g id="cs4-text_23">
+   <g id="cs4-text_21">
     <g id="cs4-patch_9">
      <path d="M 19.467923 309.428714 
 L 71.33886 309.428714 
@@ -508,7 +492,7 @@ z
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(20.367923 297.432699)">2023 grass</text>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(38.480423 306.854574)">(failed)</text>
    </g>
-   <g id="cs4-text_24">
+   <g id="cs4-text_22">
     <g id="cs4-patch_10">
      <path d="M 199.160466 263.360489 
 L 270.595153 263.360489 
@@ -519,7 +503,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="200.060466" y="261.315802" transform="rotate(-0 200.060466 261.315802)">2024 sunflower</text>
    </g>
-   <g id="cs4-text_25">
+   <g id="cs4-text_23">
     <g id="cs4-patch_11">
      <path d="M 201.973609 222.532519 
 L 248.777828 222.532519 
@@ -530,7 +514,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="225.375719" y="220.408378" transform="rotate(-0 225.375719 220.408378)">2025 oats</text>
    </g>
-   <g id="cs4-text_26">
+   <g id="cs4-text_24">
     <g id="cs4-patch_12">
      <path d="M 257.111929 184.905668 
 L 281.816929 184.905668 
@@ -541,7 +525,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="269.464429" y="182.781527" transform="rotate(-0 269.464429 182.781527)">2020</text>
    </g>
-   <g id="cs4-text_27">
+   <g id="cs4-text_25">
     <g id="cs4-patch_13">
      <path d="M 95.084669 327.281858 
 L 119.789669 327.281858 
@@ -552,7 +536,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="107.437169" y="325.157717" transform="rotate(-0 107.437169 325.157717)">2022</text>
    </g>
-   <g id="cs4-text_28">
+   <g id="cs4-text_26">
     <g id="cs4-patch_14">
      <path d="M 134.642539 231.172303 
 L 159.347539 231.172303 
@@ -563,7 +547,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="158.447539" y="229.048163" transform="rotate(-0 158.447539 229.048163)">2023</text>
    </g>
-   <g id="cs4-text_29">
+   <g id="cs4-text_27">
     <g id="cs4-patch_15">
      <path d="M 201.47561 189.371691 
 L 226.18061 189.371691 
@@ -574,7 +558,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="213.82811" y="187.247551" transform="rotate(-0 213.82811 187.247551)">2024</text>
    </g>
-   <g id="cs4-text_30">
+   <g id="cs4-text_28">
     <g id="cs4-patch_16">
      <path d="M 322.323184 78.149152 
 L 347.028184 78.149152 
@@ -585,7 +569,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="346.128184" y="76.025011" transform="rotate(-0 346.128184 76.025011)">2025</text>
    </g>
-   <g id="cs4-text_31">
+   <g id="cs4-text_29">
     <g id="cs4-patch_17">
      <path d="M 131.053664 310.784632 
 L 155.758664 310.784632 
@@ -596,7 +580,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="131.953664" y="308.660491" transform="rotate(-0 131.953664 308.660491)">2024</text>
    </g>
-   <g id="cs4-text_32">
+   <g id="cs4-text_30">
     <g id="cs4-patch_18">
      <path d="M 76.283748 264.605528 
 L 149.092342 264.605528 
@@ -607,7 +591,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="148.192342" y="262.56084" transform="rotate(-0 148.192342 262.56084)">2025 faba bean</text>
    </g>
-   <g id="cs4-text_33">
+   <g id="cs4-text_31">
     <g id="cs4-patch_19">
      <path d="M 207.554314 365.250184 
 L 262.163221 365.250184 
@@ -623,7 +607,7 @@ z
 Q 277.594088 248.861885 265.001666 240.474422 
 " style="fill: none; stroke: #888888; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
-   <g id="cs4-text_34">
+   <g id="cs4-text_32">
     <g id="cs4-patch_21">
      <path d="M 273.110374 277.049861 
 L 336.990687 277.049861 
@@ -635,7 +619,7 @@ z
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(274.010374 265.92572)">2019</text>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(274.010374 274.133298)">(pre-thinning)</text>
    </g>
-   <g id="cs4-text_35">
+   <g id="cs4-text_33">
     <g id="cs4-patch_22">
      <path d="M 104.450888 194.818759 
 L 176.096513 194.818759 
@@ -646,7 +630,7 @@ z
     </g>
     <text style="font-size: 9px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="175.196513" y="191.902197" transform="rotate(-0 175.196513 191.902197)">2020 (thinning)</text>
    </g>
-   <g id="cs4-text_36">
+   <g id="cs4-text_34">
     <g id="cs4-patch_23">
      <path d="M 290.933965 248.277663 
 L 343.043965 248.277663 
@@ -659,10 +643,10 @@ z
    </g>
   </g>
   <g id="cs4-legend_1">
-   <g id="cs4-text_37">
+   <g id="cs4-text_35">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="407.286614" y="236.29404" transform="rotate(-0 407.286614 236.29404)">Site</text>
    </g>
-   <g id="cs4-line2d_35">
+   <g id="cs4-line2d_33">
     <defs>
      <path id="cs4-m404243e282" d="M 0 5.525 
 C 1.465247 5.525 2.870679 4.942851 3.906765 3.906765 
@@ -680,10 +664,10 @@ z
      <use xlink:href="#cs4-m404243e282" x="417.786614" y="250.469861" style="fill: #0072b2; stroke: #ffffff; stroke-width: 0.8"/>
     </g>
    </g>
-   <g id="cs4-text_38">
+   <g id="cs4-text_36">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="254.144861" transform="rotate(-0 432.486614 254.144861)">👱🏻‍♂️🫛 Anttila</text>
    </g>
-   <g id="cs4-line2d_36">
+   <g id="cs4-line2d_34">
     <defs>
      <path id="cs4-mb1fd629c6e" d="M -5.525 5.525 
 L 5.525 5.525 
@@ -696,10 +680,10 @@ z
      <use xlink:href="#cs4-mb1fd629c6e" x="417.786614" y="268.320681" style="fill: #e69f00; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-text_39">
+   <g id="cs4-text_37">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="271.995681" transform="rotate(-0 432.486614 271.995681)">🐟🌱 Särkisuo</text>
    </g>
-   <g id="cs4-line2d_37">
+   <g id="cs4-line2d_35">
     <defs>
      <path id="cs4-m7cdf2abb2b" d="M 0 -5.525 
 L -5.525 5.525 
@@ -711,10 +695,10 @@ z
      <use xlink:href="#cs4-m7cdf2abb2b" x="417.786614" y="286.171501" style="fill: #56b4e9; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-text_40">
+   <g id="cs4-text_38">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="289.846501" transform="rotate(-0 432.486614 289.846501)">🧚🌾 Haltiala</text>
    </g>
-   <g id="cs4-line2d_38">
+   <g id="cs4-line2d_36">
     <defs>
      <path id="cs4-m0d910b0cb4" d="M -0 7.81353 
 L 7.81353 0 
@@ -727,10 +711,10 @@ z
      <use xlink:href="#cs4-m0d910b0cb4" x="417.786614" y="304.022322" style="fill: #cc79a7; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-text_41">
+   <g id="cs4-text_39">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="307.697322" transform="rotate(-0 432.486614 307.697322)">🐂🐝 Qvidja</text>
    </g>
-   <g id="cs4-line2d_39">
+   <g id="cs4-line2d_37">
     <defs>
      <path id="cs4-m854f2cf925" d="M 0 -5.525 
 L -5.254587 -1.707319 
@@ -744,10 +728,10 @@ z
      <use xlink:href="#cs4-m854f2cf925" x="417.786614" y="321.873142" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-text_42">
+   <g id="cs4-text_40">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="325.548142" transform="rotate(-0 432.486614 325.548142)">👩🏻‍🔬🎓 Viikki</text>
    </g>
-   <g id="cs4-line2d_40">
+   <g id="cs4-line2d_38">
     <defs>
      <path id="cs4-ma6490439c3" d="M -0 5.525 
 L 5.525 -5.525 
@@ -759,10 +743,10 @@ z
      <use xlink:href="#cs4-ma6490439c3" x="417.786614" y="339.723962" style="fill: #d55e00; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
     </g>
    </g>
-   <g id="cs4-text_43">
+   <g id="cs4-text_41">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="432.486614" y="343.398962" transform="rotate(-0 432.486614 343.398962)">🇰🇪🌽 Maktau</text>
    </g>
-   <g id="cs4-line2d_41">
+   <g id="cs4-line2d_39">
     <defs>
      <path id="cs4-m4d5740e12e" d="M 0 -8.075 
 L -1.81295 -2.495312 
@@ -781,7 +765,7 @@ z
      <use xlink:href="#cs4-m4d5740e12e" x="417.786614" y="366.188474" style="fill: #009e73; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
     </g>
    </g>
-   <g id="cs4-text_44">
+   <g id="cs4-text_42">
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(432.486614 362.300808)">🌲🍄 Hyytiälä</text>
     <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(432.486614 374.903679)">(forest)</text>
    </g>

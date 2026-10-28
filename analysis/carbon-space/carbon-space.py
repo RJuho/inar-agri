@@ -104,6 +104,9 @@ OUTPUTS
     figures/3-uptake-days-peak.svg  as Figure 2, second bar = the 90-day window with the largest GPP
     figures/4-carbon-space-forest.svg  Figure 1 plus the Hyytiala forest site-years
     figures/5-uptake-days-peak-forest.svg  Figure 3 plus the Hyytiala forest site-years
+    figures/variants/1-carbon-space-no-labels.svg  Figure 1 without the point labels
+    figures/variants/4-carbon-space-forest-no-labels.svg  Figure 4 without the point labels
+        (the variants are not in the article; results.json figureVariants has their text)
     output/run.log               run log (not in git)
     output/site-years.csv        all site-years with the numbers (not in git)
     With --check, all outputs go to output/ and the script compares them with the committed files.
@@ -578,7 +581,6 @@ SITE_COLORS = (
 SITE_MARKERS = ("o", "s", "^", "D", "p", "v")
 INK = "#222222"
 GUIDE = "#888888"
-GUIDE_TEXT = "#555555"
 LINE_WIDTH = 2.2
 MARKER_SIZE = 13
 MARKER_EDGE = 0.8  # white edge line that separates touching markers
@@ -602,6 +604,15 @@ FIGURES = (
     (4, "carbon-space-forest"),
     (5, "uptake-days-peak-forest"),
 )
+# Variants of figures (not in the article; for presentations): (n, name, variant). The file is
+# figures/variants/<n>-<name>-<variant>.svg. VARIANT_TAGS gives the aria id part and the short id
+# prefix part of each variant, so that the ids do not agree with the ids of the main figures.
+FIGURE_VARIANTS = (
+    (1, "carbon-space", "no-labels"),
+    (4, "carbon-space-forest", "no-labels"),
+)
+VARIANT_TAGS = {"no-labels": ("nolabels", "n")}
+NO_LABELS_NOTE = " The point labels (year and crop) are not shown in this variant."
 # Style of the reference site: Okabe-Ito bluish green and a star (not a slot of sites.parquet).
 REF_COLOR = "#009e73"
 REF_MARKER = "*"
@@ -625,7 +636,6 @@ REF_LEGEND = f"{SITE_EMOJI[REF_SITE]} {REF_NAME}\n(forest)"
 AXIS_LO_1 = 600.0
 AXIS_HI_1 = 1600.0
 AXIS_TICK_1 = 200.0
-NEE_GUIDES = (-200.0, -400.0)
 X_LABEL_1 = r"Annual GPP (g C m$^{-2}$ yr$^{-1}$)"
 Y_LABEL_1 = r"Annual TER (g C m$^{-2}$ yr$^{-1}$)"
 Y_LABEL_2 = "Percentage of days with\nnet CO$_2$ uptake (NEE < 0)"
@@ -1677,10 +1687,22 @@ def esc(s: str) -> str:
     )
 
 
-def add_svg_text(path: Path, n: int, title: str, desc: str) -> None:
+def svg_ids(n: int, variant: str = "") -> tuple[str, str, str]:
+    """The ids of <title> and <desc> and the id prefix of a figure (or of one of its variants)."""
+    if not variant:
+        return f"{SLUG}-fig{n}-title", f"{SLUG}-fig{n}-desc", f"{SVG_ID_PREFIX}{n}-"
+    tag, short = VARIANT_TAGS[variant]
+    return (
+        f"{SLUG}-fig{n}-{tag}-title",
+        f"{SLUG}-fig{n}-{tag}-desc",
+        f"{SVG_ID_PREFIX}{n}{short}-",
+    )
+
+
+def add_svg_text(path: Path, n: int, title: str, desc: str, variant: str = "") -> None:
     """Add role, aria-labelledby, <title> and <desc>, and the site font stack on each text element."""
     svg = path.read_text(encoding="utf-8")
-    tid, did = f"{SLUG}-fig{n}-title", f"{SLUG}-fig{n}-desc"
+    tid, did, prefix = svg_ids(n, variant)
     m = re.search(r"<svg\b[^>]*>", svg)
     if not m:
         raise RuntimeError(f"{path}: no <svg> element")
@@ -1714,7 +1736,7 @@ def add_svg_text(path: Path, n: int, title: str, desc: str) -> None:
         ),
         svg,
     )
-    svg = prefix_svg_ids(svg, f"{SVG_ID_PREFIX}{n}-", keep={tid, did})
+    svg = prefix_svg_ids(svg, prefix, keep={tid, did})
     path.write_text(svg, encoding="utf-8")
 
 
@@ -1741,9 +1763,15 @@ def prefix_svg_ids(svg: str, prefix: str, keep: set[str]) -> str:
 
 
 def save_svg(
-    fig: Any, path: Path, n: int, title: str, desc: str, meta: dict[str, str]
+    fig: Any,
+    path: Path,
+    n: int,
+    title: str,
+    desc: str,
+    meta: dict[str, str],
+    variant: str = "",
 ) -> None:
-    plt.rcParams["svg.hashsalt"] = f"{SLUG}-{n}"
+    plt.rcParams["svg.hashsalt"] = f"{SLUG}-{n}" + (f"-{variant}" if variant else "")
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(
         path,
@@ -1758,7 +1786,7 @@ def save_svg(
         },
     )
     plt.close(fig)
-    add_svg_text(path, n, title, desc)
+    add_svg_text(path, n, title, desc, variant)
 
 
 def lighter(hex_color: str, f: float = 0.55) -> str:
@@ -1806,11 +1834,14 @@ def site_style(site: str, data: Data) -> tuple[str, str, float, float, str]:
     )
 
 
-def fig_carbon_space(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
+def fig_carbon_space(
+    res: dict[str, Any], data: Data, labels: bool = True
+) -> tuple[Any, str, str]:
+    """Figure 1. With labels=False: the variant without point labels (own title and alt text)."""
     rows = [r for r in res["siteYears"] if r["inFig1"]]
-    fig, lo, hi = carbon_space_plot(rows, data, LABEL_OFFSETS, {})
-    desc = carbon_space_desc(res, rows, lo, hi)
-    return fig, FIG1_TITLE, desc
+    fig, lo, hi = carbon_space_plot(rows, data, LABEL_OFFSETS if labels else {}, {})
+    desc = carbon_space_desc(res, rows, lo, hi, labels)
+    return fig, FIG1_TITLE + ("" if labels else NO_LABELS_NOTE), desc
 
 
 def carbon_space_plot(
@@ -1834,22 +1865,6 @@ def carbon_space_plot(
     ax.set_aspect("equal", adjustable="box")
     ax.plot([lo, hi], [lo, hi], color=INK, lw=1.8, ls=":", zorder=1)
     fs_small = 6 * FONT_SCALE
-    for g in NEE_GUIDES:
-        # NEE = Reco - GPP = g, thus Reco = GPP + g. The label is at the right axis edge, at
-        # the upper end of the line (the bottom edge holds the Maktau 2019 marker).
-        ax.plot([lo - g, hi], [lo, hi + g], color=GUIDE, lw=1.1, ls=":", zorder=1)
-        ax.annotate(
-            f"NEE = {fmt(g)}",
-            (hi, hi + g),
-            xytext=(-8, 5),
-            textcoords="offset points",
-            ha="right",
-            va="bottom",
-            rotation=45,
-            rotation_mode="anchor",
-            fontsize=fs_small,
-            color=GUIDE_TEXT,
-        )
     ax.text(
         lo + 0.03 * (hi - lo),
         hi - 0.03 * (hi - lo),
@@ -1952,8 +1967,48 @@ def carbon_space_plot(
     return fig, lo, hi
 
 
+def site_years_text(rows: Sequence[dict[str, Any]]) -> str:
+    """The site-years of the rows per site, for example "Qvidja 2020, 2022; Maktau 2019 maize"."""
+    parts = []
+    for site in (*ALL_SITES, REF_SITE):
+        sr = [r for r in rows if r["site"] == site]
+        if sr:
+            parts.append(
+                f"{sr[0]['siteName']} " + ", ".join(point_label(r) for r in sr)
+            )
+    return "; ".join(parts)
+
+
+def star_position(r: dict[str, Any], ref_rows: Sequence[dict[str, Any]]) -> str:
+    """Words for the place of one Hyytiala star in Figure 4, from the numbers (no labels there)."""
+    others = [o for o in ref_rows if o["key"] != r["key"]]
+    side = "above" if r["nee"] > 0 else "below"
+    words = [f"at GPP {fmt(r['gpp'])}, TER {fmt(r['reco'])}"]
+    if all((o["nee"] > 0) != (r["nee"] > 0) for o in others):
+        words.append(f"the only star {side} the 1:1 line")
+    else:
+        words.append(f"{side} the 1:1 line")
+    if all(r["gpp"] < o["gpp"] for o in others):
+        words.append("the star with the lowest GPP")
+    elif all(r["gpp"] > o["gpp"] for o in others):
+        words.append("the star with the highest GPP")
+    cluster = [o for o in ref_rows if o["year"] > THINNING_YEAR]
+    if r["year"] < THINNING_YEAR and cluster:
+        g_lo = min(o["gpp"] for o in cluster)
+        g_hi = max(o["gpp"] for o in cluster)
+        where = "in" if g_lo <= r["gpp"] <= g_hi else "near"
+        words.append(
+            f"{where} the group of the {CLUSTER_TEXT} stars (GPP {fmt(g_lo)} to {fmt(g_hi)})"
+        )
+    return ", ".join(words)
+
+
 def carbon_space_desc(
-    res: dict[str, Any], rows: Sequence[dict[str, Any]], lo: float, hi: float
+    res: dict[str, Any],
+    rows: Sequence[dict[str, Any]],
+    lo: float,
+    hi: float,
+    labels: bool = True,
 ) -> str:
     reg = res["regression"]
     s = res["summary"]
@@ -1963,8 +2018,7 @@ def carbon_space_desc(
         f"Scatter plot of {s['nFig1']} site-years (full and reliable years with annual GPP and "
         f"TER): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, both from {fmt(lo)} to "
         f"{fmt(hi)} on the same scale. A dotted 1:1 line divides net source years (above, NEE > 0) "
-        f"from net sink years (below, NEE < 0); light dotted lines mark NEE = −200 and −400 g C "
-        f"m−2 yr−1; faint grid lines every 200. Annual GPP is {fmt(s['fig1']['gpp']['min'])} to {fmt(s['fig1']['gpp']['max'])}, "
+        f"from net sink years (below, NEE < 0); faint grid lines every 200. Annual GPP is {fmt(s['fig1']['gpp']['min'])} to {fmt(s['fig1']['gpp']['max'])}, "
         f"TER {fmt(s['fig1']['reco']['min'])} to {fmt(s['fig1']['reco']['max'])} g C m−2 yr−1. "
         f"{s['nSink']} site-years are below the line and {s['nSource']} above it. NEE is "
         f"{fmt(s['fig1']['nee']['mean'])} ± {fmt(s['fig1']['nee']['sd'])} (mean ± SD, range "
@@ -1975,20 +2029,27 @@ def carbon_space_desc(
         f"{fmt(reg['all']['intercept'])}, r = {fmt(reg['all']['r'], 2)} (n = {reg['all']['n']}); "
         f"without Maktau slope {fmt(reg['withoutMaktau']['slope'], 2)}, r = "
         f"{fmt(reg['withoutMaktau']['r'], 2)} (n = {reg['withoutMaktau']['n']}). Each site has its "
-        "own colour and marker; labels give the year and, for annual crops and the failed grass, "
-        "the crop."
+        "own colour and marker; "
+        + (
+            "labels give the year and, for annual crops and the failed grass, the crop."
+            if labels
+            else "the points have no labels. The site-years (year and, for annual crops and "
+            f"the failed grass, the crop) are: {site_years_text(rows)}."
+        )
     )
     return desc
 
 
-def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
+def fig_carbon_space_forest(
+    res: dict[str, Any], data: Data, labels: bool = True
+) -> tuple[Any, str, str]:
+    """Figure 4. With labels=False: the variant without point labels (own title and alt text)."""
     ref = res["reference"]["hyytiala"]
     db_rows = [r for r in res["siteYears"] if r["inFig1"]]
     ref_rows = [r for r in ref["siteYears"] if r["inFig1"]]
     rows = db_rows + ref_rows
-    fig, lo, hi = carbon_space_plot(
-        rows, data, {**LABEL_OFFSETS, **LABEL_OFFSETS_FOREST}, LABEL_TEXT_FOREST
-    )
+    offsets = {**LABEL_OFFSETS, **LABEL_OFFSETS_FOREST} if labels else {}
+    fig, lo, hi = carbon_space_plot(rows, data, offsets, LABEL_TEXT_FOREST)
     reg = res["regression"]
     g = res["groups"]
     s4 = res["summary"]["fig4"]
@@ -1997,16 +2058,31 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
         for r in ref_rows
     )
     excl = [e for e in ref["excluded"]]
+    thinning = (
+        f"the stand was thinned at the start of {THINNING_YEAR}, "
+        f"{LIT['basalAreaReductionPct']['value']} % of the basal area removed, de Quesada et "
+        "al. 2025"
+    )
+    by_key = {r["key"]: r for r in ref_rows}
+    if labels:
+        label_text = (
+            f"Labels: Hyytiälä {REF_YEARS[0]} (pre-thinning), {THINNING_YEAR} (thinning: "
+            f"{thinning}) and the cluster {CLUSTER_TEXT}. "
+        )
+    else:
+        label_text = (
+            "The points have no labels. Hyytiälä "
+            f"{REF_YEARS[0]} (pre-thinning) is the star "
+            f"{star_position(by_key[PRE_THINNING_KEY], ref_rows)}; {THINNING_YEAR} "
+            f"(thinning: {thinning}) is the star "
+            f"{star_position(by_key[THINNING_KEY], ref_rows)}. "
+        )
     desc = (
         f"The scatter plot of Figure 1 ({len(db_rows)} site-years of the six sites) with "
         f"{len(ref_rows)} site-years of the SMEAR II Hyytiälä Scots pine forest (green stars, "
         f"a reference with rare management): x axis {X_AXIS_TEXT_1}, y axis {Y_AXIS_TEXT_1}, "
-        f"both from {fmt(lo)} to {fmt(hi)} on the same scale, dotted 1:1 line, light dotted "
-        "lines at NEE = −200 and −400 g C m−2 yr−1, faint grid lines every 200. Labels: Hyytiälä "
-        f"{REF_YEARS[0]} (pre-thinning), {THINNING_YEAR} (thinning: the stand was thinned at the "
-        f"start of {THINNING_YEAR}, {LIT['basalAreaReductionPct']['value']} % of the basal area "
-        f"removed, de Quesada et al. 2025) and the cluster {CLUSTER_TEXT}. Hyytiälä "
-        f"(g C m−2 yr−1) {per}. Hyytiälä NEE "
+        f"both from {fmt(lo)} to {fmt(hi)} on the same scale, dotted 1:1 line, faint grid lines "
+        "every 200. " + label_text + f"Hyytiälä (g C m−2 yr−1) {per}. Hyytiälä NEE "
         f"{fmt(g[REF_GROUP]['nee']['mean'])} ± {fmt(g[REF_GROUP]['nee']['sd'])} (mean ± SD, "
         f"range {fmt(g[REF_GROUP]['nee']['min'])} to {fmt(g[REF_GROUP]['nee']['max'])}, n = "
         f"{g[REF_GROUP]['nee']['n']}); grassland "
@@ -2026,7 +2102,7 @@ def fig_carbon_space_forest(res: dict[str, Any], data: Data) -> tuple[Any, str, 
             else ""
         )
     )
-    return fig, FIG4_TITLE, desc
+    return fig, FIG4_TITLE + ("" if labels else NO_LABELS_NOTE), desc
 
 
 X_AXIS_TEXT_1 = "annual GPP (g C m−2 yr−1)"
@@ -2440,7 +2516,6 @@ def method_json() -> dict[str, Any]:
             )
         ],
         "failedGrassNote": "Haltiala 2023 (grass sown, failed) is in the group grassland with the crop label 'grass (failed)'",
-        "nee_guides": list(NEE_GUIDES),
         "sumRtol": SUM_RTOL,
         "units": {
             "daily": DAILY_UNIT,
@@ -2571,6 +2646,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             {"n": n, "file": f"figures/{n}-{name}.svg", "title": title, "desc": desc}
         )
         log.info("figure %d: %s (%d bytes)", n, path, size)
+    variants_json: list[dict[str, Any]] = []
+    for n, name, variant in FIGURE_VARIANTS:
+        if name == "carbon-space":
+            fig, title, desc = fig_carbon_space(res, data, labels=False)
+        else:
+            fig, title, desc = fig_carbon_space_forest(res, data, labels=False)
+        file = f"figures/variants/{n}-{name}-{variant}.svg"
+        path = target / file
+        save_svg(fig, path, n, title, desc, meta, variant)
+        size = path.stat().st_size
+        if size >= 1_000_000:
+            raise RuntimeError(f"{path}: {size} bytes (limit 1 MB)")
+        variants_json.append(
+            {"n": n, "variant": variant, "file": file, "title": title, "desc": desc}
+        )
+        log.info("figure %d variant %s: %s (%d bytes)", n, variant, path, size)
 
     pd.DataFrame(
         [
@@ -2612,6 +2703,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "literature": list(LITERATURE),
         "literatureByKey": LIT,
         "figures": figures_json,
+        "figureVariants": variants_json,
         "dataVersion": dv,
     }
     results = round_sig(results)
@@ -2629,7 +2721,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "sha256": sha256_file(target / f["file"]),
                     "sha256WithoutMetadata": svg_body_hash(target / f["file"]),
                 }
-                for f in figures_json
+                for f in [*figures_json, *variants_json]
             },
         },
     }
@@ -2647,7 +2739,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         man_path = out_dir / "manifest.json"
         if man_path.is_file():
             old = json.loads(man_path.read_text(encoding="utf-8"))["outputs"]["figures"]
-            for f in figures_json:
+            for f in [*figures_json, *variants_json]:
                 new_h = svg_body_hash(target / f["file"])
                 old_h = old.get(f["file"], {}).get("sha256WithoutMetadata")
                 if new_h != old_h:

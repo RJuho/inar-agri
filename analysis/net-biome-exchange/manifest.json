@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-28T11:19:54Z",
+  "generatedAt": "2026-10-28T20:15:46Z",
   "git": {
-    "commit": "445cc40",
+    "commit": "efff520",
     "dirty": true
   },
   "script": {
     "path": "analysis/net-biome-exchange/net-biome-exchange.py",
-    "sha256": "ec5cbf5766ac596423adb10c407804b2cc2daefba8cce42a10750f87e4b74473"
+    "sha256": "494f8a9649761566a32db89103978a7f582f8f2c31ec97bc969b451855fe9db0"
   },
   "lock": {
     "path": "analysis/net-biome-exchange/net-biome-exchange.py.lock",
@@ -452,11 +452,33 @@
     }
   },
   "outputs": {
-    "results.json": "270a1161e3c8d967275d1432d737efcddf029427be32bdc87c73361b2955da79",
+    "results.json": "6aa1ca697d409a8aa4b225c9e0d44d46a5fa33a2071c4f3cef3f1bba3190e998",
     "figures": {
       "figures/1-nbe-carbon-space.svg": {
-        "sha256": "29894c8ad632e7cef4b6209474012dc8a143452d52c7f252139257292d4ea732",
-        "sha256WithoutMetadata": "f3a513093cc11540ec3a7550d3aeec5cc78e62e4f9ef1c2d2ac8f26a0f01665a"
+        "sha256": "45ecb2cb99dd8032041bf24ff564691fe7f5a3008d38ab5eed52c9511a7ae36f",
+        "sha256WithoutMetadata": "85943d69e6eb156eb15c8aba418b0364d0abdb8958b10ad6662708729cbfc052"
+      }
+    },
+    "figureVariants": {
+      "figures/variants/1-nbe-carbon-space-no-labels.svg": {
+        "sha256": "93bc8b6a75b3502ca75b3625febfcc67f154b0e727aa320ac4a2952b7b5f5af3",
+        "sha256WithoutMetadata": "3cdb02e4f340861bd141098c87fcc299725b59f30d754b238605997501feb66e"
+      },
+      "figures/variants/1-nbe-carbon-space-wide.svg": {
+        "sha256": "eee9468bde5b49e82eb1db4a180a1536aa01f1fdcfec5d6026890b32bed4e89b",
+        "sha256WithoutMetadata": "34f45965b8f68a1cda4e4bfa12b8d603204edfed81f49292083253a7a7c355c3"
+      },
+      "figures/variants/1-nbe-carbon-space-wide-no-labels.svg": {
+        "sha256": "7d7801a68f63a36a4449117dbcd6dd41b3865058d3f493fbda32cc95628db294",
+        "sha256WithoutMetadata": "08bbe3b9e7fc134d9d81f47b2a3c188d026f65fc1864ff57b21cdfb0abf6a9b5"
+      },
+      "figures/variants/1-nbe-carbon-space-wide-no-nee.svg": {
+        "sha256": "9801b5c72bfbabd0266f8d887ef472dfb4ada42b787764c86caa1bea12ede119",
+        "sha256WithoutMetadata": "f0bd7826fa33e313371a55a5e96402e2fc55507854b1f7484a68ce7f2359d548"
+      },
+      "figures/variants/1-nbe-carbon-space-wide-no-nee-no-labels.svg": {
+        "sha256": "8e784733267fb73efd96b0d15ea05793d42f8b67362f71c344b923e9e675586e",
+        "sha256WithoutMetadata": "7f09ab2f402c1f725d304edbbd03fa7a2b3c14450ff7ace6c36632f4822baaa5"
       }
     }
   }

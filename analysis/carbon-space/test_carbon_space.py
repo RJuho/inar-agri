@@ -370,11 +370,43 @@ def test_svgs_exist() -> None:
     assert [p.name for p in SVGS] == [f"{n}-{name}.svg" for n, name in cs.FIGURES]
 
 
-@pytest.mark.parametrize("path", SVGS, ids=[p.name for p in SVGS])
+VARIANT_SVGS = sorted((HERE / "figures" / "variants").glob("*.svg"))
+
+
+def test_variant_svgs_exist() -> None:
+    expected = sorted(
+        f"figures/variants/{n}-{name}-{variant}.svg"
+        for n, name, variant in cs.FIGURE_VARIANTS
+    )
+    assert [p.relative_to(HERE).as_posix() for p in VARIANT_SVGS] == expected
+    declared = sorted(f["file"] for f in results()["figureVariants"])
+    assert declared == expected
+    manifest = json.loads((HERE / "manifest.json").read_text(encoding="utf-8"))
+    assert set(expected) <= set(manifest["outputs"]["figures"])
+
+
+def figure_entry(path: Path) -> tuple[dict[str, Any], str]:
+    """The results.json entry of an SVG (main figure or variant) and its variant name."""
+    res = results()
+    rel = path.relative_to(HERE).as_posix()
+    for f in res["figureVariants"]:
+        if f["file"] == rel:
+            return f, f["variant"]
+    n = int(path.name.split("-")[0])
+    return next(f for f in res["figures"] if f["n"] == n), ""
+
+
+@pytest.mark.parametrize(
+    "path", SVGS + VARIANT_SVGS, ids=[p.name for p in SVGS + VARIANT_SVGS]
+)
 def test_svg_text(path: Path) -> None:
     n = int(path.name.split("-")[0])
     root = ET.parse(path).getroot()
-    tid, did = f"{cs.SLUG}-fig{n}-title", f"{cs.SLUG}-fig{n}-desc"
+    fig, variant = figure_entry(path)
+    tid, did, prefix = cs.svg_ids(n, variant)
+    if variant:
+        main_ids = {i for m, _ in cs.FIGURES for i in cs.svg_ids(m)}
+        assert not {tid, did, prefix} & main_ids
     assert root.get("role") == "img"
     assert root.get("aria-labelledby") == f"{tid} {did}"
     children = list(root)
@@ -384,8 +416,7 @@ def test_svg_text(path: Path) -> None:
     ids = [str(e.get("id")) for e in root.iter() if e.get("id")]
     assert len(ids) == len(set(ids))
     keep = {tid, did}
-    assert all(i.startswith(f"{cs.SVG_ID_PREFIX}{n}-") for i in ids if i not in keep)
-    fig = next(f for f in results()["figures"] if f["n"] == n)
+    assert all(i.startswith(prefix) for i in ids if i not in keep)
     assert children[0].text == fig["title"]
     assert children[1].text == fig["desc"]
     texts = root.findall(f".//{SVG_NS}text")
@@ -395,3 +426,50 @@ def test_svg_text(path: Path) -> None:
         assert cs.FONT_STACK in style
         assert "font-variant-numeric: tabular-nums" in style
     assert path.stat().st_size < 1_000_000
+
+
+def svg_texts(path: Path) -> str:
+    """All text of the <text> and <tspan> elements of an SVG, one line per element."""
+    root = ET.parse(path).getroot()
+    return "\n".join(
+        "".join(e.itertext())
+        for e in root.iter()
+        if e.tag in (f"{SVG_NS}text", f"{SVG_NS}tspan")
+    )
+
+
+def test_no_nee_guide_labels() -> None:
+    for path in SVGS + VARIANT_SVGS:
+        text = svg_texts(path)
+        assert "NEE = −200" not in text and "NEE = −400" not in text, path.name
+        assert "NEE = -200" not in text and "NEE = -400" not in text, path.name
+
+
+def test_variants_have_no_point_labels() -> None:
+    res = results()
+    rows = {r["key"]: r for r in res["siteYears"]}
+    labels = {cs.point_label(rows[k]) for k in cs.LABEL_OFFSETS}
+    labels |= set(cs.LABEL_TEXT_FOREST.values())
+    # the label text in the SVG can have a line break before the bracket
+    parts = {p for t in labels for p in t.replace(" (", "\n(").split("\n")}
+    for path in VARIANT_SVGS:
+        lines = set(svg_texts(path).splitlines())
+        assert not (lines & parts), (path.name, lines & parts)
+        assert not any(
+            line.startswith(str(y)) for line in lines for y in range(2017, 2026)
+        ), path.name
+    # the labelled figures have the labels (the test above finds them)
+    main = set(svg_texts(HERE / "figures" / "1-carbon-space.svg").splitlines())
+    assert main & parts
+
+
+def test_variant_desc_places_hyytiala_years() -> None:
+    f = next(v for v in results()["figureVariants"] if v["n"] == 4)
+    assert "have no labels" in f["desc"]
+    assert f"{cs.REF_YEARS[0]} (pre-thinning) is the star at GPP" in f["desc"]
+    assert f"{cs.THINNING_YEAR} (thinning:" in f["desc"]
+    assert "the only star above the 1:1 line" in f["desc"]
+    for v in results()["figureVariants"]:
+        assert "labels give the year" not in v["desc"]
+        assert f"both from {cs.AXIS_LO_1:.0f} to {cs.AXIS_HI_1:.0f}" in v["desc"]
+        assert v["title"].endswith(cs.NO_LABELS_NOTE.strip())

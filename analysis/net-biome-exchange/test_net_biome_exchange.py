@@ -267,3 +267,85 @@ def test_svg_text(path: Path) -> None:
         assert nb.FONT_STACK in style
         assert "font-variant-numeric: tabular-nums" in style
     assert path.stat().st_size < 1_000_000
+
+
+# ---------- SVG variants ----------
+VARIANT_SVGS = sorted((HERE / "figures" / "variants").glob("*.svg"))
+
+
+def variant_file(n: int, variant: str) -> str:
+    return f"figures/variants/{n}-{dict(nb.FIGURES)[n]}-{variant}.svg"
+
+
+def test_variant_set() -> None:
+    """The variant files, the script table FIGURE_VARIANTS and results.json agree."""
+    expected = sorted(variant_file(v[0], v[1]) for v in nb.FIGURE_VARIANTS)
+    assert sorted(f"figures/variants/{p.name}" for p in VARIANT_SVGS) == expected
+    assert sorted(f["file"] for f in results()["figureVariants"]) == expected
+    codes = [v[5] for v in nb.FIGURE_VARIANTS]
+    assert len(codes) == len(set(codes))
+
+
+@pytest.mark.parametrize("path", VARIANT_SVGS, ids=[p.name for p in VARIANT_SVGS])
+def test_variant_svg_text(path: Path) -> None:
+    rel = f"figures/variants/{path.name}"
+    entry = next(f for f in results()["figureVariants"] if f["file"] == rel)
+    spec = next(v for v in nb.FIGURE_VARIANTS if v[1] == entry["variant"])
+    n, variant, layout, shift, labels, code = spec
+    root = ET.parse(path).getroot()
+    tid, did = nb.svg_aria_ids(n, variant)
+    assert tid == f"{nb.SLUG}-fig{n}-{variant}-title"
+    assert root.get("role") == "img"
+    assert root.get("aria-labelledby") == f"{tid} {did}"
+    children = list(root)
+    assert children[0].tag == f"{SVG_NS}title" and children[0].get("id") == tid
+    assert children[1].tag == f"{SVG_NS}desc" and children[1].get("id") == did
+    assert children[0].text == entry["title"]
+    assert children[1].text == entry["desc"]
+    ids = [str(e.get("id")) for e in root.iter() if e.get("id")]
+    assert len(ids) == len(set(ids))
+    assert all(
+        i.startswith(f"{nb.SVG_ID_PREFIX}{n}{code}-")
+        for i in ids
+        if i not in {tid, did}
+    )
+    texts = root.findall(f".//{SVG_NS}text")
+    assert texts, "the text must stay text (svg.fonttype none)"
+    for t in texts:
+        style = t.get("style") or ""
+        assert nb.FONT_STACK in style
+        assert "font-variant-numeric: tabular-nums" in style
+    assert path.stat().st_size < 1_000_000
+    width = float(str(root.get("width")).removesuffix("pt"))
+    height = float(str(root.get("height")).removesuffix("pt"))
+    if layout == "wide":
+        assert math.isclose(width / height, 16 / 9, rel_tol=1e-3)
+    else:
+        assert height > width
+    drawn = "\n".join("".join(t.itertext()) for t in texts)
+    shift_word = nb.SHIFT_LEGEND.split("\n")[0]
+    assert (shift_word in drawn) == shift
+    assert ("A grey line links each marker" in entry["desc"]) == shift
+    label_texts = {
+        nb.LABEL_TEXT.get(k, "") for k in nb.LABEL_OFFSETS if k in nb.LABEL_TEXT
+    }
+    for t in label_texts:
+        assert (t in drawn) == labels, t
+    assert ("labels give the year" in entry["desc"]) == labels
+
+
+def all_svgs() -> list[Path]:
+    return [*SVGS, *VARIANT_SVGS]
+
+
+@pytest.mark.parametrize("path", all_svgs(), ids=[p.name for p in all_svgs()])
+def test_no_nbe_guides(path: Path) -> None:
+    """The guide lines NBE = −200 and −400 are removed (only the 1:1 line stays)."""
+    body = path.read_text(encoding="utf-8")
+    assert "NBE = −200" not in body and "NBE = −400" not in body
+    assert "NBE = -200" not in body
+
+
+def test_axes_start_equal() -> None:
+    """The 1:1 line starts in the lower left corner."""
+    assert nb.X_LO == nb.Y_LO

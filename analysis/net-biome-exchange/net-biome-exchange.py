@@ -139,6 +139,11 @@ OUTPUTS
     results.json                 all result numbers, figure caption and alt text, dataVersion
     manifest.json                provenance of the run and SHA-256 of the outputs
     figures/1-nbe-carbon-space.svg  annual carbon out (TER + C_out - C_in) against annual GPP
+    figures/variants/1-nbe-carbon-space-<variant>.svg  variants of Figure 1 for slides (not on
+                                 the site; FIGURE_VARIANTS): no-labels (tall, no point labels),
+                                 wide (16:9, legends at the left), wide-no-labels, wide-no-nee
+                                 (no grey shift line and tick at the NEE position),
+                                 wide-no-nee-no-labels
     output/run.log               run log (not in git)
     output/site-years.csv        all site-years with the terms (not in git)
     With --check, all outputs go to output/ and the script compares them with the committed files.
@@ -171,7 +176,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import matplotlib
 
@@ -781,7 +786,6 @@ SITE_COLORS = (
 SITE_MARKERS = ("o", "s", "^", "D", "p", "v")
 INK = "#222222"
 GUIDE = "#888888"
-GUIDE_TEXT = "#555555"
 SHIFT = "#a6a6a6"  # the grey line from the NEE position to the NBE position
 MARKER_SIZE = 13
 MARKER_EDGE = 0.8
@@ -791,6 +795,25 @@ MM = 1 / 25.4
 FIG_WIDTH_IN = 180 * MM
 FIG1_HEIGHT_IN = 210 * MM
 FIGURES = ((1, "nbe-carbon-space"),)
+# Wide layout (16:9, for slides): legends in a column at the left, axes at the right.
+FIG_WIDE_W_IN = 300 * MM
+FIG_WIDE_H_IN = 300 * 9 / 16 * MM
+AXES_TALL = (0.12, 0.075, 0.83, 0.91)  # left, bottom, width, height (figure fraction)
+AXES_WIDE = (0.245, 0.11, 0.72, 0.865)
+WIDE_LEGEND_X = 0.012  # left edge of the legend column (figure fraction)
+WIDE_LEGEND_TOP = 0.975
+WIDE_CLASS_LEGEND_GAP = (
+    0.05  # space between the Site and the Class legend (figure fraction)
+)
+# Variants of Figure 1 in figures/variants/ (the site shows only the main figure):
+# (n, variant, layout, shift line and tick, point labels, id code for prefix_svg_ids).
+FIGURE_VARIANTS: tuple[tuple[int, str, str, bool, bool, str], ...] = (
+    (1, "no-labels", "tall", True, False, "nl"),
+    (1, "wide", "wide", True, True, "w"),
+    (1, "wide-no-labels", "wide", True, False, "wnl"),
+    (1, "wide-no-nee", "wide", False, True, "wnn"),
+    (1, "wide-no-nee-no-labels", "wide", False, False, "wnnnl"),
+)
 REF_COLOR = "#009e73"
 REF_MARKER = "*"
 REF_MARKER_SIZE = 19
@@ -807,10 +830,10 @@ SITE_EMOJI = {
 REF_LEGEND = f"{SITE_EMOJI[REF_SITE]} {REF_NAME}\n(forest)"
 # Axis ranges (g C m-2 yr-1). x as Deep Dive #9; y up to the Hyytiala 2020 whisker. The script
 # stops when a marker or a whisker end is outside.
-X_LO, X_HI, X_TICK = 600.0, 1600.0, 200.0
+# x and y both start at 400, so that the 1:1 line starts in the lower left corner. y cannot
+# start at 600: Qvidja 2023 is at about 545.
+X_LO, X_HI, X_TICK = 400.0, 1600.0, 200.0
 Y_LO, Y_HI, Y_TICK = 400.0, 3600.0, 400.0
-NBE_GUIDES = (-200.0, -400.0)
-GUIDE_LABEL_X = 1530.0  # x of the NBE guide labels (empty area of the plot)
 X_LABEL = r"Annual GPP (g C m$^{-2}$ yr$^{-1}$)"
 Y_LABEL = r"Annual carbon out, TER + C$_{out}$ − C$_{in}$ (g C m$^{-2}$ yr$^{-1}$)"
 X_AXIS_TEXT = "annual GPP (g C m−2 yr−1)"
@@ -826,18 +849,18 @@ CLUSTER_KEY = f"{REF_SITE}-{REF_YEARS[-1]}"
 PRE_THINNING_KEY = f"{REF_SITE}-{REF_YEARS[0]}"
 CLUSTER_TEXT = f"{THINNING_YEAR + 1}–{REF_YEARS[-1]}"
 LABEL_OFFSETS: dict[str, tuple[float, float, str]] = {
-    "anttila-2022": (11, 0, "left"),
-    "anttila-2023": (11, 0, "left"),
+    "anttila-2022": (0, 14, "center"),
+    "anttila-2023": (0, 14, "center"),
     "sarkisuo-2022": (-11, 0, "right"),
     "haltiala-2022": (11, 0, "left"),
     "haltiala-2023": (-8, 20, "left"),
     "haltiala-2024": (0, -17, "center"),
-    "haltiala-2025": (11, 0, "left"),
+    "haltiala-2025": (11, 6, "left"),
     "qvidja-2020": (11, 0, "left"),
     "qvidja-2022": (0, -18, "center"),
     "qvidja-2023": (11, 0, "left"),
-    "qvidja-2024": (11, 0, "left"),
-    "qvidja-2025": (11, 0, "left"),
+    "qvidja-2024": (-4, 14, "right"),
+    "qvidja-2025": (0, 14, "center"),
     "viikki-2024": (11, 0, "left"),
     "viikki-2025": (-11, 0, "right"),
     PRE_THINNING_KEY: (14, -24, "left"),
@@ -849,6 +872,13 @@ LABEL_TEXT = {
     THINNING_KEY: f"{THINNING_YEAR} (thinning)",
     CLUSTER_KEY: CLUSTER_TEXT,
 }
+# Wide layout: the y axis is shorter on the page, so the markers are nearer to each other.
+LABEL_OFFSETS_WIDE: dict[str, tuple[float, float, str]] = {
+    **LABEL_OFFSETS,
+    "haltiala-2022": (11, -4, "left"),
+    "sarkisuo-2022": (-11, 4, "right"),
+}
+SHIFT_LEGEND = "shift from NEE\n(tick at y = TER)"
 LEADER_KEYS = frozenset({PRE_THINNING_KEY})
 WRAP_LABELS: frozenset[str] = frozenset()
 FIG1_TITLE = (
@@ -2032,10 +2062,20 @@ def esc(s: str) -> str:
     )
 
 
-def add_svg_text(path: Path, n: int, title: str, desc: str) -> None:
-    """Add role, aria-labelledby, <title> and <desc>, and the site font stack on each text element."""
+def svg_aria_ids(n: int, variant: str = "") -> tuple[str, str]:
+    """Ids of <title> and <desc> of figure n (a variant adds its name)."""
+    base = f"{SLUG}-fig{n}-{variant}" if variant else f"{SLUG}-fig{n}"
+    return f"{base}-title", f"{base}-desc"
+
+
+def add_svg_text(
+    path: Path, n: int, title: str, desc: str, variant: str = "", id_code: str = ""
+) -> None:
+    """Add role, aria-labelledby, <title> and <desc>, and the site font stack on each text element.
+
+    A variant of figure n gets its own aria ids and its own id prefix (id_code)."""
     svg = path.read_text(encoding="utf-8")
-    tid, did = f"{SLUG}-fig{n}-title", f"{SLUG}-fig{n}-desc"
+    tid, did = svg_aria_ids(n, variant)
     m = re.search(r"<svg\b[^>]*>", svg)
     if not m:
         raise RuntimeError(f"{path}: no <svg> element")
@@ -2069,7 +2109,7 @@ def add_svg_text(path: Path, n: int, title: str, desc: str) -> None:
         ),
         svg,
     )
-    svg = prefix_svg_ids(svg, f"{SVG_ID_PREFIX}{n}-", keep={tid, did})
+    svg = prefix_svg_ids(svg, f"{SVG_ID_PREFIX}{n}{id_code}-", keep={tid, did})
     path.write_text(svg, encoding="utf-8")
 
 
@@ -2096,9 +2136,16 @@ def prefix_svg_ids(svg: str, prefix: str, keep: set[str]) -> str:
 
 
 def save_svg(
-    fig: Any, path: Path, n: int, title: str, desc: str, meta: dict[str, str]
+    fig: Any,
+    path: Path,
+    n: int,
+    title: str,
+    desc: str,
+    meta: dict[str, str],
+    variant: str = "",
+    id_code: str = "",
 ) -> None:
-    plt.rcParams["svg.hashsalt"] = f"{SLUG}-{n}"
+    plt.rcParams["svg.hashsalt"] = f"{SLUG}-{n}-{variant}" if variant else f"{SLUG}-{n}"
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(
         path,
@@ -2113,7 +2160,7 @@ def save_svg(
         },
     )
     plt.close(fig)
-    add_svg_text(path, n, title, desc)
+    add_svg_text(path, n, title, desc, variant, id_code)
 
 
 def point_label(r: dict[str, Any]) -> str:
@@ -2147,42 +2194,35 @@ def site_style(site: str, data: Data) -> tuple[str, str, float, float, str]:
     )
 
 
-def screen_angle(ax: Any, p1: tuple[float, float], p2: tuple[float, float]) -> float:
-    """Angle in degrees of the line p1-p2 on the page (data coordinates in)."""
-    a = ax.transData.transform(p1)
-    b = ax.transData.transform(p2)
-    return math.degrees(math.atan2(b[1] - a[1], b[0] - a[0]))
+def nbe_plot(
+    rows: Sequence[dict[str, Any]],
+    data: Data,
+    *,
+    layout: Literal["tall", "wide"] = "tall",
+    shift: bool = True,
+    labels: bool = True,
+) -> Any:
+    """Figure 1: carbon out (TER + C_out - C_in) against GPP.
 
-
-def nbe_plot(rows: Sequence[dict[str, Any]], data: Data) -> Any:
-    """Figure 1: carbon out (TER + C_out - C_in) against GPP."""
-    fig = plt.figure(figsize=(FIG_WIDTH_IN, FIG1_HEIGHT_IN))
-    ax = fig.add_axes((0.12, 0.075, 0.83, 0.91))
+    layout "tall": 180 x 210 mm, legends in the axes (upper right). layout "wide": 16:9, the
+    same axis ranges, legends in a column at the left of the axes. shift: draw the grey line
+    and the tick at the NEE position (y = TER). labels: write the point labels.
+    """
+    wide = layout == "wide"
+    if wide:
+        fig = plt.figure(figsize=(FIG_WIDE_W_IN, FIG_WIDE_H_IN))
+        ax = fig.add_axes(AXES_WIDE)
+        offsets = LABEL_OFFSETS_WIDE
+    else:
+        fig = plt.figure(figsize=(FIG_WIDTH_IN, FIG1_HEIGHT_IN))
+        ax = fig.add_axes(AXES_TALL)
+        offsets = LABEL_OFFSETS
     ax.set_xlim(X_LO, X_HI)
     ax.set_ylim(Y_LO, Y_HI)
     fs_small = 6 * FONT_SCALE
-    # The 1:1 line (NBE = 0) and the guide lines NBE = g (y = x + g), inside the axes.
-    for g, color, lw in ((0.0, INK, 1.8), *((g, GUIDE, 1.1) for g in NBE_GUIDES)):
-        x1 = max(X_LO, Y_LO - g)
-        x2 = min(X_HI, Y_HI - g)
-        ax.plot([x1, x2], [x1 + g, x2 + g], color=color, lw=lw, ls=":", zorder=1)
-        if g != 0:
-            # Label in the empty lower right part, on the line (x = GUIDE_LABEL_X).
-            gx = GUIDE_LABEL_X
-            ang = screen_angle(ax, (x1, x1 + g), (x2, x2 + g))
-            ax.annotate(
-                f"NBE = {fmt(g)}",
-                (gx, gx + g),
-                xytext=(0, 3),
-                textcoords="offset points",
-                ha="center",
-                va="bottom",
-                rotation=ang,
-                rotation_mode="anchor",
-                fontsize=fs_small,
-                color=GUIDE_TEXT,
-                zorder=1,
-            )
+    # The 1:1 line (NBE = 0), inside the axes. X_LO = Y_LO: it starts in the lower left corner.
+    x1, x2 = max(X_LO, Y_LO), min(X_HI, Y_HI)
+    ax.plot([x1, x2], [x1, x2], color=INK, lw=1.8, ls=":", zorder=1)
     ax.text(
         X_LO + 0.03 * (X_HI - X_LO),
         Y_HI - 0.02 * (Y_HI - Y_LO),
@@ -2209,21 +2249,27 @@ def nbe_plot(rows: Sequence[dict[str, Any]], data: Data) -> Any:
         color, marker, ms, zorder, legend = site_style(site, data)
         for r in sr:
             x, y, ter = r["gpp"], r["carbonOut"], r["ter"]
-            # Grey line from the NEE position (y = TER) to the NBE position, and a short tick
-            # at the NEE position.
-            ax.plot(
-                [x, x], [ter, y], color=SHIFT, lw=1.0, zorder=1.5, solid_capstyle="butt"
-            )
-            ax.plot(
-                [x],
-                [ter],
-                ls="none",
-                marker="_",
-                ms=9,
-                mew=1.4,
-                color=SHIFT,
-                zorder=1.6,
-            )
+            if shift:
+                # Grey line from the NEE position (y = TER) to the NBE position, and a short
+                # tick at the NEE position.
+                ax.plot(
+                    [x, x],
+                    [ter, y],
+                    color=SHIFT,
+                    lw=1.0,
+                    zorder=1.5,
+                    solid_capstyle="butt",
+                )
+                ax.plot(
+                    [x],
+                    [ter],
+                    ls="none",
+                    marker="_",
+                    ms=9,
+                    mew=1.4,
+                    color=SHIFT,
+                    zorder=1.6,
+                )
             hollow = r["class"] == "B"
             if hollow and r["nbeHigh"] - r["nbeLow"] > 1e-9:
                 y_lo = ter + r["nbeLow"] - r["nee"]
@@ -2251,9 +2297,9 @@ def nbe_plot(rows: Sequence[dict[str, Any]], data: Data) -> Any:
                 zorder=zorder,
                 clip_on=False,
             )
-            if r["key"] not in LABEL_OFFSETS:
+            if not labels or r["key"] not in offsets:
                 continue
-            dx, dy, ha = LABEL_OFFSETS[r["key"]]
+            dx, dy, ha = offsets[r["key"]]
             text = LABEL_TEXT.get(r["key"], point_label(r))
             if r["key"] in WRAP_LABELS:
                 text = text.replace(" ", "\n", 1)
@@ -2300,20 +2346,6 @@ def nbe_plot(rows: Sequence[dict[str, Any]], data: Data) -> Any:
     ax.grid(True, color=GRID, lw=GRID_LW, zorder=0)
     ax.set_xticks(np.arange(X_LO, X_HI + 1, X_TICK))
     ax.set_yticks(np.arange(Y_LO, Y_HI + 1, Y_TICK))
-    leg1 = ax.legend(
-        handles=handles,
-        loc="upper right",
-        bbox_to_anchor=(1.0, 1.0),
-        frameon=True,
-        framealpha=1.0,
-        edgecolor="none",
-        title="Site",
-        title_fontsize=7 * FONT_SCALE,
-        alignment="left",
-        handletextpad=0.4,
-        labelspacing=0.7,
-        borderaxespad=0,
-    )
     key_handles = [
         Line2D(
             [],
@@ -2339,18 +2371,63 @@ def nbe_plot(rows: Sequence[dict[str, Any]], data: Data) -> Any:
             color=INK,
             label="B: assumed term;\nbar = low to high",
         ),
-        Line2D(
-            [],
-            [],
-            ls="-",
-            lw=1.0,
-            color=SHIFT,
-            marker="_",
-            ms=9,
-            mew=1.4,
-            label="shift from NEE\n(tick at y = TER)",
-        ),
     ]
+    if shift:
+        key_handles.append(
+            Line2D(
+                [],
+                [],
+                ls="-",
+                lw=1.0,
+                color=SHIFT,
+                marker="_",
+                ms=9,
+                mew=1.4,
+                label=SHIFT_LEGEND,
+            )
+        )
+    common: dict[str, Any] = {
+        "title_fontsize": 7 * FONT_SCALE,
+        "alignment": "left",
+        "borderaxespad": 0,
+    }
+    if wide:
+        leg1 = fig.legend(
+            handles=handles,
+            loc="upper left",
+            bbox_to_anchor=(WIDE_LEGEND_X, WIDE_LEGEND_TOP),
+            frameon=False,
+            title="Site",
+            handletextpad=0.4,
+            labelspacing=0.7,
+            **common,
+        )
+        # The Class legend goes below the Site legend: measure the Site legend first.
+        fig.canvas.draw()
+        box = leg1.get_window_extent().transformed(fig.transFigure.inverted())
+        fig.legend(
+            handles=key_handles,
+            loc="upper left",
+            bbox_to_anchor=(WIDE_LEGEND_X, box.y0 - WIDE_CLASS_LEGEND_GAP),
+            frameon=False,
+            title="Class",
+            handletextpad=0.6,
+            labelspacing=1.0,
+            **common,
+        )
+        return fig
+    leg1 = ax.legend(
+        handles=handles,
+        loc="upper right",
+        bbox_to_anchor=(1.0, 1.0),
+        frameon=True,
+        framealpha=1.0,
+        edgecolor="none",
+        title="Site",
+        handletextpad=0.4,
+        labelspacing=0.7,
+        **common,
+    )
     ax.legend(
         handles=key_handles,
         loc="upper right",
@@ -2359,19 +2436,25 @@ def nbe_plot(rows: Sequence[dict[str, Any]], data: Data) -> Any:
         framealpha=1.0,
         edgecolor="none",
         title="Class",
-        title_fontsize=7 * FONT_SCALE,
-        alignment="left",
         handletextpad=0.6,
         labelspacing=1.0,
-        borderaxespad=0,
+        **common,
     )
     ax.add_artist(leg1)
     return fig
 
 
-def fig_nbe(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
+def fig_nbe(
+    res: dict[str, Any],
+    data: Data,
+    *,
+    layout: Literal["tall", "wide"] = "tall",
+    shift: bool = True,
+    labels: bool = True,
+) -> tuple[Any, str, str]:
+    """Figure 1 (or a variant), its caption and its alt text (made from the result numbers)."""
     rows = [r for r in res["siteYears"] if r["inFigure"]]
-    fig = nbe_plot(rows, data)
+    fig = nbe_plot(rows, data, layout=layout, shift=shift, labels=labels)
     s = res["summary"]
     fs = s["figureSites"]
     sy = res["sy"]
@@ -2383,16 +2466,37 @@ def fig_nbe(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         f"{r['siteName']} {r['year']} {fmt(r['nbe'])} ({fmt(r['nbeLow'])} to {fmt(r['nbeHigh'])})"
         for r in b_rows
     )
+    scale_text = (
+        "the y axis is longer than the x axis, so the scales differ"
+        if layout == "tall"
+        else "a wide figure: the y range is longer than the x range, but the y axis is "
+        "shorter on the page, so the scales differ"
+    )
+    shift_text = (
+        "A grey line links each marker to a short grey tick at y = TER, the position without "
+        "management carbon (NEE). "
+        if shift
+        else ""
+    )
+    legend_text = (
+        "The Site and Class legends are in a column at the left of the plot. "
+        if layout == "wide"
+        else ""
+    )
+    label_text = (
+        "Each site has its own colour and marker; labels give the year and, for annual crops "
+        "and the failed grass, the crop."
+        if labels
+        else "Each site has its own colour and marker; the markers have no year labels."
+    )
     desc = (
         f"Scatter plot of {s['nFigure']} site-years (full and reliable years with annual GPP, "
         f"TER and NBE): {s['nFigureSites']} of the six sites and {s['nFigureHyytiala']} of the "
         f"SMEAR II Hyytiälä forest (green stars). X axis {X_AXIS_TEXT}, from {fmt(X_LO)} to "
-        f"{fmt(X_HI)}; y axis {Y_AXIS_TEXT}, from {fmt(Y_LO)} to {fmt(Y_HI)} (the y axis is "
-        "longer than the x axis, so the scales differ). The vertical distance from the dotted "
-        "1:1 line is NBE: above the line the field lost carbon (NBE > 0), below it gained "
-        "carbon. Light dotted lines mark NBE = −200 and −400 g C m−2 yr−1. A grey line links "
-        "each marker to a short grey tick at y = TER, the position without management carbon "
-        f"(NEE). Filled markers are class A ({s['nFigureClassA']} site-years of the six sites), "
+        f"{fmt(X_HI)}; y axis {Y_AXIS_TEXT}, from {fmt(Y_LO)} to {fmt(Y_HI)} ({scale_text}). "
+        "The vertical distance from the dotted 1:1 line is NBE: above the line the field lost "
+        f"carbon (NBE > 0), below it gained carbon. {shift_text}"
+        f"Filled markers are class A ({s['nFigureClassA']} site-years of the six sites), "
         f"hollow markers with a bar are class B ({s['nFigureClassB']}; the bar spans the low to "
         f"high NBE of the assumptions). For the six sites, NBE was {fmt(fs['nbe']['mean'])} ± "
         f"{fmt(fs['nbe']['sd'])} g C m−2 yr−1 (mean ± SD, range {fmt(fs['nbe']['min'])} to "
@@ -2408,9 +2512,7 @@ def fig_nbe(res: dict[str, Any], data: Data) -> tuple[Any, str, str]:
         f"{fmt(th['cOut'])} gives NBE {fmt(th['nbe'])} (range {fmt(th['nbeLow'])} to "
         f"{fmt(th['nbeHigh'])}), carbon out {fmt(th['carbonOut'])}; the other Hyytiälä years "
         f"have NBE = NEE, {fmt(s['hyytiala']['nee']['min'])} to "
-        f"{fmt(s['hyytiala']['neeMaxWithoutThinning'])}. "
-        "Each site has its own colour and marker; labels give the year and, for annual crops "
-        "and the failed grass, the crop."
+        f"{fmt(s['hyytiala']['neeMaxWithoutThinning'])}. {legend_text}{label_text}"
     )
     return fig, FIG1_TITLE, desc
 
@@ -2521,7 +2623,6 @@ def method_json() -> dict[str, Any]:
             "factor": HH_TO_GC,
         },
         "heimschWindow2020": [d.isoformat() for d in HEIMSCH_WINDOW_2020],
-        "nbeGuides": list(NBE_GUIDES),
         "axes": {"x": [X_LO, X_HI, X_TICK], "y": [Y_LO, Y_HI, Y_TICK]},
         "units": {"annual": ANNUAL_UNIT, "terms": "g C m-2"},
         "rules": [
@@ -2623,6 +2724,26 @@ def main(argv: Sequence[str] | None = None) -> int:
             {"n": n, "file": f"figures/{n}-{name}.svg", "title": title, "desc": desc}
         )
         log.info("figure %d: %s (%d bytes)", n, path, size)
+    variants_json: list[dict[str, Any]] = []
+    for n, variant, layout, shift, labels, id_code in FIGURE_VARIANTS:
+        name = dict(FIGURES)[n]
+        fig, title, desc = fig_nbe(
+            res,
+            data,
+            layout="wide" if layout == "wide" else "tall",
+            shift=shift,
+            labels=labels,
+        )
+        rel = f"figures/variants/{n}-{name}-{variant}.svg"
+        path = target / rel
+        save_svg(fig, path, n, title, desc, meta, variant, id_code)
+        size = path.stat().st_size
+        if size >= 1_000_000:
+            raise RuntimeError(f"{path}: {size} bytes (limit 1 MB)")
+        variants_json.append(
+            {"n": n, "variant": variant, "file": rel, "title": title, "desc": desc}
+        )
+        log.info("figure %d variant %s: %s (%d bytes)", n, variant, path, size)
 
     pd.DataFrame(
         [
@@ -2664,6 +2785,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "literature": list(LITERATURE),
         "literatureByKey": LIT,
         "figures": figures_json,
+        "figureVariants": variants_json,
         "dataVersion": dv,
     }
     results = round_sig(results)
@@ -2683,6 +2805,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 }
                 for f in figures_json
             },
+            "figureVariants": {
+                f["file"]: {
+                    "sha256": sha256_file(target / f["file"]),
+                    "sha256WithoutMetadata": svg_body_hash(target / f["file"]),
+                }
+                for f in variants_json
+            },
         },
     }
     (target / "manifest.json").write_text(
@@ -2698,8 +2827,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         diffs = compare(results, json.loads(committed.read_text(encoding="utf-8")))
         man_path = out_dir / "manifest.json"
         if man_path.is_file():
-            old = json.loads(man_path.read_text(encoding="utf-8"))["outputs"]["figures"]
-            for f in figures_json:
+            outs = json.loads(man_path.read_text(encoding="utf-8"))["outputs"]
+            old = {**outs["figures"], **outs.get("figureVariants", {})}
+            for f in [*figures_json, *variants_json]:
                 if svg_body_hash(target / f["file"]) != old.get(f["file"], {}).get(
                     "sha256WithoutMetadata"
                 ):

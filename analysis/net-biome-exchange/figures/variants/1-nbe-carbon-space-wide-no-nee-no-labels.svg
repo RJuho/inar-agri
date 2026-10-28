@@ -1,0 +1,895 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="850.393701pt" height="478.346457pt" viewBox="0 0 850.393701 478.346457" xmlns="http://www.w3.org/2000/svg" version="1.1" role="img" aria-labelledby="net-biome-exchange-fig1-wide-no-nee-no-labels-title net-biome-exchange-fig1-wide-no-nee-no-labels-desc">
+ <title id="net-biome-exchange-fig1-wide-no-nee-no-labels-title">Annual carbon out (total ecosystem respiration TER plus the carbon that management takes out, minus the carbon that it brings in) against annual gross primary production (GPP), one marker per site-year, with the SMEAR II Hyytiälä forest as a reference; below the 1:1 line the site-year was a net carbon sink (NBE &lt; 0).</title>
+ <desc id="net-biome-exchange-fig1-wide-no-nee-no-labels-desc">Scatter plot of 20 site-years (full and reliable years with annual GPP, TER and NBE): 14 of the six sites and 6 of the SMEAR II Hyytiälä forest (green stars). X axis annual GPP (g C m−2 yr−1), from 400 to 1600; y axis annual carbon out = TER + C_out − C_in (total ecosystem respiration plus the carbon that management takes out, minus the carbon that it brings in; g C m−2 yr−1), from 400 to 3600 (a wide figure: the y range is longer than the x range, but the y axis is shorter on the page, so the scales differ). The vertical distance from the dotted 1:1 line is NBE: above the line the field lost carbon (NBE &gt; 0), below it gained carbon. Filled markers are class A (8 site-years of the six sites), hollow markers with a bar are class B (6; the bar spans the low to high NBE of the assumptions). For the six sites, NBE was 24 ± 142 g C m−2 yr−1 (mean ± SD, range −377 to 177, n = 14); NEE was −51 ± 132 (range −283 to 131). 6 site-years had NEE &gt; 0 and 9 had NBE &gt; 0. C_out − C_in was 74 ± 219 (range −466, Qvidja 2023, to 363, Anttila 2023). Lowest NBE: Qvidja 2023, −377; highest: Haltiala 2025 oats, 177. Class B (NBE, low to high): Haltiala 2023 97 (−89 to 108); Qvidja 2020 −81 (−96 to −72); Qvidja 2023 −377 (−471 to −336); Qvidja 2025 0 (−1 to 17); Viikki 2024 −17 (−163 to 11); Viikki 2025 109 (103 to 115). Hyytiälä 2020 (thinning): NEE 115, the commercial removal of 2310 gives NBE 2425 (range 1605 to 2555), carbon out 3393; the other Hyytiälä years have NBE = NEE, −248 to −144. The Site and Class legends are in a column at the left of the plot. Each site has its own colour and marker; the markers have no year labels.</desc>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Annual carbon out (total ecosystem respiration TER plus the carbon that management takes out, minus the carbon that it brings in) against annual gross primary production (GPP), one marker per site-year, with the SMEAR II Hyytiälä forest as a reference; below the 1:1 line the site-year was a net carbon sink (NBE &lt; 0).</dc:title>
+    <dc:description>Scatter plot of 20 site-years (full and reliable years with annual GPP, TER and NBE): 14 of the six sites and 6 of the SMEAR II Hyytiälä forest (green stars). X axis annual GPP (g C m−2 yr−1), from 400 to 1600; y axis annual carbon out = TER + C_out − C_in (total ecosystem respiration plus the carbon that management takes out, minus the carbon that it brings in; g C m−2 yr−1), from 400 to 3600 (a wide figure: the y range is longer than the x range, but the y axis is shorter on the page, so the scales differ). The vertical distance from the dotted 1:1 line is NBE: above the line the field lost carbon (NBE &gt; 0), below it gained carbon. Filled markers are class A (8 site-years of the six sites), hollow markers with a bar are class B (6; the bar spans the low to high NBE of the assumptions). For the six sites, NBE was 24 ± 142 g C m−2 yr−1 (mean ± SD, range −377 to 177, n = 14); NEE was −51 ± 132 (range −283 to 131). 6 site-years had NEE &gt; 0 and 9 had NBE &gt; 0. C_out − C_in was 74 ± 219 (range −466, Qvidja 2023, to 363, Anttila 2023). Lowest NBE: Qvidja 2023, −377; highest: Haltiala 2025 oats, 177. Class B (NBE, low to high): Haltiala 2023 97 (−89 to 108); Qvidja 2020 −81 (−96 to −72); Qvidja 2023 −377 (−471 to −336); Qvidja 2025 0 (−1 to 17); Viikki 2024 −17 (−163 to 11); Viikki 2025 109 (103 to 115). Hyytiälä 2020 (thinning): NEE 115, the commercial removal of 2310 gives NBE 2425 (range 1605 to 2555), carbon out 3393; the other Hyytiälä years have NBE = NEE, −248 to −144. The Site and Class legends are in a column at the left of the plot. Each site has its own colour and marker; the markers have no year labels.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:relation>database snapshot 2026-10-23T19:03:07.928Z; db/sites.parquet sha256 9c59f8e1e499d2af0769d19265ace22a790a82e1a32025af931e00a0ba314a59; db/events.parquet sha256 b2cbe1a7e5de79406bdeb49b14b7b80048990fb432baf346d073ef2443a2cb8b; calculated/annual.csv sha256 27bc79419cac31239082a2ea9cf61bfe1c099b891e8792e0d5f7460885a95abe; calculated/management_carbon.csv sha256 87f481aec6ec5aa7c3779faa93c5a909bd53a8b379fa97c1e0e133281caa7c8a; smear/HYY_EDDY233_NEE_GPP_2019.csv sha256 32e13af00db88a7c00f6e0cabbdbcbfe9f08fcda220df8b6e2d0e6e72999ced7; smear/HYY_EDDYMAST_F_c_270_2019.csv sha256 6535ff06a6c24f85fa7b4dfe23e94b53039085815227366bce1e95da7524f739; smear/HYY_EDDY233_NEE_GPP_2020.csv sha256 75ec98c5586b7d3e4282b4cdc5a6c7ce0ae07d9e0b2230240eed33f215eb8d20; smear/HYY_EDDYMAST_F_c_270_2020.csv sha256 fc377d3b61aefa5764c497ef1a80f27f6e04c9ad6b67efa8e1c543c4a8a1ebc2; smear/HYY_EDDY233_NEE_GPP_2021.csv sha256 468e107389aa93b8d33a7e57623b1f3da6183df7f0eb440ce84204bb63af09a5; smear/HYY_EDDYMAST_F_c_270_2021.csv sha256 5e8e6b9d11b32115216ab31253815b0a7171c73d9c4cd53e9cdf5b637ea11d8d; smear/HYY_EDDY233_NEE_GPP_2022.csv sha256 4120ef19f3982225b8aab469df3e867c8322eebe8b769c0a6ff32da21edcdedb; smear/HYY_EDDYMAST_F_c_270_2022.csv sha256 c3b23cd0252fc653c8dd190f0314810810a55888008bd0c3c4ef9625553db762; smear/HYY_EDDY233_NEE_GPP_2023.csv sha256 cf4b22e4d6abe8ccf1a1b5eace6a8f2f7c336985373f5518ff7e17ec88a10914; smear/HYY_EDDYMAST_F_c_270_2023.csv sha256 95c0784f87f26920b3e8cc65363e1405619804c4f55c9c5cacd9d224c09d440a; smear/HYY_EDDY233_NEE_GPP_2024.csv sha256 2c856524d7c56aec62ff585c602b3065388c27811d18e46e0ddeecf6686aad5a; smear/HYY_EDDYMAST_F_c_270_2024.csv sha256 b3ee919b973063b611bfe0105ae4b0ab52157a8bd7e19e33d501a8e2910a5af3</dc:relation>
+    <dc:source>analysis/net-biome-exchange/net-biome-exchange.py (git efff520, dirty)</dc:source>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>matplotlib 3.11.2</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="nb1wnnnl-figure_1">
+  <g id="nb1wnnnl-patch_1">
+   <path d="M 0 478.346457 
+L 850.393701 478.346457 
+L 850.393701 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="nb1wnnnl-axes_1">
+   <g id="nb1wnnnl-patch_2">
+    <path d="M 208.346457 425.728346 
+L 820.629921 425.728346 
+L 820.629921 11.958661 
+L 208.346457 11.958661 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="nb1wnnnl-matplotlib.axis_1">
+    <g id="nb1wnnnl-xtick_1">
+     <g id="nb1wnnnl-line2d_1">
+      <path d="M 208.346457 425.728346 
+L 208.346457 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_2">
+      <defs>
+       <path id="nb1wnnnl-m65b032c87c" d="M 0 0 
+L 0 3.5 
+" style="stroke: #222222; stroke-width: 0.9"/>
+      </defs>
+      <g>
+       <use xlink:href="#nb1wnnnl-m65b032c87c" x="208.346457" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_1">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="208.346457" y="440.705886" transform="rotate(-0 208.346457 440.705886)">400</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-xtick_2">
+     <g id="nb1wnnnl-line2d_3">
+      <path d="M 310.393701 425.728346 
+L 310.393701 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_4">
+      <g>
+       <use xlink:href="#nb1wnnnl-m65b032c87c" x="310.393701" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_2">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="310.393701" y="440.705886" transform="rotate(-0 310.393701 440.705886)">600</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-xtick_3">
+     <g id="nb1wnnnl-line2d_5">
+      <path d="M 412.440945 425.728346 
+L 412.440945 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_6">
+      <g>
+       <use xlink:href="#nb1wnnnl-m65b032c87c" x="412.440945" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_3">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="412.440945" y="440.705886" transform="rotate(-0 412.440945 440.705886)">800</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-xtick_4">
+     <g id="nb1wnnnl-line2d_7">
+      <path d="M 514.488189 425.728346 
+L 514.488189 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_8">
+      <g>
+       <use xlink:href="#nb1wnnnl-m65b032c87c" x="514.488189" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_4">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="514.488189" y="440.705886" transform="rotate(-0 514.488189 440.705886)">1000</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-xtick_5">
+     <g id="nb1wnnnl-line2d_9">
+      <path d="M 616.535433 425.728346 
+L 616.535433 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_10">
+      <g>
+       <use xlink:href="#nb1wnnnl-m65b032c87c" x="616.535433" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_5">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="616.535433" y="440.705886" transform="rotate(-0 616.535433 440.705886)">1200</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-xtick_6">
+     <g id="nb1wnnnl-line2d_11">
+      <path d="M 718.582677 425.728346 
+L 718.582677 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_12">
+      <g>
+       <use xlink:href="#nb1wnnnl-m65b032c87c" x="718.582677" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_6">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="718.582677" y="440.705886" transform="rotate(-0 718.582677 440.705886)">1400</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-xtick_7">
+     <g id="nb1wnnnl-line2d_13">
+      <path d="M 820.629921 425.728346 
+L 820.629921 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_14">
+      <g>
+       <use xlink:href="#nb1wnnnl-m65b032c87c" x="820.629921" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_7">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: middle; fill: #222222; font-variant-numeric: tabular-nums" x="820.629921" y="440.705886" transform="rotate(-0 820.629921 440.705886)">1600</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-text_8">
+     <!-- Annual GPP (g C m$^{-2}$ yr$^{-1}$) -->
+     <g style="fill: #222222" transform="translate(439.788189 457.803346)">
+      <text style="font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-variant-numeric: tabular-nums">
+       <tspan x="0" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">A</tspan>
+       <tspan x="7.695923" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+       <tspan x="14.82605" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+       <tspan x="21.956177" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">u</tspan>
+       <tspan x="29.086304" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="35.980225" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">l</tspan>
+       <tspan x="39.105835" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="42.681885" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">G</tspan>
+       <tspan x="51.399536" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="58.183594" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">P</tspan>
+       <tspan x="64.967651" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="68.543701" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">(</tspan>
+       <tspan x="72.932739" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">g</tspan>
+       <tspan x="80.073853" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="83.649902" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+       <tspan x="91.505127" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="95.081177" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+       <tspan x="118.064026" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="121.640076" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">y</tspan>
+       <tspan x="128.297791" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">r</tspan>
+       <tspan x="144.947021" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">)</tspan>
+       <tspan x="106.147705" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="112.746094" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">2</tspan>
+       <tspan x="133.030701" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="139.629089" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+   <g id="nb1wnnnl-matplotlib.axis_2">
+    <g id="nb1wnnnl-ytick_1">
+     <g id="nb1wnnnl-line2d_15">
+      <path d="M 208.346457 425.728346 
+L 820.629921 425.728346 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_16">
+      <defs>
+       <path id="nb1wnnnl-m3ecd1fa37f" d="M 0 0 
+L -3.5 0 
+" style="stroke: #222222; stroke-width: 0.9"/>
+      </defs>
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="425.728346" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_9">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="429.717116" transform="rotate(-0 201.346457 429.717116)">400</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_2">
+     <g id="nb1wnnnl-line2d_17">
+      <path d="M 208.346457 374.007136 
+L 820.629921 374.007136 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_18">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="374.007136" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_10">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="377.995905" transform="rotate(-0 201.346457 377.995905)">800</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_3">
+     <g id="nb1wnnnl-line2d_19">
+      <path d="M 208.346457 322.285925 
+L 820.629921 322.285925 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_20">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="322.285925" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_11">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="326.274695" transform="rotate(-0 201.346457 326.274695)">1200</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_4">
+     <g id="nb1wnnnl-line2d_21">
+      <path d="M 208.346457 270.564715 
+L 820.629921 270.564715 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_22">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="270.564715" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_12">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="274.553484" transform="rotate(-0 201.346457 274.553484)">1600</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_5">
+     <g id="nb1wnnnl-line2d_23">
+      <path d="M 208.346457 218.843504 
+L 820.629921 218.843504 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_24">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="218.843504" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_13">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="222.832273" transform="rotate(-0 201.346457 222.832273)">2000</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_6">
+     <g id="nb1wnnnl-line2d_25">
+      <path d="M 208.346457 167.122293 
+L 820.629921 167.122293 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_26">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="167.122293" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_14">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="171.111063" transform="rotate(-0 201.346457 171.111063)">2400</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_7">
+     <g id="nb1wnnnl-line2d_27">
+      <path d="M 208.346457 115.401083 
+L 820.629921 115.401083 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_28">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="115.401083" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_15">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="119.389852" transform="rotate(-0 201.346457 119.389852)">2800</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_8">
+     <g id="nb1wnnnl-line2d_29">
+      <path d="M 208.346457 63.679872 
+L 820.629921 63.679872 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_30">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="63.679872" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_16">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="67.668642" transform="rotate(-0 201.346457 67.668642)">3200</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-ytick_9">
+     <g id="nb1wnnnl-line2d_31">
+      <path d="M 208.346457 11.958661 
+L 820.629921 11.958661 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #e2e2e2; stroke-width: 0.6; stroke-linecap: square"/>
+     </g>
+     <g id="nb1wnnnl-line2d_32">
+      <g>
+       <use xlink:href="#nb1wnnnl-m3ecd1fa37f" x="208.346457" y="11.958661" style="fill: #222222; stroke: #222222; stroke-width: 0.9"/>
+      </g>
+     </g>
+     <g id="nb1wnnnl-text_17">
+      <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="201.346457" y="15.947431" transform="rotate(-0 201.346457 15.947431)">3600</text>
+     </g>
+    </g>
+    <g id="nb1wnnnl-text_18">
+     <!-- Annual carbon out, TER + C$_{out}$ − C$_{in}$ (g C m$^{-2}$ yr$^{-1}$) -->
+     <g style="fill: #222222" transform="translate(167.92132 362.168504) rotate(-90)">
+      <text style="font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-variant-numeric: tabular-nums">
+       <tspan x="0" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">A</tspan>
+       <tspan x="7.695923" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+       <tspan x="14.82605" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+       <tspan x="21.956177" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">u</tspan>
+       <tspan x="29.086304" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="35.980225" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">l</tspan>
+       <tspan x="39.105835" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="42.681885" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">c</tspan>
+       <tspan x="48.867188" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">a</tspan>
+       <tspan x="55.761108" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">r</tspan>
+       <tspan x="60.386353" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">b</tspan>
+       <tspan x="67.527466" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="74.4104" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+       <tspan x="81.540527" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="85.116577" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="91.999512" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">u</tspan>
+       <tspan x="99.129639" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="103.540649" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">,</tspan>
+       <tspan x="107.116699" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="110.692749" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">T</tspan>
+       <tspan x="117.564697" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">E</tspan>
+       <tspan x="124.672852" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">R</tspan>
+       <tspan x="132.489624" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="136.065674" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">+</tspan>
+       <tspan x="145.491943" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="149.067993" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+       <tspan x="170.235352" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="173.811401" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="183.237671" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="186.813721" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+       <tspan x="202.263245" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="205.839294" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">(</tspan>
+       <tspan x="210.228333" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">g</tspan>
+       <tspan x="217.369446" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="220.945496" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">C</tspan>
+       <tspan x="228.80072" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="232.37677" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">m</tspan>
+       <tspan x="255.359619" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums"> </tspan>
+       <tspan x="258.935669" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">y</tspan>
+       <tspan x="265.593384" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">r</tspan>
+       <tspan x="282.242615" y="-0.513125" style="font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">)</tspan>
+       <tspan x="157.030884" y="1.17437" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">o</tspan>
+       <tspan x="161.848938" y="1.17437" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">u</tspan>
+       <tspan x="166.840027" y="1.17437" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">t</tspan>
+       <tspan x="194.776611" y="1.17437" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">i</tspan>
+       <tspan x="196.964539" y="1.17437" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">n</tspan>
+       <tspan x="243.443298" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="250.041687" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">2</tspan>
+       <tspan x="270.326294" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">−</tspan>
+       <tspan x="276.924683" y="-5.159375" style="font-size: 7.875px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums">1</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_33">
+    <path d="M 208.346457 425.728346 
+L 820.629921 270.564715 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke-dasharray: 1.8,2.97; stroke-dashoffset: 0; stroke: #222222; stroke-width: 1.8"/>
+   </g>
+   <g id="nb1wnnnl-LineCollection_1">
+    <path d="M 498.224256 144.792556 
+L 498.224256 21.95468 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #009e73; stroke-width: 1.6"/>
+   </g>
+   <g id="nb1wnnnl-line2d_34">
+    <defs>
+     <path id="nb1wnnnl-m6dd259769d" d="M 5 0 
+L -5 -0 
+" style="stroke: #009e73; stroke-width: 1.6"/>
+    </defs>
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m6dd259769d" x="498.224256" y="144.792556" style="fill: #1f77b4; stroke: #009e73; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_35">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m6dd259769d" x="498.224256" y="21.95468" style="fill: #1f77b4; stroke: #009e73; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_36">
+    <defs>
+     <path id="nb1wnnnl-m4b154adb87" d="M 0 -9.5 
+L -2.132883 -2.935661 
+L -9.035037 -2.935661 
+L -3.451077 1.121323 
+L -5.58396 7.685661 
+L -0 3.628677 
+L 5.58396 7.685661 
+L 3.451077 1.121323 
+L 9.035037 -2.935661 
+L 2.132883 -2.935661 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m4b154adb87" x="611.578591" y="351.173615" style="fill: #009e73; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_37">
+    <defs>
+     <path id="nb1wnnnl-m1a060366f7" d="M 0 -9.5 
+L -2.132883 -2.935661 
+L -9.035037 -2.935661 
+L -3.451077 1.121323 
+L -5.58396 7.685661 
+L -0 3.628677 
+L 5.58396 7.685661 
+L 3.451077 1.121323 
+L 9.035037 -2.935661 
+L 2.132883 -2.935661 
+z
+" style="stroke: #009e73; stroke-width: 2; stroke-linejoin: bevel"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m1a060366f7" x="498.224256" y="38.764074" style="fill: #ffffff; stroke: #009e73; stroke-width: 2; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_38">
+    <g>
+     <use xlink:href="#nb1wnnnl-m4b154adb87" x="573.016841" y="351.915355" style="fill: #009e73; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_39">
+    <g>
+     <use xlink:href="#nb1wnnnl-m4b154adb87" x="619.692087" y="345.694288" style="fill: #009e73; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_40">
+    <g>
+     <use xlink:href="#nb1wnnnl-m4b154adb87" x="620.407394" y="350.127384" style="fill: #009e73; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_41">
+    <g>
+     <use xlink:href="#nb1wnnnl-m4b154adb87" x="641.614334" y="347.997368" style="fill: #009e73; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-patch_3">
+    <path d="M 208.346457 425.728346 
+L 208.346457 11.958661 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="nb1wnnnl-patch_4">
+    <path d="M 208.346457 425.728346 
+L 820.629921 425.728346 
+" style="fill: none; stroke: #222222; stroke-width: 0.9; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="nb1wnnnl-LineCollection_2">
+    <path d="M 625.902917 332.287952 
+L 625.902917 329.184679 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #cc79a7; stroke-width: 1.6"/>
+   </g>
+   <g id="nb1wnnnl-line2d_42">
+    <defs>
+     <path id="nb1wnnnl-m48ebbd6c86" d="M 5 0 
+L -5 -0 
+" style="stroke: #cc79a7; stroke-width: 1.6"/>
+    </defs>
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m48ebbd6c86" x="625.902917" y="332.287952" style="fill: #1f77b4; stroke: #cc79a7; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_43">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m48ebbd6c86" x="625.902917" y="329.184679" style="fill: #1f77b4; stroke: #cc79a7; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-LineCollection_3">
+    <path d="M 474.362174 419.185381 
+L 474.362174 401.754075 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #cc79a7; stroke-width: 1.6"/>
+   </g>
+   <g id="nb1wnnnl-line2d_44">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m48ebbd6c86" x="474.362174" y="419.185381" style="fill: #1f77b4; stroke: #cc79a7; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_45">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m48ebbd6c86" x="474.362174" y="401.754075" style="fill: #1f77b4; stroke: #cc79a7; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-LineCollection_4">
+    <path d="M 758.726788 286.405646 
+L 758.726788 284.087017 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #cc79a7; stroke-width: 1.6"/>
+   </g>
+   <g id="nb1wnnnl-line2d_46">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m48ebbd6c86" x="758.726788" y="286.405646" style="fill: #1f77b4; stroke: #cc79a7; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_47">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m48ebbd6c86" x="758.726788" y="284.087017" style="fill: #1f77b4; stroke: #cc79a7; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-LineCollection_5">
+    <path d="M 400.886606 397.977067 
+L 400.886606 375.457619 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #000000; stroke-width: 1.6"/>
+   </g>
+   <g id="nb1wnnnl-line2d_48">
+    <defs>
+     <path id="nb1wnnnl-md281a6ae70" d="M 5 0 
+L -5 -0 
+" style="stroke: #000000; stroke-width: 1.6"/>
+    </defs>
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-md281a6ae70" x="400.886606" y="397.977067" style="fill: #1f77b4; stroke: #000000; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_49">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-md281a6ae70" x="400.886606" y="375.457619" style="fill: #1f77b4; stroke: #000000; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-LineCollection_6">
+    <path d="M 458.823997 348.923629 
+L 458.823997 347.392397 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #000000; stroke-width: 1.6"/>
+   </g>
+   <g id="nb1wnnnl-line2d_50">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-md281a6ae70" x="458.823997" y="348.923629" style="fill: #1f77b4; stroke: #000000; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_51">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-md281a6ae70" x="458.823997" y="347.392397" style="fill: #1f77b4; stroke: #000000; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_19">
+    <text style="font-weight: 700; font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="226.714961" y="28.781418" transform="rotate(-0 226.714961 28.781418)">net source (NBE &gt; 0)</text>
+   </g>
+   <g id="nb1wnnnl-text_20">
+    <text style="font-weight: 700; font-size: 11.25px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: end; fill: #222222; font-variant-numeric: tabular-nums" x="802.261417" y="418.888013" transform="rotate(-0 802.261417 418.888013)">net sink (NBE &lt; 0)</text>
+   </g>
+   <g id="nb1wnnnl-line2d_52">
+    <defs>
+     <path id="nb1wnnnl-m653bc38a59" d="M 0 6.5 
+C 1.72382 6.5 3.377269 5.815119 4.596194 4.596194 
+C 5.815119 3.377269 6.5 1.72382 6.5 0 
+C 6.5 -1.72382 5.815119 -3.377269 4.596194 -4.596194 
+C 3.377269 -5.815119 1.72382 -6.5 0 -6.5 
+C -1.72382 -6.5 -3.377269 -5.815119 -4.596194 -4.596194 
+C -5.815119 -3.377269 -6.5 -1.72382 -6.5 0 
+C -6.5 1.72382 -5.815119 3.377269 -4.596194 4.596194 
+C -3.377269 5.815119 -1.72382 6.5 0 6.5 
+z
+" style="stroke: #ffffff; stroke-width: 0.8"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m653bc38a59" x="652.487852" y="299.799506" style="fill: #0072b2; stroke: #ffffff; stroke-width: 0.8"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_53">
+    <g>
+     <use xlink:href="#nb1wnnnl-m653bc38a59" x="705.510652" y="289.449322" style="fill: #0072b2; stroke: #ffffff; stroke-width: 0.8"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_54">
+    <defs>
+     <path id="nb1wnnnl-mc790c331cd" d="M -6.5 6.5 
+L 6.5 6.5 
+L 6.5 -6.5 
+L -6.5 -6.5 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-mc790c331cd" x="478.649349" y="335.709035" style="fill: #e69f00; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_55">
+    <defs>
+     <path id="nb1wnnnl-m4f18133022" d="M -0 9.192388 
+L 9.192388 0 
+L 0 -9.192388 
+L -9.192388 -0 
+z
+" style="stroke: #cc79a7; stroke-width: 2; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m4f18133022" x="625.902917" y="330.348407" style="fill: #ffffff; stroke: #cc79a7; stroke-width: 2; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_56">
+    <defs>
+     <path id="nb1wnnnl-m258584a8d3" d="M -0 9.192388 
+L 9.192388 0 
+L 0 -9.192388 
+L -9.192388 -0 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m258584a8d3" x="380.407068" y="390.365408" style="fill: #cc79a7; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_57">
+    <g>
+     <use xlink:href="#nb1wnnnl-m4f18133022" x="474.362174" y="407.003665" style="fill: #ffffff; stroke: #cc79a7; stroke-width: 2; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_58">
+    <g>
+     <use xlink:href="#nb1wnnnl-m258584a8d3" x="541.605464" y="327.13664" style="fill: #cc79a7; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_59">
+    <g>
+     <use xlink:href="#nb1wnnnl-m4f18133022" x="758.726788" y="286.216007" style="fill: #ffffff; stroke: #cc79a7; stroke-width: 2; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_60">
+    <defs>
+     <path id="nb1wnnnl-mc352071473" d="M 0 -6.5 
+L -6.181867 -2.00861 
+L -3.820604 5.25861 
+L 3.820604 5.25861 
+L 6.181867 -2.00861 
+z
+" style="stroke: #000000; stroke-width: 2; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-mc352071473" x="400.886606" y="379.090208" style="fill: #ffffff; stroke: #000000; stroke-width: 2; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_61">
+    <g>
+     <use xlink:href="#nb1wnnnl-mc352071473" x="458.823997" y="348.158013" style="fill: #ffffff; stroke: #000000; stroke-width: 2; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-LineCollection_7">
+    <path d="M 341.015692 403.55513 
+L 341.015692 378.145062 
+" clip-path="url(#nb1wnnnl-p14ac67b1f1)" style="fill: none; stroke: #56b4e9; stroke-width: 1.6"/>
+   </g>
+   <g id="nb1wnnnl-line2d_62">
+    <defs>
+     <path id="nb1wnnnl-m5dc5b80790" d="M 5 0 
+L -5 -0 
+" style="stroke: #56b4e9; stroke-width: 1.6"/>
+    </defs>
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m5dc5b80790" x="341.015692" y="403.55513" style="fill: #1f77b4; stroke: #56b4e9; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_63">
+    <g clip-path="url(#nb1wnnnl-p14ac67b1f1)">
+     <use xlink:href="#nb1wnnnl-m5dc5b80790" x="341.015692" y="378.145062" style="fill: #1f77b4; stroke: #56b4e9; stroke-width: 1.6"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_64">
+    <defs>
+     <path id="nb1wnnnl-m04e9a47957" d="M 0 -6.5 
+L -6.5 6.5 
+L 6.5 6.5 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m04e9a47957" x="523.785296" y="336.233706" style="fill: #56b4e9; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_65">
+    <defs>
+     <path id="nb1wnnnl-m2aafc04026" d="M 0 -6.5 
+L -6.5 6.5 
+L 6.5 6.5 
+z
+" style="stroke: #56b4e9; stroke-width: 2; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m2aafc04026" x="341.015692" y="379.550947" style="fill: #ffffff; stroke: #56b4e9; stroke-width: 2; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_66">
+    <g>
+     <use xlink:href="#nb1wnnnl-m04e9a47957" x="504.07873" y="356.860402" style="fill: #56b4e9; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-line2d_67">
+    <g>
+     <use xlink:href="#nb1wnnnl-m04e9a47957" x="559.101841" y="314.017892" style="fill: #56b4e9; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+  </g>
+  <g id="nb1wnnnl-legend_1">
+   <g id="nb1wnnnl-text_21">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="14.404724" y="24.137021" transform="rotate(-0 14.404724 24.137021)">Site</text>
+   </g>
+   <g id="nb1wnnnl-line2d_68">
+    <defs>
+     <path id="nb1wnnnl-m6bf6b13df3" d="M 0 5.525 
+C 1.465247 5.525 2.870679 4.942851 3.906765 3.906765 
+C 4.942851 2.870679 5.525 1.465247 5.525 0 
+C 5.525 -1.465247 4.942851 -2.870679 3.906765 -3.906765 
+C 2.870679 -4.942851 1.465247 -5.525 0 -5.525 
+C -1.465247 -5.525 -2.870679 -4.942851 -3.906765 -3.906765 
+C -4.942851 -2.870679 -5.525 -1.465247 -5.525 0 
+C -5.525 1.465247 -4.942851 2.870679 -3.906765 3.906765 
+C -2.870679 4.942851 -1.465247 5.525 0 5.525 
+z
+" style="stroke: #ffffff; stroke-width: 0.8"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m6bf6b13df3" x="24.904724" y="38.312841" style="fill: #0072b2; stroke: #ffffff; stroke-width: 0.8"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_22">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="39.604724" y="41.987841" transform="rotate(-0 39.604724 41.987841)">👱🏻‍♂️🫛 Anttila</text>
+   </g>
+   <g id="nb1wnnnl-line2d_69">
+    <defs>
+     <path id="nb1wnnnl-me185d04bb0" d="M -5.525 5.525 
+L 5.525 5.525 
+L 5.525 -5.525 
+L -5.525 -5.525 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-me185d04bb0" x="24.904724" y="56.163661" style="fill: #e69f00; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_23">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="39.604724" y="59.838661" transform="rotate(-0 39.604724 59.838661)">🐟🌱 Särkisuo</text>
+   </g>
+   <g id="nb1wnnnl-line2d_70">
+    <defs>
+     <path id="nb1wnnnl-mc7933fc8fd" d="M 0 -5.525 
+L -5.525 5.525 
+L 5.525 5.525 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-mc7933fc8fd" x="24.904724" y="74.014482" style="fill: #56b4e9; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_24">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="39.604724" y="77.689482" transform="rotate(-0 39.604724 77.689482)">🧚🌾 Haltiala</text>
+   </g>
+   <g id="nb1wnnnl-line2d_71">
+    <defs>
+     <path id="nb1wnnnl-mfb04c618fd" d="M -0 7.81353 
+L 7.81353 0 
+L 0 -7.81353 
+L -7.81353 -0 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-mfb04c618fd" x="24.904724" y="91.865302" style="fill: #cc79a7; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_25">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="39.604724" y="95.540302" transform="rotate(-0 39.604724 95.540302)">🐂🐝 Qvidja</text>
+   </g>
+   <g id="nb1wnnnl-line2d_72">
+    <defs>
+     <path id="nb1wnnnl-mb8ef3a9e90" d="M 0 -5.525 
+L -5.254587 -1.707319 
+L -3.247514 4.469819 
+L 3.247514 4.469819 
+L 5.254587 -1.707319 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-mb8ef3a9e90" x="24.904724" y="109.716122" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_26">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="39.604724" y="113.391122" transform="rotate(-0 39.604724 113.391122)">👩🏻‍🔬🎓 Viikki</text>
+   </g>
+   <g id="nb1wnnnl-line2d_73">
+    <defs>
+     <path id="nb1wnnnl-madf708b5ce" d="M 0 -8.075 
+L -1.81295 -2.495312 
+L -7.679781 -2.495312 
+L -2.933415 0.953124 
+L -4.746366 6.532812 
+L -0 3.084375 
+L 4.746366 6.532812 
+L 2.933415 0.953124 
+L 7.679781 -2.495312 
+L 1.81295 -2.495312 
+z
+" style="stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-madf708b5ce" x="24.904724" y="136.180634" style="fill: #009e73; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_27">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(39.604724 132.292968)">🌲🍄 Hyytiälä</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(39.604724 144.895839)">(forest)</text>
+   </g>
+  </g>
+  <g id="nb1wnnnl-legend_2">
+   <g id="nb1wnnnl-text_28">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; text-anchor: start; fill: #222222; font-variant-numeric: tabular-nums" x="14.404724" y="188.800867" transform="rotate(-0 14.404724 188.800867)">Class</text>
+   </g>
+   <g id="nb1wnnnl-line2d_74">
+    <defs>
+     <path id="nb1wnnnl-m73705e6d46" d="M 0 5.2 
+C 1.379056 5.2 2.701815 4.652095 3.676955 3.676955 
+C 4.652095 2.701815 5.2 1.379056 5.2 0 
+C 5.2 -1.379056 4.652095 -2.701815 3.676955 -3.676955 
+C 2.701815 -4.652095 1.379056 -5.2 0 -5.2 
+C -1.379056 -5.2 -2.701815 -4.652095 -3.676955 -3.676955 
+C -4.652095 -2.701815 -5.2 -1.379056 -5.2 0 
+C -5.2 1.379056 -4.652095 2.701815 -3.676955 3.676955 
+C -2.701815 4.652095 -1.379056 5.2 0 5.2 
+z
+" style="stroke: #ffffff; stroke-width: 0.8"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m73705e6d46" x="24.904724" y="214.740379" style="fill: #222222; stroke: #ffffff; stroke-width: 0.8"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_29">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(41.704724 210.852713)">A: all terms</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(41.704724 223.455584)">from site data</text>
+   </g>
+   <g id="nb1wnnnl-line2d_75">
+    <path d="M 14.404724 250.446121 
+L 24.904724 250.446121 
+L 35.404724 250.446121 
+" style="fill: none; stroke: #222222; stroke-width: 1.6; stroke-linecap: square"/>
+    <defs>
+     <path id="nb1wnnnl-m046d1c1df6" d="M 0 5.2 
+C 1.379056 5.2 2.701815 4.652095 3.676955 3.676955 
+C 4.652095 2.701815 5.2 1.379056 5.2 0 
+C 5.2 -1.379056 4.652095 -2.701815 3.676955 -3.676955 
+C 2.701815 -4.652095 1.379056 -5.2 0 -5.2 
+C -1.379056 -5.2 -2.701815 -4.652095 -3.676955 -3.676955 
+C -4.652095 -2.701815 -5.2 -1.379056 -5.2 0 
+C -5.2 1.379056 -4.652095 2.701815 -3.676955 3.676955 
+C -2.701815 4.652095 -1.379056 5.2 0 5.2 
+z
+" style="stroke: #222222; stroke-width: 2"/>
+    </defs>
+    <g>
+     <use xlink:href="#nb1wnnnl-m046d1c1df6" x="24.904724" y="250.446121" style="fill: #ffffff; stroke: #222222; stroke-width: 2"/>
+    </g>
+   </g>
+   <g id="nb1wnnnl-text_30">
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(41.704724 246.558455)">B: assumed term;</text>
+    <text style="font-size: 10.5px; font-family: system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; fill: #222222; font-variant-numeric: tabular-nums" transform="translate(41.704724 259.161326)">bar = low to high</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="nb1wnnnl-p14ac67b1f1">
+   <rect x="208.346457" y="11.958661" width="612.283465" height="413.769685"/>
+  </clipPath>
+ </defs>
+</svg>

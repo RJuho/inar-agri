@@ -93,7 +93,7 @@ Row counts below include header lines. Finnish sites use local time UTC+2. Makta
 
 ## Read rules for `data/`
 
-- Treat `data/` as read-only. Do not write, rename or reformat files there. One exception: `data/NEE-NBE-animation/` is the output folder of `analysis/net-biome-exchange/animation/make-animation.py` (the NEE → NBE video for PowerPoint, user request 2026-10-28). Nothing reads it.
+- Treat `data/` as read-only. Do not write, rename or reformat files there. One exception: `data/NEE-NBE-animation/` is the output folder of `analysis/net-biome-exchange/animation/make-animation.py` (the NEE → NBE video for PowerPoint, user request 2026-10-28). Nothing reads it. A second exception: `data/carbon-balances/` (folders `NEE/`, `NBE/`, `CO2-uptake/`: PDF extracts of Deep Dives #9 and #10, the SVG figures and their variants, transparent PNG in `images/`) is the output of `npm run export:carbon-balances` (`scripts/export-carbon-balances.ts`, needs `npm run site:build` and the preview server; user request 2026-10-28).
 - Files are large. Read only the first lines with `head` when you inspect a file.
 - Skip the unit row in Anttila and Särkisuo files. DuckDB applies `skip` before it reads the header. Read the names first, then read the data: `read_csv(path, header=true, all_varchar=true) LIMIT 0` gives the names, then `read_csv(path, skip=2, header=false, names=[...], nullstr='-9999')` gives the data.
 - Set the missing-value string per file: `nullstr='-9999'` (Anttila, Särkisuo, Maktau), `nullstr='NA'` (Haltiala), `nullstr=''` (Qvidja, Viikki).
