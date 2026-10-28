@@ -418,6 +418,8 @@ def test_ffmpeg_cmd() -> None:
     assert cmd[cmd.index("-i") + 1] == "-"
     assert cmd[cmd.index("-f") + 1] == "rawvideo"
     assert cmd[cmd.index("-movflags") + 1] == "+faststart"
+    assert cmd[cmd.index("-crf") + 1] == "14"
+    assert ma.DEFAULT_WIDTH == 1440 and ma.canvas_for(ma.DEFAULT_WIDTH).height == 1080
 
 
 def test_render_stills_tiny(points: tuple[Any, ...], tmp_path: Path) -> None:

@@ -24,7 +24,7 @@ INPUTS
     analysis/carbon-space/results.json        (siteYears[]: inFig1, gpp, reco, cropLabel; Maktau 2019)
     The script stops with exit code 3 when GPP or TER differ between the files.
 
-OUTPUTS (default folder data/NEE-NBE-animation/, 1080 x 810 px, 60 fps, H.264 yuv420p, no audio)
+OUTPUTS (default folder data/NEE-NBE-animation/, 1440 x 1080 px, 60 fps, H.264 yuv420p, no audio)
     1-nee.mp4, 2-nee-to-nbe.mp4, 3-thinning.mp4, nee-nbe-animation.mp4 (all three in one),
     1-nee.png, 2-nbe.png, 3-nbe-thinning.png (the still frames), timeline.json.
 
@@ -129,12 +129,13 @@ MAKTAU_FADE_END = 0.5  # Maktau 2019 fades out in the first half of step 2
 CLASS_LEGEND_START = 0.5  # the Class legend fades in during the second half of step 2
 
 # ======================================================================================
-# Canvas. 180 x 135 mm (4:3) at dpi = width / 7.0866 in: 1080 x 810 px, the same point
-# sizes as the SVG figures (180 mm wide). The axes box is fixed in figure coordinates.
+# Canvas. 180 x 135 mm (4:3) at dpi = width / 7.0866 in. The default is 1440 x 1080 px
+# (full HD height, user request 2026-10-28). The point sizes stay the same relative to the
+# figure, as in the SVG figures (180 mm wide). The axes box is fixed in figure coordinates.
 # ======================================================================================
 MM = 1 / 25.4
 FIG_WIDTH_MM, FIG_HEIGHT_MM = 180.0, 135.0
-DEFAULT_WIDTH = 1080
+DEFAULT_WIDTH = 1440
 # The axes box is square (648 x 648 px at 1080 x 810): x and y have the same range in steps
 # 1 and 2, thus the same scale, and the 1:1 line is at 45 degrees (user request 2026-10-28).
 AXES_RECT = (113 / 1080, 90 / 810, 648 / 1080, 648 / 810)  # left, bottom, width, height
@@ -1112,7 +1113,9 @@ def ffmpeg_cmd(exe: str, canvas: Canvas, fps: int, out: Path) -> list[str]:
         "-an",
         "-c:v", "libx264",
         "-pix_fmt", "yuv420p",
-        "-crf", "18",
+        "-profile:v", "high",
+        "-level", "4.2",  # 1440 x 1080 at 60 fps
+        "-crf", "14",  # higher bitrate than CRF 18 (user request 2026-10-28)
         "-preset", "slow",
         "-movflags", "+faststart",
         str(out),

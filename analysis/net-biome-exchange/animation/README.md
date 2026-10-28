@@ -10,9 +10,9 @@ Run (from the repository root; `uv` installs matplotlib, numpy and the `imageio-
 uv run analysis/net-biome-exchange/animation/make-animation.py
 ```
 
-Options: `--out <folder>` (default `data/NEE-NBE-animation/`, not in git), `--fps 60`, `--width 1080` (4:3, a multiple of 8), `--stills-only` (only the three PNG stills, about 1 s), `--frames` (also every frame as PNG to `analysis/net-biome-exchange/output/animation/frames/`, not in git), `--repo <folder>` (the repository root; default: from the script path). A system `ffmpeg` on `PATH` is used when it exists. The full run takes about 1 to 2 minutes (810 frames; identical hold frames are drawn once). Exit codes: 0 done, 1 render or ffmpeg error, 2 bad option, 3 data check failed.
+Options: `--out <folder>` (default `data/NEE-NBE-animation/`, not in git), `--fps 60`, `--width 1440` (4:3, a multiple of 8), `--stills-only` (only the three PNG stills, about 1 s), `--frames` (also every frame as PNG to `analysis/net-biome-exchange/output/animation/frames/`, not in git), `--repo <folder>` (the repository root; default: from the script path). A system `ffmpeg` on `PATH` is used when it exists. The full run takes about 1 to 2 minutes (810 frames; identical hold frames are drawn once). Exit codes: 0 done, 1 render or ffmpeg error, 2 bad option, 3 data check failed.
 
-Output: 1080 × 810 px (4:3), 60 fps, H.264 (yuv420p, CRF 18), no audio, white background, legend on the right.
+Output: 1440 × 1080 px (4:3, full HD height), 60 fps, H.264 (High profile, level 4.2, yuv420p, CRF 14), no audio, white background, legend on the right.
 
 | File | Content | Timeline | Duration |
 |---|---|---|---|
