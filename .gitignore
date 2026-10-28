@@ -15,7 +15,7 @@ site/public/duckdb/
 site/src/data/
 analysis/*/output/
 site/public/deep-dive/
-analysis/*/__pycache__/
+analysis/**/__pycache__/
 .pytest_cache/
 .ruff_cache/
 snapshots/
