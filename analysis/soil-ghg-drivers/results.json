@@ -1,0 +1,5936 @@
+{
+  "slug": "soil-ghg-drivers",
+  "script": "analysis/soil-ghg-drivers/soil-ghg-drivers.py",
+  "question": "How do soil temperature, soil water content and soil type (peat or mineral) relate to the CH4 and N2O fluxes at Anttila, Särkisuo and Viikki?",
+  "method": {
+    "sites": [
+      "anttila",
+      "sarkisuo",
+      "viikki"
+    ],
+    "gasSites": {
+      "ch4": [
+        "anttila",
+        "sarkisuo"
+      ],
+      "n2o": [
+        "anttila",
+        "sarkisuo",
+        "viikki"
+      ]
+    },
+    "years": {
+      "anttila": [
+        2022,
+        2023
+      ],
+      "sarkisuo": [
+        2022,
+        2023
+      ],
+      "viikki": [
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    "units": {
+      "ch4": "µmol CH4 m-2 s-1",
+      "n2o": "nmol N2O m-2 s-1",
+      "tsoil": "°C",
+      "swc": "m3 m-3",
+      "annual": {
+        "ch4": "kg CH4 ha-1 yr-1",
+        "n2o": "kg N2O ha-1 yr-1"
+      },
+      "dailyText": {
+        "ch4": "mg CH4 m-2 d-1",
+        "n2o": "mg N2O m-2 d-1"
+      }
+    },
+    "molarMass": {
+      "ch4": 16.043,
+      "n2o": 44.013
+    },
+    "n2oNFactor": 1.571163388,
+    "minValuesPerDay": 40,
+    "tBin": 1.0,
+    "wBin": 0.02,
+    "minBinDays": 10,
+    "fitMinBins": 5,
+    "fitMinPositiveShare": 0.75,
+    "tRef": 10.0,
+    "hacLags": 7,
+    "partialCoverage": 0.9,
+    "blockDays": 7,
+    "bootReps": 5000,
+    "bootSeed": 20261029,
+    "findingNumbers": {
+      "VII-04": {
+        "maxTsoil": 28.9,
+        "days": 34,
+        "dailyBiasLo": 2.0,
+        "dailyBiasHi": 5.0
+      }
+    },
+    "fertDays": 30,
+    "mapTBin": 2.0,
+    "mapWBin": 0.04,
+    "minCellDays": 5,
+    "soil": {
+      "anttila": {
+        "type": "mineral",
+        "litKey": "anttilaSoil",
+        "depthCm": 5
+      },
+      "sarkisuo": {
+        "type": "peat",
+        "litKey": "sarkisuoSoil",
+        "depthCm": 5
+      },
+      "viikki": {
+        "type": "mineral (clay loam)",
+        "litKey": "viikkiSoil",
+        "depthCm": 14
+      }
+    },
+    "timeBase": "local day = calendar day of ts_start + utc_offset_min (UTC+2); open finding ANT-01, SAR-01, VII-01: the true local day starts 2 h earlier",
+    "signConvention": "flux > 0 = emission to the atmosphere",
+    "rules": [
+      "Sites: Anttila (mineral soil), Sarkisuo (drained peat) and Viikki (clay loam, mineral). CH4",
+      "is only at Anttila and Sarkisuo (2022 to 2023), N2O at all three (Anttila and Sarkisuo 2022 to",
+      "2023, Viikki 2022 to 2025). The fluxes are the gap-filled values of the providers (the",
+      "database has no measured CH4 or N2O). The gap-fill models use soil drivers, thus a part of",
+      "each relation below comes from the models (circularity). Soil drivers: tsoil (degC) and swc",
+      "(m3 m-3) of the shallowest sensor (Anttila and Sarkisuo 5 cm, Shurpali et al. 2025 p. 4;",
+      "Viikki 14 cm). The soil type is static per site (LITERATURE). Units are the harmonised units:",
+      "ch4 umol CH4 m-2 s-1, n2o nmol N2O m-2 s-1 (positive = emission).",
+      "1. Local day = calendar day of ts_start + utc_offset_min. Daily mean of each variable; a day",
+      "keeps the mean of a variable when the variable has MIN_VALUES_PER_DAY (40) or more of the",
+      "48 half hours, else the daily value is missing. Each analysis uses the days where all its",
+      "variables have a daily value. For the text only, daily CH4 is also given in",
+      "mg CH4 m-2 d-1 and daily N2O in mg N2O m-2 d-1.",
+      "2. Temperature response, per site and gas: daily tsoil in 1 degC bins (bin = floor(tsoil));",
+      "a bin needs MIN_BIN_DAYS (10) days. Per bin: median and 25 and 75 % quantiles of the daily",
+      "flux. Spearman rho (scipy.stats.spearmanr) over all days. Exponential fit",
+      "F = F10 x Q10^((T - 10) / 10) to the bin medians that are > 0, at the bin centres. The",
+      "fit is in log space: ln F = ln F10 + k (T - 10) (scipy.optimize.curve_fit), Q10 =",
+      "exp(10 k). Thus each bin has the same relative weight; a fit in linear space lets one",
+      "warm bin with a fertilisation peak set the curve. The fit needs 5 or more such bins, and",
+      "they must be 75 % or more of the bins; else the fit is null with the reason. 95 % CI of",
+      "Q10 = exp(10 (k +/- t(0.975, n - 2) x SE(k))), n = number of bins. R2 is in log space.",
+      "\"The bins\" = the bins with MIN_BIN_DAYS or more days; bin centre = (floor(x / width) +",
+      "0.5) x width.",
+      "3. Water response: the same with swc in 0.02 m3 m-3 bins (bin = floor(swc / 0.02)), and",
+      "Spearman rho. No fit.",
+      "4. Joint effect, per site and gas: OLS of the daily flux on z(tsoil), z(swc) and",
+      "z(tsoil) x z(swc) (z = (x - mean) / SD of the days of the site and gas, SD with n - 1),",
+      "with a constant; the mean and SD come from the OLS days (days with flux, tsoil and swc).",
+      "Standard errors: Newey-West HAC with 7 lags (statsmodels: Bartlett kernel, no small-sample",
+      "correction; CI and p-values from the normal distribution). Reported: coefficients in flux",
+      "units per 1 SD, 95 % CI, p-values and R2.",
+      "5. Soil type, Sarkisuo (peat) against Anttila (mineral): (a) annual sums per site, local",
+      "year and gas = sum of the 30-min values x 1800 s, in kg CH4 ha-1 yr-1 and kg N2O ha-1",
+      "yr-1 (molar mass CH4 16.043, N2O 44.013 g mol-1), with the coverage (values / half hours",
+      "of the year); a year with coverage < 0.9 is partial. The 2022 sums are compared with",
+      "Shurpali et al. 2025 Table 3 (LITERATURE). (b) Paired days: the local days in 2022 and",
+      "2023 where both sites have a daily value of the gas. Daily distributions (median, 25 and",
+      "75 %) and the mean daily difference Sarkisuo - Anttila, with a 95 % CI from a block",
+      "bootstrap: the paired days in date order are cut into blocks of 7 days (BLOCK_DAYS); the",
+      "last, shorter block is kept. Each replicate draws as many blocks as there are, with",
+      "replacement (numpy.random.default_rng(BOOT_SEED), BOOT_REPS 5000); the statistic is the",
+      "mean of all days in the drawn blocks; percentile interval. Viikki gets annual sums too",
+      "(N2O). kg ha-1 = sum x 1800 s x 1e-6 (CH4) or 1e-9 (N2O) mol x molar mass g mol-1 x 10.",
+      "6. Sensitivity for N2O: steps 2 to 4 again without the days of fertilisation effect: the",
+      "local days 0 to 29 after each fertilisation event of db/events.parquet (the event day is",
+      "day 0; FERT_DAYS 30). Events: rows with type == 'fertilisation'. Also: the share of the",
+      "N2O sum of each site-year that is on these days = sum of the daily N2O means of the days",
+      "in the windows / sum of all daily N2O means of the year.",
+      "7. Heat map (Figure 3): mean daily flux per cell of 2 degC tsoil x 0.04 m3 m-3 swc",
+      "(cell = floor(tsoil / 2), floor(swc / 0.04)); a cell needs MIN_CELL_DAYS (5) days.",
+      "8. Each step that removes rows or days logs a count (results.json dataVersion.steps).",
+      "9. Open findings of docs/anomaly-data-report.md that touch this dive are printed",
+      "(OPEN_FINDINGS)."
+    ],
+    "openFindings": [
+      "Gap-filled fluxes (limit of the method): the database has only the gap-filled CH4 and N2O values. In 2022, 28 to 67 % of the 30-min values were measured (Shurpali 2025 p. 3). The gap-fill models use soil drivers, thus a part of each relation comes from the models.",
+      "ANT-01, SAR-01, VII-01 (open, waits for the providers): the raw stamps of Anttila, Sarkisuo and Viikki are UTC, but the build reads them as UTC+2. A local day of these sites thus holds the hours 02:00 to 02:00 true local time. Daily means change little; the annual sums change by the 2 hours at the ends of the year only.",
+      "VII-06 (open question): the Viikki N2O unit can be ug N2O or ug N2O-N. The build assumes ug N2O. If it is N2O-N, all Viikki N2O values are 1.57 times too small. The relations (rho) do not change; the Viikki slopes, sums and medians change by this factor.",
+      "SAR-07 (known): Sarkisuo CH4 and N2O start on 2022-05-06. The 2022 sums are partial years (coverage 0.66); the paired days of Sarkisuo and Anttila start on that day.",
+      "VII-04 (open, waits for the provider): the Viikki tsoil at 14 cm has spikes up to 28.9 degC after field work in May, August and September 2025. On 34 days the daily mean can be 2 to 5 degC too high; some of these days are in the 30 days after the fertilisation of 2025-05-10. The dive does not remove them.",
+      "SAR-04, ANT-05, VII-03 (zero curtain): in winter, tsoil stays near 0 degC for weeks (Sarkisuo 0.2 degC for most of the winter 2022-23; a sensor floor is an open question). The 0 degC bins thus hold many winter days with different fluxes."
+    ]
+  },
+  "sites": {
+    "anttila": {
+      "name": "Anttila",
+      "slot": 0,
+      "soilType": "mineral",
+      "soilLitKey": "anttilaSoil",
+      "sensorDepthCm": 5,
+      "years": [
+        2022,
+        2023
+      ],
+      "gases": [
+        "ch4",
+        "n2o"
+      ],
+      "fertilisationEvents": [
+        "2022-05-23",
+        "2022-06-22",
+        "2023-05-16",
+        "2023-06-28"
+      ]
+    },
+    "sarkisuo": {
+      "name": "Särkisuo",
+      "slot": 1,
+      "soilType": "peat",
+      "soilLitKey": "sarkisuoSoil",
+      "sensorDepthCm": 5,
+      "years": [
+        2022,
+        2023
+      ],
+      "gases": [
+        "ch4",
+        "n2o"
+      ],
+      "fertilisationEvents": [
+        "2022-05-30",
+        "2022-07-04",
+        "2023-05-22",
+        "2023-07-03"
+      ]
+    },
+    "viikki": {
+      "name": "Viikki",
+      "slot": 4,
+      "soilType": "mineral (clay loam)",
+      "soilLitKey": "viikkiSoil",
+      "sensorDepthCm": 14,
+      "years": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "gases": [
+        "n2o"
+      ],
+      "fertilisationEvents": [
+        "2022-05-10",
+        "2023-04-27",
+        "2023-05-25",
+        "2024-05-08",
+        "2024-05-22",
+        "2024-10-09",
+        "2025-05-10"
+      ]
+    }
+  },
+  "temperature": {
+    "ch4": {
+      "anttila": {
+        "n": 724,
+        "spearman": {
+          "rho": -0.06187954675,
+          "p": 0.09616720561,
+          "n": 724
+        },
+        "driverMin": -0.1632645833,
+        "driverMax": 23.79402083,
+        "nInBins": 689,
+        "bins": [
+          {
+            "lo": 0.0,
+            "centre": 0.5,
+            "n": 342,
+            "median": 9.79015625e-05,
+            "q25": -0.0001686159896,
+            "q75": 0.0007220308854,
+            "mean": 0.0006020198185
+          },
+          {
+            "lo": 2.0,
+            "centre": 2.5,
+            "n": 11,
+            "median": -3.000916667e-05,
+            "q25": -7.683958333e-05,
+            "q75": 0.0007837804167,
+            "mean": 0.0006299867614
+          },
+          {
+            "lo": 3.0,
+            "centre": 3.5,
+            "n": 16,
+            "median": -7.386229167e-05,
+            "q25": -0.0002031936979,
+            "q75": 0.0003702528646,
+            "mean": 0.0001428607422
+          },
+          {
+            "lo": 4.0,
+            "centre": 4.5,
+            "n": 11,
+            "median": -1.886333333e-05,
+            "q25": -0.0002386695833,
+            "q75": 0.0002476127083,
+            "mean": -3.5213125e-05
+          },
+          {
+            "lo": 5.0,
+            "centre": 5.5,
+            "n": 15,
+            "median": -0.0002024145833,
+            "q25": -0.0003272419792,
+            "q75": 0.0002236061458,
+            "mean": 1.210041667e-05
+          },
+          {
+            "lo": 6.0,
+            "centre": 6.5,
+            "n": 10,
+            "median": 1.264083333e-05,
+            "q25": -0.000298435,
+            "q75": 0.001378823854,
+            "mean": 0.0004160476042
+          },
+          {
+            "lo": 7.0,
+            "centre": 7.5,
+            "n": 16,
+            "median": -2.1681875e-05,
+            "q25": -0.0003117252604,
+            "q75": 0.0009569532292,
+            "mean": 0.0009293760417
+          },
+          {
+            "lo": 8.0,
+            "centre": 8.5,
+            "n": 19,
+            "median": 8.770708333e-05,
+            "q25": -0.0003066508333,
+            "q75": 0.0006437988542,
+            "mean": 0.0008477357456
+          },
+          {
+            "lo": 9.0,
+            "centre": 9.5,
+            "n": 17,
+            "median": -0.0002316529167,
+            "q25": -0.0003874997917,
+            "q75": 0.0001458441667,
+            "mean": 0.0001745040319
+          },
+          {
+            "lo": 10.0,
+            "centre": 10.5,
+            "n": 23,
+            "median": -5.0464375e-05,
+            "q25": -0.0002416010417,
+            "q75": 0.0007007934375,
+            "mean": 0.0006134259692
+          },
+          {
+            "lo": 11.0,
+            "centre": 11.5,
+            "n": 21,
+            "median": 0.0002198295833,
+            "q25": -0.000158014375,
+            "q75": 0.001406147917,
+            "mean": 0.0007948266865
+          },
+          {
+            "lo": 12.0,
+            "centre": 12.5,
+            "n": 22,
+            "median": -9.73478125e-05,
+            "q25": -0.0002761458333,
+            "q75": 0.000430794375,
+            "mean": 0.0003593267992
+          },
+          {
+            "lo": 13.0,
+            "centre": 13.5,
+            "n": 22,
+            "median": -4.151635417e-05,
+            "q25": -0.0002998522396,
+            "q75": 0.000674433125,
+            "mean": 0.0003014038163
+          },
+          {
+            "lo": 14.0,
+            "centre": 14.5,
+            "n": 25,
+            "median": 1.740125e-05,
+            "q25": -0.0001162825,
+            "q75": 0.0005217491667,
+            "mean": 0.0003361503333
+          },
+          {
+            "lo": 15.0,
+            "centre": 15.5,
+            "n": 31,
+            "median": 0.000268344375,
+            "q25": -0.0001362372917,
+            "q75": 0.0009979871875,
+            "mean": 0.0005670238642
+          },
+          {
+            "lo": 16.0,
+            "centre": 16.5,
+            "n": 31,
+            "median": 0.000303084375,
+            "q25": -0.0001383830208,
+            "q75": 0.0007478123958,
+            "mean": 0.0003513054301
+          },
+          {
+            "lo": 17.0,
+            "centre": 17.5,
+            "n": 38,
+            "median": -1.959604167e-05,
+            "q25": -0.0001963403125,
+            "q75": 0.0006394300521,
+            "mean": 0.0001407308333
+          },
+          {
+            "lo": 18.0,
+            "centre": 18.5,
+            "n": 19,
+            "median": 0.0001114091667,
+            "q25": -0.0003213433333,
+            "q75": 0.0008686996875,
+            "mean": 0.0004421091338
+          }
+        ],
+        "fluxMedian": 4.236708333e-05,
+        "fluxMean": 0.0004901183587,
+        "fit": {
+          "nBins": 8,
+          "nBinsAll": 18,
+          "ok": false,
+          "reason": "bins with median > 0 are less than 75% of the bins"
+        }
+      },
+      "sarkisuo": {
+        "n": 504,
+        "spearman": {
+          "rho": 0.8158039443,
+          "p": 1.782476163e-121,
+          "n": 504
+        },
+        "driverMin": 0.1995145833,
+        "driverMax": 19.10478958,
+        "nInBins": 478,
+        "bins": [
+          {
+            "lo": 0.0,
+            "centre": 0.5,
+            "n": 153,
+            "median": 0.003677734792,
+            "q25": 0.003183878333,
+            "q75": 0.004717754583,
+            "mean": 0.004348710545
+          },
+          {
+            "lo": 1.0,
+            "centre": 1.5,
+            "n": 56,
+            "median": 0.00603014875,
+            "q25": 0.004993325208,
+            "q75": 0.008180811146,
+            "mean": 0.006877026659
+          },
+          {
+            "lo": 2.0,
+            "centre": 2.5,
+            "n": 18,
+            "median": 0.01341100479,
+            "q25": 0.01129723307,
+            "q75": 0.01603278802,
+            "mean": 0.01377325596
+          },
+          {
+            "lo": 3.0,
+            "centre": 3.5,
+            "n": 18,
+            "median": 0.01664853323,
+            "q25": 0.009540653906,
+            "q75": 0.01935466589,
+            "mean": 0.01444775777
+          },
+          {
+            "lo": 4.0,
+            "centre": 4.5,
+            "n": 20,
+            "median": 0.0191148326,
+            "q25": 0.007037944062,
+            "q75": 0.02216784984,
+            "mean": 0.01712680273
+          },
+          {
+            "lo": 6.0,
+            "centre": 6.5,
+            "n": 10,
+            "median": 0.00312118875,
+            "q25": 0.002383857135,
+            "q75": 0.02227484974,
+            "mean": 0.01124454342
+          },
+          {
+            "lo": 7.0,
+            "centre": 7.5,
+            "n": 20,
+            "median": 0.02020423917,
+            "q25": 0.002461682292,
+            "q75": 0.03242353786,
+            "mean": 0.01926853104
+          },
+          {
+            "lo": 8.0,
+            "centre": 8.5,
+            "n": 21,
+            "median": 0.03391031562,
+            "q25": 0.03045290542,
+            "q75": 0.0365176275,
+            "mean": 0.03182515014
+          },
+          {
+            "lo": 10.0,
+            "centre": 10.5,
+            "n": 12,
+            "median": 0.04115110646,
+            "q25": 0.02110814943,
+            "q75": 0.04703110854,
+            "mean": 0.03448145026
+          },
+          {
+            "lo": 11.0,
+            "centre": 11.5,
+            "n": 23,
+            "median": 0.04429294813,
+            "q25": 0.01245452156,
+            "q75": 0.05184214823,
+            "mean": 0.03876788597
+          },
+          {
+            "lo": 12.0,
+            "centre": 12.5,
+            "n": 22,
+            "median": 0.07088133063,
+            "q25": 0.02852474896,
+            "q75": 0.08154705875,
+            "mean": 0.05846502638
+          },
+          {
+            "lo": 13.0,
+            "centre": 13.5,
+            "n": 16,
+            "median": 0.0730342724,
+            "q25": 0.01542643776,
+            "q75": 0.08772083542,
+            "mean": 0.05987318296
+          },
+          {
+            "lo": 14.0,
+            "centre": 14.5,
+            "n": 22,
+            "median": 0.06317449062,
+            "q25": 0.05866675865,
+            "q75": 0.072014025,
+            "mean": 0.05865493937
+          },
+          {
+            "lo": 15.0,
+            "centre": 15.5,
+            "n": 23,
+            "median": 0.07141018167,
+            "q25": 0.06030846927,
+            "q75": 0.0844525674,
+            "mean": 0.06951273359
+          },
+          {
+            "lo": 16.0,
+            "centre": 16.5,
+            "n": 29,
+            "median": 0.06793021979,
+            "q25": 0.05564541896,
+            "q75": 0.0912926225,
+            "mean": 0.0745084354
+          },
+          {
+            "lo": 17.0,
+            "centre": 17.5,
+            "n": 15,
+            "median": 0.03384080979,
+            "q25": 0.02767261573,
+            "q75": 0.07196436646,
+            "mean": 0.05267702385
+          }
+        ],
+        "fluxMedian": 0.01084465312,
+        "fluxMean": 0.02628077517,
+        "fit": {
+          "nBins": 16,
+          "nBinsAll": 16,
+          "ok": true,
+          "reason": null,
+          "f10": 0.02804181221,
+          "lnF10Se": 0.1584915862,
+          "k": 0.1537606646,
+          "kSe": 0.02887637568,
+          "q10": 4.653439604,
+          "q10Lo": 2.504953031,
+          "q10Hi": 8.644673124,
+          "ciExcludes1": true,
+          "r2Log": 0.6694480184,
+          "tMin": 0.0,
+          "tMax": 18.0
+        }
+      }
+    },
+    "n2o": {
+      "anttila": {
+        "n": 724,
+        "spearman": {
+          "rho": 0.1715334499,
+          "p": 3.451101276e-06,
+          "n": 724
+        },
+        "driverMin": -0.1632645833,
+        "driverMax": 23.79402083,
+        "nInBins": 689,
+        "bins": [
+          {
+            "lo": 0.0,
+            "centre": 0.5,
+            "n": 342,
+            "median": 0.08731333333,
+            "q25": 0.044235,
+            "q75": 0.1789490104,
+            "mean": 0.123501543
+          },
+          {
+            "lo": 2.0,
+            "centre": 2.5,
+            "n": 11,
+            "median": 0.1107485417,
+            "q25": 0.060235,
+            "q75": 0.1771985417,
+            "mean": 0.1576157386
+          },
+          {
+            "lo": 3.0,
+            "centre": 3.5,
+            "n": 16,
+            "median": 0.07264572917,
+            "q25": 0.04716885417,
+            "q75": 0.1143624479,
+            "mean": 0.08255527344
+          },
+          {
+            "lo": 4.0,
+            "centre": 4.5,
+            "n": 11,
+            "median": 0.05935625,
+            "q25": 0.03217229167,
+            "q75": 0.08459552083,
+            "mean": 0.07579623106
+          },
+          {
+            "lo": 5.0,
+            "centre": 5.5,
+            "n": 15,
+            "median": 0.03611416667,
+            "q25": 0.02340291667,
+            "q75": 0.0573990625,
+            "mean": 0.06870266667
+          },
+          {
+            "lo": 6.0,
+            "centre": 6.5,
+            "n": 10,
+            "median": 0.05382072917,
+            "q25": 0.041649375,
+            "q75": 0.08739671875,
+            "mean": 0.1040153125
+          },
+          {
+            "lo": 7.0,
+            "centre": 7.5,
+            "n": 16,
+            "median": 0.04109697917,
+            "q25": 0.03259015625,
+            "q75": 0.09317166667,
+            "mean": 0.08868794271
+          },
+          {
+            "lo": 8.0,
+            "centre": 8.5,
+            "n": 19,
+            "median": 0.05777729167,
+            "q25": 0.03781104167,
+            "q75": 0.1652086458,
+            "mean": 0.1201438925
+          },
+          {
+            "lo": 9.0,
+            "centre": 9.5,
+            "n": 17,
+            "median": 0.06816583333,
+            "q25": 0.04977020833,
+            "q75": 0.22933125,
+            "mean": 0.1369077328
+          },
+          {
+            "lo": 10.0,
+            "centre": 10.5,
+            "n": 23,
+            "median": 0.09463979167,
+            "q25": 0.07285489583,
+            "q75": 0.1471251042,
+            "mean": 0.1204051449
+          },
+          {
+            "lo": 11.0,
+            "centre": 11.5,
+            "n": 21,
+            "median": 0.08056229167,
+            "q25": 0.05329354167,
+            "q75": 0.1565752083,
+            "mean": 0.1444508829
+          },
+          {
+            "lo": 12.0,
+            "centre": 12.5,
+            "n": 22,
+            "median": 0.08317041667,
+            "q25": 0.05189510417,
+            "q75": 0.1747735417,
+            "mean": 0.1605801326
+          },
+          {
+            "lo": 13.0,
+            "centre": 13.5,
+            "n": 22,
+            "median": 0.1674946875,
+            "q25": 0.07637890625,
+            "q75": 0.2438474479,
+            "mean": 0.2006568655
+          },
+          {
+            "lo": 14.0,
+            "centre": 14.5,
+            "n": 25,
+            "median": 0.1431660417,
+            "q25": 0.08115979167,
+            "q75": 0.18257875,
+            "mean": 0.1767638
+          },
+          {
+            "lo": 15.0,
+            "centre": 15.5,
+            "n": 31,
+            "median": 0.165443125,
+            "q25": 0.1027741667,
+            "q75": 0.235059375,
+            "mean": 0.238041754
+          },
+          {
+            "lo": 16.0,
+            "centre": 16.5,
+            "n": 31,
+            "median": 0.1865889583,
+            "q25": 0.08743239583,
+            "q75": 0.3970530208,
+            "mean": 0.417386875
+          },
+          {
+            "lo": 17.0,
+            "centre": 17.5,
+            "n": 38,
+            "median": 0.1426782292,
+            "q25": 0.09172286458,
+            "q75": 0.3187547396,
+            "mean": 0.4500749945
+          },
+          {
+            "lo": 18.0,
+            "centre": 18.5,
+            "n": 19,
+            "median": 0.2817889583,
+            "q25": 0.1242255208,
+            "q75": 0.3662505208,
+            "mean": 0.267590625
+          }
+        ],
+        "fluxMedian": 0.09988822917,
+        "fluxMean": 0.2008363858,
+        "fit": {
+          "nBins": 18,
+          "nBinsAll": 18,
+          "ok": true,
+          "reason": null,
+          "f10": 0.09290911497,
+          "lnF10Se": 0.09601767125,
+          "k": 0.07221325585,
+          "kSe": 0.01817269725,
+          "q10": 2.058819085,
+          "q10Lo": 1.400583011,
+          "q10Hi": 3.026408281,
+          "ciExcludes1": true,
+          "r2Log": 0.4967045244,
+          "tMin": 0.0,
+          "tMax": 19.0
+        }
+      },
+      "sarkisuo": {
+        "n": 504,
+        "spearman": {
+          "rho": 0.6388696211,
+          "p": 3.707102305e-59,
+          "n": 504
+        },
+        "driverMin": 0.1995145833,
+        "driverMax": 19.10478958,
+        "nInBins": 478,
+        "bins": [
+          {
+            "lo": 0.0,
+            "centre": 0.5,
+            "n": 153,
+            "median": 0.06285125,
+            "q25": 0.04273020833,
+            "q75": 0.08602770833,
+            "mean": 0.0655773652
+          },
+          {
+            "lo": 1.0,
+            "centre": 1.5,
+            "n": 56,
+            "median": 0.05823364583,
+            "q25": 0.04107807292,
+            "q75": 0.07666364583,
+            "mean": 0.06270072173
+          },
+          {
+            "lo": 2.0,
+            "centre": 2.5,
+            "n": 18,
+            "median": 0.0749565625,
+            "q25": 0.054754375,
+            "q75": 0.08829041667,
+            "mean": 0.07790017361
+          },
+          {
+            "lo": 3.0,
+            "centre": 3.5,
+            "n": 18,
+            "median": 0.07841864583,
+            "q25": 0.06596244792,
+            "q75": 0.0913921875,
+            "mean": 0.08083027778
+          },
+          {
+            "lo": 4.0,
+            "centre": 4.5,
+            "n": 20,
+            "median": 0.07870010417,
+            "q25": 0.05885833333,
+            "q75": 0.09002770833,
+            "mean": 0.08632260417
+          },
+          {
+            "lo": 6.0,
+            "centre": 6.5,
+            "n": 10,
+            "median": 0.3788154167,
+            "q25": 0.1292640104,
+            "q75": 0.4975298958,
+            "mean": 0.3336879375
+          },
+          {
+            "lo": 7.0,
+            "centre": 7.5,
+            "n": 20,
+            "median": 0.160440625,
+            "q25": 0.05882942708,
+            "q75": 0.5494052604,
+            "mean": 0.3124674063
+          },
+          {
+            "lo": 8.0,
+            "centre": 8.5,
+            "n": 21,
+            "median": 0.08226833333,
+            "q25": 0.06628979167,
+            "q75": 0.09976208333,
+            "mean": 0.1378482837
+          },
+          {
+            "lo": 10.0,
+            "centre": 10.5,
+            "n": 12,
+            "median": 0.07383427083,
+            "q25": 0.06726239583,
+            "q75": 0.2244469271,
+            "mean": 0.3972310764
+          },
+          {
+            "lo": 11.0,
+            "centre": 11.5,
+            "n": 23,
+            "median": 0.090469375,
+            "q25": 0.0640490625,
+            "q75": 1.703614271,
+            "mean": 3.388419384
+          },
+          {
+            "lo": 12.0,
+            "centre": 12.5,
+            "n": 22,
+            "median": 0.104281875,
+            "q25": 0.08223265625,
+            "q75": 3.211154948,
+            "mean": 2.984777386
+          },
+          {
+            "lo": 13.0,
+            "centre": 13.5,
+            "n": 16,
+            "median": 0.144554375,
+            "q25": 0.1096380208,
+            "q75": 4.301359167,
+            "mean": 2.177326693
+          },
+          {
+            "lo": 14.0,
+            "centre": 14.5,
+            "n": 22,
+            "median": 0.2330967708,
+            "q25": 0.1569698958,
+            "q75": 0.4332796354,
+            "mean": 1.272125521
+          },
+          {
+            "lo": 15.0,
+            "centre": 15.5,
+            "n": 23,
+            "median": 0.2952083333,
+            "q25": 0.2288182292,
+            "q75": 0.5697819792,
+            "mean": 1.168280933
+          },
+          {
+            "lo": 16.0,
+            "centre": 16.5,
+            "n": 29,
+            "median": 0.4710027083,
+            "q25": 0.3118095833,
+            "q75": 1.073967917,
+            "mean": 1.410917414
+          },
+          {
+            "lo": 17.0,
+            "centre": 17.5,
+            "n": 15,
+            "median": 1.671742083,
+            "q25": 0.7051852083,
+            "q75": 4.022034271,
+            "mean": 3.317759264
+          }
+        ],
+        "fluxMedian": 0.08704322917,
+        "fluxMean": 0.7856597466,
+        "fit": {
+          "nBins": 16,
+          "nBinsAll": 16,
+          "ok": true,
+          "reason": null,
+          "f10": 0.1614779224,
+          "lnF10Se": 0.1696527036,
+          "k": 0.1178368029,
+          "kSe": 0.03090987547,
+          "q10": 3.249067491,
+          "q10Lo": 1.67433678,
+          "q10Hi": 6.304848393,
+          "ciExcludes1": true,
+          "r2Log": 0.5093470339,
+          "tMin": 0.0,
+          "tMax": 18.0
+        }
+      },
+      "viikki": {
+        "n": 1326,
+        "spearman": {
+          "rho": -0.07265822227,
+          "p": 0.008125722658,
+          "n": 1326
+        },
+        "driverMin": -2.396493056,
+        "driverMax": 22.40475694,
+        "nInBins": 1307,
+        "bins": [
+          {
+            "lo": -1.0,
+            "centre": -0.5,
+            "n": 55,
+            "median": 0.1209536467,
+            "q25": 0.04148387669,
+            "q75": 0.218959804,
+            "mean": 0.1859094046
+          },
+          {
+            "lo": 0.0,
+            "centre": 0.5,
+            "n": 285,
+            "median": 0.1583728259,
+            "q25": 0.07403581234,
+            "q75": 0.2869153124,
+            "mean": 0.236176409
+          },
+          {
+            "lo": 1.0,
+            "centre": 1.5,
+            "n": 53,
+            "median": 0.2282803372,
+            "q25": 0.1210366686,
+            "q75": 0.3065495871,
+            "mean": 0.2526541675
+          },
+          {
+            "lo": 2.0,
+            "centre": 2.5,
+            "n": 35,
+            "median": 0.1884503991,
+            "q25": 0.08313689161,
+            "q75": 0.3730424572,
+            "mean": 0.2637549688
+          },
+          {
+            "lo": 3.0,
+            "centre": 3.5,
+            "n": 39,
+            "median": 0.2140096004,
+            "q25": 0.0849730165,
+            "q75": 0.4068573937,
+            "mean": 0.6843764062
+          },
+          {
+            "lo": 4.0,
+            "centre": 4.5,
+            "n": 48,
+            "median": 0.1213783678,
+            "q25": 0.03119147965,
+            "q75": 0.2520099082,
+            "mean": 0.4377132509
+          },
+          {
+            "lo": 5.0,
+            "centre": 5.5,
+            "n": 51,
+            "median": 0.2183618784,
+            "q25": 0.1093272873,
+            "q75": 0.6191855411,
+            "mean": 0.8764934765
+          },
+          {
+            "lo": 6.0,
+            "centre": 6.5,
+            "n": 41,
+            "median": 0.1226436806,
+            "q25": 0.07555554656,
+            "q75": 0.4101306323,
+            "mean": 0.4377036205
+          },
+          {
+            "lo": 7.0,
+            "centre": 7.5,
+            "n": 48,
+            "median": 0.1439889538,
+            "q25": 0.08162358198,
+            "q75": 0.5856657378,
+            "mean": 0.7323955839
+          },
+          {
+            "lo": 8.0,
+            "centre": 8.5,
+            "n": 53,
+            "median": 0.1026216099,
+            "q25": 0.01803787659,
+            "q75": 0.4177112804,
+            "mean": 0.8709460073
+          },
+          {
+            "lo": 9.0,
+            "centre": 9.5,
+            "n": 55,
+            "median": 0.1942326661,
+            "q25": 0.04588632644,
+            "q75": 0.6781603418,
+            "mean": 1.199777665
+          },
+          {
+            "lo": 10.0,
+            "centre": 10.5,
+            "n": 29,
+            "median": 0.107506375,
+            "q25": 0.03750913556,
+            "q75": 0.4113646626,
+            "mean": 0.5427971321
+          },
+          {
+            "lo": 11.0,
+            "centre": 11.5,
+            "n": 25,
+            "median": 0.3746396614,
+            "q25": 0.1525500832,
+            "q75": 1.139032399,
+            "mean": 1.558729995
+          },
+          {
+            "lo": 12.0,
+            "centre": 12.5,
+            "n": 25,
+            "median": 1.25514473,
+            "q25": 0.3925903606,
+            "q75": 2.07710443,
+            "mean": 2.027588627
+          },
+          {
+            "lo": 13.0,
+            "centre": 13.5,
+            "n": 45,
+            "median": 0.3333905792,
+            "q25": 0.1182873829,
+            "q75": 0.9778706916,
+            "mean": 2.970246855
+          },
+          {
+            "lo": 14.0,
+            "centre": 14.5,
+            "n": 62,
+            "median": 0.3023247743,
+            "q25": 0.13443571,
+            "q75": 0.8781789236,
+            "mean": 1.207791061
+          },
+          {
+            "lo": 15.0,
+            "centre": 15.5,
+            "n": 68,
+            "median": 0.2625966793,
+            "q25": 0.05815604303,
+            "q75": 1.11219794,
+            "mean": 1.358195275
+          },
+          {
+            "lo": 16.0,
+            "centre": 16.5,
+            "n": 82,
+            "median": 0.08216197511,
+            "q25": 0.02933174999,
+            "q75": 0.2637572938,
+            "mean": 0.5000791691
+          },
+          {
+            "lo": 17.0,
+            "centre": 17.5,
+            "n": 84,
+            "median": 0.07909269799,
+            "q25": 0.0150061652,
+            "q75": 0.1873862025,
+            "mean": 0.4692015941
+          },
+          {
+            "lo": 18.0,
+            "centre": 18.5,
+            "n": 68,
+            "median": 0.08751670884,
+            "q25": 0.01943589347,
+            "q75": 0.1608757626,
+            "mean": 0.134760543
+          },
+          {
+            "lo": 19.0,
+            "centre": 19.5,
+            "n": 37,
+            "median": 0.09916958531,
+            "q25": 0.05098931424,
+            "q75": 0.1308101872,
+            "mean": 0.09672785971
+          },
+          {
+            "lo": 20.0,
+            "centre": 20.5,
+            "n": 19,
+            "median": 0.1251998922,
+            "q25": 0.06241586222,
+            "q75": 0.1363081533,
+            "mean": 0.1032064232
+          }
+        ],
+        "fluxMedian": 0.1485818842,
+        "fluxMean": 0.6489716461,
+        "fit": {
+          "nBins": 22,
+          "nBinsAll": 22,
+          "ok": true,
+          "reason": null,
+          "f10": 0.1721794828,
+          "lnF10Se": 0.1390686344,
+          "k": -0.009825029242,
+          "kSe": 0.02192028827,
+          "q10": 0.9064220048,
+          "q10Lo": 0.5737855876,
+          "q10Hi": 1.431895238,
+          "ciExcludes1": false,
+          "r2Log": 0.009944994212,
+          "tMin": -1.0,
+          "tMax": 21.0
+        }
+      }
+    }
+  },
+  "water": {
+    "ch4": {
+      "anttila": {
+        "n": 724,
+        "spearman": {
+          "rho": 0.03051203757,
+          "p": 0.412348807,
+          "n": 724
+        },
+        "driverMin": 0.10549375,
+        "driverMax": 0.4491041667,
+        "nInBins": 703,
+        "bins": [
+          {
+            "lo": 0.12,
+            "centre": 0.13,
+            "n": 10,
+            "median": 0.0002309159375,
+            "q25": -0.0002333144271,
+            "q75": 0.001000844427,
+            "mean": 0.0003831796042
+          },
+          {
+            "lo": 0.14,
+            "centre": 0.15,
+            "n": 12,
+            "median": -7.07725e-05,
+            "q25": -0.0002993744271,
+            "q75": 0.0003377177604,
+            "mean": 0.0001974455903
+          },
+          {
+            "lo": 0.16,
+            "centre": 0.17,
+            "n": 26,
+            "median": -1.60171875e-05,
+            "q25": -0.0002162807813,
+            "q75": 0.0008580779687,
+            "mean": 0.0004141599439
+          },
+          {
+            "lo": 0.18,
+            "centre": 0.19,
+            "n": 15,
+            "median": -1.520875e-05,
+            "q25": -0.0001951566667,
+            "q75": 0.0001880082292,
+            "mean": 2.273101389e-05
+          },
+          {
+            "lo": 0.2,
+            "centre": 0.21,
+            "n": 55,
+            "median": 0.0001717558333,
+            "q25": -0.0003102632292,
+            "q75": 0.000803484375,
+            "mean": 0.0006525281326
+          },
+          {
+            "lo": 0.22,
+            "centre": 0.23,
+            "n": 80,
+            "median": -8.92934375e-05,
+            "q25": -0.0002883031771,
+            "q75": 0.0005699652083,
+            "mean": 0.0002355120651
+          },
+          {
+            "lo": 0.24,
+            "centre": 0.25,
+            "n": 49,
+            "median": 3.060416667e-05,
+            "q25": -0.0001907066667,
+            "q75": 0.001119732708,
+            "mean": 0.00108481767
+          },
+          {
+            "lo": 0.26,
+            "centre": 0.27,
+            "n": 56,
+            "median": 0.0002169779167,
+            "q25": -0.0001468143229,
+            "q75": 0.001215804219,
+            "mean": 0.000737319747
+          },
+          {
+            "lo": 0.28,
+            "centre": 0.29,
+            "n": 62,
+            "median": 9.915208333e-05,
+            "q25": -0.0002091426563,
+            "q75": 0.00067179375,
+            "mean": 0.000515309338
+          },
+          {
+            "lo": 0.3,
+            "centre": 0.31,
+            "n": 53,
+            "median": 5.530958333e-05,
+            "q25": -0.00029818375,
+            "q75": 0.0009845135417,
+            "mean": 0.0006350144025
+          },
+          {
+            "lo": 0.32,
+            "centre": 0.33,
+            "n": 96,
+            "median": 9e-08,
+            "q25": -0.0002111711979,
+            "q75": 0.0006286772396,
+            "mean": 0.0003911519401
+          },
+          {
+            "lo": 0.34,
+            "centre": 0.35,
+            "n": 107,
+            "median": 7.816583333e-05,
+            "q25": -0.0001965179167,
+            "q75": 0.0005357377083,
+            "mean": 0.0003403968438
+          },
+          {
+            "lo": 0.36,
+            "centre": 0.37,
+            "n": 58,
+            "median": 0.0001080883333,
+            "q25": -6.730119792e-05,
+            "q75": 0.0004322830729,
+            "mean": 0.000227703046
+          },
+          {
+            "lo": 0.38,
+            "centre": 0.39,
+            "n": 24,
+            "median": 0.0001877735417,
+            "q25": -0.0001679454167,
+            "q75": 0.0006870235937,
+            "mean": 0.0004200274045
+          }
+        ],
+        "fluxMedian": 4.236708333e-05,
+        "fluxMean": 0.0004901183587
+      },
+      "sarkisuo": {
+        "n": 504,
+        "spearman": {
+          "rho": 0.1139265799,
+          "p": 0.01047826488,
+          "n": 504
+        },
+        "driverMin": 0.2912083333,
+        "driverMax": 0.7979979167,
+        "nInBins": 458,
+        "bins": [
+          {
+            "lo": 0.36,
+            "centre": 0.37,
+            "n": 11,
+            "median": 0.032002995,
+            "q25": 0.01194871323,
+            "q75": 0.04630650281,
+            "mean": 0.0302731297
+          },
+          {
+            "lo": 0.38,
+            "centre": 0.39,
+            "n": 37,
+            "median": 0.00675658625,
+            "q25": 0.005158444167,
+            "q75": 0.01543280542,
+            "mean": 0.0168324022
+          },
+          {
+            "lo": 0.4,
+            "centre": 0.41,
+            "n": 28,
+            "median": 0.007510424167,
+            "q25": 0.006071900937,
+            "q75": 0.009038585469,
+            "mean": 0.01410563003
+          },
+          {
+            "lo": 0.42,
+            "centre": 0.43,
+            "n": 15,
+            "median": 0.01789193229,
+            "q25": 0.004368713125,
+            "q75": 0.05281589469,
+            "mean": 0.03259453374
+          },
+          {
+            "lo": 0.44,
+            "centre": 0.45,
+            "n": 20,
+            "median": 0.03463095906,
+            "q25": 0.009905514115,
+            "q75": 0.04469295792,
+            "mean": 0.03859567861
+          },
+          {
+            "lo": 0.46,
+            "centre": 0.47,
+            "n": 11,
+            "median": 0.02640406104,
+            "q25": 0.002259245521,
+            "q75": 0.05272853813,
+            "mean": 0.03254690763
+          },
+          {
+            "lo": 0.48,
+            "centre": 0.49,
+            "n": 50,
+            "median": 0.003518936042,
+            "q25": 0.00307533276,
+            "q75": 0.004037244583,
+            "mean": 0.01425908225
+          },
+          {
+            "lo": 0.5,
+            "centre": 0.51,
+            "n": 24,
+            "median": 0.004632533229,
+            "q25": 0.003590470677,
+            "q75": 0.04479787328,
+            "mean": 0.02429879241
+          },
+          {
+            "lo": 0.52,
+            "centre": 0.53,
+            "n": 12,
+            "median": 0.02599938937,
+            "q25": 0.003461983333,
+            "q75": 0.07648684182,
+            "mean": 0.04197755554
+          },
+          {
+            "lo": 0.56,
+            "centre": 0.57,
+            "n": 37,
+            "median": 0.005302932917,
+            "q25": 0.004578618958,
+            "q75": 0.006030817917,
+            "mean": 0.009504044724
+          },
+          {
+            "lo": 0.58,
+            "centre": 0.59,
+            "n": 21,
+            "median": 0.007737573333,
+            "q25": 0.004081014167,
+            "q75": 0.02560289958,
+            "mean": 0.02303779844
+          },
+          {
+            "lo": 0.6,
+            "centre": 0.61,
+            "n": 18,
+            "median": 0.01784809406,
+            "q25": 0.003222473854,
+            "q75": 0.06104581005,
+            "mean": 0.03602149547
+          },
+          {
+            "lo": 0.64,
+            "centre": 0.65,
+            "n": 13,
+            "median": 0.008216855833,
+            "q25": 0.003954527083,
+            "q75": 0.02129048604,
+            "mean": 0.01606391974
+          },
+          {
+            "lo": 0.66,
+            "centre": 0.67,
+            "n": 20,
+            "median": 0.03489925146,
+            "q25": 0.003196303646,
+            "q75": 0.05982830859,
+            "mean": 0.03544210552
+          },
+          {
+            "lo": 0.68,
+            "centre": 0.69,
+            "n": 25,
+            "median": 0.02150374687,
+            "q25": 0.004163986042,
+            "q75": 0.03122069479,
+            "mean": 0.02055994962
+          },
+          {
+            "lo": 0.7,
+            "centre": 0.71,
+            "n": 51,
+            "median": 0.009058573125,
+            "q25": 0.005325089896,
+            "q75": 0.01653800333,
+            "mean": 0.01262804769
+          },
+          {
+            "lo": 0.74,
+            "centre": 0.75,
+            "n": 12,
+            "median": 0.05725587573,
+            "q25": 0.05021668198,
+            "q75": 0.07571469099,
+            "mean": 0.06172674205
+          },
+          {
+            "lo": 0.76,
+            "centre": 0.77,
+            "n": 17,
+            "median": 0.07953015021,
+            "q25": 0.04474487229,
+            "q75": 0.08999637792,
+            "mean": 0.07168708589
+          },
+          {
+            "lo": 0.78,
+            "centre": 0.79,
+            "n": 36,
+            "median": 0.02379995906,
+            "q25": 0.01067947,
+            "q75": 0.07179854349,
+            "mean": 0.03750843907
+          }
+        ],
+        "fluxMedian": 0.01084465312,
+        "fluxMean": 0.02628077517
+      }
+    },
+    "n2o": {
+      "anttila": {
+        "n": 724,
+        "spearman": {
+          "rho": -0.284243527,
+          "p": 6.371303662e-15,
+          "n": 724
+        },
+        "driverMin": 0.10549375,
+        "driverMax": 0.4491041667,
+        "nInBins": 703,
+        "bins": [
+          {
+            "lo": 0.12,
+            "centre": 0.13,
+            "n": 10,
+            "median": 0.09596114583,
+            "q25": 0.08351088542,
+            "q75": 0.1126674479,
+            "mean": 0.08610897917
+          },
+          {
+            "lo": 0.14,
+            "centre": 0.15,
+            "n": 12,
+            "median": 0.09759666667,
+            "q25": 0.05432776042,
+            "q75": 0.1278020313,
+            "mean": 0.09969347222
+          },
+          {
+            "lo": 0.16,
+            "centre": 0.17,
+            "n": 26,
+            "median": 0.1178190625,
+            "q25": 0.06079796875,
+            "q75": 0.3227010417,
+            "mean": 0.1647450881
+          },
+          {
+            "lo": 0.18,
+            "centre": 0.19,
+            "n": 15,
+            "median": 0.1236495833,
+            "q25": 0.06777,
+            "q75": 0.2368075,
+            "mean": 0.1742543472
+          },
+          {
+            "lo": 0.2,
+            "centre": 0.21,
+            "n": 55,
+            "median": 0.135634375,
+            "q25": 0.08055125,
+            "q75": 0.2122601042,
+            "mean": 0.1578808561
+          },
+          {
+            "lo": 0.22,
+            "centre": 0.23,
+            "n": 80,
+            "median": 0.1538976042,
+            "q25": 0.07200697917,
+            "q75": 0.2454545312,
+            "mean": 0.2244928411
+          },
+          {
+            "lo": 0.24,
+            "centre": 0.25,
+            "n": 49,
+            "median": 0.1851216667,
+            "q25": 0.1107375,
+            "q75": 0.2870185417,
+            "mean": 0.3107061947
+          },
+          {
+            "lo": 0.26,
+            "centre": 0.27,
+            "n": 56,
+            "median": 0.1550391667,
+            "q25": 0.08037421875,
+            "q75": 0.2505308333,
+            "mean": 0.4475049479
+          },
+          {
+            "lo": 0.28,
+            "centre": 0.29,
+            "n": 62,
+            "median": 0.1661153125,
+            "q25": 0.0955371875,
+            "q75": 0.2531504167,
+            "mean": 0.3315877184
+          },
+          {
+            "lo": 0.3,
+            "centre": 0.31,
+            "n": 53,
+            "median": 0.1028002083,
+            "q25": 0.04935,
+            "q75": 0.3862672917,
+            "mean": 0.2504088994
+          },
+          {
+            "lo": 0.32,
+            "centre": 0.33,
+            "n": 96,
+            "median": 0.06541583333,
+            "q25": 0.0355459375,
+            "q75": 0.1325921875,
+            "mean": 0.1507175825
+          },
+          {
+            "lo": 0.34,
+            "centre": 0.35,
+            "n": 107,
+            "median": 0.06819479167,
+            "q25": 0.03028177083,
+            "q75": 0.1208044792,
+            "mean": 0.1139528057
+          },
+          {
+            "lo": 0.36,
+            "centre": 0.37,
+            "n": 58,
+            "median": 0.072315,
+            "q25": 0.05200677083,
+            "q75": 0.1056663021,
+            "mean": 0.09276698635
+          },
+          {
+            "lo": 0.38,
+            "centre": 0.39,
+            "n": 24,
+            "median": 0.0612009375,
+            "q25": 0.04032572917,
+            "q75": 0.1000745833,
+            "mean": 0.07845460937
+          }
+        ],
+        "fluxMedian": 0.09988822917,
+        "fluxMean": 0.2008363858
+      },
+      "sarkisuo": {
+        "n": 504,
+        "spearman": {
+          "rho": -0.2995743666,
+          "p": 6.553635624e-12,
+          "n": 504
+        },
+        "driverMin": 0.2912083333,
+        "driverMax": 0.7979979167,
+        "nInBins": 458,
+        "bins": [
+          {
+            "lo": 0.36,
+            "centre": 0.37,
+            "n": 11,
+            "median": 1.656469792,
+            "q25": 0.06912541667,
+            "q75": 5.166587708,
+            "mean": 2.730427652
+          },
+          {
+            "lo": 0.38,
+            "centre": 0.39,
+            "n": 37,
+            "median": 0.094505,
+            "q25": 0.07163541667,
+            "q75": 1.555922917,
+            "mean": 1.977291841
+          },
+          {
+            "lo": 0.4,
+            "centre": 0.41,
+            "n": 28,
+            "median": 0.1069880208,
+            "q25": 0.08391375,
+            "q75": 1.055056198,
+            "mean": 3.334834792
+          },
+          {
+            "lo": 0.42,
+            "centre": 0.43,
+            "n": 15,
+            "median": 0.08067458333,
+            "q25": 0.06876645833,
+            "q75": 0.15535125,
+            "mean": 0.2671166944
+          },
+          {
+            "lo": 0.44,
+            "centre": 0.45,
+            "n": 20,
+            "median": 0.0930765625,
+            "q25": 0.07288645833,
+            "q75": 0.1790591667,
+            "mean": 0.2242416354
+          },
+          {
+            "lo": 0.46,
+            "centre": 0.47,
+            "n": 11,
+            "median": 0.2635941667,
+            "q25": 0.0979909375,
+            "q75": 0.4025928125,
+            "mean": 0.4511491477
+          },
+          {
+            "lo": 0.48,
+            "centre": 0.49,
+            "n": 50,
+            "median": 0.04286604167,
+            "q25": 0.02964796875,
+            "q75": 0.08268677083,
+            "mean": 0.1461724583
+          },
+          {
+            "lo": 0.5,
+            "centre": 0.51,
+            "n": 24,
+            "median": 0.098018125,
+            "q25": 0.0556990625,
+            "q75": 0.2298825,
+            "mean": 0.2755035677
+          },
+          {
+            "lo": 0.52,
+            "centre": 0.53,
+            "n": 12,
+            "median": 0.2360847917,
+            "q25": 0.109964375,
+            "q75": 0.5985286979,
+            "mean": 1.620323976
+          },
+          {
+            "lo": 0.56,
+            "centre": 0.57,
+            "n": 37,
+            "median": 0.071806875,
+            "q25": 0.05458541667,
+            "q75": 0.09735458333,
+            "mean": 0.1721881982
+          },
+          {
+            "lo": 0.58,
+            "centre": 0.59,
+            "n": 21,
+            "median": 0.1102420833,
+            "q25": 0.08246395833,
+            "q75": 0.36164125,
+            "mean": 0.3924687599
+          },
+          {
+            "lo": 0.6,
+            "centre": 0.61,
+            "n": 18,
+            "median": 0.07497229167,
+            "q25": 0.05659526042,
+            "q75": 0.2824930208,
+            "mean": 0.3774073148
+          },
+          {
+            "lo": 0.64,
+            "centre": 0.65,
+            "n": 13,
+            "median": 0.07429354167,
+            "q25": 0.041144375,
+            "q75": 0.1131827083,
+            "mean": 0.5426204327
+          },
+          {
+            "lo": 0.66,
+            "centre": 0.67,
+            "n": 20,
+            "median": 0.1016484375,
+            "q25": 0.05869619792,
+            "q75": 0.7168023958,
+            "mean": 1.053240292
+          },
+          {
+            "lo": 0.68,
+            "centre": 0.69,
+            "n": 25,
+            "median": 0.1011539583,
+            "q25": 0.08384041667,
+            "q75": 0.1456897917,
+            "mean": 0.5061733167
+          },
+          {
+            "lo": 0.7,
+            "centre": 0.71,
+            "n": 51,
+            "median": 0.07709104167,
+            "q25": 0.05246114583,
+            "q75": 0.095091875,
+            "mean": 0.08133471405
+          },
+          {
+            "lo": 0.74,
+            "centre": 0.75,
+            "n": 12,
+            "median": 0.05783239583,
+            "q25": 0.03340859375,
+            "q75": 0.08839052083,
+            "mean": 0.06434993056
+          },
+          {
+            "lo": 0.76,
+            "centre": 0.77,
+            "n": 17,
+            "median": 0.1027258333,
+            "q25": 0.07927416667,
+            "q75": 0.1275729167,
+            "mean": 0.09066997549
+          },
+          {
+            "lo": 0.78,
+            "centre": 0.79,
+            "n": 36,
+            "median": 0.05656333333,
+            "q25": 0.04649739583,
+            "q75": 0.1022400521,
+            "mean": 0.07258274306
+          }
+        ],
+        "fluxMedian": 0.08704322917,
+        "fluxMean": 0.7856597466
+      },
+      "viikki": {
+        "n": 1294,
+        "spearman": {
+          "rho": 0.2971369252,
+          "p": 8.653673668e-28,
+          "n": 1294
+        },
+        "driverMin": 0.103118425,
+        "driverMax": 0.5314718156,
+        "nInBins": 1285,
+        "bins": [
+          {
+            "lo": 0.1,
+            "centre": 0.11,
+            "n": 46,
+            "median": 0.03913017106,
+            "q25": -0.01170653308,
+            "q75": 0.104798054,
+            "mean": 0.07691515445
+          },
+          {
+            "lo": 0.12,
+            "centre": 0.13,
+            "n": 177,
+            "median": 0.04636484675,
+            "q25": 0.009265836704,
+            "q75": 0.1255344297,
+            "mean": 0.07813473826
+          },
+          {
+            "lo": 0.14,
+            "centre": 0.15,
+            "n": 86,
+            "median": 0.08877988558,
+            "q25": 0.016098649,
+            "q75": 0.1617304745,
+            "mean": 0.1231883721
+          },
+          {
+            "lo": 0.16,
+            "centre": 0.17,
+            "n": 94,
+            "median": 0.1193933438,
+            "q25": 0.03824016578,
+            "q75": 0.3179209081,
+            "mean": 0.2462992606
+          },
+          {
+            "lo": 0.18,
+            "centre": 0.19,
+            "n": 44,
+            "median": 0.1217824374,
+            "q25": 0.06711305644,
+            "q75": 0.2585194889,
+            "mean": 0.1597145773
+          },
+          {
+            "lo": 0.2,
+            "centre": 0.21,
+            "n": 27,
+            "median": 0.2752236617,
+            "q25": 0.1836705083,
+            "q75": 0.4169908486,
+            "mean": 0.567120686
+          },
+          {
+            "lo": 0.22,
+            "centre": 0.23,
+            "n": 22,
+            "median": 0.2637459051,
+            "q25": 0.05482612524,
+            "q75": 1.088096884,
+            "mean": 0.8149479795
+          },
+          {
+            "lo": 0.24,
+            "centre": 0.25,
+            "n": 32,
+            "median": 0.2009331878,
+            "q25": 0.05651257015,
+            "q75": 0.8171049463,
+            "mean": 0.6649973833
+          },
+          {
+            "lo": 0.26,
+            "centre": 0.27,
+            "n": 49,
+            "median": 0.1043528735,
+            "q25": 0.06523416898,
+            "q75": 0.3000069184,
+            "mean": 0.4896192199
+          },
+          {
+            "lo": 0.28,
+            "centre": 0.29,
+            "n": 87,
+            "median": 0.2743881126,
+            "q25": 0.03609558611,
+            "q75": 1.040866275,
+            "mean": 0.6975558117
+          },
+          {
+            "lo": 0.3,
+            "centre": 0.31,
+            "n": 73,
+            "median": 0.5232176862,
+            "q25": 0.1739887349,
+            "q75": 1.812830706,
+            "mean": 1.301771568
+          },
+          {
+            "lo": 0.32,
+            "centre": 0.33,
+            "n": 107,
+            "median": 0.4400346574,
+            "q25": 0.176298533,
+            "q75": 2.21579952,
+            "mean": 1.949866093
+          },
+          {
+            "lo": 0.34,
+            "centre": 0.35,
+            "n": 56,
+            "median": 0.3351261862,
+            "q25": 0.1435885553,
+            "q75": 0.6876422335,
+            "mean": 1.619041073
+          },
+          {
+            "lo": 0.36,
+            "centre": 0.37,
+            "n": 42,
+            "median": 0.3233431429,
+            "q25": 0.180832335,
+            "q75": 2.126764947,
+            "mean": 2.554886743
+          },
+          {
+            "lo": 0.38,
+            "centre": 0.39,
+            "n": 30,
+            "median": 0.364816314,
+            "q25": 0.2148308756,
+            "q75": 0.5290126492,
+            "mean": 2.086920946
+          },
+          {
+            "lo": 0.4,
+            "centre": 0.41,
+            "n": 30,
+            "median": 0.1654143828,
+            "q25": 0.07620940191,
+            "q75": 0.2488748562,
+            "mean": 0.2976431245
+          },
+          {
+            "lo": 0.42,
+            "centre": 0.43,
+            "n": 17,
+            "median": 0.158403093,
+            "q25": 0.1136654241,
+            "q75": 0.3154080338,
+            "mean": 0.4594306269
+          },
+          {
+            "lo": 0.44,
+            "centre": 0.45,
+            "n": 21,
+            "median": 0.2367398903,
+            "q25": 0.1239934423,
+            "q75": 0.4265929593,
+            "mean": 0.7858226029
+          },
+          {
+            "lo": 0.46,
+            "centre": 0.47,
+            "n": 80,
+            "median": 0.1092358811,
+            "q25": 0.05581619588,
+            "q75": 0.180061077,
+            "mean": 0.2179737509
+          },
+          {
+            "lo": 0.48,
+            "centre": 0.49,
+            "n": 107,
+            "median": 0.1629363876,
+            "q25": 0.1173059839,
+            "q75": 0.3154772181,
+            "mean": 0.3045277932
+          },
+          {
+            "lo": 0.5,
+            "centre": 0.51,
+            "n": 58,
+            "median": 0.1312981482,
+            "q25": 0.0601973754,
+            "q75": 0.1825131235,
+            "mean": 0.131616787
+          }
+        ],
+        "fluxMedian": 0.14896526,
+        "fluxMean": 0.660343694
+      }
+    }
+  },
+  "ols": {
+    "ch4": {
+      "anttila": {
+        "n": 724,
+        "r2": 0.02646262799,
+        "coef": {
+          "const": {
+            "est": 0.000512959896,
+            "se": 8.569627578e-05,
+            "lo": 0.0003449982819,
+            "hi": 0.0006809215101,
+            "p": 2.153422887e-09
+          },
+          "tsoil": {
+            "est": -7.040523391e-05,
+            "se": 6.954465378e-05,
+            "lo": -0.0002067102506,
+            "hi": 6.589978281e-05,
+            "p": 0.3113590273
+          },
+          "swc": {
+            "est": -9.066657417e-05,
+            "se": 7.7263839e-05,
+            "lo": -0.0002421009159,
+            "hi": 6.076776758e-05,
+            "p": 0.2406085372
+          },
+          "tsoilXswc": {
+            "est": 0.0001644109553,
+            "se": 6.532365582e-05,
+            "lo": 3.637894258e-05,
+            "hi": 0.0002924429681,
+            "p": 0.01184035068
+          }
+        },
+        "drivers": {
+          "tsoil": {
+            "mean": 6.699960697,
+            "sd": 7.020534361
+          },
+          "swc": {
+            "mean": 0.2882254391,
+            "sd": 0.06858676793
+          }
+        }
+      },
+      "sarkisuo": {
+        "n": 504,
+        "r2": 0.7199849029,
+        "coef": {
+          "const": {
+            "est": 0.02723021084,
+            "se": 0.001641576868,
+            "lo": 0.0240127793,
+            "hi": 0.03044764238,
+            "p": 8.53376937e-62
+          },
+          "tsoil": {
+            "est": 0.02563018552,
+            "se": 0.001885351765,
+            "lo": 0.02193496396,
+            "hi": 0.02932540708,
+            "p": 4.324181679e-42
+          },
+          "swc": {
+            "est": 0.004934374687,
+            "se": 0.00128558856,
+            "lo": 0.002414667411,
+            "hi": 0.007454081963,
+            "p": 0.0001239282609
+          },
+          "tsoilXswc": {
+            "est": 0.006680691347,
+            "se": 0.001387894094,
+            "lo": 0.003960468908,
+            "hi": 0.009400913787,
+            "p": 1.482758352e-06
+          }
+        },
+        "drivers": {
+          "tsoil": {
+            "mean": 6.553224255,
+            "sd": 6.274507315
+          },
+          "swc": {
+            "mean": 0.5657471851,
+            "sd": 0.1375423804
+          }
+        }
+      }
+    },
+    "n2o": {
+      "anttila": {
+        "n": 724,
+        "r2": 0.04405229718,
+        "coef": {
+          "const": {
+            "est": 0.2049402192,
+            "se": 0.04326376112,
+            "lo": 0.1201448056,
+            "hi": 0.2897356329,
+            "p": 2.169105364e-06
+          },
+          "tsoil": {
+            "est": 0.1445809723,
+            "se": 0.07728144357,
+            "lo": -0.006887873798,
+            "hi": 0.2960498183,
+            "p": 0.06136769854
+          },
+          "swc": {
+            "est": -0.01014865735,
+            "se": 0.0209207154,
+            "lo": -0.05115250606,
+            "hi": 0.03085519137,
+            "p": 0.6276047914
+          },
+          "tsoilXswc": {
+            "est": 0.02953895634,
+            "se": 0.02570459374,
+            "lo": -0.02084112163,
+            "hi": 0.0799190343,
+            "p": 0.2504857547
+          }
+        },
+        "drivers": {
+          "tsoil": {
+            "mean": 6.699960697,
+            "sd": 7.020534361
+          },
+          "swc": {
+            "mean": 0.2882254391,
+            "sd": 0.06858676793
+          }
+        }
+      },
+      "sarkisuo": {
+        "n": 504,
+        "r2": 0.1934904559,
+        "coef": {
+          "const": {
+            "est": 0.73609665,
+            "se": 0.2222493996,
+            "lo": 0.3004958311,
+            "hi": 1.171697469,
+            "p": 0.0009262165636
+          },
+          "tsoil": {
+            "est": 0.7128834396,
+            "se": 0.2022486098,
+            "lo": 0.3164834484,
+            "hi": 1.109283431,
+            "p": 0.0004238220934
+          },
+          "swc": {
+            "est": -0.4765403536,
+            "se": 0.2086368369,
+            "lo": -0.8854610398,
+            "hi": -0.06761966742,
+            "p": 0.02236763886
+          },
+          "tsoilXswc": {
+            "est": -0.3487500641,
+            "se": 0.1520274299,
+            "lo": -0.6467183514,
+            "hi": -0.05078177681,
+            "p": 0.02179082372
+          }
+        },
+        "drivers": {
+          "tsoil": {
+            "mean": 6.553224255,
+            "sd": 6.274507315
+          },
+          "swc": {
+            "mean": 0.5657471851,
+            "sd": 0.1375423804
+          }
+        }
+      },
+      "viikki": {
+        "n": 1294,
+        "r2": 0.07761822791,
+        "coef": {
+          "const": {
+            "est": 0.8918896317,
+            "se": 0.2175568072,
+            "lo": 0.465486125,
+            "hi": 1.318293138,
+            "p": 4.139162329e-05
+          },
+          "tsoil": {
+            "est": 0.618797131,
+            "se": 0.2493760613,
+            "lo": 0.1300290323,
+            "hi": 1.10756523,
+            "p": 0.01308742383
+          },
+          "swc": {
+            "est": 0.5119745184,
+            "se": 0.1898290425,
+            "lo": 0.1399164319,
+            "hi": 0.8840326049,
+            "p": 0.006996108241
+          },
+          "tsoilXswc": {
+            "est": 0.613518744,
+            "se": 0.2280939386,
+            "lo": 0.1664628392,
+            "hi": 1.060574649,
+            "p": 0.007150267893
+          }
+        },
+        "drivers": {
+          "tsoil": {
+            "mean": 8.400706262,
+            "sd": 7.037934859
+          },
+          "swc": {
+            "mean": 0.2947012105,
+            "sd": 0.130934206
+          }
+        }
+      }
+    }
+  },
+  "annual": {
+    "anttila": {
+      "2022": {
+        "ch4": {
+          "kgHa": 2.338502464,
+          "gM2": 0.2338502464,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false
+        },
+        "n2o": {
+          "kgHa": 3.849222067,
+          "gM2": 0.3849222067,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false
+        }
+      },
+      "2023": {
+        "ch4": {
+          "kgHa": 2.734067585,
+          "gM2": 0.2734067585,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false
+        },
+        "n2o": {
+          "kgHa": 1.704502107,
+          "gM2": 0.1704502107,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false
+        }
+      }
+    },
+    "sarkisuo": {
+      "2022": {
+        "ch4": {
+          "kgHa": 103.4644566,
+          "gM2": 10.34644566,
+          "values": 11520,
+          "halfHours": 17520,
+          "coverage": 0.6575342466,
+          "partial": true
+        },
+        "n2o": {
+          "kgHa": 16.01185461,
+          "gM2": 1.601185461,
+          "values": 11520,
+          "halfHours": 17520,
+          "coverage": 0.6575342466,
+          "partial": true
+        }
+      },
+      "2023": {
+        "ch4": {
+          "kgHa": 128.1815394,
+          "gM2": 12.81815394,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false
+        },
+        "n2o": {
+          "kgHa": 11.32072715,
+          "gM2": 1.132072715,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false
+        }
+      }
+    },
+    "viikki": {
+      "2022": {
+        "n2o": {
+          "kgHa": 16.76979339,
+          "gM2": 1.676979339,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false,
+          "kgHaIfN2oN": 26.34808541
+        }
+      },
+      "2023": {
+        "n2o": {
+          "kgHa": 5.559976394,
+          "gM2": 0.5559976394,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false,
+          "kgHaIfN2oN": 8.735631351
+        }
+      },
+      "2024": {
+        "n2o": {
+          "kgHa": 4.575906578,
+          "gM2": 0.4575906578,
+          "values": 17568,
+          "halfHours": 17568,
+          "coverage": 1.0,
+          "partial": false,
+          "kgHaIfN2oN": 7.189496884
+        }
+      },
+      "2025": {
+        "n2o": {
+          "kgHa": 6.432723196,
+          "gM2": 0.6432723196,
+          "values": 17520,
+          "halfHours": 17520,
+          "coverage": 1.0,
+          "partial": false,
+          "kgHaIfN2oN": 10.10685917
+        }
+      }
+    }
+  },
+  "literatureCompare": {
+    "anttila_ch4": {
+      "site": "anttila",
+      "gas": "ch4",
+      "year": 2022,
+      "ours": 2.338502464,
+      "coverage": 1.0,
+      "partial": false,
+      "literature": 2,
+      "literatureLo": 2,
+      "literatureHi": 3,
+      "unit": "kg CH4 ha-1 yr-1",
+      "ratio": 1.169251232,
+      "litKey": "anttilaCh4_2022"
+    },
+    "sarkisuo_ch4": {
+      "site": "sarkisuo",
+      "gas": "ch4",
+      "year": 2022,
+      "ours": 103.4644566,
+      "coverage": 0.6575342466,
+      "partial": true,
+      "literature": 110,
+      "literatureLo": 110,
+      "literatureHi": 120,
+      "unit": "kg CH4 ha-1 yr-1",
+      "ratio": 0.940585969,
+      "litKey": "sarkisuoCh4_2022"
+    },
+    "anttila_n2o": {
+      "site": "anttila",
+      "gas": "n2o",
+      "year": 2022,
+      "ours": 3.849222067,
+      "coverage": 1.0,
+      "partial": false,
+      "literature": 3.8,
+      "literatureLo": 3.7,
+      "literatureHi": 4.0,
+      "unit": "kg N2O ha-1 yr-1",
+      "ratio": 1.012953176,
+      "litKey": "anttilaN2o_2022"
+    },
+    "sarkisuo_n2o": {
+      "site": "sarkisuo",
+      "gas": "n2o",
+      "year": 2022,
+      "ours": 16.01185461,
+      "coverage": 0.6575342466,
+      "partial": true,
+      "literature": 16,
+      "literatureLo": 16,
+      "literatureHi": 17,
+      "unit": "kg N2O ha-1 yr-1",
+      "ratio": 1.000740913,
+      "litKey": "sarkisuoN2o_2022"
+    }
+  },
+  "soilTypeCompare": {
+    "peat": "sarkisuo",
+    "mineral": "anttila",
+    "blockDays": 7,
+    "reps": 5000,
+    "seed": 20261029,
+    "ch4": {
+      "nDays": 605,
+      "first": "2022-05-06",
+      "last": "2023-12-31",
+      "diff": {
+        "mean": 0.02702000304,
+        "lo": 0.0212380874,
+        "hi": 0.03327711074,
+        "nBlocks": 87,
+        "nDays": 605,
+        "lastBlockDays": 3
+      },
+      "diffMgPerDay": {
+        "mean": 37.45283692,
+        "lo": 29.43843576,
+        "hi": 46.12590901
+      },
+      "daysPeatHigher": 592,
+      "peatStats": {
+        "mean": 0.02762295253,
+        "sd": 0.02943629568,
+        "median": 0.01555372063,
+        "q25": 0.004823937708,
+        "q75": 0.04159090021,
+        "meanMgPerDay": 38.28859437,
+        "medianMgPerDay": 21.55924857
+      },
+      "mineralStats": {
+        "mean": 0.0006029494886,
+        "sd": 0.001446652837,
+        "median": 0.0001331977083,
+        "q25": -0.000197450625,
+        "q75": 0.0008828075,
+        "meanMgPerDay": 0.835757451,
+        "medianMgPerDay": 0.1846273681
+      },
+      "ratioOfMeans": 45.81304579
+    },
+    "n2o": {
+      "nDays": 605,
+      "first": "2022-05-06",
+      "last": "2023-12-31",
+      "diff": {
+        "mean": 0.9946870303,
+        "lo": 0.4673822617,
+        "hi": 1.633072402,
+        "nBlocks": 87,
+        "nDays": 605,
+        "lastBlockDays": 3
+      },
+      "diffMgPerDay": {
+        "mean": 3.782519447,
+        "lo": 1.77732537,
+        "hi": 6.210122312
+      },
+      "daysPeatHigher": 415,
+      "peatStats": {
+        "mean": 1.188038643,
+        "sd": 3.567730735,
+        "median": 0.09923333333,
+        "q25": 0.06243,
+        "q75": 0.4707477083,
+        "meanMgPerDay": 4.51778211,
+        "medianMgPerDay": 0.3773568989
+      },
+      "mineralStats": {
+        "mean": 0.1933516126,
+        "sd": 0.7364670914,
+        "median": 0.08204083333,
+        "q25": 0.04495541667,
+        "q75": 0.1567845833,
+        "meanMgPerDay": 0.735262663,
+        "medianMgPerDay": 0.3119785803
+      },
+      "ratioOfMeans": 6.144446518
+    }
+  },
+  "sensitivity": {
+    "fertDays": 30,
+    "daysRemoved": {
+      "anttila": 120,
+      "sarkisuo": 120,
+      "viikki": 192
+    },
+    "temperature": {
+      "n2o": {
+        "anttila": {
+          "n": 604,
+          "spearman": {
+            "rho": -0.01320578248,
+            "p": 0.7460193788,
+            "n": 604
+          },
+          "driverMin": -0.1632645833,
+          "driverMax": 20.13125417,
+          "nInBins": 579,
+          "bins": [
+            {
+              "lo": 0.0,
+              "centre": 0.5,
+              "n": 342,
+              "median": 0.08731333333,
+              "q25": 0.044235,
+              "q75": 0.1789490104,
+              "mean": 0.123501543
+            },
+            {
+              "lo": 2.0,
+              "centre": 2.5,
+              "n": 11,
+              "median": 0.1107485417,
+              "q25": 0.060235,
+              "q75": 0.1771985417,
+              "mean": 0.1576157386
+            },
+            {
+              "lo": 3.0,
+              "centre": 3.5,
+              "n": 16,
+              "median": 0.07264572917,
+              "q25": 0.04716885417,
+              "q75": 0.1143624479,
+              "mean": 0.08255527344
+            },
+            {
+              "lo": 4.0,
+              "centre": 4.5,
+              "n": 11,
+              "median": 0.05935625,
+              "q25": 0.03217229167,
+              "q75": 0.08459552083,
+              "mean": 0.07579623106
+            },
+            {
+              "lo": 5.0,
+              "centre": 5.5,
+              "n": 15,
+              "median": 0.03611416667,
+              "q25": 0.02340291667,
+              "q75": 0.0573990625,
+              "mean": 0.06870266667
+            },
+            {
+              "lo": 6.0,
+              "centre": 6.5,
+              "n": 10,
+              "median": 0.05382072917,
+              "q25": 0.041649375,
+              "q75": 0.08739671875,
+              "mean": 0.1040153125
+            },
+            {
+              "lo": 7.0,
+              "centre": 7.5,
+              "n": 16,
+              "median": 0.04109697917,
+              "q25": 0.03259015625,
+              "q75": 0.09317166667,
+              "mean": 0.08868794271
+            },
+            {
+              "lo": 8.0,
+              "centre": 8.5,
+              "n": 18,
+              "median": 0.0625809375,
+              "q25": 0.03772010417,
+              "q75": 0.1864365104,
+              "mean": 0.1236641898
+            },
+            {
+              "lo": 9.0,
+              "centre": 9.5,
+              "n": 12,
+              "median": 0.07277770833,
+              "q25": 0.03668578125,
+              "q75": 0.2386105729,
+              "mean": 0.1247428646
+            },
+            {
+              "lo": 10.0,
+              "centre": 10.5,
+              "n": 13,
+              "median": 0.118690625,
+              "q25": 0.08058208333,
+              "q75": 0.190380625,
+              "mean": 0.1318797276
+            },
+            {
+              "lo": 11.0,
+              "centre": 11.5,
+              "n": 15,
+              "median": 0.07108583333,
+              "q25": 0.051738125,
+              "q75": 0.08369885417,
+              "mean": 0.09605669444
+            },
+            {
+              "lo": 12.0,
+              "centre": 12.5,
+              "n": 14,
+              "median": 0.064859375,
+              "q25": 0.044303125,
+              "q75": 0.08717770833,
+              "mean": 0.06994370536
+            },
+            {
+              "lo": 14.0,
+              "centre": 14.5,
+              "n": 20,
+              "median": 0.1181694792,
+              "q25": 0.07434697917,
+              "q75": 0.1523290625,
+              "mean": 0.1154834479
+            },
+            {
+              "lo": 15.0,
+              "centre": 15.5,
+              "n": 19,
+              "median": 0.165443125,
+              "q25": 0.1044377083,
+              "q75": 0.1986044792,
+              "mean": 0.1693577522
+            },
+            {
+              "lo": 16.0,
+              "centre": 16.5,
+              "n": 12,
+              "median": 0.1678648958,
+              "q25": 0.1001148958,
+              "q75": 0.2178201042,
+              "mean": 0.1751263368
+            },
+            {
+              "lo": 17.0,
+              "centre": 17.5,
+              "n": 24,
+              "median": 0.218375625,
+              "q25": 0.08834291667,
+              "q75": 0.3376756771,
+              "mean": 0.2300059201
+            },
+            {
+              "lo": 18.0,
+              "centre": 18.5,
+              "n": 11,
+              "median": 0.3572916667,
+              "q25": 0.1119697917,
+              "q75": 0.4560425,
+              "mean": 0.3176712121
+            }
+          ],
+          "fluxMedian": 0.08657260417,
+          "fluxMean": 0.12808755,
+          "fit": {
+            "nBins": 17,
+            "nBinsAll": 17,
+            "ok": true,
+            "reason": null,
+            "f10": 0.0931381049,
+            "lnF10Se": 0.1106830733,
+            "k": 0.07556566962,
+            "kSe": 0.02061089577,
+            "q10": 2.129009177,
+            "q10Lo": 1.372104719,
+            "q10Hi": 3.30345054,
+            "ciExcludes1": true,
+            "r2Log": 0.4726060152,
+            "tMin": 0.0,
+            "tMax": 19.0
+          }
+        },
+        "sarkisuo": {
+          "n": 447,
+          "spearman": {
+            "rho": 0.5212426437,
+            "p": 1.670181275e-32,
+            "n": 447
+          },
+          "driverMin": 0.1995145833,
+          "driverMax": 19.10478958,
+          "nInBins": 418,
+          "bins": [
+            {
+              "lo": 0.0,
+              "centre": 0.5,
+              "n": 153,
+              "median": 0.06285125,
+              "q25": 0.04273020833,
+              "q75": 0.08602770833,
+              "mean": 0.0655773652
+            },
+            {
+              "lo": 1.0,
+              "centre": 1.5,
+              "n": 56,
+              "median": 0.05823364583,
+              "q25": 0.04107807292,
+              "q75": 0.07666364583,
+              "mean": 0.06270072173
+            },
+            {
+              "lo": 2.0,
+              "centre": 2.5,
+              "n": 18,
+              "median": 0.0749565625,
+              "q25": 0.054754375,
+              "q75": 0.08829041667,
+              "mean": 0.07790017361
+            },
+            {
+              "lo": 3.0,
+              "centre": 3.5,
+              "n": 18,
+              "median": 0.07841864583,
+              "q25": 0.06596244792,
+              "q75": 0.0913921875,
+              "mean": 0.08083027778
+            },
+            {
+              "lo": 4.0,
+              "centre": 4.5,
+              "n": 20,
+              "median": 0.07870010417,
+              "q25": 0.05885833333,
+              "q75": 0.09002770833,
+              "mean": 0.08632260417
+            },
+            {
+              "lo": 6.0,
+              "centre": 6.5,
+              "n": 10,
+              "median": 0.3788154167,
+              "q25": 0.1292640104,
+              "q75": 0.4975298958,
+              "mean": 0.3336879375
+            },
+            {
+              "lo": 7.0,
+              "centre": 7.5,
+              "n": 20,
+              "median": 0.160440625,
+              "q25": 0.05882942708,
+              "q75": 0.5494052604,
+              "mean": 0.3124674063
+            },
+            {
+              "lo": 8.0,
+              "centre": 8.5,
+              "n": 21,
+              "median": 0.08226833333,
+              "q25": 0.06628979167,
+              "q75": 0.09976208333,
+              "mean": 0.1378482837
+            },
+            {
+              "lo": 10.0,
+              "centre": 10.5,
+              "n": 11,
+              "median": 0.07163541667,
+              "q25": 0.06526479167,
+              "q75": 0.150525,
+              "mean": 0.2827548295
+            },
+            {
+              "lo": 11.0,
+              "centre": 11.5,
+              "n": 17,
+              "median": 0.06633979167,
+              "q25": 0.062515625,
+              "q75": 0.1223610417,
+              "mean": 0.1884520466
+            },
+            {
+              "lo": 12.0,
+              "centre": 12.5,
+              "n": 16,
+              "median": 0.09706583333,
+              "q25": 0.07133958333,
+              "q75": 0.1075671354,
+              "mean": 0.08986147135
+            },
+            {
+              "lo": 13.0,
+              "centre": 13.5,
+              "n": 11,
+              "median": 0.1124579167,
+              "q25": 0.1032097917,
+              "q75": 0.144554375,
+              "mean": 0.1281305303
+            },
+            {
+              "lo": 14.0,
+              "centre": 14.5,
+              "n": 17,
+              "median": 0.1865539583,
+              "q25": 0.1480897917,
+              "q75": 0.2884716667,
+              "mean": 0.2251002206
+            },
+            {
+              "lo": 15.0,
+              "centre": 15.5,
+              "n": 14,
+              "median": 0.2687775,
+              "q25": 0.1722539063,
+              "q75": 0.4643743229,
+              "mean": 0.3182236161
+            },
+            {
+              "lo": 16.0,
+              "centre": 16.5,
+              "n": 16,
+              "median": 0.3924052083,
+              "q25": 0.1928608854,
+              "q75": 0.5218602604,
+              "mean": 0.8394185807
+            }
+          ],
+          "fluxMedian": 0.07898708333,
+          "fluxMean": 0.2090401589,
+          "fit": {
+            "nBins": 15,
+            "nBinsAll": 15,
+            "ok": true,
+            "reason": null,
+            "f10": 0.1271869753,
+            "lnF10Se": 0.1476382579,
+            "k": 0.07077160761,
+            "kSe": 0.02771195846,
+            "q10": 2.029351078,
+            "q10Lo": 1.115202063,
+            "q10Hi": 3.6928427,
+            "ciExcludes1": true,
+            "r2Log": 0.3340861055,
+            "tMin": 0.0,
+            "tMax": 17.0
+          }
+        },
+        "viikki": {
+          "n": 1135,
+          "spearman": {
+            "rho": -0.1515392296,
+            "p": 2.907526589e-07,
+            "n": 1135
+          },
+          "driverMin": -2.396493056,
+          "driverMax": 22.40475694,
+          "nInBins": 1116,
+          "bins": [
+            {
+              "lo": -1.0,
+              "centre": -0.5,
+              "n": 55,
+              "median": 0.1209536467,
+              "q25": 0.04148387669,
+              "q75": 0.218959804,
+              "mean": 0.1859094046
+            },
+            {
+              "lo": 0.0,
+              "centre": 0.5,
+              "n": 285,
+              "median": 0.1583728259,
+              "q25": 0.07403581234,
+              "q75": 0.2869153124,
+              "mean": 0.236176409
+            },
+            {
+              "lo": 1.0,
+              "centre": 1.5,
+              "n": 53,
+              "median": 0.2282803372,
+              "q25": 0.1210366686,
+              "q75": 0.3065495871,
+              "mean": 0.2526541675
+            },
+            {
+              "lo": 2.0,
+              "centre": 2.5,
+              "n": 34,
+              "median": 0.1863569762,
+              "q25": 0.08038340673,
+              "q75": 0.3540679713,
+              "mean": 0.253576322
+            },
+            {
+              "lo": 3.0,
+              "centre": 3.5,
+              "n": 36,
+              "median": 0.2117097138,
+              "q25": 0.05637262594,
+              "q75": 0.343602332,
+              "mean": 0.6855195104
+            },
+            {
+              "lo": 4.0,
+              "centre": 4.5,
+              "n": 47,
+              "median": 0.1141592124,
+              "q25": 0.02995419298,
+              "q75": 0.2568457201,
+              "mean": 0.4442901812
+            },
+            {
+              "lo": 5.0,
+              "centre": 5.5,
+              "n": 44,
+              "median": 0.1789878963,
+              "q25": 0.09494051,
+              "q75": 0.5483338565,
+              "mean": 0.9298057962
+            },
+            {
+              "lo": 6.0,
+              "centre": 6.5,
+              "n": 32,
+              "median": 0.109720152,
+              "q25": 0.05229313404,
+              "q75": 0.1828696318,
+              "mean": 0.3591626102
+            },
+            {
+              "lo": 7.0,
+              "centre": 7.5,
+              "n": 39,
+              "median": 0.1176178473,
+              "q25": 0.07179365377,
+              "q75": 0.3907245549,
+              "mean": 0.4166495506
+            },
+            {
+              "lo": 8.0,
+              "centre": 8.5,
+              "n": 40,
+              "median": 0.06366559833,
+              "q25": 0.01048310028,
+              "q75": 0.1495983196,
+              "mean": 0.1854317436
+            },
+            {
+              "lo": 9.0,
+              "centre": 9.5,
+              "n": 38,
+              "median": 0.09732907986,
+              "q25": 0.0315974247,
+              "q75": 0.2126967211,
+              "mean": 0.1759154299
+            },
+            {
+              "lo": 10.0,
+              "centre": 10.5,
+              "n": 21,
+              "median": 0.05516775063,
+              "q25": 0.02392288689,
+              "q75": 0.1470147651,
+              "mean": 0.1246557771
+            },
+            {
+              "lo": 11.0,
+              "centre": 11.5,
+              "n": 13,
+              "median": 0.1525500832,
+              "q25": 0.07151354524,
+              "q75": 0.241678656,
+              "mean": 0.2585289167
+            },
+            {
+              "lo": 13.0,
+              "centre": 13.5,
+              "n": 19,
+              "median": 0.08503926397,
+              "q25": 0.0080779372,
+              "q75": 0.2386038805,
+              "mean": 0.2113384881
+            },
+            {
+              "lo": 14.0,
+              "centre": 14.5,
+              "n": 41,
+              "median": 0.2691514254,
+              "q25": 0.1254727879,
+              "q75": 0.8881698935,
+              "mean": 1.160758637
+            },
+            {
+              "lo": 15.0,
+              "centre": 15.5,
+              "n": 55,
+              "median": 0.2743881126,
+              "q25": 0.05498181622,
+              "q75": 1.813837586,
+              "mean": 1.597662432
+            },
+            {
+              "lo": 16.0,
+              "centre": 16.5,
+              "n": 70,
+              "median": 0.07558916139,
+              "q25": 0.02196901602,
+              "q75": 0.2439862536,
+              "mean": 0.5362157729
+            },
+            {
+              "lo": 17.0,
+              "centre": 17.5,
+              "n": 76,
+              "median": 0.06802400001,
+              "q25": 0.0140371816,
+              "q75": 0.1873862025,
+              "mean": 0.4825670808
+            },
+            {
+              "lo": 18.0,
+              "centre": 18.5,
+              "n": 66,
+              "median": 0.08421896845,
+              "q25": 0.01890648644,
+              "q75": 0.1490111953,
+              "mean": 0.1275843197
+            },
+            {
+              "lo": 19.0,
+              "centre": 19.5,
+              "n": 37,
+              "median": 0.09916958531,
+              "q25": 0.05098931424,
+              "q75": 0.1308101872,
+              "mean": 0.09672785971
+            },
+            {
+              "lo": 20.0,
+              "centre": 20.5,
+              "n": 15,
+              "median": 0.08643514842,
+              "q25": 0.03402600321,
+              "q75": 0.1294020457,
+              "mean": 0.07624155912
+            }
+          ],
+          "fluxMedian": 0.1257949389,
+          "fluxMean": 0.4080424731,
+          "fit": {
+            "nBins": 21,
+            "nBinsAll": 21,
+            "ok": true,
+            "reason": null,
+            "f10": 0.1206666179,
+            "lnF10Se": 0.09884114918,
+            "k": -0.02712077975,
+            "kSe": 0.01527535299,
+            "q10": 0.762458043,
+            "q10Lo": 0.5538149851,
+            "q10Hi": 1.049704835,
+            "ciExcludes1": false,
+            "r2Log": 0.1422996444,
+            "tMin": -1.0,
+            "tMax": 21.0
+          }
+        }
+      }
+    },
+    "water": {
+      "n2o": {
+        "anttila": {
+          "n": 604,
+          "spearman": {
+            "rho": -0.2925645709,
+            "p": 2.193944447e-13,
+            "n": 604
+          },
+          "driverMin": 0.10549375,
+          "driverMax": 0.4491041667,
+          "nInBins": 566,
+          "bins": [
+            {
+              "lo": 0.12,
+              "centre": 0.13,
+              "n": 10,
+              "median": 0.09596114583,
+              "q25": 0.08351088542,
+              "q75": 0.1126674479,
+              "mean": 0.08610897917
+            },
+            {
+              "lo": 0.16,
+              "centre": 0.17,
+              "n": 20,
+              "median": 0.1392023958,
+              "q25": 0.05627416667,
+              "q75": 0.382250625,
+              "mean": 0.1867184479
+            },
+            {
+              "lo": 0.2,
+              "centre": 0.21,
+              "n": 46,
+              "median": 0.1351984375,
+              "q25": 0.07085703125,
+              "q75": 0.2338591146,
+              "mean": 0.1588622237
+            },
+            {
+              "lo": 0.22,
+              "centre": 0.23,
+              "n": 36,
+              "median": 0.1714605208,
+              "q25": 0.070575,
+              "q75": 0.2408895833,
+              "mean": 0.169141713
+            },
+            {
+              "lo": 0.24,
+              "centre": 0.25,
+              "n": 31,
+              "median": 0.129815,
+              "q25": 0.0758653125,
+              "q75": 0.2442825,
+              "mean": 0.177891418
+            },
+            {
+              "lo": 0.26,
+              "centre": 0.27,
+              "n": 47,
+              "median": 0.1459945833,
+              "q25": 0.06544166667,
+              "q75": 0.202588125,
+              "mean": 0.1469126463
+            },
+            {
+              "lo": 0.28,
+              "centre": 0.29,
+              "n": 57,
+              "median": 0.1638358333,
+              "q25": 0.08737291667,
+              "q75": 0.21486375,
+              "mean": 0.1748141045
+            },
+            {
+              "lo": 0.3,
+              "centre": 0.31,
+              "n": 48,
+              "median": 0.08899125,
+              "q25": 0.04756697917,
+              "q75": 0.2988326042,
+              "mean": 0.1796916059
+            },
+            {
+              "lo": 0.32,
+              "centre": 0.33,
+              "n": 87,
+              "median": 0.059183125,
+              "q25": 0.03136604167,
+              "q75": 0.1137380208,
+              "mean": 0.09693209052
+            },
+            {
+              "lo": 0.34,
+              "centre": 0.35,
+              "n": 103,
+              "median": 0.06409916667,
+              "q25": 0.02909072917,
+              "q75": 0.1140967708,
+              "mean": 0.08712671319
+            },
+            {
+              "lo": 0.36,
+              "centre": 0.37,
+              "n": 57,
+              "median": 0.07127520833,
+              "q25": 0.05180979167,
+              "q75": 0.1087414583,
+              "mean": 0.09270253289
+            },
+            {
+              "lo": 0.38,
+              "centre": 0.39,
+              "n": 24,
+              "median": 0.0612009375,
+              "q25": 0.04032572917,
+              "q75": 0.1000745833,
+              "mean": 0.07845460937
+            }
+          ],
+          "fluxMedian": 0.08657260417,
+          "fluxMean": 0.12808755
+        },
+        "sarkisuo": {
+          "n": 447,
+          "spearman": {
+            "rho": -0.1799031829,
+            "p": 0.0001312101801,
+            "n": 447
+          },
+          "driverMin": 0.2912083333,
+          "driverMax": 0.7979979167,
+          "nInBins": 396,
+          "bins": [
+            {
+              "lo": 0.38,
+              "centre": 0.39,
+              "n": 28,
+              "median": 0.0796046875,
+              "q25": 0.06805239583,
+              "q75": 0.1014703646,
+              "mean": 0.2108649256
+            },
+            {
+              "lo": 0.4,
+              "centre": 0.41,
+              "n": 21,
+              "median": 0.09578166667,
+              "q25": 0.07768583333,
+              "q75": 0.1182058333,
+              "mean": 0.2090099702
+            },
+            {
+              "lo": 0.42,
+              "centre": 0.43,
+              "n": 14,
+              "median": 0.08047739583,
+              "q25": 0.06761125,
+              "q75": 0.1257484375,
+              "mean": 0.173451994
+            },
+            {
+              "lo": 0.44,
+              "centre": 0.45,
+              "n": 18,
+              "median": 0.08513104167,
+              "q25": 0.06779729167,
+              "q75": 0.1113544271,
+              "mean": 0.1427932407
+            },
+            {
+              "lo": 0.46,
+              "centre": 0.47,
+              "n": 10,
+              "median": 0.2006688542,
+              "q25": 0.08459380208,
+              "q75": 0.3597023438,
+              "mean": 0.2406861458
+            },
+            {
+              "lo": 0.48,
+              "centre": 0.49,
+              "n": 47,
+              "median": 0.03912583333,
+              "q25": 0.0291065625,
+              "q75": 0.06437489583,
+              "mean": 0.1004397252
+            },
+            {
+              "lo": 0.5,
+              "centre": 0.51,
+              "n": 22,
+              "median": 0.091148125,
+              "q25": 0.05376635417,
+              "q75": 0.2225386979,
+              "mean": 0.1411583428
+            },
+            {
+              "lo": 0.56,
+              "centre": 0.57,
+              "n": 36,
+              "median": 0.06862197917,
+              "q25": 0.05385916667,
+              "q75": 0.09644661458,
+              "mean": 0.08282836227
+            },
+            {
+              "lo": 0.58,
+              "centre": 0.59,
+              "n": 18,
+              "median": 0.1056636458,
+              "q25": 0.08199161458,
+              "q75": 0.3106521354,
+              "mean": 0.1961169907
+            },
+            {
+              "lo": 0.6,
+              "centre": 0.61,
+              "n": 16,
+              "median": 0.07119697917,
+              "q25": 0.05561036458,
+              "q75": 0.1431844271,
+              "mean": 0.1401188411
+            },
+            {
+              "lo": 0.64,
+              "centre": 0.65,
+              "n": 12,
+              "median": 0.06370489583,
+              "q25": 0.03987697917,
+              "q75": 0.09994661458,
+              "mean": 0.08265524306
+            },
+            {
+              "lo": 0.66,
+              "centre": 0.67,
+              "n": 15,
+              "median": 0.07323520833,
+              "q25": 0.05513895833,
+              "q75": 0.1225841667,
+              "mean": 0.1572029028
+            },
+            {
+              "lo": 0.68,
+              "centre": 0.69,
+              "n": 23,
+              "median": 0.09821854167,
+              "q25": 0.08343302083,
+              "q75": 0.1052704167,
+              "mean": 0.1039966033
+            },
+            {
+              "lo": 0.7,
+              "centre": 0.71,
+              "n": 51,
+              "median": 0.07709104167,
+              "q25": 0.05246114583,
+              "q75": 0.095091875,
+              "mean": 0.08133471405
+            },
+            {
+              "lo": 0.74,
+              "centre": 0.75,
+              "n": 12,
+              "median": 0.05783239583,
+              "q25": 0.03340859375,
+              "q75": 0.08839052083,
+              "mean": 0.06434993056
+            },
+            {
+              "lo": 0.76,
+              "centre": 0.77,
+              "n": 17,
+              "median": 0.1027258333,
+              "q25": 0.07927416667,
+              "q75": 0.1275729167,
+              "mean": 0.09066997549
+            },
+            {
+              "lo": 0.78,
+              "centre": 0.79,
+              "n": 36,
+              "median": 0.05656333333,
+              "q25": 0.04649739583,
+              "q75": 0.1022400521,
+              "mean": 0.07258274306
+            }
+          ],
+          "fluxMedian": 0.07898708333,
+          "fluxMean": 0.2090401589
+        },
+        "viikki": {
+          "n": 1106,
+          "spearman": {
+            "rho": 0.3211424245,
+            "p": 5.974960469e-28,
+            "n": 1106
+          },
+          "driverMin": 0.103118425,
+          "driverMax": 0.5314718156,
+          "nInBins": 1097,
+          "bins": [
+            {
+              "lo": 0.1,
+              "centre": 0.11,
+              "n": 39,
+              "median": 0.02470618671,
+              "q25": -0.02371940464,
+              "q75": 0.102089733,
+              "mean": 0.07608861217
+            },
+            {
+              "lo": 0.12,
+              "centre": 0.13,
+              "n": 160,
+              "median": 0.04148387669,
+              "q25": 0.007397917116,
+              "q75": 0.1114510364,
+              "mean": 0.07329436892
+            },
+            {
+              "lo": 0.14,
+              "centre": 0.15,
+              "n": 79,
+              "median": 0.0787363653,
+              "q25": 0.01465773252,
+              "q75": 0.1526752943,
+              "mean": 0.1189515366
+            },
+            {
+              "lo": 0.16,
+              "centre": 0.17,
+              "n": 68,
+              "median": 0.07794790696,
+              "q25": 0.01970419665,
+              "q75": 0.1338106837,
+              "mean": 0.1085606439
+            },
+            {
+              "lo": 0.18,
+              "centre": 0.19,
+              "n": 41,
+              "median": 0.1161605449,
+              "q25": 0.05391159004,
+              "q75": 0.2488144573,
+              "mean": 0.156083111
+            },
+            {
+              "lo": 0.2,
+              "centre": 0.21,
+              "n": 25,
+              "median": 0.2663098417,
+              "q25": 0.1819855795,
+              "q75": 0.412490907,
+              "mean": 0.5422075394
+            },
+            {
+              "lo": 0.22,
+              "centre": 0.23,
+              "n": 20,
+              "median": 0.2637459051,
+              "q25": 0.04263971665,
+              "q75": 1.216752821,
+              "mean": 0.863824713
+            },
+            {
+              "lo": 0.24,
+              "centre": 0.25,
+              "n": 31,
+              "median": 0.1878102194,
+              "q25": 0.04766455791,
+              "q75": 0.801174256,
+              "mean": 0.6610964507
+            },
+            {
+              "lo": 0.26,
+              "centre": 0.27,
+              "n": 45,
+              "median": 0.08423230589,
+              "q25": 0.06147512383,
+              "q75": 0.2108610595,
+              "mean": 0.3048399227
+            },
+            {
+              "lo": 0.28,
+              "centre": 0.29,
+              "n": 59,
+              "median": 0.0663490962,
+              "q25": 0.0177579122,
+              "q75": 0.293491139,
+              "mean": 0.3289612046
+            },
+            {
+              "lo": 0.3,
+              "centre": 0.31,
+              "n": 46,
+              "median": 0.2328750585,
+              "q25": 0.06519350592,
+              "q75": 0.6944842977,
+              "mean": 0.6040853548
+            },
+            {
+              "lo": 0.32,
+              "centre": 0.33,
+              "n": 74,
+              "median": 0.3901365882,
+              "q25": 0.1339618718,
+              "q75": 0.7741362227,
+              "mean": 1.073003292
+            },
+            {
+              "lo": 0.34,
+              "centre": 0.35,
+              "n": 35,
+              "median": 0.3202473398,
+              "q25": 0.1206645565,
+              "q75": 0.803973065,
+              "mean": 1.119966524
+            },
+            {
+              "lo": 0.36,
+              "centre": 0.37,
+              "n": 40,
+              "median": 0.2917033587,
+              "q25": 0.1757833299,
+              "q75": 0.6501221538,
+              "mean": 1.674944487
+            },
+            {
+              "lo": 0.38,
+              "centre": 0.39,
+              "n": 29,
+              "median": 0.3547230113,
+              "q25": 0.2140096004,
+              "q75": 0.5247672345,
+              "mean": 1.521696374
+            },
+            {
+              "lo": 0.4,
+              "centre": 0.41,
+              "n": 30,
+              "median": 0.1654143828,
+              "q25": 0.07620940191,
+              "q75": 0.2488748562,
+              "mean": 0.2976431245
+            },
+            {
+              "lo": 0.42,
+              "centre": 0.43,
+              "n": 16,
+              "median": 0.1517340774,
+              "q25": 0.1114199959,
+              "q75": 0.2397541247,
+              "mean": 0.4411994552
+            },
+            {
+              "lo": 0.44,
+              "centre": 0.45,
+              "n": 19,
+              "median": 0.1899469925,
+              "q25": 0.1231492464,
+              "q75": 0.351636178,
+              "mean": 0.2768047641
+            },
+            {
+              "lo": 0.46,
+              "centre": 0.47,
+              "n": 79,
+              "median": 0.1053847277,
+              "q25": 0.05518442752,
+              "q75": 0.1696541483,
+              "mean": 0.2130135583
+            },
+            {
+              "lo": 0.48,
+              "centre": 0.49,
+              "n": 104,
+              "median": 0.1612889748,
+              "q25": 0.1162713815,
+              "q75": 0.2987419743,
+              "mean": 0.2987912612
+            },
+            {
+              "lo": 0.5,
+              "centre": 0.51,
+              "n": 58,
+              "median": 0.1312981482,
+              "q25": 0.0601973754,
+              "q75": 0.1825131235,
+              "mean": 0.131616787
+            }
+          ],
+          "fluxMedian": 0.1265851699,
+          "fluxMean": 0.4146712585
+        }
+      }
+    },
+    "ols": {
+      "n2o": {
+        "anttila": {
+          "n": 604,
+          "r2": 0.07907788179,
+          "coef": {
+            "const": {
+              "est": 0.1276914799,
+              "se": 0.01067334669,
+              "lo": 0.1067721048,
+              "hi": 0.148610855,
+              "p": 5.513002156e-33
+            },
+            "tsoil": {
+              "est": 0.02349676318,
+              "se": 0.0118134431,
+              "lo": 0.0003428401669,
+              "hi": 0.0466506862,
+              "p": 0.04670283948
+            },
+            "swc": {
+              "est": -0.02447828452,
+              "se": 0.009872673563,
+              "lo": -0.04382836913,
+              "hi": -0.005128199908,
+              "p": 0.01316044609
+            },
+            "tsoilXswc": {
+              "est": 0.01023918347,
+              "se": 0.01130982993,
+              "lo": -0.01192767587,
+              "hi": 0.03240604281,
+              "p": 0.3652880057
+            }
+          },
+          "drivers": {
+            "tsoil": {
+              "mean": 4.943229285,
+              "sd": 6.163022704
+            },
+            "swc": {
+              "mean": 0.2968525686,
+              "sd": 0.06905876232
+            }
+          }
+        },
+        "sarkisuo": {
+          "n": 447,
+          "r2": 0.1782431125,
+          "coef": {
+            "const": {
+              "est": 0.2062695343,
+              "se": 0.05666975152,
+              "lo": 0.09519886226,
+              "hi": 0.3173402063,
+              "p": 0.0002727943069
+            },
+            "tsoil": {
+              "est": 0.1951963413,
+              "se": 0.08693376989,
+              "lo": 0.0248092833,
+              "hi": 0.3655833993,
+              "p": 0.02474596689
+            },
+            "swc": {
+              "est": -0.10522229,
+              "se": 0.05527219097,
+              "lo": -0.2135537936,
+              "hi": 0.003109213653,
+              "p": 0.05694780462
+            },
+            "tsoilXswc": {
+              "est": -0.1792481161,
+              "se": 0.1189983541,
+              "lo": -0.4124806043,
+              "hi": 0.05398437208,
+              "p": 0.1319882475
+            }
+          },
+          "drivers": {
+            "tsoil": {
+              "mean": 5.460483758,
+              "sd": 5.761644266
+            },
+            "swc": {
+              "mean": 0.5791240009,
+              "sd": 0.1340662604
+            }
+          }
+        },
+        "viikki": {
+          "n": 1106,
+          "r2": 0.09348341279,
+          "coef": {
+            "const": {
+              "est": 0.5495649199,
+              "se": 0.1315379721,
+              "lo": 0.2917552321,
+              "hi": 0.8073746077,
+              "p": 2.940908034e-05
+            },
+            "tsoil": {
+              "est": 0.3720710326,
+              "se": 0.1761591181,
+              "lo": 0.02680550555,
+              "hi": 0.7173365596,
+              "p": 0.03467526423
+            },
+            "swc": {
+              "est": 0.2869735572,
+              "se": 0.1151225766,
+              "lo": 0.06133745324,
+              "hi": 0.5126096612,
+              "p": 0.01267526208
+            },
+            "tsoilXswc": {
+              "est": 0.3752216245,
+              "se": 0.1607056274,
+              "lo": 0.06024438268,
+              "hi": 0.6901988663,
+              "p": 0.01955187912
+            }
+          },
+          "drivers": {
+            "tsoil": {
+              "mean": 7.737812535,
+              "sd": 7.232054716
+            },
+            "swc": {
+              "mean": 0.2992650805,
+              "sd": 0.1361494349
+            }
+          }
+        }
+      }
+    },
+    "shareInWindows": {
+      "anttila": {
+        "2022": {
+          "shareOfDailySum": 0.500660477,
+          "daysInWindows": 60,
+          "daysWithValue": 365,
+          "windowDaysWithValue": 60,
+          "shareOfDays": 0.1643835616
+        },
+        "2023": {
+          "shareOfDailySum": 0.3873534232,
+          "daysInWindows": 60,
+          "daysWithValue": 365,
+          "windowDaysWithValue": 60,
+          "shareOfDays": 0.1643835616
+        }
+      },
+      "sarkisuo": {
+        "2022": {
+          "shareOfDailySum": 0.8284667877,
+          "daysInWindows": 60,
+          "daysWithValue": 240,
+          "windowDaysWithValue": 60,
+          "shareOfDays": 0.25
+        },
+        "2023": {
+          "shareOfDailySum": 0.8232945941,
+          "daysInWindows": 60,
+          "daysWithValue": 365,
+          "windowDaysWithValue": 60,
+          "shareOfDays": 0.1643835616
+        }
+      },
+      "viikki": {
+        "2022": {
+          "shareOfDailySum": 0.6201456666,
+          "daysInWindows": 30,
+          "daysWithValue": 365,
+          "windowDaysWithValue": 30,
+          "shareOfDays": 0.08219178082
+        },
+        "2023": {
+          "shareOfDailySum": 0.2533027809,
+          "daysInWindows": 58,
+          "daysWithValue": 365,
+          "windowDaysWithValue": 58,
+          "shareOfDays": 0.1589041096
+        },
+        "2024": {
+          "shareOfDailySum": 0.6419479447,
+          "daysInWindows": 74,
+          "daysWithValue": 366,
+          "windowDaysWithValue": 74,
+          "shareOfDays": 0.2021857923
+        },
+        "2025": {
+          "shareOfDailySum": 0.05850863394,
+          "daysInWindows": 30,
+          "daysWithValue": 365,
+          "windowDaysWithValue": 30,
+          "shareOfDays": 0.08219178082
+        }
+      }
+    }
+  },
+  "heatMap": {
+    "tBin": 2.0,
+    "wBin": 0.04,
+    "minDays": 5,
+    "ch4": {
+      "anttila": {
+        "nDays": 724,
+        "nCells": 40,
+        "nDaysInCells": 663,
+        "cells": [
+          {
+            "t": 0.0,
+            "w": 0.12,
+            "n": 13,
+            "mean": 0.0006883976603
+          },
+          {
+            "t": 0.0,
+            "w": 0.16,
+            "n": 26,
+            "mean": 0.0002975533574
+          },
+          {
+            "t": 0.0,
+            "w": 0.2,
+            "n": 61,
+            "mean": 0.0007933006489
+          },
+          {
+            "t": 0.0,
+            "w": 0.24,
+            "n": 33,
+            "mean": 0.001325864413
+          },
+          {
+            "t": 0.0,
+            "w": 0.28,
+            "n": 59,
+            "mean": 0.0002016437712
+          },
+          {
+            "t": 0.0,
+            "w": 0.32,
+            "n": 119,
+            "mean": 0.0004812814583
+          },
+          {
+            "t": 0.0,
+            "w": 0.36,
+            "n": 26,
+            "mean": 0.0001894822115
+          },
+          {
+            "t": 0.0,
+            "w": 0.4,
+            "n": 7,
+            "mean": 0.0006076224107
+          },
+          {
+            "t": 2.0,
+            "w": 0.32,
+            "n": 6,
+            "mean": 0.0001746598958
+          },
+          {
+            "t": 2.0,
+            "w": 0.36,
+            "n": 16,
+            "mean": 0.0005004577995
+          },
+          {
+            "t": 4.0,
+            "w": 0.32,
+            "n": 8,
+            "mean": 8.421677083e-05
+          },
+          {
+            "t": 4.0,
+            "w": 0.36,
+            "n": 15,
+            "mean": 3.892008333e-05
+          },
+          {
+            "t": 6.0,
+            "w": 0.24,
+            "n": 5,
+            "mean": 0.000422359625
+          },
+          {
+            "t": 6.0,
+            "w": 0.28,
+            "n": 5,
+            "mean": 0.003088277167
+          },
+          {
+            "t": 6.0,
+            "w": 0.32,
+            "n": 10,
+            "mean": -0.0002697117083
+          },
+          {
+            "t": 6.0,
+            "w": 0.36,
+            "n": 5,
+            "mean": 0.000797065625
+          },
+          {
+            "t": 8.0,
+            "w": 0.2,
+            "n": 5,
+            "mean": -0.0002102232083
+          },
+          {
+            "t": 8.0,
+            "w": 0.24,
+            "n": 12,
+            "mean": 0.001413810278
+          },
+          {
+            "t": 8.0,
+            "w": 0.28,
+            "n": 6,
+            "mean": 0.000630760625
+          },
+          {
+            "t": 8.0,
+            "w": 0.32,
+            "n": 11,
+            "mean": -0.0001478640341
+          },
+          {
+            "t": 10.0,
+            "w": 0.2,
+            "n": 17,
+            "mean": 0.0003114360662
+          },
+          {
+            "t": 10.0,
+            "w": 0.24,
+            "n": 14,
+            "mean": 0.001314121801
+          },
+          {
+            "t": 10.0,
+            "w": 0.28,
+            "n": 5,
+            "mean": 0.000799457375
+          },
+          {
+            "t": 10.0,
+            "w": 0.32,
+            "n": 5,
+            "mean": 0.0003129181667
+          },
+          {
+            "t": 12.0,
+            "w": 0.2,
+            "n": 8,
+            "mean": 0.0002320898698
+          },
+          {
+            "t": 12.0,
+            "w": 0.24,
+            "n": 10,
+            "mean": -3.64056875e-05
+          },
+          {
+            "t": 12.0,
+            "w": 0.28,
+            "n": 6,
+            "mean": 0.001997991806
+          },
+          {
+            "t": 12.0,
+            "w": 0.32,
+            "n": 10,
+            "mean": 5.401514583e-05
+          },
+          {
+            "t": 12.0,
+            "w": 0.36,
+            "n": 7,
+            "mean": 0.000185637381
+          },
+          {
+            "t": 14.0,
+            "w": 0.12,
+            "n": 5,
+            "mean": -0.0002617435833
+          },
+          {
+            "t": 14.0,
+            "w": 0.2,
+            "n": 5,
+            "mean": 0.0004216745417
+          },
+          {
+            "t": 14.0,
+            "w": 0.24,
+            "n": 14,
+            "mean": 0.0007933804613
+          },
+          {
+            "t": 14.0,
+            "w": 0.28,
+            "n": 11,
+            "mean": 0.0007360877841
+          },
+          {
+            "t": 14.0,
+            "w": 0.32,
+            "n": 16,
+            "mean": 0.0003445551693
+          },
+          {
+            "t": 16.0,
+            "w": 0.2,
+            "n": 17,
+            "mean": 3.094818627e-05
+          },
+          {
+            "t": 16.0,
+            "w": 0.24,
+            "n": 12,
+            "mean": 0.0002626830729
+          },
+          {
+            "t": 16.0,
+            "w": 0.28,
+            "n": 18,
+            "mean": 0.0003685284606
+          },
+          {
+            "t": 16.0,
+            "w": 0.32,
+            "n": 15,
+            "mean": 0.0003768668611
+          },
+          {
+            "t": 18.0,
+            "w": 0.2,
+            "n": 15,
+            "mean": -0.000107483
+          },
+          {
+            "t": 20.0,
+            "w": 0.2,
+            "n": 5,
+            "mean": -0.0001824142083
+          }
+        ],
+        "maxCell": {
+          "t": 6.0,
+          "w": 0.28,
+          "n": 5,
+          "mean": 0.003088277167
+        }
+      },
+      "sarkisuo": {
+        "nDays": 504,
+        "nCells": 29,
+        "nDaysInCells": 375,
+        "cells": [
+          {
+            "t": 0.0,
+            "w": 0.36,
+            "n": 19,
+            "mean": 0.00512883023
+          },
+          {
+            "t": 0.0,
+            "w": 0.4,
+            "n": 21,
+            "mean": 0.006534603264
+          },
+          {
+            "t": 0.0,
+            "w": 0.44,
+            "n": 5,
+            "mean": 0.005766087125
+          },
+          {
+            "t": 0.0,
+            "w": 0.48,
+            "n": 52,
+            "mean": 0.003718617817
+          },
+          {
+            "t": 0.0,
+            "w": 0.52,
+            "n": 7,
+            "mean": 0.004282525149
+          },
+          {
+            "t": 0.0,
+            "w": 0.56,
+            "n": 39,
+            "mean": 0.00523189367
+          },
+          {
+            "t": 0.0,
+            "w": 0.6,
+            "n": 14,
+            "mean": 0.00434173308
+          },
+          {
+            "t": 0.0,
+            "w": 0.64,
+            "n": 16,
+            "mean": 0.004151026055
+          },
+          {
+            "t": 0.0,
+            "w": 0.68,
+            "n": 25,
+            "mean": 0.005016586292
+          },
+          {
+            "t": 0.0,
+            "w": 0.76,
+            "n": 11,
+            "mean": 0.009723303163
+          },
+          {
+            "t": 2.0,
+            "w": 0.56,
+            "n": 5,
+            "mean": 0.01573656546
+          },
+          {
+            "t": 2.0,
+            "w": 0.68,
+            "n": 17,
+            "mean": 0.01160980081
+          },
+          {
+            "t": 2.0,
+            "w": 0.76,
+            "n": 6,
+            "mean": 0.01477952174
+          },
+          {
+            "t": 4.0,
+            "w": 0.68,
+            "n": 20,
+            "mean": 0.01663089982
+          },
+          {
+            "t": 6.0,
+            "w": 0.44,
+            "n": 8,
+            "mean": 0.01064896385
+          },
+          {
+            "t": 6.0,
+            "w": 0.68,
+            "n": 5,
+            "mean": 0.0264657915
+          },
+          {
+            "t": 6.0,
+            "w": 0.76,
+            "n": 5,
+            "mean": 0.03459675233
+          },
+          {
+            "t": 8.0,
+            "w": 0.44,
+            "n": 9,
+            "mean": 0.0358709756
+          },
+          {
+            "t": 10.0,
+            "w": 0.36,
+            "n": 13,
+            "mean": 0.02830409817
+          },
+          {
+            "t": 10.0,
+            "w": 0.4,
+            "n": 8,
+            "mean": 0.03501830268
+          },
+          {
+            "t": 12.0,
+            "w": 0.36,
+            "n": 8,
+            "mean": 0.02139363331
+          },
+          {
+            "t": 12.0,
+            "w": 0.72,
+            "n": 5,
+            "mean": 0.07108035158
+          },
+          {
+            "t": 12.0,
+            "w": 0.76,
+            "n": 16,
+            "mean": 0.08355788641
+          },
+          {
+            "t": 14.0,
+            "w": 0.48,
+            "n": 10,
+            "mean": 0.07064649448
+          },
+          {
+            "t": 14.0,
+            "w": 0.76,
+            "n": 7,
+            "mean": 0.07638544845
+          },
+          {
+            "t": 16.0,
+            "w": 0.28,
+            "n": 7,
+            "mean": 0.03675947827
+          },
+          {
+            "t": 16.0,
+            "w": 0.44,
+            "n": 5,
+            "mean": 0.07781522321
+          },
+          {
+            "t": 16.0,
+            "w": 0.64,
+            "n": 7,
+            "mean": 0.07118119396
+          },
+          {
+            "t": 18.0,
+            "w": 0.32,
+            "n": 5,
+            "mean": 0.03279379808
+          }
+        ],
+        "maxCell": {
+          "t": 12.0,
+          "w": 0.76,
+          "n": 16,
+          "mean": 0.08355788641
+        }
+      }
+    },
+    "n2o": {
+      "anttila": {
+        "nDays": 724,
+        "nCells": 40,
+        "nDaysInCells": 663,
+        "cells": [
+          {
+            "t": 0.0,
+            "w": 0.12,
+            "n": 13,
+            "mean": 0.1166761859
+          },
+          {
+            "t": 0.0,
+            "w": 0.16,
+            "n": 26,
+            "mean": 0.172960633
+          },
+          {
+            "t": 0.0,
+            "w": 0.2,
+            "n": 61,
+            "mean": 0.1708954952
+          },
+          {
+            "t": 0.0,
+            "w": 0.24,
+            "n": 33,
+            "mean": 0.1378594444
+          },
+          {
+            "t": 0.0,
+            "w": 0.28,
+            "n": 59,
+            "mean": 0.1476680685
+          },
+          {
+            "t": 0.0,
+            "w": 0.32,
+            "n": 119,
+            "mean": 0.07191326681
+          },
+          {
+            "t": 0.0,
+            "w": 0.36,
+            "n": 26,
+            "mean": 0.1287861538
+          },
+          {
+            "t": 0.0,
+            "w": 0.4,
+            "n": 7,
+            "mean": 0.0586233631
+          },
+          {
+            "t": 2.0,
+            "w": 0.32,
+            "n": 6,
+            "mean": 0.1094662847
+          },
+          {
+            "t": 2.0,
+            "w": 0.36,
+            "n": 16,
+            "mean": 0.0927980599
+          },
+          {
+            "t": 4.0,
+            "w": 0.32,
+            "n": 8,
+            "mean": 0.05250596354
+          },
+          {
+            "t": 4.0,
+            "w": 0.36,
+            "n": 15,
+            "mean": 0.04779030556
+          },
+          {
+            "t": 6.0,
+            "w": 0.24,
+            "n": 5,
+            "mean": 0.15848775
+          },
+          {
+            "t": 6.0,
+            "w": 0.28,
+            "n": 5,
+            "mean": 0.1227990417
+          },
+          {
+            "t": 6.0,
+            "w": 0.32,
+            "n": 10,
+            "mean": 0.0741050625
+          },
+          {
+            "t": 6.0,
+            "w": 0.36,
+            "n": 5,
+            "mean": 0.053560375
+          },
+          {
+            "t": 8.0,
+            "w": 0.2,
+            "n": 5,
+            "mean": 0.08020091667
+          },
+          {
+            "t": 8.0,
+            "w": 0.24,
+            "n": 12,
+            "mean": 0.1617359896
+          },
+          {
+            "t": 8.0,
+            "w": 0.28,
+            "n": 6,
+            "mean": 0.1646189583
+          },
+          {
+            "t": 8.0,
+            "w": 0.32,
+            "n": 11,
+            "mean": 0.1040967992
+          },
+          {
+            "t": 10.0,
+            "w": 0.2,
+            "n": 17,
+            "mean": 0.07805730392
+          },
+          {
+            "t": 10.0,
+            "w": 0.24,
+            "n": 14,
+            "mean": 0.2402304464
+          },
+          {
+            "t": 10.0,
+            "w": 0.28,
+            "n": 5,
+            "mean": 0.08669054167
+          },
+          {
+            "t": 10.0,
+            "w": 0.32,
+            "n": 5,
+            "mean": 0.106965375
+          },
+          {
+            "t": 12.0,
+            "w": 0.2,
+            "n": 8,
+            "mean": 0.2693348437
+          },
+          {
+            "t": 12.0,
+            "w": 0.24,
+            "n": 10,
+            "mean": 0.2186693542
+          },
+          {
+            "t": 12.0,
+            "w": 0.28,
+            "n": 6,
+            "mean": 0.3754339583
+          },
+          {
+            "t": 12.0,
+            "w": 0.32,
+            "n": 10,
+            "mean": 0.08152985417
+          },
+          {
+            "t": 12.0,
+            "w": 0.36,
+            "n": 7,
+            "mean": 0.05706392857
+          },
+          {
+            "t": 14.0,
+            "w": 0.12,
+            "n": 5,
+            "mean": 0.01178404167
+          },
+          {
+            "t": 14.0,
+            "w": 0.2,
+            "n": 5,
+            "mean": 0.1622064583
+          },
+          {
+            "t": 14.0,
+            "w": 0.24,
+            "n": 14,
+            "mean": 0.2350096429
+          },
+          {
+            "t": 14.0,
+            "w": 0.28,
+            "n": 11,
+            "mean": 0.2439954356
+          },
+          {
+            "t": 14.0,
+            "w": 0.32,
+            "n": 16,
+            "mean": 0.2842957812
+          },
+          {
+            "t": 16.0,
+            "w": 0.2,
+            "n": 17,
+            "mean": 0.1448263235
+          },
+          {
+            "t": 16.0,
+            "w": 0.24,
+            "n": 12,
+            "mean": 0.3010754514
+          },
+          {
+            "t": 16.0,
+            "w": 0.28,
+            "n": 18,
+            "mean": 0.8838534028
+          },
+          {
+            "t": 16.0,
+            "w": 0.32,
+            "n": 15,
+            "mean": 0.4910731944
+          },
+          {
+            "t": 18.0,
+            "w": 0.2,
+            "n": 15,
+            "mean": 0.1920150972
+          },
+          {
+            "t": 20.0,
+            "w": 0.2,
+            "n": 5,
+            "mean": 0.6032884583
+          }
+        ],
+        "maxCell": {
+          "t": 16.0,
+          "w": 0.28,
+          "n": 18,
+          "mean": 0.8838534028
+        }
+      },
+      "sarkisuo": {
+        "nDays": 504,
+        "nCells": 29,
+        "nDaysInCells": 375,
+        "cells": [
+          {
+            "t": 0.0,
+            "w": 0.36,
+            "n": 19,
+            "mean": 0.07810389254
+          },
+          {
+            "t": 0.0,
+            "w": 0.4,
+            "n": 21,
+            "mean": 0.09125844246
+          },
+          {
+            "t": 0.0,
+            "w": 0.44,
+            "n": 5,
+            "mean": 0.09148641667
+          },
+          {
+            "t": 0.0,
+            "w": 0.48,
+            "n": 52,
+            "mean": 0.04627451923
+          },
+          {
+            "t": 0.0,
+            "w": 0.52,
+            "n": 7,
+            "mean": 0.07572595238
+          },
+          {
+            "t": 0.0,
+            "w": 0.56,
+            "n": 39,
+            "mean": 0.07055669338
+          },
+          {
+            "t": 0.0,
+            "w": 0.6,
+            "n": 14,
+            "mean": 0.05837032738
+          },
+          {
+            "t": 0.0,
+            "w": 0.64,
+            "n": 16,
+            "mean": 0.05612661458
+          },
+          {
+            "t": 0.0,
+            "w": 0.68,
+            "n": 25,
+            "mean": 0.07117285
+          },
+          {
+            "t": 0.0,
+            "w": 0.76,
+            "n": 11,
+            "mean": 0.04583132576
+          },
+          {
+            "t": 2.0,
+            "w": 0.56,
+            "n": 5,
+            "mean": 0.1013154583
+          },
+          {
+            "t": 2.0,
+            "w": 0.68,
+            "n": 17,
+            "mean": 0.07289761029
+          },
+          {
+            "t": 2.0,
+            "w": 0.76,
+            "n": 6,
+            "mean": 0.07910520833
+          },
+          {
+            "t": 4.0,
+            "w": 0.68,
+            "n": 20,
+            "mean": 0.09641407292
+          },
+          {
+            "t": 6.0,
+            "w": 0.44,
+            "n": 8,
+            "mean": 0.3644747656
+          },
+          {
+            "t": 6.0,
+            "w": 0.68,
+            "n": 5,
+            "mean": 0.111414875
+          },
+          {
+            "t": 6.0,
+            "w": 0.76,
+            "n": 5,
+            "mean": 0.02010591667
+          },
+          {
+            "t": 8.0,
+            "w": 0.44,
+            "n": 9,
+            "mean": 0.07979013889
+          },
+          {
+            "t": 10.0,
+            "w": 0.36,
+            "n": 13,
+            "mean": 2.554803878
+          },
+          {
+            "t": 10.0,
+            "w": 0.4,
+            "n": 8,
+            "mean": 6.003521771
+          },
+          {
+            "t": 12.0,
+            "w": 0.36,
+            "n": 8,
+            "mean": 6.082483802
+          },
+          {
+            "t": 12.0,
+            "w": 0.72,
+            "n": 5,
+            "mean": 0.07710629167
+          },
+          {
+            "t": 12.0,
+            "w": 0.76,
+            "n": 16,
+            "mean": 0.1044454557
+          },
+          {
+            "t": 14.0,
+            "w": 0.48,
+            "n": 10,
+            "mean": 0.5879346042
+          },
+          {
+            "t": 14.0,
+            "w": 0.76,
+            "n": 7,
+            "mean": 0.1405591369
+          },
+          {
+            "t": 16.0,
+            "w": 0.28,
+            "n": 7,
+            "mean": 3.045165327
+          },
+          {
+            "t": 16.0,
+            "w": 0.44,
+            "n": 5,
+            "mean": 0.966857625
+          },
+          {
+            "t": 16.0,
+            "w": 0.64,
+            "n": 7,
+            "mean": 2.103270923
+          },
+          {
+            "t": 18.0,
+            "w": 0.32,
+            "n": 5,
+            "mean": 5.523864042
+          }
+        ],
+        "maxCell": {
+          "t": 12.0,
+          "w": 0.36,
+          "n": 8,
+          "mean": 6.082483802
+        }
+      },
+      "viikki": {
+        "nDays": 1294,
+        "nCells": 70,
+        "nDaysInCells": 1216,
+        "cells": [
+          {
+            "t": -2.0,
+            "w": 0.08,
+            "n": 5,
+            "mean": 0.2991627497
+          },
+          {
+            "t": -2.0,
+            "w": 0.12,
+            "n": 40,
+            "mean": 0.08986022894
+          },
+          {
+            "t": -2.0,
+            "w": 0.16,
+            "n": 8,
+            "mean": 0.2908941163
+          },
+          {
+            "t": 0.0,
+            "w": 0.12,
+            "n": 31,
+            "mean": 0.2129441462
+          },
+          {
+            "t": 0.0,
+            "w": 0.16,
+            "n": 63,
+            "mean": 0.1368371564
+          },
+          {
+            "t": 0.0,
+            "w": 0.2,
+            "n": 17,
+            "mean": 0.6402929503
+          },
+          {
+            "t": 0.0,
+            "w": 0.24,
+            "n": 28,
+            "mean": 0.3047809221
+          },
+          {
+            "t": 0.0,
+            "w": 0.28,
+            "n": 34,
+            "mean": 0.2416500371
+          },
+          {
+            "t": 0.0,
+            "w": 0.32,
+            "n": 17,
+            "mean": 0.3357109513
+          },
+          {
+            "t": 0.0,
+            "w": 0.36,
+            "n": 18,
+            "mean": 0.2974580909
+          },
+          {
+            "t": 0.0,
+            "w": 0.4,
+            "n": 16,
+            "mean": 0.2113313479
+          },
+          {
+            "t": 0.0,
+            "w": 0.44,
+            "n": 29,
+            "mean": 0.2294243301
+          },
+          {
+            "t": 0.0,
+            "w": 0.48,
+            "n": 79,
+            "mean": 0.1938724598
+          },
+          {
+            "t": 0.0,
+            "w": 0.52,
+            "n": 6,
+            "mean": 0.2386879233
+          },
+          {
+            "t": 2.0,
+            "w": 0.32,
+            "n": 8,
+            "mean": 0.3548982891
+          },
+          {
+            "t": 2.0,
+            "w": 0.36,
+            "n": 8,
+            "mean": 2.428960718
+          },
+          {
+            "t": 2.0,
+            "w": 0.4,
+            "n": 5,
+            "mean": 0.4376446041
+          },
+          {
+            "t": 2.0,
+            "w": 0.44,
+            "n": 20,
+            "mean": 0.282352926
+          },
+          {
+            "t": 2.0,
+            "w": 0.48,
+            "n": 28,
+            "mean": 0.1771641945
+          },
+          {
+            "t": 4.0,
+            "w": 0.12,
+            "n": 10,
+            "mean": 0.1565713514
+          },
+          {
+            "t": 4.0,
+            "w": 0.32,
+            "n": 17,
+            "mean": 1.452952464
+          },
+          {
+            "t": 4.0,
+            "w": 0.4,
+            "n": 6,
+            "mean": 1.462202538
+          },
+          {
+            "t": 4.0,
+            "w": 0.44,
+            "n": 26,
+            "mean": 0.3403119857
+          },
+          {
+            "t": 4.0,
+            "w": 0.48,
+            "n": 33,
+            "mean": 0.4227073066
+          },
+          {
+            "t": 6.0,
+            "w": 0.28,
+            "n": 6,
+            "mean": 0.7093343042
+          },
+          {
+            "t": 6.0,
+            "w": 0.32,
+            "n": 34,
+            "mean": 1.167115801
+          },
+          {
+            "t": 6.0,
+            "w": 0.36,
+            "n": 8,
+            "mean": 0.4344521267
+          },
+          {
+            "t": 6.0,
+            "w": 0.4,
+            "n": 6,
+            "mean": 0.07319559775
+          },
+          {
+            "t": 6.0,
+            "w": 0.44,
+            "n": 11,
+            "mean": 0.08877337885
+          },
+          {
+            "t": 6.0,
+            "w": 0.48,
+            "n": 15,
+            "mean": 0.1484691403
+          },
+          {
+            "t": 8.0,
+            "w": 0.12,
+            "n": 10,
+            "mean": -0.00520162523
+          },
+          {
+            "t": 8.0,
+            "w": 0.24,
+            "n": 6,
+            "mean": 0.01334868218
+          },
+          {
+            "t": 8.0,
+            "w": 0.28,
+            "n": 31,
+            "mean": 1.166019187
+          },
+          {
+            "t": 8.0,
+            "w": 0.32,
+            "n": 24,
+            "mean": 2.896002763
+          },
+          {
+            "t": 8.0,
+            "w": 0.36,
+            "n": 11,
+            "mean": 0.2203540711
+          },
+          {
+            "t": 8.0,
+            "w": 0.44,
+            "n": 9,
+            "mean": 0.07681403443
+          },
+          {
+            "t": 8.0,
+            "w": 0.48,
+            "n": 7,
+            "mean": 0.2675884697
+          },
+          {
+            "t": 10.0,
+            "w": 0.12,
+            "n": 5,
+            "mean": 0.03212842333
+          },
+          {
+            "t": 10.0,
+            "w": 0.24,
+            "n": 6,
+            "mean": 0.1133171565
+          },
+          {
+            "t": 10.0,
+            "w": 0.28,
+            "n": 15,
+            "mean": 2.187500205
+          },
+          {
+            "t": 10.0,
+            "w": 0.32,
+            "n": 10,
+            "mean": 1.422237344
+          },
+          {
+            "t": 10.0,
+            "w": 0.36,
+            "n": 5,
+            "mean": 0.2795810285
+          },
+          {
+            "t": 12.0,
+            "w": 0.16,
+            "n": 9,
+            "mean": 0.7377570889
+          },
+          {
+            "t": 12.0,
+            "w": 0.24,
+            "n": 11,
+            "mean": 0.8473495257
+          },
+          {
+            "t": 12.0,
+            "w": 0.28,
+            "n": 18,
+            "mean": 1.71360199
+          },
+          {
+            "t": 12.0,
+            "w": 0.32,
+            "n": 17,
+            "mean": 3.837503955
+          },
+          {
+            "t": 14.0,
+            "w": 0.08,
+            "n": 5,
+            "mean": -0.002937910769
+          },
+          {
+            "t": 14.0,
+            "w": 0.12,
+            "n": 24,
+            "mean": 0.07164678146
+          },
+          {
+            "t": 14.0,
+            "w": 0.16,
+            "n": 7,
+            "mean": 0.6378684407
+          },
+          {
+            "t": 14.0,
+            "w": 0.2,
+            "n": 5,
+            "mean": 2.644153933
+          },
+          {
+            "t": 14.0,
+            "w": 0.24,
+            "n": 8,
+            "mean": 1.765290734
+          },
+          {
+            "t": 14.0,
+            "w": 0.28,
+            "n": 27,
+            "mean": 0.99680099
+          },
+          {
+            "t": 14.0,
+            "w": 0.32,
+            "n": 23,
+            "mean": 2.109806141
+          },
+          {
+            "t": 14.0,
+            "w": 0.36,
+            "n": 10,
+            "mean": 5.43604046
+          },
+          {
+            "t": 14.0,
+            "w": 0.4,
+            "n": 6,
+            "mean": 0.1629211481
+          },
+          {
+            "t": 16.0,
+            "w": 0.08,
+            "n": 13,
+            "mean": 0.0637863604
+          },
+          {
+            "t": 16.0,
+            "w": 0.12,
+            "n": 72,
+            "mean": 0.06675257308
+          },
+          {
+            "t": 16.0,
+            "w": 0.16,
+            "n": 16,
+            "mean": 0.1177486112
+          },
+          {
+            "t": 16.0,
+            "w": 0.2,
+            "n": 10,
+            "mean": 0.3771027692
+          },
+          {
+            "t": 16.0,
+            "w": 0.24,
+            "n": 13,
+            "mean": 0.7328371301
+          },
+          {
+            "t": 16.0,
+            "w": 0.28,
+            "n": 19,
+            "mean": 0.6311595322
+          },
+          {
+            "t": 16.0,
+            "w": 0.32,
+            "n": 10,
+            "mean": 2.856201262
+          },
+          {
+            "t": 18.0,
+            "w": 0.08,
+            "n": 9,
+            "mean": 0.03492351234
+          },
+          {
+            "t": 18.0,
+            "w": 0.12,
+            "n": 50,
+            "mean": 0.07643454269
+          },
+          {
+            "t": 18.0,
+            "w": 0.16,
+            "n": 15,
+            "mean": 0.1302521569
+          },
+          {
+            "t": 18.0,
+            "w": 0.2,
+            "n": 11,
+            "mean": 0.1538475791
+          },
+          {
+            "t": 18.0,
+            "w": 0.24,
+            "n": 7,
+            "mean": 0.2762425549
+          },
+          {
+            "t": 18.0,
+            "w": 0.28,
+            "n": 5,
+            "mean": 0.40572268
+          },
+          {
+            "t": 20.0,
+            "w": 0.12,
+            "n": 10,
+            "mean": 0.08046590477
+          },
+          {
+            "t": 20.0,
+            "w": 0.16,
+            "n": 15,
+            "mean": 0.1067857176
+          }
+        ],
+        "maxCell": {
+          "t": 14.0,
+          "w": 0.36,
+          "n": 10,
+          "mean": 5.43604046
+        }
+      }
+    }
+  },
+  "summary": {
+    "anttila_ch4": {
+      "rhoT": -0.06187954675,
+      "rhoW": 0.03051203757,
+      "q10": null,
+      "q10Lo": null,
+      "q10Hi": null,
+      "olsR2": 0.02646262799,
+      "nDays": 724
+    },
+    "sarkisuo_ch4": {
+      "rhoT": 0.8158039443,
+      "rhoW": 0.1139265799,
+      "q10": 4.653439604,
+      "q10Lo": 2.504953031,
+      "q10Hi": 8.644673124,
+      "olsR2": 0.7199849029,
+      "nDays": 504
+    },
+    "anttila_n2o": {
+      "rhoT": 0.1715334499,
+      "rhoW": -0.284243527,
+      "q10": 2.058819085,
+      "q10Lo": 1.400583011,
+      "q10Hi": 3.026408281,
+      "olsR2": 0.04405229718,
+      "nDays": 724,
+      "rhoTNoFert": -0.01320578248,
+      "rhoWNoFert": -0.2925645709,
+      "q10NoFert": 2.129009177,
+      "olsR2NoFert": 0.07907788179
+    },
+    "sarkisuo_n2o": {
+      "rhoT": 0.6388696211,
+      "rhoW": -0.2995743666,
+      "q10": 3.249067491,
+      "q10Lo": 1.67433678,
+      "q10Hi": 6.304848393,
+      "olsR2": 0.1934904559,
+      "nDays": 504,
+      "rhoTNoFert": 0.5212426437,
+      "rhoWNoFert": -0.1799031829,
+      "q10NoFert": 2.029351078,
+      "olsR2NoFert": 0.1782431125
+    },
+    "viikki_n2o": {
+      "rhoT": -0.07265822227,
+      "rhoW": 0.2971369252,
+      "q10": 0.9064220048,
+      "q10Lo": 0.5737855876,
+      "q10Hi": 1.431895238,
+      "olsR2": 0.07761822791,
+      "nDays": 1326,
+      "rhoTNoFert": -0.1515392296,
+      "rhoWNoFert": 0.3211424245,
+      "q10NoFert": 0.762458043,
+      "olsR2NoFert": 0.09348341279
+    }
+  },
+  "literature": [
+    {
+      "key": "anttilaCh4_2022",
+      "text": "Anttila annual CH4 flux 2022 (range of the gap-filling algorithms)",
+      "value": 2,
+      "unit": "kg CH4 ha-1 yr-1",
+      "uncertainty": {
+        "lo": 2,
+        "hi": 3,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    {
+      "key": "sarkisuoCh4_2022",
+      "text": "Sarkisuo annual CH4 flux 2022; the gap before 6 May is filled with the median flux of December 2022 (p. 3)",
+      "value": 110,
+      "unit": "kg CH4 ha-1 yr-1",
+      "uncertainty": {
+        "lo": 110,
+        "hi": 120,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    {
+      "key": "anttilaN2o_2022",
+      "text": "Anttila annual N2O flux 2022",
+      "value": 3.8,
+      "unit": "kg N2O ha-1 yr-1",
+      "uncertainty": {
+        "lo": 3.7,
+        "hi": 4.0,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    {
+      "key": "sarkisuoN2o_2022",
+      "text": "Sarkisuo annual N2O flux 2022",
+      "value": 16,
+      "unit": "kg N2O ha-1 yr-1",
+      "uncertainty": {
+        "lo": 16,
+        "hi": 17,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    {
+      "key": "anttilaSoil",
+      "text": "Anttila: mineral soil, Eutric Gleysol to Luvic Planosol/Stagnosol, silt loam",
+      "value": "mineral",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 2, Sect. 2.1; p. 3",
+      "tableFigure": "Table 2"
+    },
+    {
+      "key": "sarkisuoSoil",
+      "text": "Sarkisuo: drained organic soil, mainly sedge peat",
+      "value": "drained peat",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 2, Sect. 2.1; p. 3",
+      "tableFigure": "Table 2"
+    },
+    {
+      "key": "sarkisuoPeatDepthMinCm",
+      "text": "Sarkisuo peat depth, minimum (maximum > 100 cm)",
+      "value": 63,
+      "unit": "cm",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 2",
+      "tableFigure": "Table 1"
+    },
+    {
+      "key": "anttilaSocPct",
+      "text": "Anttila soil organic carbon, 0 to 10 cm (mean, SD 0.82)",
+      "value": 3.36,
+      "unit": "%",
+      "uncertainty": {
+        "sd": 0.82
+      },
+      "ref": "shurpali2025",
+      "page": "p. 2",
+      "tableFigure": "Table 1"
+    },
+    {
+      "key": "sarkisuoSocPct",
+      "text": "Sarkisuo soil organic carbon, 0 to 10 cm (mean, SD 11.1)",
+      "value": 38.9,
+      "unit": "%",
+      "uncertainty": {
+        "sd": 11.1
+      },
+      "ref": "shurpali2025",
+      "page": "p. 2",
+      "tableFigure": "Table 1"
+    },
+    {
+      "key": "sensorDepthCm",
+      "text": "Anttila and Sarkisuo: soil temperature and soil water content at 5 cm depth",
+      "value": 5,
+      "unit": "cm",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 4, Sect. 3.1",
+      "tableFigure": "Fig. 1"
+    },
+    {
+      "key": "sarkisuoSwcRangePct",
+      "text": "Sarkisuo soil water content at 5 cm in 2022: 30 to 69 %",
+      "value": "30 to 69",
+      "unit": "% (volumetric)",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 4, Sect. 3.1",
+      "tableFigure": "Fig. 1"
+    },
+    {
+      "key": "anttilaSwcRangePct",
+      "text": "Anttila soil water content at 5 cm in 2022: 10 to 39 %",
+      "value": "10 to 39",
+      "unit": "% (volumetric)",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 4, Sect. 3.1",
+      "tableFigure": "Fig. 1"
+    },
+    {
+      "key": "measuredCoverageCh4N2o",
+      "text": "Share of measured 30-min values after the quality filter in 2022: Anttila 67 % (CH4) and 67 % (N2O), Sarkisuo 28 % (CH4) and 30 % (N2O)",
+      "value": "Anttila 67/67, Sarkisuo 28/30",
+      "unit": "%",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 3, Sect. 2.3.2",
+      "tableFigure": null
+    },
+    {
+      "key": "viikkiSoil",
+      "text": "Viikki field Alaniitty 1 (A1): clay loam soil",
+      "value": "clay loam",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "vettikkat2026",
+      "page": "p. 2, Sect. 2.1; p. 3",
+      "tableFigure": null
+    },
+    {
+      "key": "viikkiSoilClass",
+      "text": "Viikki SMEAR-Agri field: clay texture, artificially drained Stagnosols and Planosols",
+      "value": "clay, Stagnosols and Planosols",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "gao2026",
+      "page": "p. 3 (Page 3 of 15)",
+      "tableFigure": null
+    }
+  ],
+  "literatureByKey": {
+    "anttilaCh4_2022": {
+      "key": "anttilaCh4_2022",
+      "text": "Anttila annual CH4 flux 2022 (range of the gap-filling algorithms)",
+      "value": 2,
+      "unit": "kg CH4 ha-1 yr-1",
+      "uncertainty": {
+        "lo": 2,
+        "hi": 3,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    "sarkisuoCh4_2022": {
+      "key": "sarkisuoCh4_2022",
+      "text": "Sarkisuo annual CH4 flux 2022; the gap before 6 May is filled with the median flux of December 2022 (p. 3)",
+      "value": 110,
+      "unit": "kg CH4 ha-1 yr-1",
+      "uncertainty": {
+        "lo": 110,
+        "hi": 120,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    "anttilaN2o_2022": {
+      "key": "anttilaN2o_2022",
+      "text": "Anttila annual N2O flux 2022",
+      "value": 3.8,
+      "unit": "kg N2O ha-1 yr-1",
+      "uncertainty": {
+        "lo": 3.7,
+        "hi": 4.0,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    "sarkisuoN2o_2022": {
+      "key": "sarkisuoN2o_2022",
+      "text": "Sarkisuo annual N2O flux 2022",
+      "value": 16,
+      "unit": "kg N2O ha-1 yr-1",
+      "uncertainty": {
+        "lo": 16,
+        "hi": 17,
+        "kind": "range of three gap-filling algorithms"
+      },
+      "ref": "shurpali2025",
+      "page": "p. 6",
+      "tableFigure": "Table 3"
+    },
+    "anttilaSoil": {
+      "key": "anttilaSoil",
+      "text": "Anttila: mineral soil, Eutric Gleysol to Luvic Planosol/Stagnosol, silt loam",
+      "value": "mineral",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 2, Sect. 2.1; p. 3",
+      "tableFigure": "Table 2"
+    },
+    "sarkisuoSoil": {
+      "key": "sarkisuoSoil",
+      "text": "Sarkisuo: drained organic soil, mainly sedge peat",
+      "value": "drained peat",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 2, Sect. 2.1; p. 3",
+      "tableFigure": "Table 2"
+    },
+    "sarkisuoPeatDepthMinCm": {
+      "key": "sarkisuoPeatDepthMinCm",
+      "text": "Sarkisuo peat depth, minimum (maximum > 100 cm)",
+      "value": 63,
+      "unit": "cm",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 2",
+      "tableFigure": "Table 1"
+    },
+    "anttilaSocPct": {
+      "key": "anttilaSocPct",
+      "text": "Anttila soil organic carbon, 0 to 10 cm (mean, SD 0.82)",
+      "value": 3.36,
+      "unit": "%",
+      "uncertainty": {
+        "sd": 0.82
+      },
+      "ref": "shurpali2025",
+      "page": "p. 2",
+      "tableFigure": "Table 1"
+    },
+    "sarkisuoSocPct": {
+      "key": "sarkisuoSocPct",
+      "text": "Sarkisuo soil organic carbon, 0 to 10 cm (mean, SD 11.1)",
+      "value": 38.9,
+      "unit": "%",
+      "uncertainty": {
+        "sd": 11.1
+      },
+      "ref": "shurpali2025",
+      "page": "p. 2",
+      "tableFigure": "Table 1"
+    },
+    "sensorDepthCm": {
+      "key": "sensorDepthCm",
+      "text": "Anttila and Sarkisuo: soil temperature and soil water content at 5 cm depth",
+      "value": 5,
+      "unit": "cm",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 4, Sect. 3.1",
+      "tableFigure": "Fig. 1"
+    },
+    "sarkisuoSwcRangePct": {
+      "key": "sarkisuoSwcRangePct",
+      "text": "Sarkisuo soil water content at 5 cm in 2022: 30 to 69 %",
+      "value": "30 to 69",
+      "unit": "% (volumetric)",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 4, Sect. 3.1",
+      "tableFigure": "Fig. 1"
+    },
+    "anttilaSwcRangePct": {
+      "key": "anttilaSwcRangePct",
+      "text": "Anttila soil water content at 5 cm in 2022: 10 to 39 %",
+      "value": "10 to 39",
+      "unit": "% (volumetric)",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 4, Sect. 3.1",
+      "tableFigure": "Fig. 1"
+    },
+    "measuredCoverageCh4N2o": {
+      "key": "measuredCoverageCh4N2o",
+      "text": "Share of measured 30-min values after the quality filter in 2022: Anttila 67 % (CH4) and 67 % (N2O), Sarkisuo 28 % (CH4) and 30 % (N2O)",
+      "value": "Anttila 67/67, Sarkisuo 28/30",
+      "unit": "%",
+      "uncertainty": null,
+      "ref": "shurpali2025",
+      "page": "p. 3, Sect. 2.3.2",
+      "tableFigure": null
+    },
+    "viikkiSoil": {
+      "key": "viikkiSoil",
+      "text": "Viikki field Alaniitty 1 (A1): clay loam soil",
+      "value": "clay loam",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "vettikkat2026",
+      "page": "p. 2, Sect. 2.1; p. 3",
+      "tableFigure": null
+    },
+    "viikkiSoilClass": {
+      "key": "viikkiSoilClass",
+      "text": "Viikki SMEAR-Agri field: clay texture, artificially drained Stagnosols and Planosols",
+      "value": "clay, Stagnosols and Planosols",
+      "unit": "soil type",
+      "uncertainty": null,
+      "ref": "gao2026",
+      "page": "p. 3 (Page 3 of 15)",
+      "tableFigure": null
+    }
+  },
+  "figures": [
+    {
+      "n": 1,
+      "file": "figures/1-temperature-response.svg",
+      "title": "Daily CH₄ and N₂O flux against the daily soil temperature at Anttila (mineral soil), Särkisuo (drained peat) and Viikki (clay loam): median per 1 °C bin with the 25 to 75 % band, and the Q₁₀ fit.",
+      "desc": "Two panels, one above the other: CH₄ flux (µmol m⁻² s⁻¹, top) and N₂O flux (nmol m⁻² s⁻¹, bottom) against the daily mean soil temperature (°C, shared x axis; Anttila and Särkisuo at 5 cm, Viikki at 14 cm). Each line is the median of the daily means per 1 °C bin with the 25 to 75 % band; the dotted lines are Q₁₀ fits. CH₄: Anttila: ρ −0.06 (n = 724 days), tsoil −0.2 to 23.8 °C, largest bin median 0.000303 µmol CH₄ m⁻² s⁻¹ at 16.5 °C, no Q₁₀ fit (bins with median > 0 are less than 75% of the bins); Särkisuo: ρ 0.82 (n = 504 days), tsoil 0.2 to 19.1 °C, largest bin median 0.0730 µmol CH₄ m⁻² s⁻¹ at 13.5 °C, Q₁₀ 4.65 (95 % CI 2.50 to 8.64). N₂O: Anttila: ρ 0.17 (n = 724 days), tsoil −0.2 to 23.8 °C, largest bin median 0.282 nmol N₂O m⁻² s⁻¹ at 18.5 °C, Q₁₀ 2.06 (95 % CI 1.40 to 3.03); Särkisuo: ρ 0.64 (n = 504 days), tsoil 0.2 to 19.1 °C, largest bin median 1.67 nmol N₂O m⁻² s⁻¹ at 17.5 °C, Q₁₀ 3.25 (95 % CI 1.67 to 6.30); Viikki: ρ −0.07 (n = 1326 days), tsoil −2.4 to 22.4 °C, largest bin median 1.26 nmol N₂O m⁻² s⁻¹ at 12.5 °C, Q₁₀ 0.91 (95 % CI 0.57 to 1.43). CH₄ against soil temperature: Anttila no clear monotonic relation; Särkisuo a strong positive relation. N₂O against soil temperature: Anttila a weak positive relation; Särkisuo a strong positive relation; Viikki no clear monotonic relation. The fluxes are gap-filled values. Flux > 0 = emission."
+    },
+    {
+      "n": 2,
+      "file": "figures/2-water-response.svg",
+      "title": "Daily CH₄ and N₂O flux against the daily soil water content at Anttila (mineral soil), Särkisuo (drained peat) and Viikki (clay loam): median per 0.02 m³ m⁻³ bin with the 25 to 75 % band.",
+      "desc": "Two panels, one above the other: CH₄ flux (µmol m⁻² s⁻¹, top) and N₂O flux (nmol m⁻² s⁻¹, bottom) against the daily mean soil water content (m³ m⁻³, shared x axis). Each line is the median of the daily means per 0.02 m³ m⁻³ bin with the 25 to 75 % band. CH₄: Anttila: ρ 0.03 (n = 724 days), swc 0.11 to 0.45 m³ m⁻³; Särkisuo: ρ 0.11 (n = 504 days), swc 0.29 to 0.80 m³ m⁻³. N₂O: Anttila: ρ −0.28 (n = 724 days), swc 0.11 to 0.45 m³ m⁻³; Särkisuo: ρ −0.30 (n = 504 days), swc 0.29 to 0.80 m³ m⁻³; Viikki: ρ 0.30 (n = 1294 days), swc 0.10 to 0.53 m³ m⁻³. CH₄ against soil water content: Anttila no clear monotonic relation; Särkisuo a weak positive relation. N₂O against soil water content: Anttila a weak negative relation; Särkisuo a weak negative relation; Viikki a weak positive relation. The fluxes are gap-filled values. Flux > 0 = emission."
+    },
+    {
+      "n": 3,
+      "file": "figures/3-temperature-water-map.svg",
+      "title": "Mean daily CH₄ and N₂O flux per cell of soil temperature and soil water content, one panel per site and gas.",
+      "desc": "Five heat maps: x axis daily mean soil temperature (°C, −2 to 22), y axis daily mean soil water content (m³ m⁻³, 0.08 to 0.80), the same axes in all panels. Top row CH₄ at Anttila and Särkisuo (µmol m⁻² s⁻¹); bottom row N₂O at Anttila, Särkisuo and Viikki (nmol m⁻² s⁻¹). Cells of 2 °C by 0.04 m³ m⁻³ with 5 or more days; colour = mean daily flux, diverging around 0, each panel with its own colour scale. Anttila CH₄: 40 cells, 663 of 724 days; largest mean 0.00309 µmol CH₄ m⁻² s⁻¹ at 6 to 8 °C and 0.28 to 0.32 m³ m⁻³ (n = 5). Särkisuo CH₄: 29 cells, 375 of 504 days; largest mean 0.0836 µmol CH₄ m⁻² s⁻¹ at 12 to 14 °C and 0.76 to 0.80 m³ m⁻³ (n = 16). Anttila N₂O: 40 cells, 663 of 724 days; largest mean 0.884 nmol N₂O m⁻² s⁻¹ at 16 to 18 °C and 0.28 to 0.32 m³ m⁻³ (n = 18). Särkisuo N₂O: 29 cells, 375 of 504 days; largest mean 6.08 nmol N₂O m⁻² s⁻¹ at 12 to 14 °C and 0.36 to 0.40 m³ m⁻³ (n = 8). Viikki N₂O: 70 cells, 1216 of 1294 days; largest mean 5.44 nmol N₂O m⁻² s⁻¹ at 14 to 16 °C and 0.36 to 0.40 m³ m⁻³ (n = 10). Soil water ranges (m³ m⁻³): Anttila 0.11 to 0.45; Särkisuo 0.29 to 0.80; Viikki 0.10 to 0.53. Grey = no cell. The flux values are gap-filled. Flux > 0 = emission."
+    },
+    {
+      "n": 4,
+      "file": "figures/4-peat-vs-mineral.svg",
+      "title": "Annual CH₄ and N₂O sums per site-year at the peat site Särkisuo and the mineral sites Anttila and Viikki, with the 2022 values of Shurpali et al. (2025).",
+      "desc": "Two bar charts of annual sums per site-year: CH₄ in kg CH₄ ha⁻¹ yr⁻¹ (left; Anttila and Särkisuo 2022 and 2023) and N₂O in kg N₂O ha⁻¹ yr⁻¹ (right; also Viikki 2022 to 2025). A lighter, hatched bar with an asterisk is a partial year (coverage below 90%). Black diamonds with a bar are the 2022 values and ranges of Shurpali et al. (2025) Table 3. CH₄: Anttila 2022 2.34; Anttila 2023 2.73; Särkisuo 2022 103 (partial, coverage 0.66); Särkisuo 2023 128. N₂O: Anttila 2022 3.85; Anttila 2023 1.70; Särkisuo 2022 16.0 (partial, coverage 0.66); Särkisuo 2023 11.3; Viikki 2022 16.8; Viikki 2023 5.56; Viikki 2024 4.58; Viikki 2025 6.43. Shurpali 2022 Anttila CH₄: 2.0 (2.0 to 3.0); this dive 2.34. Shurpali 2022 Särkisuo CH₄: 110 (110 to 120); this dive 103. Shurpali 2022 Anttila N₂O: 3.8 (3.7 to 4.0); this dive 3.85. Shurpali 2022 Särkisuo N₂O: 16 (16 to 17); this dive 16.0. Ratio Särkisuo / Anttila of the annual CH₄ sum: 2022 44, 2023 47 (Särkisuo 2022 is a partial year). Ratio Särkisuo / Anttila of the annual N₂O sum: 2022 4.2, 2023 6.6 (Särkisuo 2022 is a partial year). If the Viikki N₂O unit is N₂O-N (open finding VII-06, status: waits for provider), the Viikki bars are 1.57 times higher (2022: 26.3)."
+    }
+  ],
+  "dataVersion": {
+    "generatedAt": "2026-10-29T11:44:58Z",
+    "git": {
+      "commit": "67998a2",
+      "dirty": true
+    },
+    "script": {
+      "path": "analysis/soil-ghg-drivers/soil-ghg-drivers.py",
+      "sha256": "bd1abc973c217f3466b30c9dc6655d26aa7d4b16e6150d2c2d2eaf8848c53648"
+    },
+    "lock": {
+      "path": "analysis/soil-ghg-drivers/soil-ghg-drivers.py.lock",
+      "sha256": "0466d282c48b240070e225aea61a492f27788dd45b79e8dcf744b156f38008af"
+    },
+    "python": "3.13.5",
+    "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+    "packages": {
+      "annotated-types": "0.8.0",
+      "contourpy": "1.4.0",
+      "cycler": "0.12.1",
+      "fonttools": "4.68.0",
+      "formulaic": "1.2.2",
+      "interface_meta": "2.0.1",
+      "kiwisolver": "1.5.1",
+      "matplotlib": "3.11.2",
+      "mypy_extensions": "1.1.0",
+      "narwhals": "2.28.0",
+      "numpy": "2.5.4",
+      "packaging": "26.3",
+      "pandas": "3.1.0",
+      "pandera": "0.34.1",
+      "patsy": "1.0.3",
+      "pillow": "13.0.0",
+      "pyarrow": "26.0.0",
+      "pydantic": "2.14.1",
+      "pydantic_core": "2.50.1",
+      "pyparsing": "3.3.3",
+      "python-dateutil": "3.0.0",
+      "scipy": "1.18.1",
+      "six": "1.17.0",
+      "statsmodels": "0.15.0",
+      "typeguard": "4.6.0",
+      "typing-inspect": "0.9.0",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "tzdata": "2026.6",
+      "wrapt": "2.5.1"
+    },
+    "seeds": {
+      "bootstrap": 20261029
+    },
+    "args": {
+      "db": "db",
+      "out": null,
+      "check": false
+    },
+    "dbBuiltAt": "2026-10-28T10:44:08.475Z",
+    "calcBuiltAt": null,
+    "snapshot": {
+      "builtAt": "2026-10-28T10:44:08.475Z",
+      "commit": "72e41ab",
+      "commitNote": "the build ran on the working tree that this commit recorded; HEAD at build time was eab1555",
+      "url": null,
+      "urlNote": "TODO: release asset db-2026-10-28.zip not yet published",
+      "inputs": [
+        {
+          "path": "db/observations.parquet",
+          "sha256": "5c934e8cb1a138e92ced776651ec9703d1722321c2406b75e88d8de31aff585a",
+          "rows": 553762
+        },
+        {
+          "path": "db/sites.parquet",
+          "sha256": "4314b30c3aa8f57c0eefdfa5cceabe95b5c49b7c4641aeab9bc4c8ff6a17f4a8",
+          "rows": 6
+        },
+        {
+          "path": "db/variables.parquet",
+          "sha256": "4053e99aa6a88f9d5f9c290ad8f7b3772e5750675fc33a659204339ac4159283",
+          "rows": 26
+        },
+        {
+          "path": "db/events.parquet",
+          "sha256": "f27df617c335881361166a3c7074ab95ed712cf8e5665ec929760131d9b2f306",
+          "rows": 114
+        }
+      ]
+    },
+    "inputs": [
+      {
+        "path": "db/observations.parquet",
+        "sha256": "5c934e8cb1a138e92ced776651ec9703d1722321c2406b75e88d8de31aff585a",
+        "rows": 553762,
+        "builtAt": "2026-10-28T10:44:08.475Z",
+        "columns": [
+          "site_id",
+          "ts_start",
+          "ch4",
+          "n2o",
+          "tsoil",
+          "swc"
+        ]
+      },
+      {
+        "path": "db/sites.parquet",
+        "sha256": "4314b30c3aa8f57c0eefdfa5cceabe95b5c49b7c4641aeab9bc4c8ff6a17f4a8",
+        "rows": 6,
+        "builtAt": "2026-10-28T10:44:08.475Z",
+        "columns": [
+          "site_id",
+          "code",
+          "name",
+          "utc_offset_min"
+        ]
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "4053e99aa6a88f9d5f9c290ad8f7b3772e5750675fc33a659204339ac4159283",
+        "rows": 26,
+        "builtAt": "2026-10-28T10:44:08.475Z",
+        "columns": [
+          "column_name",
+          "unit"
+        ]
+      },
+      {
+        "path": "db/events.parquet",
+        "sha256": "f27df617c335881361166a3c7074ab95ed712cf8e5665ec929760131d9b2f306",
+        "rows": 114,
+        "builtAt": "2026-10-28T10:44:08.475Z",
+        "columns": [
+          "site_code",
+          "date",
+          "type"
+        ]
+      }
+    ],
+    "steps": {
+      "units": {
+        "ch4": "µmol CH4 m-2 s-1",
+        "n2o": "nmol N2O m-2 s-1",
+        "tsoil": "°C",
+        "swc": "m3 m-3"
+      },
+      "observations": {
+        "rowsRead": 140208,
+        "rowsOutsideYears": 0,
+        "rowsKept": 140208,
+        "rule": "sites anttila, sarkisuo, viikki; local years anttila 2022-2023, sarkisuo 2022-2023, viikki 2022-2025",
+        "perSite": {
+          "anttila": {
+            "rows": 35040,
+            "values_ch4": 35040,
+            "values_n2o": 35040,
+            "values_tsoil": 34880,
+            "values_swc": 34880
+          },
+          "sarkisuo": {
+            "rows": 35040,
+            "values_ch4": 29040,
+            "values_n2o": 29040,
+            "values_tsoil": 30526,
+            "values_swc": 30529
+          },
+          "viikki": {
+            "rows": 70128,
+            "values_ch4": 0,
+            "values_n2o": 70128,
+            "values_tsoil": 63939,
+            "values_swc": 62472
+          }
+        }
+      },
+      "daily": {
+        "rule": "daily mean of a variable when it has 40 or more of the 48 half hours of the local day",
+        "days": 2921,
+        "perSite": {
+          "anttila": {
+            "days": 730,
+            "ch4": {
+              "daysWithValue": 730,
+              "daysRemovedTooFew": 0,
+              "daysWithoutValues": 0
+            },
+            "n2o": {
+              "daysWithValue": 730,
+              "daysRemovedTooFew": 0,
+              "daysWithoutValues": 0
+            },
+            "tsoil": {
+              "daysWithValue": 724,
+              "daysRemovedTooFew": 6,
+              "daysWithoutValues": 0
+            },
+            "swc": {
+              "daysWithValue": 724,
+              "daysRemovedTooFew": 6,
+              "daysWithoutValues": 0
+            }
+          },
+          "sarkisuo": {
+            "days": 730,
+            "ch4": {
+              "daysWithValue": 605,
+              "daysRemovedTooFew": 0,
+              "daysWithoutValues": 125
+            },
+            "n2o": {
+              "daysWithValue": 605,
+              "daysRemovedTooFew": 0,
+              "daysWithoutValues": 125
+            },
+            "tsoil": {
+              "daysWithValue": 629,
+              "daysRemovedTooFew": 15,
+              "daysWithoutValues": 86
+            },
+            "swc": {
+              "daysWithValue": 629,
+              "daysRemovedTooFew": 15,
+              "daysWithoutValues": 86
+            }
+          },
+          "viikki": {
+            "days": 1461,
+            "ch4": {
+              "daysWithValue": 0,
+              "daysRemovedTooFew": 0,
+              "daysWithoutValues": 1461
+            },
+            "n2o": {
+              "daysWithValue": 1461,
+              "daysRemovedTooFew": 0,
+              "daysWithoutValues": 0
+            },
+            "tsoil": {
+              "daysWithValue": 1326,
+              "daysRemovedTooFew": 13,
+              "daysWithoutValues": 122
+            },
+            "swc": {
+              "daysWithValue": 1294,
+              "daysRemovedTooFew": 17,
+              "daysWithoutValues": 150
+            }
+          }
+        }
+      },
+      "events": {
+        "rowsRead": 114,
+        "fertilisationEvents": {
+          "anttila": [
+            "2022-05-23",
+            "2022-06-22",
+            "2023-05-16",
+            "2023-06-28"
+          ],
+          "sarkisuo": [
+            "2022-05-30",
+            "2022-07-04",
+            "2023-05-22",
+            "2023-07-03"
+          ],
+          "viikki": [
+            "2022-05-10",
+            "2023-04-27",
+            "2023-05-25",
+            "2024-05-08",
+            "2024-05-22",
+            "2024-10-09",
+            "2025-05-10"
+          ]
+        },
+        "rule": "type fertilisation, site in the dive, year in the data years"
+      },
+      "drivers": {
+        "rule": "days with a daily value of the gas and the driver; bins with 10 or more days",
+        "counts": {
+          "ch4.anttila": {
+            "daysTemperature": 724,
+            "daysTemperatureInBins": 689,
+            "daysWater": 724,
+            "daysWaterInBins": 703,
+            "daysOls": 724
+          },
+          "ch4.sarkisuo": {
+            "daysTemperature": 504,
+            "daysTemperatureInBins": 478,
+            "daysWater": 504,
+            "daysWaterInBins": 458,
+            "daysOls": 504
+          },
+          "n2o.anttila": {
+            "daysTemperature": 724,
+            "daysTemperatureInBins": 689,
+            "daysWater": 724,
+            "daysWaterInBins": 703,
+            "daysOls": 724
+          },
+          "n2o.sarkisuo": {
+            "daysTemperature": 504,
+            "daysTemperatureInBins": 478,
+            "daysWater": 504,
+            "daysWaterInBins": 458,
+            "daysOls": 504
+          },
+          "n2o.viikki": {
+            "daysTemperature": 1326,
+            "daysTemperatureInBins": 1307,
+            "daysWater": 1294,
+            "daysWaterInBins": 1285,
+            "daysOls": 1294
+          }
+        }
+      },
+      "sensitivityN2o": {
+        "rule": "remove the local days 0 to 29 after each fertilisation event",
+        "daysWithN2oRemoved": {
+          "anttila": 120,
+          "sarkisuo": 120,
+          "viikki": 192
+        },
+        "counts": {
+          "n2o.anttila": {
+            "daysTemperature": 604,
+            "daysTemperatureInBins": 579,
+            "daysWater": 604,
+            "daysWaterInBins": 566,
+            "daysOls": 604
+          },
+          "n2o.sarkisuo": {
+            "daysTemperature": 447,
+            "daysTemperatureInBins": 418,
+            "daysWater": 447,
+            "daysWaterInBins": 396,
+            "daysOls": 447
+          },
+          "n2o.viikki": {
+            "daysTemperature": 1135,
+            "daysTemperatureInBins": 1116,
+            "daysWater": 1106,
+            "daysWaterInBins": 1097,
+            "daysOls": 1106
+          }
+        }
+      }
+    }
+  }
+}

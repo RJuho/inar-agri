@@ -1,0 +1,368 @@
+{
+  "generatedAt": "2026-10-29T11:44:58Z",
+  "git": {
+    "commit": "67998a2",
+    "dirty": true
+  },
+  "script": {
+    "path": "analysis/soil-ghg-drivers/soil-ghg-drivers.py",
+    "sha256": "bd1abc973c217f3466b30c9dc6655d26aa7d4b16e6150d2c2d2eaf8848c53648"
+  },
+  "lock": {
+    "path": "analysis/soil-ghg-drivers/soil-ghg-drivers.py.lock",
+    "sha256": "0466d282c48b240070e225aea61a492f27788dd45b79e8dcf744b156f38008af"
+  },
+  "python": "3.13.5",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.41",
+  "packages": {
+    "annotated-types": "0.8.0",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "fonttools": "4.68.0",
+    "formulaic": "1.2.2",
+    "interface_meta": "2.0.1",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.11.2",
+    "mypy_extensions": "1.1.0",
+    "narwhals": "2.28.0",
+    "numpy": "2.5.4",
+    "packaging": "26.3",
+    "pandas": "3.1.0",
+    "pandera": "0.34.1",
+    "patsy": "1.0.3",
+    "pillow": "13.0.0",
+    "pyarrow": "26.0.0",
+    "pydantic": "2.14.1",
+    "pydantic_core": "2.50.1",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "3.0.0",
+    "scipy": "1.18.1",
+    "six": "1.17.0",
+    "statsmodels": "0.15.0",
+    "typeguard": "4.6.0",
+    "typing-inspect": "0.9.0",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.6",
+    "wrapt": "2.5.1"
+  },
+  "seeds": {
+    "bootstrap": 20261029
+  },
+  "args": {
+    "db": "db",
+    "out": null,
+    "check": false
+  },
+  "dbBuiltAt": "2026-10-28T10:44:08.475Z",
+  "calcBuiltAt": null,
+  "snapshot": {
+    "builtAt": "2026-10-28T10:44:08.475Z",
+    "commit": "72e41ab",
+    "commitNote": "the build ran on the working tree that this commit recorded; HEAD at build time was eab1555",
+    "url": null,
+    "urlNote": "TODO: release asset db-2026-10-28.zip not yet published",
+    "inputs": [
+      {
+        "path": "db/observations.parquet",
+        "sha256": "5c934e8cb1a138e92ced776651ec9703d1722321c2406b75e88d8de31aff585a",
+        "rows": 553762
+      },
+      {
+        "path": "db/sites.parquet",
+        "sha256": "4314b30c3aa8f57c0eefdfa5cceabe95b5c49b7c4641aeab9bc4c8ff6a17f4a8",
+        "rows": 6
+      },
+      {
+        "path": "db/variables.parquet",
+        "sha256": "4053e99aa6a88f9d5f9c290ad8f7b3772e5750675fc33a659204339ac4159283",
+        "rows": 26
+      },
+      {
+        "path": "db/events.parquet",
+        "sha256": "f27df617c335881361166a3c7074ab95ed712cf8e5665ec929760131d9b2f306",
+        "rows": 114
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "path": "db/observations.parquet",
+      "sha256": "5c934e8cb1a138e92ced776651ec9703d1722321c2406b75e88d8de31aff585a",
+      "rows": 553762,
+      "builtAt": "2026-10-28T10:44:08.475Z",
+      "columns": [
+        "site_id",
+        "ts_start",
+        "ch4",
+        "n2o",
+        "tsoil",
+        "swc"
+      ]
+    },
+    {
+      "path": "db/sites.parquet",
+      "sha256": "4314b30c3aa8f57c0eefdfa5cceabe95b5c49b7c4641aeab9bc4c8ff6a17f4a8",
+      "rows": 6,
+      "builtAt": "2026-10-28T10:44:08.475Z",
+      "columns": [
+        "site_id",
+        "code",
+        "name",
+        "utc_offset_min"
+      ]
+    },
+    {
+      "path": "db/variables.parquet",
+      "sha256": "4053e99aa6a88f9d5f9c290ad8f7b3772e5750675fc33a659204339ac4159283",
+      "rows": 26,
+      "builtAt": "2026-10-28T10:44:08.475Z",
+      "columns": [
+        "column_name",
+        "unit"
+      ]
+    },
+    {
+      "path": "db/events.parquet",
+      "sha256": "f27df617c335881361166a3c7074ab95ed712cf8e5665ec929760131d9b2f306",
+      "rows": 114,
+      "builtAt": "2026-10-28T10:44:08.475Z",
+      "columns": [
+        "site_code",
+        "date",
+        "type"
+      ]
+    }
+  ],
+  "steps": {
+    "units": {
+      "ch4": "µmol CH4 m-2 s-1",
+      "n2o": "nmol N2O m-2 s-1",
+      "tsoil": "°C",
+      "swc": "m3 m-3"
+    },
+    "observations": {
+      "rowsRead": 140208,
+      "rowsOutsideYears": 0,
+      "rowsKept": 140208,
+      "rule": "sites anttila, sarkisuo, viikki; local years anttila 2022-2023, sarkisuo 2022-2023, viikki 2022-2025",
+      "perSite": {
+        "anttila": {
+          "rows": 35040,
+          "values_ch4": 35040,
+          "values_n2o": 35040,
+          "values_tsoil": 34880,
+          "values_swc": 34880
+        },
+        "sarkisuo": {
+          "rows": 35040,
+          "values_ch4": 29040,
+          "values_n2o": 29040,
+          "values_tsoil": 30526,
+          "values_swc": 30529
+        },
+        "viikki": {
+          "rows": 70128,
+          "values_ch4": 0,
+          "values_n2o": 70128,
+          "values_tsoil": 63939,
+          "values_swc": 62472
+        }
+      }
+    },
+    "daily": {
+      "rule": "daily mean of a variable when it has 40 or more of the 48 half hours of the local day",
+      "days": 2921,
+      "perSite": {
+        "anttila": {
+          "days": 730,
+          "ch4": {
+            "daysWithValue": 730,
+            "daysRemovedTooFew": 0,
+            "daysWithoutValues": 0
+          },
+          "n2o": {
+            "daysWithValue": 730,
+            "daysRemovedTooFew": 0,
+            "daysWithoutValues": 0
+          },
+          "tsoil": {
+            "daysWithValue": 724,
+            "daysRemovedTooFew": 6,
+            "daysWithoutValues": 0
+          },
+          "swc": {
+            "daysWithValue": 724,
+            "daysRemovedTooFew": 6,
+            "daysWithoutValues": 0
+          }
+        },
+        "sarkisuo": {
+          "days": 730,
+          "ch4": {
+            "daysWithValue": 605,
+            "daysRemovedTooFew": 0,
+            "daysWithoutValues": 125
+          },
+          "n2o": {
+            "daysWithValue": 605,
+            "daysRemovedTooFew": 0,
+            "daysWithoutValues": 125
+          },
+          "tsoil": {
+            "daysWithValue": 629,
+            "daysRemovedTooFew": 15,
+            "daysWithoutValues": 86
+          },
+          "swc": {
+            "daysWithValue": 629,
+            "daysRemovedTooFew": 15,
+            "daysWithoutValues": 86
+          }
+        },
+        "viikki": {
+          "days": 1461,
+          "ch4": {
+            "daysWithValue": 0,
+            "daysRemovedTooFew": 0,
+            "daysWithoutValues": 1461
+          },
+          "n2o": {
+            "daysWithValue": 1461,
+            "daysRemovedTooFew": 0,
+            "daysWithoutValues": 0
+          },
+          "tsoil": {
+            "daysWithValue": 1326,
+            "daysRemovedTooFew": 13,
+            "daysWithoutValues": 122
+          },
+          "swc": {
+            "daysWithValue": 1294,
+            "daysRemovedTooFew": 17,
+            "daysWithoutValues": 150
+          }
+        }
+      }
+    },
+    "events": {
+      "rowsRead": 114,
+      "fertilisationEvents": {
+        "anttila": [
+          "2022-05-23",
+          "2022-06-22",
+          "2023-05-16",
+          "2023-06-28"
+        ],
+        "sarkisuo": [
+          "2022-05-30",
+          "2022-07-04",
+          "2023-05-22",
+          "2023-07-03"
+        ],
+        "viikki": [
+          "2022-05-10",
+          "2023-04-27",
+          "2023-05-25",
+          "2024-05-08",
+          "2024-05-22",
+          "2024-10-09",
+          "2025-05-10"
+        ]
+      },
+      "rule": "type fertilisation, site in the dive, year in the data years"
+    },
+    "drivers": {
+      "rule": "days with a daily value of the gas and the driver; bins with 10 or more days",
+      "counts": {
+        "ch4.anttila": {
+          "daysTemperature": 724,
+          "daysTemperatureInBins": 689,
+          "daysWater": 724,
+          "daysWaterInBins": 703,
+          "daysOls": 724
+        },
+        "ch4.sarkisuo": {
+          "daysTemperature": 504,
+          "daysTemperatureInBins": 478,
+          "daysWater": 504,
+          "daysWaterInBins": 458,
+          "daysOls": 504
+        },
+        "n2o.anttila": {
+          "daysTemperature": 724,
+          "daysTemperatureInBins": 689,
+          "daysWater": 724,
+          "daysWaterInBins": 703,
+          "daysOls": 724
+        },
+        "n2o.sarkisuo": {
+          "daysTemperature": 504,
+          "daysTemperatureInBins": 478,
+          "daysWater": 504,
+          "daysWaterInBins": 458,
+          "daysOls": 504
+        },
+        "n2o.viikki": {
+          "daysTemperature": 1326,
+          "daysTemperatureInBins": 1307,
+          "daysWater": 1294,
+          "daysWaterInBins": 1285,
+          "daysOls": 1294
+        }
+      }
+    },
+    "sensitivityN2o": {
+      "rule": "remove the local days 0 to 29 after each fertilisation event",
+      "daysWithN2oRemoved": {
+        "anttila": 120,
+        "sarkisuo": 120,
+        "viikki": 192
+      },
+      "counts": {
+        "n2o.anttila": {
+          "daysTemperature": 604,
+          "daysTemperatureInBins": 579,
+          "daysWater": 604,
+          "daysWaterInBins": 566,
+          "daysOls": 604
+        },
+        "n2o.sarkisuo": {
+          "daysTemperature": 447,
+          "daysTemperatureInBins": 418,
+          "daysWater": 447,
+          "daysWaterInBins": 396,
+          "daysOls": 447
+        },
+        "n2o.viikki": {
+          "daysTemperature": 1135,
+          "daysTemperatureInBins": 1116,
+          "daysWater": 1106,
+          "daysWaterInBins": 1097,
+          "daysOls": 1106
+        }
+      }
+    }
+  },
+  "outputs": {
+    "results.json": "ea76bddc432a6c3873c2472093920afd26cf8adc811923411da83cc42da81471",
+    "figures": {
+      "figures/1-temperature-response.svg": {
+        "sha256": "12b48adfdf7f365c48305314ed0ef2baa7029192f3713d2615affbb566847398",
+        "sha256WithoutMetadata": "698d93593712b3a59edb2008c3534f3b2055f9ce9381aa1b6e08cc00366c5da0"
+      },
+      "figures/2-water-response.svg": {
+        "sha256": "8fc4a15de06d8d6ff7ba1fc3dd458fdcc345456c7826372ec2714eb87af63516",
+        "sha256WithoutMetadata": "f40a859479e2da99ff27c5f33478e16ca0a19fb59e37c0821a93f454e9fdc2d2"
+      },
+      "figures/3-temperature-water-map.svg": {
+        "sha256": "0a70a7732eb53d2fc6778e03bba3cb72e1aa787657e873fb7feeb0c6f834c05c",
+        "sha256WithoutMetadata": "73b4f6077886bbaebe14338b188976e4aede8afa118609fbf581486e59645fb9"
+      },
+      "figures/4-peat-vs-mineral.svg": {
+        "sha256": "ee579c2f7c1f5e670fc826065a0d81dc52e3e654d2b8e90ff7924937f8b4e5b8",
+        "sha256WithoutMetadata": "ce70d8631276f9282e25ad02bf18c36f05bf21f1ca9b00da0fb6ba5f32d0d46a"
+      }
+    }
+  }
+}

@@ -105,7 +105,9 @@ db.closeSync();
 // non-zero exit code on a difference. Without --check (slug given): the script writes its files.
 for (const slug of selectedPy) {
   const script = `${ANALYSIS_DIR}/${slug}/${slug}.py`;
-  const pyArgs = ['run', script, ...(check ? ['--check'] : []), '--db', 'db', '--calculated', 'data/calculated'];
+  // --calculated only for a dive that reads data/calculated/ (CLAUDE.md: "only when the dive uses it").
+  const usesCalculated = readFileSync(script, 'utf8').includes('"--calculated"');
+  const pyArgs = ['run', script, ...(check ? ['--check'] : []), '--db', 'db', ...(usesCalculated ? ['--calculated', 'data/calculated'] : [])];
   log(`${slug}: uv ${pyArgs.join(' ')}`);
   const r = spawnSync('uv', pyArgs, { stdio: 'inherit' });
   if (r.error) {

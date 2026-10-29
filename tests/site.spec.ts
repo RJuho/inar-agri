@@ -2074,6 +2074,51 @@ test.describe('deep dive pages', () => {
     await expectOnlyUpdateScript(page);
   });
 
+  test('the soil GHG drivers dive (Python) has four figures, the relation tables and SVG downloads', async ({ page, request }) => {
+    const slug = 'soil-ghg-drivers';
+    await page.goto(`/deep-dive/${slug}/`);
+    await expect(page.locator('h1')).toContainText('CH₄ and N₂O');
+    await expect(page.locator('.dd-kicker .dd-index')).toHaveText('Deep Dive #11');
+    const h2 = await page.locator('main h2').allInnerTexts();
+    expect(h2).toEqual(['Question', 'Short answer', 'Data and method', 'Results', 'Limits and uncertainty', 'References', 'Reproduce']);
+    const figures = page.locator('figure.dd-figure .figure-mpl svg[role="img"][aria-labelledby]');
+    expect(await figures.count()).toBe(4);
+    for (const svg of await figures.all()) {
+      const info = await svg.evaluate((el) => ({
+        labelledby: el.getAttribute('aria-labelledby') ?? '',
+        first: el.children[0]?.tagName.toLowerCase(),
+        second: el.children[1]?.tagName.toLowerCase(),
+        titleId: el.children[0]?.id ?? '',
+        descId: el.children[1]?.id ?? '',
+      }));
+      expect([info.first, info.second]).toEqual(['title', 'desc']);
+      expect(info.labelledby.split(/\s+/)).toEqual([info.titleId, info.descId]);
+    }
+    const downloads = await page.locator('figure.dd-figure .dd-figure-download a[download]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    expect(downloads.length).toBe(4);
+    for (const href of downloads) {
+      expect(href).toMatch(new RegExp(`/deep-dive/${slug}/[^/]+\\.svg$`));
+      const res = await request.get(href);
+      expect(res.status(), href).toBe(200);
+    }
+    // Figure 1 opens a response diagram with soil temperature on x.
+    const link = (await page.locator('#figure-1 .dd-figure-link:not(.dd-figure-download) a').getAttribute('href')) ?? '';
+    const view = JSON.parse(Buffer.from(link.replace(/^\/#view=/, ''), 'base64url').toString('utf8')) as { params: { xVariable: string; variables: string[] }; diagrams: { type: string }[] };
+    expect(view.params.xVariable).toBe('tsoil');
+    expect(view.diagrams.map((x) => x.type)).toEqual(['response']);
+    // Five gas-site rows (CH4 at two sites, N2O at three), eight annual site-years.
+    await expect(page.locator('tr[id^="rel-"]')).toHaveCount(5);
+    await expect(page.locator('tr[id^="ols-"]')).toHaveCount(8);
+    await expect(page.locator('tr[id^="annual-"]')).toHaveCount(8);
+    await expect(page.locator('tr[id^="lit-"]').first()).toBeVisible();
+    expect(await page.locator('.dd-num').count()).toBeGreaterThan(50);
+    const text = await page.locator('main').innerText();
+    expect(text).not.toMatch(/\bundefined\b|\bNaN\b/);
+    const hrefs = await page.locator('a[href^="#ref-"]').evaluateAll((els) => els.map((a) => a.getAttribute('href') ?? ''));
+    for (const href of new Set(hrefs)) await expect(page.locator(`[id="${href.slice(1)}"]`), href).toHaveCount(1);
+    await expectOnlyUpdateScript(page);
+  });
+
   test('the data page link of a figure opens the same sites and variables', async ({ page }) => {
     await page.goto('/deep-dive/harvest-carbon/');
     const link = page.locator('#figure-1 .dd-figure-link a');
@@ -2091,7 +2136,7 @@ test.describe('deep dive pages', () => {
 
   test('no horizontal page scroll at phone width', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/', '/deep-dive/carbon-space/', '/deep-dive/net-biome-exchange/']) {
+    for (const path of ['/deep-dive/', '/deep-dive/harvest-carbon/', '/deep-dive/disturbance-size/', '/deep-dive/natural-events/', '/deep-dive/nee-without-harvest-drought/', '/deep-dive/disturbance-detail/', '/deep-dive/fertilisation-weather/', '/deep-dive/event-timing/', '/deep-dive/silage-harvest-response/', '/deep-dive/regrowth-drought/', '/deep-dive/carbon-space/', '/deep-dive/net-biome-exchange/', '/deep-dive/soil-ghg-drivers/']) {
       await page.goto(path);
       const overflow = await page.evaluate<number>('document.documentElement.scrollWidth - document.documentElement.clientWidth');
       expect(overflow, path).toBeLessThanOrEqual(0);

@@ -1,0 +1,447 @@
+---
+layout: ../../layouts/DeepDive.astro
+index: 11
+title: 'Soil temperature, soil water and soil type as drivers of CH₄ and N₂O'
+question: How do soil temperature, soil water content and soil type (peat or mineral) relate to the CH₄ and N₂O fluxes at Anttila, Särkisuo and Viikki?
+shortAnswer: 'Särkisuo (peat) emitted much more CH₄ and more N₂O than Anttila (mineral); both rose with soil temperature there. Elsewhere, and with soil water, the relations were weak. Fluxes are gap-filled.'
+sites: [anttila, sarkisuo, viikki]
+variables: [ch4, n2o, tsoil, swc]
+period: { from: 2022, to: 2025 }
+date: '2026-10-29'
+status: draft
+models:
+  - model: Claude Opus 5.5
+    role: question and plan
+  - model: Claude Opus 5.5
+    role: Python analysis script, figures
+  - model: Claude Opus 5.5
+    role: article draft and site integration
+  - model: Claude Opus 5.5
+    role: independent recompute of the numbers (own code, without the script and the JSON)
+  - model: Claude Opus 5.5
+    role: language (STE) and reference review
+script: analysis/soil-ghg-drivers/soil-ghg-drivers.py
+references: [shurpali2025, vettikkat2026, gao2026, anomaly-report]
+checks:
+  - kind: recompute
+    by: Claude Opus 5.5
+    date: '2026-10-29'
+    result: pass
+    note: Own code from the snapshot and the method text, without the script and the JSON. All values agree to the printed precision; one bootstrap CI bound differs by 0.1 (seed). The ten rules that the agent had to guess are now stated in the method (Fable was at its usage limit).
+  - kind: review
+    by: Claude Opus 5.5
+    date: '2026-10-29'
+    result: partial
+    note: References and literature numbers are on the cited pages. Must items fixed - VII-04 in the limits, the Särkisuo CH4 sum below the Shurpali range. Should items fixed - sensor depth, measured shares of the whole year, reference share of the fertilisation days, SD of the paired N2O means, no uncertainty of the annual sums, OLS coefficient sentence, Unicode figure text with the bin median unit and the VII-06 status, STE (zero curtain defined), swc range years.
+---
+
+import raw from '../../../../analysis/soil-ghg-drivers/results.json';
+import Num from '../../components/deep-dive/Num.astro';
+import Cite from '../../components/deep-dive/Cite.astro';
+import Figure from '../../components/deep-dive/Figure.astro';
+import References from '../../components/deep-dive/References.astro';
+import { baseUrl, fmtNum } from '../../lib/deepDive';
+import { REPO_URL } from '../../lib/dataReport';
+import { annualRows, emojiOf, fertDates, inputRows, litRows, litText, maxCellText, measuredCoverage, olsRows, relRows, soilData } from '../../lib/deepDives/soilGhgDrivers';
+
+export const d = soilData(raw);
+export const base = baseUrl();
+export const SITES = ['anttila', 'sarkisuo', 'viikki'];
+export const VIEW1 = { name: 'CH4 and N2O against soil temperature', sites: SITES, variables: ['ch4', 'n2o'], xVariable: 'tsoil', yearFrom: 2022, yearTo: 2025, aggregation: 'day', events: false, diagrams: ['response'] };
+export const VIEW2 = { name: 'CH4 and N2O against soil water', sites: SITES, variables: ['ch4', 'n2o'], xVariable: 'swc', yearFrom: 2022, yearTo: 2025, aggregation: 'day', events: false, diagrams: ['response'] };
+export const VIEW3 = { name: 'CH4, N2O and soil drivers', sites: SITES, variables: ['ch4', 'n2o', 'tsoil', 'swc'], yearFrom: 2022, yearTo: 2025, aggregation: 'day', events: true, diagrams: ['timeseries'] };
+export const VIEW4 = { name: 'Annual CH4 sums', sites: SITES, variables: ['ch4'], yearFrom: 2022, yearTo: 2025, aggregation: 'day', events: false, diagrams: ['budget'] };
+export const rel = relRows(d);
+export const ols = olsRows(d);
+export const annual = annualRows(d);
+export const lit = litRows(d);
+export const inputs = inputRows(d);
+export const MC = measuredCoverage(d);
+export const UCH4 = 'µmol CH₄ m⁻² s⁻¹';
+export const UN2O = 'nmol N₂O m⁻² s⁻¹';
+export const KCH4 = 'kg CH₄ ha⁻¹ yr⁻¹';
+export const KN2O = 'kg N₂O ha⁻¹ yr⁻¹';
+export const SWC = 'm³ m⁻³';
+// Site emoji before a site name in the text. aria-hidden: a screen reader reads only the name.
+export const E = ({ site }) => <span aria-hidden="true">{emojiOf(site)} </span>;
+// Spearman rho of a gas and site against tsoil (T) or swc (W); prefix "sensitivity." for the run without the fertilisation days.
+export const RT = ({ g, s, nf = false }) => <Num k={`${nf ? 'sensitivity.' : ''}temperature.${g}.${s}.spearman.rho`} />;
+export const RW = ({ g, s, nf = false }) => <Num k={`${nf ? 'sensitivity.' : ''}water.${g}.${s}.spearman.rho`} />;
+export const ND = ({ k }) => <Num k={k} digits={0} />;
+// Q10 with the 95 % CI.
+export const Q = ({ g, s, nf = false }) => {
+  const p = `${nf ? 'sensitivity.' : ''}temperature.${g}.${s}.fit`;
+  return <><Num k={`${p}.q10`} /> (95 % CI <Num k={`${p}.q10Lo`} /> to <Num k={`${p}.q10Hi`} />)</>;
+};
+// OLS coefficient per 1 SD with the 95 % CI.
+export const C = ({ g, s, c, n = 2, nf = false }) => {
+  const p = `${nf ? 'sensitivity.' : ''}ols.${g}.${s}.coef.${c}`;
+  return <><Num k={`${p}.est`} digits={n} /> (95 % CI <Num k={`${p}.lo`} digits={n} /> to <Num k={`${p}.hi`} digits={n} />)</>;
+};
+export const SH = ({ s, y }) => <Num k={`sensitivity.shareInWindows.${s}.${y}.shareOfDailySum`} percent digits={0} />;
+export const AN = ({ s, y, g, n = 1 }) => <Num k={`annual.${s}.${y}.${g}.kgHa`} digits={n} />;
+export const LC = ({ k, f = 'literature', n = 0 }) => <Num k={`literatureCompare.${k}.${f}`} digits={n} />;
+export const FINDING = ({ id }) => <a href={`${base}data-report/#finding-${id}`}>{id}</a>;
+
+## Short answer
+
+The drained peat site <E site="sarkisuo" />Särkisuo had a much larger CH₄ flux than the mineral site
+<E site="anttila" />Anttila on the same days: the mean daily difference was <Num k="soilTypeCompare.ch4.diffMgPerDay.mean" digits={0} unit="mg CH₄ m⁻² d⁻¹" />
+(95 % CI <Num k="soilTypeCompare.ch4.diffMgPerDay.lo" digits={0} /> to <Num k="soilTypeCompare.ch4.diffMgPerDay.hi" digits={0} />,
+n = <ND k="soilTypeCompare.ch4.nDays" /> days). At Särkisuo, the CH₄ flux rose with soil temperature (Spearman ρ = <RT g="ch4" s="sarkisuo" />,
+Q₁₀ = <Q g="ch4" s="sarkisuo" />). At Anttila, CH₄ was near zero and had no clear relation to soil temperature or soil
+water. The N₂O flux rose with soil temperature at Särkisuo (ρ = <RT g="n2o" s="sarkisuo" />). At Anttila the relation was
+weak (ρ = <RT g="n2o" s="anttila" />), and at <E site="viikki" />Viikki there was no clear relation (ρ = <RT g="n2o" s="viikki" />).
+Soil water content gave only weak relations (|ρ| ≤ <Num k="water.n2o.sarkisuo.spearman.rho" abs />). The <ND k="method.fertDays" /> days after a
+fertilisation held a large part of the annual N₂O sum at Särkisuo (<SH s="sarkisuo" y="2022" /> in 2022, a partial year, and
+<SH s="sarkisuo" y="2023" /> in 2023). These days are only <Num k="sensitivity.shareInWindows.sarkisuo.2023.shareOfDays" percent digits={0} /> of
+the days of 2023 and <Num k="sensitivity.shareInWindows.sarkisuo.2022.shareOfDays" percent digits={0} /> of the days with data in 2022.
+All fluxes are gap-filled values, and the results are correlations, not causes.
+
+## Data and method
+
+**Snapshot and script.** The script `analysis/soil-ghg-drivers/soil-ghg-drivers.py` reads the harmonised database
+snapshot built on {d.dataVersion.snapshot.builtAt}: `db/observations.parquet` (columns `site_id`, `ts_start`, `ch4`,
+`n2o`, `tsoil`, `swc`), `db/sites.parquet`, `db/variables.parquet` (unit check) and `db/events.parquet` (fertilisation
+dates). It checks the SHA-256 and the row count of each file before it reads data (section "Reproduce").
+
+**Sites, gases and units.** CH₄ is only at <E site="anttila" />Anttila and <E site="sarkisuo" />Särkisuo (2022 and 2023).
+N₂O is at Anttila, Särkisuo (2022 and 2023) and <E site="viikki" />Viikki (2022 to 2025). The fluxes are the gap-filled
+values of the data providers; the database has no measured CH₄ or N₂O values. The units are the units of the database:
+CH₄ in {UCH4}, N₂O in {UN2O}. A positive flux is an emission to the atmosphere. The soil drivers are `tsoil` (°C) and `swc`
+({SWC}) of the shallowest sensor. At Anttila and Särkisuo the depth is probably <ND k="sites.anttila.sensorDepthCm" /> cm:
+Shurpali et al. give <ND k="sites.anttila.sensorDepthCm" /> cm <Cite ids={['shurpali2025']} note="p. 4, Sect. 3.1" />, but the
+database lists the depth of `TS_1_1_1` and `SWC_1_1_1` as not known. At Viikki the depth is
+<ND k="sites.viikki.sensorDepthCm" /> cm (soil pit layer 1, `docs/harmonised-database.md`).
+
+**Soil type.** The soil type is one fixed value per site. Anttila has a mineral soil (silt loam). Särkisuo has a drained
+organic soil, mainly sedge peat <Cite ids={['shurpali2025']} note="p. 2, Sect. 2.1; p. 3, Table 2" />. Shurpali et al. call the
+fields adjacent grasslands with the same climate <Cite ids={['shurpali2025']} note="p. 2" />. The soil organic carbon at 0 to 10 cm is
+<Num k="literatureByKey.anttilaSocPct.value" /> % at Anttila and <Num k="literatureByKey.sarkisuoSocPct.value" digits={1} /> % at
+Särkisuo <Cite ids={['shurpali2025']} note="p. 2, Table 1" />. Viikki (field Alaniitty 1) has a clay loam soil
+<Cite ids={['vettikkat2026']} note="p. 2, Sect. 2.1; p. 3" />; Gao et al. give a clay texture and artificially drained
+Stagnosols and Planosols <Cite ids={['gao2026']} note="p. 3" />. Thus the dive has one peat site and two mineral sites.
+
+**1. Daily values.** A local day is the calendar day of `ts_start` + `utc_offset_min` (UTC+2). The script takes the
+daily mean of each variable. A daily mean is kept when the variable has <ND k="method.minValuesPerDay" /> or more of the
+48 half hours of the day; else the daily value is missing. Each analysis uses the days on which all its variables have a
+daily value. For the text only, daily CH₄ is also given in mg CH₄ m⁻² d⁻¹ and daily N₂O in mg N₂O m⁻² d⁻¹ (molar mass
+<Num k="method.molarMass.ch4" digits={3} /> and <Num k="method.molarMass.n2o" digits={3} /> g mol⁻¹).
+
+**2. Temperature response (Figure 1).** Per site and gas, the daily `tsoil` goes into bins of
+<Num k="method.tBin" digits={0} /> °C (bin number = floor(`tsoil` / width), bin centre = (floor(x / width) + 0.5) × width).
+A bin needs <ND k="method.minBinDays" /> or more days; the other bins are not used.
+Per bin, the script gives the median and the 25 % and 75 % quantiles of the daily flux. The Spearman rank correlation ρ
+uses all days. The script fits F = F₁₀ × Q₁₀^((T − 10) / 10) to the bin medians that are above zero, at the bin centres.
+The fit is in log space, ln F = ln F₁₀ + k (T − 10), and Q₁₀ = exp(10 k). Thus each bin has the same relative weight.
+The fit needs <ND k="method.fitMinBins" /> or more bins with a median above zero, and these bins must be
+<Num k="method.fitMinPositiveShare" percent digits={0} /> or more of all bins (all bins = the bins with
+<ND k="method.minBinDays" /> or more days); else there is no fit. The 95 % CI of Q₁₀ is
+exp(10 (k ± t × SE(k))), with the t quantile for n − 2 degrees of freedom (n = number of bins). R² is in log space.
+
+**3. Water response (Figure 2).** The same, with `swc` in bins of <Num k="method.wBin" /> {SWC} (bin = floor of
+`swc` / <Num k="method.wBin" />, same centre rule), and the Spearman ρ. There is no fit.
+
+**4. Joint effect.** Per site and gas, an ordinary least squares (OLS) regression of the daily flux on z(`tsoil`),
+z(`swc`) and their product, with a constant. The script uses the days that have a daily flux, `tsoil` and `swc` (the
+OLS days). z = (x − mean) / SD, with the mean and SD (n − 1) of the OLS days of that site and gas. A coefficient of
+`tsoil` or `swc` is the change of the flux for 1 SD of that driver when the other driver is at its mean. The standard
+errors are Newey–West (HAC) with <ND k="method.hacLags" /> lags, Bartlett kernel and no small-sample correction
+(statsmodels). The 95 % CI and the p-values use the normal distribution. The script gives the coefficients with the
+95 % CI, the p-values and R².
+
+**5. Soil type (Figure 4).** (a) Annual sums per site, local calendar year and gas: the sum of the 30-min values × 1800 s,
+in {KCH4} and {KN2O}, with the coverage (values / half hours of the year). The conversion is: sum of the 30-min fluxes ×
+1800 s gives µmol CH₄ m⁻² or nmol N₂O m⁻²; × molar mass (<Num k="method.molarMass.ch4" digits={3} /> g mol⁻¹ for CH₄,
+<Num k="method.molarMass.n2o" digits={3} /> g mol⁻¹ for N₂O) gives g m⁻²; × 10 gives kg ha⁻¹. A year with a coverage below
+<Num k="method.partialCoverage" percent digits={0} /> is a partial year. The script compares the 2022 sums with Table 3 of
+Shurpali et al. 2025 <Cite ids={['shurpali2025']} note="p. 6, Table 3" />. Viikki gets annual N₂O sums too. (b) Paired
+days: the local days of 2022 and 2023 on which both Särkisuo and Anttila have a daily value of the gas. The script gives
+the daily distributions (median, 25 % and 75 %) and the mean daily difference Särkisuo − Anttila. The 95 % CI of the
+difference comes from a block bootstrap. The <ND k="soilTypeCompare.ch4.diff.nDays" /> paired days, in date order, are
+cut into blocks of <ND k="method.blockDays" /> days. The last block is shorter
+(<ND k="soilTypeCompare.ch4.diff.lastBlockDays" /> days), and the script keeps it. Each replicate draws as many blocks as
+there are (<ND k="soilTypeCompare.ch4.diff.nBlocks" />), with replacement. The statistic of a replicate is the mean of all
+days in the drawn blocks. The script uses `numpy.random.default_rng` with seed {raw.method.bootSeed} and
+<ND k="method.bootReps" /> replicates, and gives the 2.5 % and 97.5 % percentiles as the 95 % CI. N₂O uses the same days and blocks.
+
+**6. Fertilisation days (N₂O).** Steps 2 to 4 again for N₂O, without the <ND k="method.fertDays" /> local days that
+start on each fertilisation event of `db/events.parquet` (rows with `type` = `fertilisation`; the event day is day 0).
+"Days removed" is the number of days with a daily N₂O value in these windows, all years of the site together.
+The script also gives the share of the N₂O sum of each site-year that is on these days: the sum of the daily N₂O means
+of the days in the windows, divided by the sum of all daily N₂O means of the year. "Fert. days" is the number of local
+days of the calendar year in the windows (windows that overlap count one time). The events are: Anttila
+{fertDates(d, 'anttila')}; Särkisuo {fertDates(d, 'sarkisuo')}; Viikki {fertDates(d, 'viikki')}.
+
+**7. Heat map (Figure 3).** The mean daily flux per cell of <Num k="method.mapTBin" digits={0} /> °C `tsoil` ×
+<Num k="method.mapWBin" /> {SWC} `swc` (cell = floor(`tsoil` / <Num k="method.mapTBin" digits={0} />) and
+floor(`swc` / <Num k="method.mapWBin" />)). A cell needs <ND k="method.minCellDays" /> or more days.
+
+The script logs each step that removes rows or days; the counts are in `results.json` (`dataVersion.steps`). It also
+prints the open findings of the Data Report that touch this dive (section "Limits and uncertainty").
+
+## Results
+
+### Soil temperature
+
+<Figure id="figure-1" svgFile="analysis/soil-ghg-drivers/figures/1-temperature-response.svg" view={VIEW1} />
+
+**CH₄.** At <E site="sarkisuo" />Särkisuo, the daily CH₄ flux had a strong positive rank correlation with soil
+temperature (ρ = <RT g="ch4" s="sarkisuo" />, n = <ND k="temperature.ch4.sarkisuo.n" /> days). The Q₁₀ fit gave
+Q₁₀ = <Q g="ch4" s="sarkisuo" /> and F₁₀ = <Num k="temperature.ch4.sarkisuo.fit.f10" digits={3} unit={UCH4} />
+(R² in log space <Num k="temperature.ch4.sarkisuo.fit.r2Log" />, <ND k="temperature.ch4.sarkisuo.fit.nBins" /> bins).
+At <E site="anttila" />Anttila, the CH₄ flux had no clear relation to soil temperature (ρ = <RT g="ch4" s="anttila" />,
+p = <Num k="temperature.ch4.anttila.spearman.p" />, n = <ND k="temperature.ch4.anttila.n" /> days). The median daily
+flux was <Num k="temperature.ch4.anttila.fluxMedian" digits={5} unit={UCH4} />, near zero. Only
+<ND k="temperature.ch4.anttila.fit.nBins" /> of the <ND k="temperature.ch4.anttila.fit.nBinsAll" /> bins had a median
+above zero, so there is no Q₁₀ fit.
+
+**N₂O.** At Särkisuo, the N₂O flux rose with soil temperature (ρ = <RT g="n2o" s="sarkisuo" />, n =
+<ND k="temperature.n2o.sarkisuo.n" /> days; Q₁₀ = <Q g="n2o" s="sarkisuo" />). At Anttila, the rank correlation was weak
+(ρ = <RT g="n2o" s="anttila" />, n = <ND k="temperature.n2o.anttila.n" /> days), and the fit gave
+Q₁₀ = <Q g="n2o" s="anttila" />. At <E site="viikki" />Viikki, the rank correlation was near zero
+(ρ = <RT g="n2o" s="viikki" />, n = <ND k="temperature.n2o.viikki.n" /> days), and the CI of Q₁₀ includes 1
+(Q₁₀ = <Q g="n2o" s="viikki" />, R² in log space <Num k="temperature.n2o.viikki.fit.r2Log" />).
+
+### Soil water content
+
+<Figure id="figure-2" svgFile="analysis/soil-ghg-drivers/figures/2-water-response.svg" view={VIEW2} />
+
+The sites have different ranges of soil water content. On the days of the dive (2022 and 2023; Viikki 2022 to 2025), the daily `swc` was <Num k="water.n2o.anttila.driverMin" /> to
+<Num k="water.n2o.anttila.driverMax" /> {SWC} at Anttila, <Num k="water.n2o.sarkisuo.driverMin" /> to
+<Num k="water.n2o.sarkisuo.driverMax" /> {SWC} at Särkisuo and <Num k="water.n2o.viikki.driverMin" /> to
+<Num k="water.n2o.viikki.driverMax" /> {SWC} at Viikki. Shurpali et al. give {litText(d, 'anttilaSwcRangePct')} % at
+Anttila and {litText(d, 'sarkisuoSwcRangePct')} % at Särkisuo at 5 cm, for 2022 only <Cite ids={['shurpali2025']} note="p. 4, Sect. 3.1" />.
+
+**CH₄.** Soil water content had no clear relation to CH₄ at Anttila (ρ = <RW g="ch4" s="anttila" />,
+p = <Num k="water.ch4.anttila.spearman.p" />) and a weak positive relation at Särkisuo (ρ = <RW g="ch4" s="sarkisuo" />).
+
+**N₂O.** The relation was weak and negative at Anttila (ρ = <RW g="n2o" s="anttila" />, n = <ND k="water.n2o.anttila.n" />
+days) and at Särkisuo (ρ = <RW g="n2o" s="sarkisuo" />, n = <ND k="water.n2o.sarkisuo.n" /> days). It was weak and positive
+at Viikki (ρ = <RW g="n2o" s="viikki" />, n = <ND k="water.n2o.viikki.n" /> days). The two mineral sites thus have
+relations with opposite signs. The dive does not test the cause.
+
+### Soil temperature and soil water together
+
+<Figure id="figure-3" svgFile="analysis/soil-ghg-drivers/figures/3-temperature-water-map.svg" view={VIEW3} />
+
+**OLS.** The coefficients are per 1 SD of the driver (table "Joint regression"). For Särkisuo CH₄, R² was
+<Num k="ols.ch4.sarkisuo.r2" /> (n = <ND k="ols.ch4.sarkisuo.n" /> days). The soil temperature
+coefficient was <C g="ch4" s="sarkisuo" c="tsoil" n={4} /> {UCH4}. The soil water coefficient was smaller,
+<C g="ch4" s="sarkisuo" c="swc" n={4} />, and the product term was <C g="ch4" s="sarkisuo" c="tsoilXswc" n={4} />.
+For Anttila CH₄, R² was <Num k="ols.ch4.anttila.r2" />. For N₂O, R² was <Num k="ols.n2o.sarkisuo.r2" /> at Särkisuo,
+<Num k="ols.n2o.anttila.r2" /> at Anttila and <Num k="ols.n2o.viikki.r2" /> at Viikki. At Särkisuo the N₂O coefficients
+were <C g="n2o" s="sarkisuo" c="tsoil" /> for soil temperature and <C g="n2o" s="sarkisuo" c="swc" /> for soil water
+({UN2O}). At Viikki all three coefficients were positive: soil temperature <C g="n2o" s="viikki" c="tsoil" />, soil
+water <C g="n2o" s="viikki" c="swc" />, product <C g="n2o" s="viikki" c="tsoilXswc" />.
+
+**Heat map.** In Figure 3, the cell with the largest mean CH₄ flux at Särkisuo is at {maxCellText(d, 'ch4', 'sarkisuo')}
+(<Num k="heatMap.ch4.sarkisuo.maxCell.mean" digits={3} unit={UCH4} />, n = <ND k="heatMap.ch4.sarkisuo.maxCell.n" /> days).
+For N₂O, the largest cell means are <Num k="heatMap.n2o.sarkisuo.maxCell.mean" digits={1} unit={UN2O} /> at Särkisuo
+({maxCellText(d, 'n2o', 'sarkisuo')}, n = <ND k="heatMap.n2o.sarkisuo.maxCell.n" /> days) and
+<Num k="heatMap.n2o.viikki.maxCell.mean" digits={1} unit={UN2O} /> at Viikki ({maxCellText(d, 'n2o', 'viikki')},
+n = <ND k="heatMap.n2o.viikki.maxCell.n" /> days). These cells have few days. The cells hold
+<ND k="heatMap.n2o.sarkisuo.nDaysInCells" /> of <ND k="heatMap.n2o.sarkisuo.nDays" /> days at Särkisuo,
+<ND k="heatMap.n2o.anttila.nDaysInCells" /> of <ND k="heatMap.n2o.anttila.nDays" /> at Anttila and
+<ND k="heatMap.n2o.viikki.nDaysInCells" /> of <ND k="heatMap.n2o.viikki.nDays" /> at Viikki.
+
+### Peat and mineral soil
+
+<Figure id="figure-4" svgFile="analysis/soil-ghg-drivers/figures/4-peat-vs-mineral.svg" view={VIEW4} />
+
+**Paired days.** <ND k="soilTypeCompare.ch4.nDays" /> local days from {raw.soilTypeCompare.ch4.first}
+to {raw.soilTypeCompare.ch4.last} have a daily value at both sites. On <ND k="soilTypeCompare.ch4.daysPeatHigher" /> of
+these days, the CH₄ flux at Särkisuo was higher than at Anttila. The median daily CH₄ flux was
+<Num k="soilTypeCompare.ch4.peatStats.median" digits={4} /> at Särkisuo (25 to 75 %: <Num k="soilTypeCompare.ch4.peatStats.q25" digits={4} />
+to <Num k="soilTypeCompare.ch4.peatStats.q75" digits={4} />) and <Num k="soilTypeCompare.ch4.mineralStats.median" digits={5} />
+at Anttila (<Num k="soilTypeCompare.ch4.mineralStats.q25" digits={5} /> to <Num k="soilTypeCompare.ch4.mineralStats.q75" digits={5} />) {UCH4}.
+The mean daily difference was <Num k="soilTypeCompare.ch4.diff.mean" digits={4} unit={UCH4} /> (95 % CI
+<Num k="soilTypeCompare.ch4.diff.lo" digits={4} /> to <Num k="soilTypeCompare.ch4.diff.hi" digits={4} />,
+<ND k="soilTypeCompare.ch4.diff.nBlocks" /> blocks), or <Num k="soilTypeCompare.ch4.diffMgPerDay.mean" digits={0} unit="mg CH₄ m⁻² d⁻¹" />.
+For N₂O, Särkisuo was higher on <ND k="soilTypeCompare.n2o.daysPeatHigher" /> of <ND k="soilTypeCompare.n2o.nDays" /> days.
+The medians were near each other (<Num k="soilTypeCompare.n2o.peatStats.median" digits={3} /> at Särkisuo and
+<Num k="soilTypeCompare.n2o.mineralStats.median" digits={3} /> at Anttila, {UN2O}), but the means were not
+(<Num k="soilTypeCompare.n2o.peatStats.mean" /> with SD <Num k="soilTypeCompare.n2o.peatStats.sd" /> at Särkisuo and
+<Num k="soilTypeCompare.n2o.mineralStats.mean" /> with SD <Num k="soilTypeCompare.n2o.mineralStats.sd" /> at Anttila). This
+suggests that the days with high N₂O fluxes make most of the difference. The mean daily difference was
+<Num k="soilTypeCompare.n2o.diff.mean" unit={UN2O} /> (95 % CI <Num k="soilTypeCompare.n2o.diff.lo" /> to
+<Num k="soilTypeCompare.n2o.diff.hi" />), or <Num k="soilTypeCompare.n2o.diffMgPerDay.mean" digits={1} unit="mg N₂O m⁻² d⁻¹" />
+(95 % CI <Num k="soilTypeCompare.n2o.diffMgPerDay.lo" digits={1} /> to <Num k="soilTypeCompare.n2o.diffMgPerDay.hi" digits={1} />).
+
+**Annual sums.** The annual CH₄ sum was <AN s="anttila" y="2022" g="ch4" /> and <AN s="anttila" y="2023" g="ch4" /> {KCH4}
+at Anttila (2022 and 2023), and <AN s="sarkisuo" y="2022" g="ch4" n={0} /> (partial year, coverage
+<Num k="annual.sarkisuo.2022.ch4.coverage" percent digits={0} />) and <AN s="sarkisuo" y="2023" g="ch4" n={0} /> {KCH4} at
+Särkisuo. The annual N₂O sum was <AN s="anttila" y="2022" g="n2o" /> and <AN s="anttila" y="2023" g="n2o" /> {KN2O} at
+Anttila, <AN s="sarkisuo" y="2022" g="n2o" /> (partial) and <AN s="sarkisuo" y="2023" g="n2o" /> at Särkisuo, and
+<AN s="viikki" y="2022" g="n2o" />, <AN s="viikki" y="2023" g="n2o" />, <AN s="viikki" y="2024" g="n2o" /> and
+<AN s="viikki" y="2025" g="n2o" /> at Viikki (2022 to 2025). The 2022 sums of Anttila CH₄, Anttila N₂O and Särkisuo N₂O are
+in the range of Table 3 of Shurpali et al. 2025 <Cite ids={['shurpali2025']} note="p. 6, Table 3" />. The Särkisuo CH₄ sum is
+below their range (<LC k="sarkisuo_ch4" f="literatureLo" /> to <LC k="sarkisuo_ch4" f="literatureHi" /> {KCH4}). The ratio of our
+sum to their value is <Num k="literatureCompare.anttila_ch4.ratio" /> (Anttila CH₄), <Num k="literatureCompare.sarkisuo_ch4.ratio" />
+(Särkisuo CH₄), <Num k="literatureCompare.anttila_n2o.ratio" /> (Anttila N₂O) and
+<Num k="literatureCompare.sarkisuo_n2o.ratio" /> (Särkisuo N₂O). Our Särkisuo 2022 sums start on {raw.soilTypeCompare.ch4.first}.
+Shurpali et al. filled the months before that day with the median flux of December 2022
+<Cite ids={['shurpali2025']} note="p. 3" />. This can explain a part of the difference.
+
+### Fertilisation days (N₂O)
+
+The <ND k="method.fertDays" /> days that start on each fertilisation day held <SH s="anttila" y="2022" /> (2022) and <SH s="anttila" y="2023" /> (2023) of the
+N₂O sum at Anttila, <SH s="sarkisuo" y="2022" /> and <SH s="sarkisuo" y="2023" /> at Särkisuo, and
+<SH s="viikki" y="2022" />, <SH s="viikki" y="2023" />, <SH s="viikki" y="2024" /> and <SH s="viikki" y="2025" /> at Viikki
+(2022 to 2025). For comparison, two windows of <ND k="method.fertDays" /> days are
+<Num k="sensitivity.shareInWindows.anttila.2022.shareOfDays" percent digits={0} /> of a full year, and
+<Num k="sensitivity.shareInWindows.sarkisuo.2022.shareOfDays" percent digits={0} /> of the days with data at Särkisuo in 2022 (a partial year).
+Without these days (<ND k="sensitivity.daysRemoved.anttila" /> days with a daily N₂O value removed at Anttila,
+<ND k="sensitivity.daysRemoved.sarkisuo" /> at Särkisuo, <ND k="sensitivity.daysRemoved.viikki" /> at Viikki):
+
+- <E site="anttila" />Anttila: ρ with soil temperature changed from <RT g="n2o" s="anttila" /> to <RT g="n2o" s="anttila" nf />
+  (p = <Num k="sensitivity.temperature.n2o.anttila.spearman.p" />). The Q₁₀ of the bin medians stayed near the same value,
+  <Q g="n2o" s="anttila" nf />. The two measures differ: ρ uses all days, and the fit gives each bin the same weight.
+  ρ with soil water changed from <RW g="n2o" s="anttila" /> to <RW g="n2o" s="anttila" nf />.
+- <E site="sarkisuo" />Särkisuo: ρ with soil temperature changed from <RT g="n2o" s="sarkisuo" /> to <RT g="n2o" s="sarkisuo" nf />,
+  and Q₁₀ from <Num k="temperature.n2o.sarkisuo.fit.q10" /> to <Q g="n2o" s="sarkisuo" nf />. ρ with soil water changed
+  from <RW g="n2o" s="sarkisuo" /> to <RW g="n2o" s="sarkisuo" nf />.
+- <E site="viikki" />Viikki: ρ with soil temperature changed from <RT g="n2o" s="viikki" /> to <RT g="n2o" s="viikki" nf />;
+  the CI of Q₁₀ still includes 1 (<Q g="n2o" s="viikki" nf />). ρ with soil water changed from <RW g="n2o" s="viikki" /> to <RW g="n2o" s="viikki" nf />.
+
+### Tables
+
+<div class="table-wrap">
+<table>
+<caption>Relations per site and gas. Days = days with a daily flux and driver value (temperature / water when they differ). ρ = Spearman rank correlation of the daily flux with the daily tsoil or swc. Q₁₀ with the 95 % CI from the fit to the positive bin medians. R² of the OLS on tsoil, swc and their product. "Without fert." = N₂O without the 30 days that start on each fertilisation day.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Soil</th><th scope="col">Gas</th><th scope="col" class="num">Days</th><th scope="col" class="num">ρ tsoil</th><th scope="col" class="num">ρ swc</th><th scope="col">Q₁₀ (95 % CI)</th><th scope="col" class="num">R² OLS</th><th scope="col" class="num">Days, without fert.</th><th scope="col" class="num">ρ tsoil, without fert.</th><th scope="col" class="num">ρ swc, without fert.</th><th scope="col">Q₁₀, without fert.</th><th scope="col" class="num">R² OLS, without fert.</th></tr>
+</thead>
+<tbody>
+{rel.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td class="wrap">{r.soil}</td><td>{r.gas}</td><td class="num">{r.days}</td><td class="num">{r.rhoT}</td><td class="num">{r.rhoW}</td><td class="wrap">{r.q10}</td><td class="num">{r.r2}</td><td class="num">{r.nfDays}</td><td class="num">{r.nfRhoT}</td><td class="num">{r.nfRhoW}</td><td class="wrap">{r.nfQ10}</td><td class="num">{r.nfR2}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Joint regression: OLS of the daily flux on z(tsoil), z(swc) and z(tsoil) × z(swc). Coefficients per 1 SD of the driver, with the 95 % CI from Newey–West (HAC) standard errors with {raw.method.hacLags} lags. Units: CH₄ {UCH4}, N₂O {UN2O}.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Gas</th><th scope="col">Days</th><th scope="col" class="num">n</th><th scope="col">tsoil</th><th scope="col">swc</th><th scope="col">tsoil × swc</th><th scope="col" class="num">R²</th></tr>
+</thead>
+<tbody>
+{ols.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td>{r.gas}</td><td class="wrap">{r.set}</td><td class="num">{r.n}</td><td class="wrap">{r.tsoil}</td><td class="wrap">{r.swc}</td><td class="wrap">{r.inter}</td><td class="num">{r.r2}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Annual sums per site-year (local calendar year) in {KCH4} and {KN2O}, with the 2022 values of Shurpali et al. 2025 (Table 3; value and range of three gap-filling algorithms). Coverage = 30-min values / half hours of the year. Fert. share = sum of the daily N₂O means on the 30 days that start on each fertilisation day / sum of all daily N₂O means of the year; fert. days = number of local days of the year in these windows (overlaps count one time). The database has only the median of the gap-filling ensemble, so the sums of this dive have no uncertainty range.</caption>
+<thead>
+<tr><th scope="col">Site</th><th scope="col">Soil</th><th scope="col" class="num">Year</th><th scope="col" class="num">CH₄</th><th scope="col">CH₄, Shurpali 2025</th><th scope="col" class="num">N₂O</th><th scope="col">N₂O, Shurpali 2025</th><th scope="col" class="num">Coverage</th><th scope="col" class="num">Fert. share</th><th scope="col" class="num">Fert. days</th></tr>
+</thead>
+<tbody>
+{annual.map((r) => (<tr id={r.id}><td><span aria-hidden="true">{r.emoji} </span>{r.site}</td><td class="wrap">{r.soil}</td><td class="num">{r.year}</td><td class="num">{r.ch4}</td><td class="wrap">{r.ch4Lit}</td><td class="num">{r.n2o}</td><td class="wrap">{r.n2oLit}</td><td class="num">{r.coverage}</td><td class="num">{r.fertShare}</td><td class="num">{r.fertDays}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+<div class="table-wrap">
+<table>
+<caption>Values from the articles (table LITERATURE of the script), with the page.</caption>
+<thead>
+<tr><th scope="col">Value</th><th scope="col">Number</th><th scope="col">Source</th><th scope="col">Page</th></tr>
+</thead>
+<tbody>
+{lit.map((r) => (<tr id={r.id}><td class="wrap">{r.text}</td><td class="wrap">{r.value}</td><td>{r.source}</td><td class="wrap">{r.page}</td></tr>))}
+</tbody>
+</table>
+</div>
+
+## Limits and uncertainty
+
+- **Gap-filled fluxes only.** The database has only the gap-filled CH₄ and N₂O values. In 2022, the share of measured
+  30-min values after the quality filter, as a share of the whole year, was {MC.anttila.ch4} % (CH₄) and {MC.anttila.n2o} % (N₂O)
+  at Anttila, and {MC.sarkisuo.ch4} % and {MC.sarkisuo.n2o} % at Särkisuo <Cite ids={['shurpali2025']} note="p. 3, Sect. 2.3.2" />.
+  At Särkisuo the CH₄ and N₂O measurements started on 6 May 2022 <Cite ids={['shurpali2025']} note="p. 3" />. No measured
+  share is known for 2023. Shurpali et
+  al. filled the gaps with three machine-learning models (random forest, XGB and kNN) and used the median of the three
+  <Cite ids={['shurpali2025']} note="p. 3" />. The main text does not list the model inputs. If soil temperature or soil
+  water is an input, a part of each relation on this page comes from the model, not from the measurements. The gap-filling
+  method of the Viikki N₂O is not in the files of this project. The size of this effect is not known.
+- **No uncertainty of the annual sums.** The database has only the ensemble median of the gap-filled fluxes. Thus the
+  annual sums of this dive have no uncertainty range. Shurpali et al. give the range of the three algorithms, for 2022
+  only <Cite ids={['shurpali2025']} note="p. 6, Table 3" />.
+- **No wind.** The Anttila and Särkisuo files have no wind speed and no u*. The dive therefore does not study wind.
+- **Two soil drivers only.** The dive uses `tsoil` and `swc` of one depth per site. The raw files also have the water
+  table depth (Anttila 2022, Viikki) and the soil O₂ (Anttila 2022), but these are not in the harmonised database. The
+  soil type is one value per site; the dive has one peat site, so it cannot separate the soil type from the other
+  differences of the two fields. The Viikki sensors are at <ND k="sites.viikki.sensorDepthCm" /> cm, not at
+  <ND k="sites.anttila.sensorDepthCm" /> cm. Thus the Viikki relations are not directly comparable with those of Anttila
+  and Särkisuo.
+- **Viikki N₂O unit.** The unit of the Viikki N₂O can be µg N₂O or µg N₂O-N (finding <FINDING id="VII-06" />; status:
+  waits for provider) <Cite ids={['anomaly-report']} />. The build assumes µg N₂O. If it is N₂O-N, all Viikki N₂O values
+  of the database are too small: the true values are <Num k="method.n2oNFactor" /> times larger, for example the 2022 sum would be
+  <Num k="annual.viikki.2022.n2o.kgHaIfN2oN" digits={1} unit={KN2O} />. The rank correlations do not change; the Viikki
+  sums, medians, coefficients and heat map values change by this factor.
+- **Time stamps.** The raw stamps of Anttila, Särkisuo and Viikki are UTC, but the build reads them as UTC+2 (findings
+  <FINDING id="ANT-01" />, <FINDING id="SAR-01" /> and <FINDING id="VII-01" />; status: waits for provider)
+  <Cite ids={['anomaly-report']} />. A local day of these sites therefore holds the hours from 02:00 to 02:00 of the true
+  local time. The changes of the daily means are probably small. The annual sums change only by the hours at the ends of
+  the year. The script does not give the size.
+- **Särkisuo 2022 is a partial year.** The Särkisuo CH₄ and N₂O values start on 2022-05-06 (finding <FINDING id="SAR-07" />;
+  status: resolved) <Cite ids={['anomaly-report']} />. The 2022 sums have a coverage of
+  <Num k="annual.sarkisuo.2022.ch4.coverage" percent digits={0} />, and the paired days start on that day.
+- **Zero curtain.** A zero curtain is a period in which the soil temperature stays near 0 °C while the soil water
+  freezes or thaws. In winter, `tsoil` stays near 0 °C for weeks. At Särkisuo it is constant for most of the winter
+  2022–23; a sensor floor is an open question (findings <FINDING id="SAR-04" />, status: waits for provider;
+  <FINDING id="ANT-05" /> and <FINDING id="VII-03" />, status: resolved) <Cite ids={['anomaly-report']} />. The lowest
+  temperature bins therefore hold many winter days with different fluxes, for example
+  <ND k="temperature.ch4.anttila.bins.0.n" /> days in the first bin at Anttila.
+- **Viikki soil temperature 2025.** The Viikki `tsoil` sensor at <ND k="sites.viikki.sensorDepthCm" /> cm has spikes up
+  to <Num k="method.findingNumbers.VII-04.maxTsoil" digits={1} unit="°C" /> after field work in May, August and September 2025
+  (finding <FINDING id="VII-04" />; status: waits for provider) <Cite ids={['anomaly-report']} />. On
+  <ND k="method.findingNumbers.VII-04.days" /> days the daily mean can be <Num k="method.findingNumbers.VII-04.dailyBiasLo" digits={0} /> to
+  <Num k="method.findingNumbers.VII-04.dailyBiasHi" digits={0} unit="°C" /> too high. Some of these days are
+  in the <ND k="method.fertDays" /> days after the fertilisation of 2025-05-10. The dive does not remove them.
+- **Autocorrelated days.** Daily values next to each other are not independent. The p-values of the Spearman ρ assume
+  independent days and are therefore too small. The OLS uses HAC standard errors, and the paired difference uses a block
+  bootstrap, but these corrections are approximate.
+- **Fertilisation days.** The <ND k="method.fertDays" /> days after a fertilisation hold a large share of the N₂O sum at some site-years (up to
+  <SH s="sarkisuo" y="2022" /> at Särkisuo 2022; this partial year has no values before {raw.soilTypeCompare.ch4.first}, so its
+  share is of a smaller sum). The N₂O relations change without these days (section "Fertilisation days").
+  The event dates come from the management records; an event that is not in `db/events.parquet` is not removed.
+- **Correlation, not cause.** Soil temperature, soil water, plant growth and management change together during the
+  year. The relations on this page are correlations. They do not show which variable causes a flux.
+- **Snapshot.** The database snapshot of this dive (built {d.dataVersion.snapshot.builtAt}) is not yet published as a
+  release asset. The hashes in "Reproduce" identify it.
+
+## References
+
+<References ids={frontmatter.references} />
+
+## Reproduce
+
+The numbers on this page come from `analysis/soil-ghg-drivers/results.json`. The Python script
+<a href={`${REPO_URL}/blob/main/analysis/soil-ghg-drivers/soil-ghg-drivers.py`}><code>analysis/soil-ghg-drivers/soil-ghg-drivers.py</code></a>
+writes this file, `manifest.json` and the four SVG figures. It reads only the database snapshot built on
+{d.dataVersion.snapshot.builtAt}. Release: {d.dataVersion.snapshot.url ? <a href={d.dataVersion.snapshot.url}>{d.dataVersion.snapshot.url}</a> : 'not yet published'}.
+The table gives the SHA-256, the row count and the columns read of each file (the paths are relative to the folder of
+`--db`); the script stops when a hash does not agree. The folder
+<a href={`${REPO_URL}/tree/main/analysis/soil-ghg-drivers`}><code>analysis/soil-ghg-drivers/</code></a> has the lock file,
+the unit tests and a README.
+
+<div class="table-wrap">
+<table>
+<caption>Input files of the snapshot (database built {d.dataVersion.snapshot.builtAt}).</caption>
+<thead>
+<tr><th scope="col">File</th><th scope="col">SHA-256</th><th scope="col" class="num">Rows</th><th scope="col">Columns read</th></tr>
+</thead>
+<tbody>
+{inputs.map((r) => (<tr><td>{r.path}</td><td class="wrap"><code>{r.sha256}</code></td><td class="num">{r.rows}</td><td class="wrap"><code>{r.columns}</code></td></tr>))}
+</tbody>
+</table>
+</div>
+
+```sh
+npm run build:db                                 # make the inputs (the hashes must agree with the script)
+uv run analysis/soil-ghg-drivers/soil-ghg-drivers.py --db db
+uv run analysis/soil-ghg-drivers/soil-ghg-drivers.py --db db --check
+npm run deep-dives -- --check                    # all dives, TypeScript and Python
+```

@@ -360,6 +360,8 @@ export interface DataLink {
   monthTo?: number;
   aggregation: Aggregation;
   events?: boolean;
+  /** x variable of the scatter and response diagrams (default: the data page default, `ta`). */
+  xVariable?: Variable;
   /** Diagram types, for example ['timeseries']. */
   diagrams: string[];
 }
@@ -373,6 +375,7 @@ export function dataPageHref(base: string, link: DataLink): string {
     params: {
       ...params,
       variables: [...link.variables],
+      xVariable: link.xVariable ?? params.xVariable,
       yearFrom: link.yearFrom,
       yearTo: link.yearTo,
       monthFrom: link.monthFrom ?? null,
